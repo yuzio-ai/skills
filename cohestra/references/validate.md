@@ -2,6 +2,20 @@
 
 通过 $cohestra validate 调用；与 [公共流程](workflow.md) 一起执行。
 
+## 调用
+
+```text
+$cohestra validate
+.cohestra/handoffs/<task-slug>/review-01.md
+```
+
+已有有效候选、只缺证据时，直接给任务目录或 code/fix 交付：
+
+```text
+$cohestra validate
+.cohestra/handoffs/<task-slug>/code-01.md
+```
+
 ## 输入与职责
 
 输入为任务目录、最终候选的 review，或按既定要求无需复审的 code/fix。读取有效验收条件、候选来源和适用证据。业务候选只读，允许在已有授权内补验证、写验收交付和任务索引，不自行修复或改写验收要求。
@@ -20,5 +34,7 @@
 ## 交付与停止
 
 在原任务目录新增 `validate-<轮次>.md`，采用 [交付骨架](../assets/handoff.md)，按公共流程落盘、回读并串行同步任务索引。
+
+对口 verify：validate 是整条链的最终验证关口，交付后不提议 verify。需要单独核对证据与 AC 的对应（如未验证项被写成通过）时，由用户主动调用 `$cohestra verify`；发现偏差时回相应阶段，不改写验收记录。
 
 范围完成、必做问题关闭、要求的复审完成且必要证据齐全时交付完成结论；否则推荐相应阶段并说明缺口、前提与负责人。验证完成不自动授权提交或发布。下一步使用 `$cohestra <阶段>` 加本轮交付物或任务目录与补充指令；交付后停止，不自动执行下一阶段。

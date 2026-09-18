@@ -4,7 +4,7 @@
 
 | Skill | 用途 | 入口 |
 |---|---|---|
-| cohestra | 初始化项目上下文，按六阶段或 quick 模式执行并落盘交接 | [SKILL.md](cohestra/SKILL.md) |
+| cohestra | 初始化项目上下文，六阶段可从任意阶段起步，缺容器时先提醒并初始化，阶段间用 verify 核对偏差 | [SKILL.md](cohestra/SKILL.md) |
 
 ## 安装 cohestra
 
@@ -31,7 +31,15 @@ npx skills add /absolute/path/to/skills --skill cohestra -a <tool>
 
 ## 调用
 
-以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。先初始化项目，再选择阶段，每次只读取对应说明。
+以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。目标项目没有 `.cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。
+
+| 诉求 | 起步 |
+|---|---|
+| 新的完整产品需求 | need，走到 validate |
+| 发现 bug，或已定位的缺陷 | fix（已有 findings）或 code（本轮直接定位） |
+| 页面样式探索与优化 | design → code |
+| 接口参数、文案等明确小改 | code → review |
+| 已有候选、只缺证据 | validate |
 
 ```text
 $cohestra init
@@ -40,25 +48,28 @@ $cohestra need
 需求：<目标、范围、约束和参考>
 
 $cohestra design
-.cohestra/handoffs/<task-slug>/need-01.md
+需求：<要探索的页面与目标>
+参考：<截图或现状链接>
 
 $cohestra code
-.cohestra/handoffs/<task-slug>/design-01.md
+需求：<改动内容与范围>
+参考：<相关文件或接口文档>
 
 $cohestra review
 .cohestra/handoffs/<task-slug>/code-01.md
 
 $cohestra fix
-.cohestra/handoffs/<task-slug>/review-01.md
+问题：<症状、预期行为、范围和参考>
 
 $cohestra validate
-.cohestra/handoffs/<task-slug>/fix-01.md
+.cohestra/handoffs/<task-slug>/review-01.md
 
-$cohestra quick
-问题：<原始症状、预期行为、范围和参考>
+$cohestra verify
+被核对：.cohestra/handoffs/<task-slug>/design-01.md
+上游依据：.cohestra/handoffs/<task-slug>/need-01.md
 ```
 
-handoff 也可替换为对应任务目录，由任务 README 定位有效输入。六阶段代表职责，不要求机械走完；没有整改就不产生 fix。标准阶段交付后停止，quick 在既有授权内组合低风险修复；不自动分派智能体、提交或发布。
+handoff 也可替换为对应任务目录，由任务 README 定位有效输入。六阶段代表职责，不要求机械走完，也不必从 need 起步；没有整改就不产生 fix。need、design、code、fix 交付后会询问是否执行一次 `verify`，轻量需求可以由用户跳过，跳过理由记入交付物；`review`、`validate` 本身是正式验证关口，不重复提议。`verify` 只核对阶段间偏差，不替代 review 的缺陷审查或 validate 的验收取证。各阶段交付后停止，不自动分派智能体、提交或发布。
 
 ## 更新与职责
 
@@ -67,7 +78,7 @@ npx skills update cohestra -p
 npx skills update cohestra -g
 ```
 
-- 技能包保存规则、阶段说明和交付骨架；`.cohestra` 只保存项目入口、任务交付和复盘，不复制提示词。
+- 技能包保存规则、阶段说明、调用片段和交付骨架；`.cohestra` 只保存项目入口、任务交付和复盘，不复制提示词。
 - 安装来源为本地路径时，按名称更新可能不识别项目级安装而静默不做任何事；此时按名称重装并核对副本与锁文件，仍不用文件复制代替。
 - 没有 `$cohestra update` 项目同步命令；更新技能后，后续调用使用实际加载版本，历史决定和交付不回写。
 - 用户级更新影响后续调用。项目需要独立固定版本时使用项目级安装，记录安装文件和 CLI 的锁文件，通过 Git 审查更新；锁文件不等于所有安装器都保证固定到同一 commit。
@@ -76,7 +87,7 @@ npx skills update cohestra -g
 
 ## 维护与验证
 
-发行版 **0.4.1**，协作协议 **v0.3**。流程与提示词由 [公共流程](cohestra/references/workflow.md) 和对应阶段说明共同定义。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。
+发行版 **0.6.0**，协作协议 **v0.5**。流程与提示词由 [公共流程](cohestra/references/workflow.md) 和对应阶段说明共同定义。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。
 
 修改后按 [验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。
 

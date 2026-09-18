@@ -6,7 +6,7 @@
 
 ## 使用
 
-在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `quick`，后附原始需求、已有 handoff 文件或任务目录及本次补充。其他工具使用各自的技能调用写法。
+在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。
 
 - [handoffs/](handoffs/)：每个任务一个目录，其 README 保存有效决定、候选、分开的状态和下一步；阶段结论单独落盘。
 - [retrospectives/](retrospectives/)：按需保存复盘，不作为每阶段必读输入。

@@ -2,6 +2,13 @@
 
 通过 $cohestra review 调用；与 [公共流程](workflow.md) 一起执行。
 
+## 调用
+
+```text
+$cohestra review
+.cohestra/handoffs/<task-slug>/code-01.md
+```
+
 ## 输入与职责
 
 输入为任务目录或 code/fix 交付，读取有效需求/设计、固定候选、前次 findings 及复审要求。业务文件只读，允许在授权范围内做审查检查、写审查交付与任务索引，不自行修复。
@@ -21,5 +28,7 @@
 ## 交付与停止
 
 在原任务目录新增 `review-<轮次>.md`，采用 [交付骨架](../assets/handoff.md)，按公共流程落盘、回读并串行同步任务索引。
+
+对口 verify：review 本身就是 code、fix 的正式验证关口，交付后不提议 verify。需要先做偏差核对再定审查范围时，可在 review 前由用户主动调用 `$cohestra verify`。
 
 必做整改转 fix，否则转 validate。列出剩余证据、可执行条件、缺失前提和负责人；全部受阻时只需最小核对与简短待验证交付。下一步使用 `$cohestra <阶段>` 加本轮交付物或任务目录与补充指令；交付后停止，不自动执行下一阶段。
