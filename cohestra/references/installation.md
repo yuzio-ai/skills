@@ -1,0 +1,42 @@
+# 安装与版本
+
+技能包采用标准 SKILL.md 目录结构，可由 [skills CLI](https://github.com/vercel-labs/skills) 安装，也可完整复制到工具识别的位置。通过 CLI 安装需要 Node.js/npm；技能阶段本身不依赖 Node.js 或 Python，业务任务的环境要求另按项目规则。
+
+## 安装
+
+在目标项目根目录执行：
+
+```sh
+npx skills add yuzio-ai/skills --skill cohestra
+npx skills add yuzio-ai/skills --skill cohestra -g
+npx skills add yuzio-ai/skills --skill cohestra -a codex codebuddy
+```
+
+第一条为项目级，第二条为用户级，第三条为项目级指定工具；按需要选用，不默认重复安装。目录和链接方式交给 CLI，优先复用其标准链接机制，不另行创建每工具一套规则。工具不支持链接时按 CLI 提供的复制选项安装。
+
+未发布内容时，可将来源替换为源仓库绝对路径。手动复制须包含全部引用与 assets，不能只复制 SKILL.md。安装成功不等于工具已发现或执行；必要时刷新工具，并实际确认入口可见。
+
+选择了某个工具也不保证 CLI 创建尚未配置的工具目录：例如 1.5.23 的项目链接模式会跳过不存在 `.codebuddy` 目录的 CodeBuddy 入口。核对安装结果中的实际路径，按该工具正常配置入口后重装；需要复制模式时显式选择 `--copy`，不擅自创建工具配置来掩盖缺失。
+
+同名技能可能同时出现在工具选择器中，不假设仓库级一定覆盖用户级。明确本次加载路径；不要为解决重复入口擅自删除其他作用域安装或修改工具配置。
+
+## 更新
+
+```sh
+npx skills update cohestra -p
+npx skills update cohestra -g
+```
+
+分别更新项目级或用户级安装，不默认更新全部技能。更新权限不扩展到项目任务或发布；手动安装由其维护者显式替换技能包，不冒称由 CLI 管理。
+
+CLI 功能随版本变化，先以实际 `npx skills --help` 为准；不支持按名称和作用域更新的旧版，应先解决 CLI 版本，不退回扩大范围的全量更新。`check` 在部分版本进入更新流程，不能假定只读。
+
+本技能不实现远程下载、固定标签安装、自动回滚或第二份安装 manifest。升级内容和安装器的锁文件由所选安装方式管理，不声称所有工具具有相同的版本固定保证。
+
+用户级升级影响后续调用；项目级可随 Git 管理独立版本。每轮交付记录当前 release.json 的发行版本和协议版本，旧交付不改写。没有 `$cohestra update`；`.cohestra` 没有需要同步的提示词副本，项目已有任务的有效决定和验收条件仍由任务索引定位。
+
+## 保留的项目边界
+
+`$cohestra init` 是安装后交给智能体的指派，仅建立或复用上下文容器。`npx skills init` 则创建新的 SKILL.md，二者不同。
+
+多个工具访问同一工作区时复用项目 `.cohestra`；不同 worktree 仍需通过 Git 同步。不把技能安装器的锁视为阶段或业务文件写入锁。旧目录处理按 [init](init.md)，普通阶段不修改初始化布局。

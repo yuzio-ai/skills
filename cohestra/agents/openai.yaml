@@ -1,0 +1,3 @@
+interface:
+  display_name: "Cohestra"
+  short_description: "初始化项目协作上下文，按六阶段或轻量模式执行并保存可追溯交接记录"
