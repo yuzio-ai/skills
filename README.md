@@ -75,7 +75,7 @@ npx skills update cohestra -g
 
 ## 维护与验证
 
-发行版 **0.4.0**，协作协议 **v0.3**。流程与提示词由 [公共流程](cohestra/references/workflow.md) 和对应阶段说明共同定义。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。
+发行版 **0.4.1**，协作协议 **v0.3**。流程与提示词由 [公共流程](cohestra/references/workflow.md) 和对应阶段说明共同定义。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。
 
 修改后按 [验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。
 
