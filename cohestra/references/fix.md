@@ -33,8 +33,8 @@ $cohestra fix
 
 ## 交付与停止
 
-在原任务目录新增 `fix-<轮次>.md`，采用 [交付骨架](../assets/handoff.md)，按公共流程落盘、回读并串行同步任务索引。
+新增 `fix-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
-对口 verify：修复与 review findings 的对应关系由既定复审覆盖；交付时仍向用户提出是否加做一次 `$cohestra verify` 单列偏差，并说明此处通常跳过。不复审代替裁决。
+对口 verify：修复与 review findings 的对应关系由既定复审覆盖，交付时仍按第 6 节提议一次并给出建议核对范围。review 复审不替代 fix 的逐条裁决，两者职责不同。
 
-按既定要求转 review 复审，否则转 validate。传递本轮 fix、原 findings、剩余证据与前提；优先原作者整改、原 reviewer 复查，未确定角色标待指派。下一步使用 `$cohestra <阶段>` 加本轮交付物或任务目录与补充指令；交付后停止，不自动执行下一阶段。
+按既定要求转 review 复审，否则转 validate。传递本轮 fix、原 findings、剩余证据与前提；优先原作者整改、原 reviewer 复查，未确定角色标待指派。

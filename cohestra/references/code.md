@@ -34,8 +34,8 @@ $cohestra code
 
 ## 交付与停止
 
-在原任务目录新增 `code-<轮次>.md`，采用 [交付骨架](../assets/handoff.md)，按公共流程落盘、回读并串行同步任务索引。
+新增 `code-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
-对口 verify：交付时向用户提出是否执行 `$cohestra verify`，建议核对 code 与 design 的偏差；正式代码验证关口仍是 `$cohestra review`，两者不互相替代。用户选择跳过时在本轮交付物中写明理由。
+对口 verify：建议核对 code 与 design 的偏差。正式代码验证关口仍是 `$cohestra review`，两者不互相替代。
 
-通常推荐 review，传递本轮 code 与固定候选；缺少可审条件时准确说明。下一步使用 `$cohestra <阶段>` 加本轮交付物或任务目录与补充指令；交付后停止，不自动执行下一阶段。
+推荐下一步 review，传递本轮 code 与固定候选；缺少可审条件时准确说明。

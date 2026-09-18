@@ -1,0 +1,76 @@
+# YUZIO Skills
+
+[English](README.md) · **中文**
+
+集中维护可复用的智能体技能。安装方式交给通用工具，任务上下文保留在各项目中。
+
+| Skill | 用途 | 入口 |
+|---|---|---|
+| cohestra | 初始化项目上下文，六阶段可从任意阶段起步，缺容器时先提醒并初始化，阶段间用 verify 核对偏差 | [SKILL.md](cohestra/SKILL.md) |
+
+## cohestra
+
+把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。
+
+规则与阶段提示词保存在技能包内，本文件只做导读；规则真源是下列文件。
+
+| 想了解 | 读 |
+|---|---|
+| 路由、执行规则、版本与来源 | [cohestra/SKILL.md](cohestra/SKILL.md) |
+| 公共流程、术语、落盘与共享写入规则 | [references/workflow.md](cohestra/references/workflow.md) |
+| 各阶段职责与可直接粘贴的调用片段 | [references/](cohestra/references/) |
+| 交付骨架与任务索引骨架 | [assets/](cohestra/assets/) |
+| 安装、更新与工具边界 | [references/installation.md](cohestra/references/installation.md) |
+| 维护者验收清单 | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
+
+## 安装
+
+在目标项目根目录执行，默认项目级安装：
+
+```sh
+npx skills add yuzio-ai/skills --skill cohestra
+```
+
+用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra 目录](cohestra/) 放入工具支持的技能位置。
+
+命令全集、更新方式，以及本地来源按名称更新会静默空转的排查，见 [安装说明](cohestra/references/installation.md)。
+
+## 调用
+
+以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。目标项目没有 `.cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。
+
+```text
+$cohestra init
+
+$cohestra need
+需求：<目标、范围、约束和参考>
+
+$cohestra design
+需求：<要探索的页面与目标>
+参考：<截图、现状链接或设计规范>
+
+$cohestra code
+需求：<改动内容与范围>
+参考：<相关文件、接口文档或截图>
+
+$cohestra review
+.cohestra/handoffs/<task-slug>/code-01.md
+
+$cohestra fix
+问题：<症状、预期行为、范围和参考>
+
+$cohestra validate
+.cohestra/handoffs/<task-slug>/review-01.md
+
+$cohestra verify
+被核对：.cohestra/handoffs/<task-slug>/design-01.md
+上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+```
+
+handoff 也可替换为对应任务目录，由任务 README 定位有效输入。起步选择、停止规则与各阶段的对口 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
+
+## 维护
+
+发行版 **0.7.0**，协作协议 **v0.6**，发行版本在 [release.json](cohestra/release.json) 维护。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。本文件有英文对应版 [README.md](README.md)，改动内容时两版一并同步。
+
+修改后按 [验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。

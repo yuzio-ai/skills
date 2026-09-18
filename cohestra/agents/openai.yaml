@@ -1,3 +1,0 @@
-interface:
-  display_name: "Cohestra"
-  short_description: "初始化项目协作上下文，六阶段可从任意阶段起步并保存可追溯交接记录；缺 .cohestra 时先提醒并初始化"
