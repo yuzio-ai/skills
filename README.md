@@ -18,13 +18,13 @@ npx skills add yuzio-ai/skills --skill cohestra
 
 ```sh
 npx skills add yuzio-ai/skills --skill cohestra -g
-npx skills add yuzio-ai/skills --skill cohestra -a codex codebuddy
+npx skills add yuzio-ai/skills --skill cohestra -a <tool-a> <tool-b>
 ```
 
 远程命令需要源仓库已发布相应内容。尚未推送时，可从目标项目使用源仓库的本地路径：
 
 ```sh
-npx skills add /absolute/path/to/skills --skill cohestra -a codex
+npx skills add /absolute/path/to/skills --skill cohestra -a <tool>
 ```
 
 技能目录、链接/复制和安装记录由 [skills CLI](https://github.com/vercel-labs/skills) 管理。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra 目录](cohestra/) 放入工具支持的技能位置。
