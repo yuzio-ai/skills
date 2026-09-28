@@ -1,0 +1,3 @@
+# Task-local large logs, caches and build products are not run records.
+/runs/*/scratch/
+.DS_Store

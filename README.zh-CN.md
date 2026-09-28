@@ -7,6 +7,7 @@
 | Skill | 用途 | 入口 |
 |---|---|---|
 | cohestra | 初始化项目上下文，六阶段可从任意阶段起步，缺容器时先提醒并初始化，阶段间用 verify 核对偏差 | [SKILL.md](cohestra/SKILL.md) |
+| cadra | 管理任务准备、队列、顺序、状态、恢复和执行报告，无人值守串行推进；单任务工程流程交由 Cohestra 阶段 | [SKILL.md](cadra/SKILL.md) |
 
 ## cohestra
 
@@ -23,15 +24,30 @@
 | 安装、更新与工具边界 | [references/installation.md](cohestra/references/installation.md) |
 | 维护者验收清单 | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
 
+## cadra
+
+Cadra 是任务编排：管理任务准备、队列、顺序、状态、恢复和执行报告，在无人值守 Run 中按既定顺序串行推进。它不定义单任务内部的工程流程——那归 Cohestra；Cadra 只声明阶段序列（flow preset）并调用 Cohestra 阶段，且只依据 Cohestra 的机器可读状态驱动。
+
+Task 走 **draft → ready → queued → running → completed / blocked / failed**；Run 串行执行（`parallelism = 1`），终态为 completed、stopped 或 interrupted，`resume` 从持久化状态恢复未完成 Run，不重复已完成任务与已完成阶段。
+
+| 想了解 | 读 |
+|---|---|
+| 路由、执行规则、边界、版本与来源 | [cadra/SKILL.md](cadra/SKILL.md) |
+| Task/Run 状态机、队列顺序、Flow Preset、Cohestra 调用契约、unattended 规则 | [references/workflow.md](cadra/references/workflow.md) |
+| 各入口职责（add / ready / list / run / resume / report） | [references/](cadra/references/) |
+| 任务与 Run 骨架、`.cadra` 容器模板 | [assets/](cadra/assets/) |
+| 维护者验收清单 | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
+
 ## 安装
 
 在目标项目根目录执行，默认项目级安装：
 
 ```sh
 npx skills add yuzio-ai/skills --skill cohestra
+npx skills add yuzio-ai/skills --skill cadra
 ```
 
-用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra 目录](cohestra/) 放入工具支持的技能位置。
+用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra](cohestra/) 或 [cadra](cadra/) 目录放入工具支持的技能位置。
 
 命令全集、更新方式，以及本地来源按名称更新会静默空转的排查，见 [安装说明](cohestra/references/installation.md)。
 
@@ -69,8 +85,32 @@ $cohestra verify
 
 handoff 也可替换为对应任务目录，由任务 README 定位有效输入。起步选择、停止规则与各阶段的对口 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
 
+Cadra 调用管理这些阶段外围的任务队列；目标项目没有 `.cadra` 时会先提醒并执行一次最小初始化：
+
+```text
+$cadra add
+任务：<title>
+需求：<目标、范围与验收条件>
+
+$cadra ready
+任务：<task-slug>
+
+$cadra list
+
+$cadra run
+范围：<task-slug 列表，或“全部 ready”>
+
+$cadra resume
+Run：<run-id>
+
+$cadra report
+Run：<run-id>
+```
+
+参数标签保持中文，原因同上。任务与调度状态保存在 `.cadra`；单任务流程与工程证据保存在 `.cohestra`，两者只通过引用关联，不互相复制内容。状态机、Ready Gate、Cohestra 调用契约与 unattended 规则见 [cadra/references/workflow.md](cadra/references/workflow.md)。
+
 ## 维护
 
-发行版 **0.8.0**，协作协议 **v0.7**，发行版本在 [release.json](cohestra/release.json) 维护。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。本文件有英文对应版 [README.md](README.md)，改动内容时两版一并同步。
+发行版 **0.8.0**，协作协议 **v0.7**；cadra 发行版 **0.1.0**，任务/Run 协议 **v0.1**，发行版本分别在 [cohestra/release.json](cohestra/release.json) 与 [cadra/release.json](cadra/release.json) 维护。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。本文件有英文对应版 [README.md](README.md)，改动内容时两版一并同步。
 
-修改后按 [验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。
+修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。

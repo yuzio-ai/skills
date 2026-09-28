@@ -7,6 +7,7 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 | Skill | Purpose | Entry |
 |---|---|---|
 | cohestra | Initializes project context; the six stages can start from any stage; initializes first when the container is missing; uses verify to check for drift between stages | [SKILL.md](cohestra/SKILL.md) |
+| cadra | Manages task preparation, queue, order, status, recovery and run reports; serial unattended execution; single-task engineering flow is delegated to Cohestra stages | [SKILL.md](cadra/SKILL.md) |
 
 ## cohestra
 
@@ -23,15 +24,30 @@ The rules and stage prompts live inside the skill package (currently documented 
 | Install, update and tool boundaries | [references/installation.md](cohestra/references/installation.md) |
 | Maintainer acceptance checklist | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
 
+## cadra
+
+Cadra is task orchestration: it manages task preparation, queue, order, status, recovery and run reports, and advances queued tasks serially in unattended runs. It does not define the engineering stages — those belong to Cohestra; Cadra only declares a stage sequence (flow preset) and calls Cohestra stages, driven strictly by Cohestra's machine-readable state.
+
+A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages.
+
+| To learn about | Read |
+|---|---|
+| Routing, execution rules, boundaries, version and provenance | [cadra/SKILL.md](cadra/SKILL.md) |
+| Task/Run state machines, queue order, flow presets, Cohestra contract, unattended rules | [references/workflow.md](cadra/references/workflow.md) |
+| Per-entry responsibilities (add / ready / list / run / resume / report) | [references/](cadra/references/) |
+| Task and run skeletons, `.cadra` container template | [assets/](cadra/assets/) |
+| Maintainer acceptance checklist | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
+
 ## Install
 
 Run from the root of the target project; the default scope is project-level:
 
 ```sh
 npx skills add yuzio-ai/skills --skill cohestra
+npx skills add yuzio-ai/skills --skill cadra
 ```
 
-Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra directory](cohestra/) where your tool looks for skills.
+Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/) or [cadra](cadra/) directory where your tool looks for skills.
 
 The full command set, how to update, and how to diagnose a local source that silently no-ops when updated by name are in the [installation guide](cohestra/references/installation.md).
 
@@ -69,8 +85,32 @@ $cohestra verify
 
 The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / 上游依据) are Chinese because the skill's own prompts are written in Chinese; keep them as shown, only the placeholders change. A handoff path may also be replaced by the corresponding task directory, whose task README points to the valid inputs. Starting-point selection, stop rules and each stage's paired verify convention are in [cohestra/SKILL.md](cohestra/SKILL.md) and the [common flow](cohestra/references/workflow.md).
 
+Cadra invocations manage the task queue around those stages; when the target project has no `.cadra`, the skill warns first and runs a minimal initialization:
+
+```text
+$cadra add
+任务：<title>
+需求：<目标、范围与验收条件>
+
+$cadra ready
+任务：<task-slug>
+
+$cadra list
+
+$cadra run
+范围：<task-slug 列表，或“全部 ready”>
+
+$cadra resume
+Run：<run-id>
+
+$cadra report
+Run：<run-id>
+```
+
+The labels are Chinese for the same reason as above. Task state lives in `.cadra`; the single-task flow and engineering evidence live in `.cohestra`, linked by reference and never copied across. The state machines, Ready Gate, Cohestra call contract and unattended rules are in [cadra/references/workflow.md](cadra/references/workflow.md).
+
 ## Maintenance
 
-Release **0.8.0**, collaboration protocol **v0.7**. The release version is maintained in [release.json](cohestra/release.json). The skill itself is only Markdown, templates and metadata: it has no Python dependency and ships no installer of its own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
+Release **0.8.0**, collaboration protocol **v0.7**; cadra is release **0.1.0**, task/run protocol **v0.1**. Release versions are maintained in [cohestra/release.json](cohestra/release.json) and [cadra/release.json](cadra/release.json). The skills are only Markdown, templates and metadata: no Python dependency and no installer of their own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
 
-After any change, check routing, documentation links, temporary installation and the handoff flow against the [validation scenarios](tests/cohestra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).
+After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).
