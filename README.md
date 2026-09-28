@@ -71,6 +71,6 @@ The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / �
 
 ## Maintenance
 
-Release **0.7.0**, collaboration protocol **v0.6**. The release version is maintained in [release.json](cohestra/release.json). The skill itself is only Markdown, templates and metadata: it has no Python dependency and ships no installer of its own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
+Release **0.8.0**, collaboration protocol **v0.7**. The release version is maintained in [release.json](cohestra/release.json). The skill itself is only Markdown, templates and metadata: it has no Python dependency and ships no installer of its own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
 
 After any change, check routing, documentation links, temporary installation and the handoff flow against the [validation scenarios](tests/cohestra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).

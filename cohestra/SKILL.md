@@ -6,11 +6,11 @@ license: MIT
 
 # Cohestra
 
-一个技能，按阶段读取说明。技能包保存协作规则和提示词；项目 `.cohestra` 只保存项目入口、任务交付和复盘。技能版本见 [release.json](release.json)，协作协议为 v0.6。AC、handoff、findings、候选、轮次、阶段状态与工作项状态等术语见 [公共流程](references/workflow.md)。
+一个技能，按阶段读取说明。技能包保存协作规则和提示词；项目 `.cohestra` 只保存项目入口、任务交付和复盘。技能版本见 [release.json](release.json)，协作协议为 v0.7。AC、handoff、findings、候选、轮次、阶段状态与工作项状态等术语见 [公共流程](references/workflow.md)。
  
 ## 路由
 
-`$cohestra <入口>` 表示技能调用意图，不是终端命令；其他工具采用其技能调用写法。调用后附原始需求、handoff 文件或任务目录，以及本次补充。
+`$cohestra <入口>` 表示技能调用意图，不是终端命令；其他工具采用其技能调用写法。调用后附原始需求、handoff 文件或任务目录，以及本次补充；未附 handoff 与任务目录时按[公共流程](references/workflow.md)第 1 节的自动衔接规则取用。
 
 | 入口 | 按需读取 | 职责 |
 |---|---|---|
