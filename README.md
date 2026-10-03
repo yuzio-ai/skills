@@ -13,6 +13,8 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 
 One collaboration is split into six stages — **need → design → code → review → fix → validate** — plus `init`, which creates the project container, and `verify`, which checks for drift between stages. The six stages are a list of responsibilities, not a mandatory route: any stage can be the starting point, and the user decides where the work ends.
 
+Every task README carries a machine-readable contract as YAML front matter — task status, stage result, candidate, blocking state, the next stage and whether continuing is allowed — so an external orchestrator can drive single-stage calls without parsing prose; the fields and enums are defined in the common flow, section 7. The Markdown body stays human-readable. Cohestra runs one stage per call, stops when the stage ends, and knows nothing about queues or schedulers: orchestration stays outside the skill.
+
 The rules and stage prompts live inside the skill package (currently documented in Chinese); this file is only a guide. The sources of truth are the files below.
 
 | To learn about | Read |
@@ -28,7 +30,9 @@ The rules and stage prompts live inside the skill package (currently documented 
 
 Cadra is task orchestration: it manages task preparation, queue, order, status, recovery and run reports, and advances queued tasks serially in unattended runs. It does not define the engineering stages — those belong to Cohestra; Cadra only declares a stage sequence (flow preset) and calls Cohestra stages, driven strictly by Cohestra's machine-readable state.
 
-A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages.
+A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages. A run is only created after the target passes the Git / `.cohestra` precondition check. Dependency chains advance one layer per run: a task passes the Ready Gate and enters the queue only after every dependency is completed, so a run never holds a task together with an unfinished dependency.
+
+For a new task without any prior delivery or call, `run` starts at the first stage in its flow. To recover blocked or failed tasks, explicitly select them in a new `run`; the previous run keeps its recorded outcome. Editing the definition of a task that already reached a terminal state sends it back to draft and through the Ready Gate again, with the old and new definitions kept side by side. Requirement or flow changes restart at the new flow's first stage. Changes limited to dependencies or execution policy retry the verified pending stage for blocked/failed tasks, or close the revision without a stage call for completed tasks. Task definitions cannot be edited while their run is unfinished. Unattended execution is bounded by three limits: a per-stage failure retry budget (2 extra calls), a remediation-round cap (3 rounds) and a per-task call budget (16 calls); exhausting any of them records `failed` and adds the task to the human-intervention list. The no-progress check fires only when two consecutive calls of the same stage leave every structured field unchanged; the validate in-stage evidence backfill is exempt and bounded by the call budget instead. Enqueue and dequeue use a three-step write with an operation id, and `resume` idempotently completes a partially written enqueue or dequeue. An existing seven-column queue list is not migrated: a new eight-column block is appended and used from then on.
 
 | To learn about | Read |
 |---|---|
@@ -99,6 +103,7 @@ $cadra list
 
 $cadra run
 范围：<task-slug 列表，或“全部 ready”>
+恢复：<blocked/failed task-slug 列表；可空，有值时必须包含在显式范围中>
 
 $cadra resume
 Run：<run-id>
@@ -111,6 +116,6 @@ The labels are Chinese for the same reason as above. Task state lives in `.cadra
 
 ## Maintenance
 
-Release **0.8.0**, collaboration protocol **v0.7**; cadra is release **0.1.0**, task/run protocol **v0.1**. Release versions are maintained in [cohestra/release.json](cohestra/release.json) and [cadra/release.json](cadra/release.json). The skills are only Markdown, templates and metadata: no Python dependency and no installer of their own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
+Release **0.9.0**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**. Release versions are maintained in [cohestra/release.json](cohestra/release.json) and [cadra/release.json](cadra/release.json). When the Cohestra collaboration protocol version changes, Cadra must ship a matching release that supports the new contract; until then Cadra runs stop at the contract-not-ready check. The skills are only Markdown, templates and metadata: no Python dependency and no installer of their own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
 
 After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).

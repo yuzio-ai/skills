@@ -1,0 +1,363 @@
+{
+  "model": "cadra-v0.5-doc-model",
+  "note": "文档模型推演，非 Cadra 运行时，未调用 Cohestra 阶段",
+  "constants": {
+    "retry_budget_appended": 2,
+    "remediation_cap": 3,
+    "task_call_budget": 16
+  },
+  "total": 52,
+  "passed": 52,
+  "groups": {
+    "A 三项上限": {
+      "passed": 7,
+      "total": 7
+    },
+    "B 无进展": {
+      "passed": 7,
+      "total": 7
+    },
+    "C 部分写入": {
+      "passed": 9,
+      "total": 9
+    },
+    "D 判定顺序": {
+      "passed": 4,
+      "total": 4
+    },
+    "E 出队阶段": {
+      "passed": 7,
+      "total": 7
+    },
+    "F 旧清单升级": {
+      "passed": 3,
+      "total": 3
+    },
+    "G 旧行收尾": {
+      "passed": 5,
+      "total": 5
+    },
+    "H 恢复入口贯通": {
+      "passed": 6,
+      "total": 6
+    },
+    "I 依赖兜底": {
+      "passed": 4,
+      "total": 4
+    }
+  },
+  "cases": [
+    {
+      "group": "A 三项上限",
+      "case": "A1 失败重试预算：比较字段有变化时追加 2 次后耗尽",
+      "ok": true,
+      "detail": "比较字段有变化的重试追加 2 次后耗尽（上限 2）"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A1b 无进展优先于重试预算（加速停止）",
+      "ok": true,
+      "detail": "比较字段完全相同的失败由无进展先停，不再消费剩余重试额度"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A2 失败重试预算不因穿插其他阶段返还",
+      "ok": true,
+      "detail": "穿插其他阶段后 code 的失败重试不再可用"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A3 跨阶段整改循环有整体上限（原 P1）",
+      "ok": true,
+      "detail": "review→fix 交替 3 轮后耗尽（上限 3）"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A4 整改轮与失败重试预算是两个独立计数器",
+      "ok": true,
+      "detail": "fix 的失败重试预算耗尽不影响 blocking_findings 触发的整改轮计数"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A5 acceptance_failed 往复由调用预算兜底",
+      "ok": true,
+      "detail": "验收失败往复在 16 次调用后由任务预算兜底停止"
+    },
+    {
+      "group": "A 三项上限",
+      "case": "A6 正常完整路径不被三项上限误伤",
+      "ok": true,
+      "detail": "完整路径调用 8/16 次、整改 1/3 轮，未触及任何上限"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B1 validate 本阶段补证豁免无进展（原 P2）",
+      "ok": true,
+      "detail": "第二轮补证不再判 failed（原 P2 缺陷已修）"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B2 补证重复由调用预算兜底，不会无界",
+      "ok": true,
+      "detail": "补证重复在 16 次调用后由调用预算停止，不会无界"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B3 豁免只限 validate 补证出口",
+      "ok": true,
+      "detail": "同阶段自循环且非 validate 补证出口时仍判无进展"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B4 仅轮次增加不构成进展",
+      "ok": true,
+      "detail": "仅 round 增加不构成进展"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B5 可选字段缺失与显式 null 等价",
+      "ok": true,
+      "detail": "可选字段缺失与显式 null 视为同一取值，仍判无进展"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B5b 写有内容的可选字段与 null 不等价（残余口径，受预算兜底）",
+      "ok": true,
+      "detail": "写有内容的 findings 映射与 null 不等价，算一次变化；该口径可被用来规避无进展，但受 16 次调用预算兜底"
+    },
+    {
+      "group": "B 无进展",
+      "case": "B6 完成优先于无进展判据",
+      "ok": true,
+      "detail": "终态表第 1–9 行优先，已 completed 不因结果相同改判 failed"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C1 建 Run 后中断可幂等补齐（原 P3）",
+      "ok": true,
+      "detail": "Run 已写、Task 仍 ready、队列缺行 → 判定同一次入队并补齐 ②③"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C2 补齐幂等：重复 resume 不重复追加",
+      "ok": true,
+      "detail": "补齐后再次 resume 判定为已完成，不重复追加队列行"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C3 Task 已 queued 时只补队列行",
+      "ok": true,
+      "detail": "Task 已 queued 时只补第 ③ 步"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C4 定义快照不一致 → 停止不补写",
+      "ok": true,
+      "detail": "定义快照不一致时停止，不补写"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C5 状态与调用记录不相容 → 停止",
+      "ok": true,
+      "detail": "Task 为入队前状态却已有阶段调用记录 → 停止"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C6 同一编号多行 → 停止",
+      "ok": true,
+      "detail": "同一 enq 编号出现多行 → 停止"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C7 出队部分写入只补未写入的步骤",
+      "ok": true,
+      "detail": "出队只补未写入的步骤（Task 终态与队列回写）"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C8 补齐不放宽 add 的归属拒绝",
+      "ok": true,
+      "detail": "属于未完成 Run 时 add 仍拒绝编辑，补齐需求不放宽归属限制"
+    },
+    {
+      "group": "C 部分写入",
+      "case": "C9 无入队记录时不进入补齐路径",
+      "ok": true,
+      "detail": "Run 无 enq 记录时按其他恢复规则处理，不猜测补齐"
+    },
+    {
+      "group": "D 判定顺序",
+      "case": "D1 收尾结论优先于预算检查",
+      "ok": true,
+      "detail": "预算用满但已到正常 flow 边界 → 按边界收尾，不判 failed"
+    },
+    {
+      "group": "D 判定顺序",
+      "case": "D2 确需继续调用时才检查预算",
+      "ok": true,
+      "detail": "flow 内仍需调用时才检查预算：达到 16 次记 failed"
+    },
+    {
+      "group": "D 判定顺序",
+      "case": "D3 第三轮 fix 后仍进入必要复审",
+      "ok": true,
+      "detail": "整改轮用满后仍调用必要复审；复审不消耗整改轮"
+    },
+    {
+      "group": "D 判定顺序",
+      "case": "D4 上限只拦该原因的第 4 次 fix",
+      "ok": true,
+      "detail": "上限只拦该原因的第 4 次 fix"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E1 failed 终态出队补齐（原误判为矛盾）",
+      "ok": true,
+      "detail": "failed 终态 + 结果快照 → 判为出队补齐，不再误报「入队前状态却已有调用」"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E2 blocked 终态出队补齐（原误判为矛盾）",
+      "ok": true,
+      "detail": "blocked 终态同样按出队补齐，不与恢复任务入队前状态混淆"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E3 skipped 回退补齐 Task 状态（原会停在 queued）",
+      "ok": true,
+      "detail": "skipped 回退把 Task 写回 ready，并补队列行"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E4 completed 补齐 Task 终态（原会停在 running）",
+      "ok": true,
+      "detail": "补齐队列行之后 Task 不会停在 running"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E5 快照与 Task 状态互不相容 → 停止",
+      "ok": true,
+      "detail": "快照 completed 而 Task 为 ready 且无 skipped 回退 → 停止"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E6 出队三者一致 → noop",
+      "ok": true,
+      "detail": "三者一致时出队判定为已完成，不重复补齐"
+    },
+    {
+      "group": "E 出队阶段",
+      "case": "E7 入队阶段的 blocked 仍走入队规则",
+      "ok": true,
+      "detail": "入队阶段的 blocked 按入队规则补齐，不被出队规则误伤"
+    },
+    {
+      "group": "F 旧清单升级",
+      "case": "F1 七列旧表块 + 八列新表块合并读取",
+      "ok": true,
+      "detail": "旧七列表块缺列写 unknown，新八列行正常读取"
+    },
+    {
+      "group": "F 旧清单升级",
+      "case": "F2 新行只追加到八列表块",
+      "ok": true,
+      "detail": "追加行落在八列表块，旧七列块字节不变，无列错位"
+    },
+    {
+      "group": "F 旧清单升级",
+      "case": "F3 首次升级新建八列表块",
+      "ok": true,
+      "detail": "只有旧表块时新建八列表块，不向旧表块追加"
+    },
+    {
+      "group": "G 旧行收尾",
+      "case": "G1 旧行未出队 → 仍阻挡新 Run",
+      "ok": true,
+      "detail": "旧表块未出队行按逐行判据识别为待收尾，未完成 Run 继续阻挡新 Run"
+    },
+    {
+      "group": "G 旧行收尾",
+      "case": "G2 旧行收尾后允许新 Run（原无写入路径）",
+      "ok": true,
+      "detail": "就地回写既有结论单元格即为合法收尾，列结构不变、未新增编号列"
+    },
+    {
+      "group": "G 旧行收尾",
+      "case": "G3 再次 resume 无重复写入",
+      "ok": true,
+      "detail": "重复 resume 判定为已完成，无重复写入、无新增行"
+    },
+    {
+      "group": "G 旧行收尾",
+      "case": "G4 已出队的旧行不得改写",
+      "ok": true,
+      "detail": "已出队的旧行被冻结，后续结论不覆盖"
+    },
+    {
+      "group": "G 旧行收尾",
+      "case": "G5 混合表块时只改目标行",
+      "ok": true,
+      "detail": "收尾只改旧表块目标行，新表块字节与其余待出队行不受影响"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H1 旧记录按 run-id + slug 定位，编号缺失不停止",
+      "ok": true,
+      "detail": "旧 Run（无 enq-/deq- 编号）经恢复入口判定为可补齐，不再停止"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H2 端到端：入口 → 旧行收尾 → 允许新 Run",
+      "ok": true,
+      "detail": "入口判定 + 就地收尾后旧行已出队，未完成 Run 不再阻挡新 Run"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H3 端到端幂等：再次 resume 无重复写入",
+      "ok": true,
+      "detail": "再次 resume 判定为已完成：入口不重复补写，文本不重复写入"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H4 旧记录的入队阶段同样可达",
+      "ok": true,
+      "detail": "旧 Run 的入队阶段用 checkpoint 的入队定义快照核对并补齐"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H5 定位歧义仍停止",
+      "ok": true,
+      "detail": "同一 run-id + slug 多行且无编号可区分时停止，不放宽停止条件"
+    },
+    {
+      "group": "H 恢复入口贯通",
+      "case": "H6 无入队凭据时不猜测补齐",
+      "ok": true,
+      "detail": "既无编号又无入队定义快照时不进入补齐路径，仍按其他恢复规则处理"
+    },
+    {
+      "group": "I 依赖兜底",
+      "case": "I1 依赖在执行窗口被修订 → blocked",
+      "ok": true,
+      "detail": "依赖在排队期间被修订回 draft → 开始/续跑前记 blocked（依赖未满足）"
+    },
+    {
+      "group": "I 依赖兜底",
+      "case": "I2 blocked 解除路径：依赖新 Run → 显式恢复",
+      "ok": true,
+      "detail": "依赖回 completed 后 Gate 第 6 条重新满足，显式恢复可入队"
+    },
+    {
+      "group": "I 依赖兜底",
+      "case": "I3 依赖链逐层逐 Run，同 Run 不入队",
+      "ok": true,
+      "detail": "依赖未 completed 不得入队：同一 Run 不含任务与其未完成依赖"
+    },
+    {
+      "group": "I 依赖兜底",
+      "case": "I4 blocked 出队后允许新 Run（自锁解除）",
+      "ok": true,
+      "detail": "blocked 出队后队列无待出队行，依赖任务可经新 Run 执行"
+    }
+  ]
+}

@@ -13,6 +13,8 @@
 
 把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。
 
+每个任务 README 的 YAML Front Matter 提供机器可读契约——任务状态、阶段结果、候选、受阻状态、下一阶段与是否允许继续——外部编排系统无需解析正文即可驱动单阶段调用；字段与枚举定义在公共流程第 7 节。Markdown 正文保持人类可读。Cohestra 一次调用只执行一个阶段、阶段结束即停止，不感知队列与调度：编排留在技能之外。
+
 规则与阶段提示词保存在技能包内，本文件只做导读；规则真源是下列文件。
 
 | 想了解 | 读 |
@@ -28,7 +30,9 @@
 
 Cadra 是任务编排：管理任务准备、队列、顺序、状态、恢复和执行报告，在无人值守 Run 中按既定顺序串行推进。它不定义单任务内部的工程流程——那归 Cohestra；Cadra 只声明阶段序列（flow preset）并调用 Cohestra 阶段，且只依据 Cohestra 的机器可读状态驱动。
 
-Task 走 **draft → ready → queued → running → completed / blocked / failed**；Run 串行执行（`parallelism = 1`），终态为 completed、stopped 或 interrupted，`resume` 从持久化状态恢复未完成 Run，不重复已完成任务与已完成阶段。
+Task 走 **draft → ready → queued → running → completed / blocked / failed**；Run 串行执行（`parallelism = 1`），终态为 completed、stopped 或 interrupted，`resume` 从持久化状态恢复未完成 Run，不重复已完成任务与已完成阶段。建 Run 前先检查目标与 Cohestra 初始化前提（Git 工作区）。依赖链按层级逐 Run 推进：一层全部 completed 后，下一层才能通过 Ready Gate 入队，同一 Run 不含任务与其未完成依赖。
+
+新任务没有既往交付或调用时，run 从 flow 首项启动。blocked/failed 通过新 run 的显式恢复选择重新执行，旧 Run 保留本轮结果。已到终态的任务修改定义会回到 draft、重新过 Ready Gate，旧定义与旧结论并列保留。requirement 或 flow 变更从新 flow 首项重启；仅 dependencies 或 execution policy 变更时，blocked/failed 重试核实后的待调用阶段，completed 不调用阶段、只作修订收尾。所属 Run 未完成时不允许编辑任务定义。无人值守推进受三项上限约束：逐阶段失败重试预算（2 次）、整改轮上限（3 轮）与任务调用预算（16 次），任一耗尽即记 failed 并列入需人工介入；无进展判定只在同阶段连续两次结构化状态全未变时成立，validate 的本阶段补证出口除外，由调用预算兜底。入队与出队按三步写入并带操作编号，中断留下部分写入时由 resume 按同一编号幂等补齐；旧版七列队列清单不迁移历史行，改为追加八列表块后继续使用。
 
 | 想了解 | 读 |
 |---|---|
@@ -99,6 +103,7 @@ $cadra list
 
 $cadra run
 范围：<task-slug 列表，或“全部 ready”>
+恢复：<blocked/failed task-slug 列表；可空，有值时必须包含在显式范围中>
 
 $cadra resume
 Run：<run-id>
@@ -111,6 +116,6 @@ Run：<run-id>
 
 ## 维护
 
-发行版 **0.8.0**，协作协议 **v0.7**；cadra 发行版 **0.1.0**，任务/Run 协议 **v0.1**，发行版本分别在 [cohestra/release.json](cohestra/release.json) 与 [cadra/release.json](cadra/release.json) 维护。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。本文件有英文对应版 [README.md](README.md)，改动内容时两版一并同步。
+发行版 **0.9.0**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**，发行版本分别在 [cohestra/release.json](cohestra/release.json) 与 [cadra/release.json](cadra/release.json) 维护。Cohestra 协作协议版本变更时，Cadra 须同步发布支持新契约的版本，否则 Cadra run 将停在契约未就绪。技能本身只有 Markdown、模板和元数据，不依赖 Python，也不提供自研安装器。本文件有英文对应版 [README.md](README.md)，改动内容时两版一并同步。
 
 修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。
