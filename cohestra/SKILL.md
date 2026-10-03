@@ -1,12 +1,12 @@
 ---
 name: cohestra
-description: 通过 init 初始化项目协作上下文，或按 need、design、code、review、fix、validate 执行指定阶段、按 verify 做阶段间偏差核对，结果交接到 .cohestra。六阶段完整但可从任意阶段起步；目标缺 .cohestra 时先提醒并初始化；仅讨论流程不触发执行。
+description: 通过 init 初始化项目协作上下文，或按 need、design、code、review、fix、validate 执行指定阶段、按 verify 做阶段间偏差核对，结果交接到 .cohestra。六阶段完整但可从任意阶段起步；目标缺 .cohestra 时先提醒并初始化；任务 README Front Matter 提供机器可读契约；仅讨论流程不触发执行。
 license: MIT
 ---
 
 # Cohestra
 
-一个技能，按阶段读取说明。技能包保存协作规则和提示词；项目 `.cohestra` 只保存项目入口、任务交付和复盘。技能版本见 [release.json](release.json)，协作协议为 v0.7。AC、handoff、findings、候选、轮次、阶段状态与工作项状态等术语见 [公共流程](references/workflow.md)。
+一个技能，按阶段读取说明。技能包保存协作规则和提示词；项目 `.cohestra` 只保存项目入口、任务交付和复盘。技能版本见 [release.json](release.json)，协作协议为 v0.8。任务 README 的 YAML Front Matter 提供机器可读契约（Orchestrator Contract），Markdown 正文保持人类/智能体可读，字段与枚举见 [公共流程](references/workflow.md) 第 7 节。AC、handoff、findings、候选、轮次、阶段状态与工作项状态等术语见 [公共流程](references/workflow.md)。
  
 ## 路由
 
@@ -45,6 +45,8 @@ license: MIT
 4. `init` 只读取初始化说明及所需模板；其他入口读取一次 [公共流程](references/workflow.md)、本阶段说明和发行版本，再定位任务索引及必要输入。不要预读其他阶段、所有任务或全部复盘。写交付时再读对应骨架。
 5. 业务规范、有效任务决定和已有用户授权保持效力。只执行指定的阶段，不因阶段相邻或仍在链条内而自动继续；为进入阶段而做的初始化是前置动作，不构成跨阶段继续。不自动提交、发布或启动其他智能体。
 6. need、design、code、fix 交付后向用户提议一次 `verify` 并给出建议核对范围，是否执行由用户决定，不设前置条件；`review`、`validate` 本身是正式验证关口，交付后不提议 verify，需要时由用户主动调用。
+7. 正式阶段交付后按[公共流程](references/workflow.md)第 5、7 节把结构化状态写入任务 README Front Matter，正文「推荐下一步」与 `next` 字段保持一致；外部编排只读该契约即可判断控制流。Cohestra 一次调用只执行一个阶段，不含 queue、batch、run-all、scheduler 等多任务调度入口，编排由外部系统负责。
+8. 调用方声明 `execution_mode: unattended` 时按[公共流程](references/workflow.md)第 7.4 节执行无人值守语义：不提问空等、不自行选择产品方向、不扩大范围、不产生新的隐含授权、不降低质量门禁；无法在现有信息下合法继续时标记受阻并停止。该模式下规则 6 的 verify 提议按跳过处理并记入交付物，不改控制字段。默认 `attended` 行为不变。
 
 ## 来源与版本
 

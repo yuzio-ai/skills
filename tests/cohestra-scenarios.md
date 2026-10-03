@@ -7,7 +7,7 @@
 - SKILL.md 前置元数据有效，发行版与协议版本明确，八个入口（init、六阶段与 verify）均能定位阶段文件；只加载公共流程、对应阶段及 verify 的被核对交付物，init 不加载业务阶段。
 - Markdown 相对链接存在，模板占位符可识别，技能包无脚本和测试运行时依赖；无失效的项目 prompts 路由、旧安装器命令或模板管理清单。
 - 普通阶段只读取任务索引及必要输入。need/design/review/validate/verify 的业务只读边界仍允许阶段落盘；code/fix 保留实施授权与停止线。
-- 五节交付、任务索引、版本记录、AC、finding ID、候选及证据链可以通过模板和说明完整定位。
+- 五节交付、任务索引、结构化状态（任务 README YAML Front Matter）、版本记录、AC、finding ID、候选及证据链可以通过模板和说明完整定位。
 - 根 README 为双语版（`README.md` 英文、`README.zh-CN.md` 中文），顶部语言切换行双向可达；两版的标题层级、表格行列、代码块内容与相对链接目标一致，改一版必须同步另一版。
 
 ## 临时安装
@@ -57,6 +57,31 @@
 | 缺容器时从任意阶段起步 | 先最小初始化再执行；初始化不读业务任务、不清旧副本、不生成任务、不提交 |
 | 目标路径不明确或有多个候选 | 先澄清，不在错误目录初始化，也不开始阶段 |
 | 只讨论、未知入口、旧 update 调用 | 不开始实施或隐式更新，说明入口或澄清必要信息 |
+| code 正常完成（契约） | Front Matter：stage_result.status=completed，next.stage=review、allowed=true、reason=stage_completed，正文推荐与 next 一致 |
+| review 无阻塞（契约） | findings.blocking=0 → next.stage=validate、reason=stage_completed，不要求 fix |
+| review 有阻塞（契约） | findings.blocking>0 → next.stage=fix、allowed=true、reason=blocking_findings |
+| validate 验收通过（契约） | acceptance.status=passed 且满足既有完成条件 → 任务 status=completed、next.stage=null、allowed=false、reason=task_completed |
+| unattended 缺人工决策（契约） | 不提问空等、不自行选择产品方向 → stage_result.status=blocked、blocked.reason=human_decision_required、next.allowed=false，然后停止 |
+| 环境阻塞（契约） | stage_result.status=blocked、blocked.reason=environment_blocked、next.allowed=false，然后停止 |
+| README 更新失败（契约） | handoff 已落盘并回读；逐字报告 `handoff completed`、`index sync failed` 及错误，失败后回读并区分旧版（或未创建）/ 新版 / 无法确认，消费方停止推进，不固定宣称停留在上一轮 |
+| README 完整发布（契约） | 完整准备 Front Matter 与正文，校验后写同目录唯一临时文件、回读、重读原文件核对未变、原子替换、回读；不分次发布两部分，临时文件不是第二状态源 |
+| 临时写入或原子替换失败 | 正式 README 保持原版或未创建，不消费临时文件；保留 handoff、报告失败，清理本执行者临时文件 |
+| 替换前检测到并发修改 | 保留他人版本与本阶段 handoff，不覆盖；单写入者仍是前提，重读比较不冒充文件锁 |
+| 替换成功但回读失败 | 不宣称回滚；恢复读取后区分完整新版或无法确认，仍报告 index sync failed，恢复核实前不推进 |
+| validate 缺必要复审但可执行 | 无已确认验收失败、输入/授权/执行条件齐备 → acceptance=pending、next={review,true,stage_completed}，正文一致，不重复 validate 代替 review |
+| validate 复审条件不足 | stage_result.status=blocked、任务 status=blocked、blocked.reason 按实际原因、next.allowed=false，不空等或绕过复审 |
+| validate 已失败且仍缺复审 | 保留 acceptance=failed，优先推荐 fix/design/need；整改缺权限等前提时受阻，不降为 pending |
+| validate 仅缺本阶段可补证据 | 有执行条件才 next={validate,true,stage_completed}；缺权限或环境等条件时受阻，不以“将来可恢复”为由空转 |
+| 旧任务无 Front Matter（契约） | 正文继续读取；首次正式阶段交付成功同步索引时才最小加入本次结构化状态，不批量迁移、不重写历史 handoff、不重跑旧阶段 |
+| 旧任务首次 verify 后再正式阶段 | verify 只写交付与正文、不加 Front Matter；随后正式阶段成功同步时补完整必填集，阶段/轮次仅记录本次，不补造历史 |
+| 外部编排只读控制流（契约） | 只读 Front Matter 即可判断任务状态、阶段结果、候选、受阻、下一阶段与是否允许继续，不解析正文 |
+| Front Matter 唯一状态源（契约） | 不出现 state.json / status.json / runtime.json；handoff 仍是不可变历史交付 |
+| verify 交付（契约） | 只写 verify 交付与正文索引行；完整发布 README 时保留已有 Front Matter 全部原值，不改 stage_result / next / execution_mode 等控制字段 |
+| 链条外终点（契约） | 用户声明终点（如 review-only 于 review 收尾、small-change 于 code 收尾）→ 任务 status=completed、next={null,false,task_completed}、acceptance 可缺省；不与「仅 passed 才 completed」冲突，必做问题未关闭不按终点收尾；与 Cadra 配合使用时终点由 flow 表达（flow 含 validate 而验收缺省时 Cadra 判 blocked，见 Cadra 终态映射第 7、8 行） |
+| 受阻任务状态（契约） | blocked.value=true 时任务 status 同步写 blocked，受阻解除后回 in_progress；消费方单读 status 也能看到受阻 |
+| 契约版本核对（契约） | Front Matter 含必填 `contract`（取当前协作协议版本）；消费方可核对版本，缺失判「契约未就绪」而非靠字段嗅探 |
+| 必填与可选（契约） | 必填集缺失才判协议输出不合法；findings/acceptance 等可选字段缺失合法；旧任务首次写入含完整必填集但不回填历史 |
+| unattended 下 verify 提议（契约） | 按跳过处理并记入交付物（不改控制字段），不降低也不替代 review、复审与验收要求 |
 
 交付检查结果时分开标注：文档静态检查、文件/CLI 实测、桌面推演、独立智能体实测。未执行项如实列出。
 
@@ -120,3 +145,43 @@
 - 同轮二修（第二轮同会话审查新增四条后收口）：① 排除条补 `init`——无参数 `$cohestra init` 是正常用法，不应被 `SKILL.md` 的统一表述带进自动衔接再报「上游没有交付」（空项目与单任务项目各推演一次）；② need 输入规则去重：排除条只留边界并指向第 1 节原条，「首次 need 以原始需求为输入」不再在排除条与术语条重复；③ `SKILL.md`「未附 handoff 时」改「未附 handoff 与任务目录时」，只附任务目录时以显式输入为准、不误触发；④ 重跑较早阶段补「作为动因的下游交付可作补充材料引用，不得冒充上游依据」，避免交付物「输入与上游依据」与真实动因不符。同会话审查不构成独立审查。
 - 未执行（如实列出）：自动衔接未在独立智能体会话中实跑（含「跳过 verify 与草稿」「多任务并列请指定」两个分支）；未用 skills CLI 做 0.8.0 的安装或更新实测；未做远程安装验证。
 - 未做替代：未用桌面推演冒充智能体实测；自动衔接的行为结论以文档规则为准，实跑证据留待补。
+
+## 0.9.0 本地验证记录
+
+- 变更：新增**机器可读契约（Orchestrator Contract）**，让外部 Task Orchestrator 不解析正文即可判断任务状态、阶段结果、候选、受阻、下一阶段与是否允许继续；Cohestra 仍保持一次调用只执行一个阶段、阶段结束即停止，不新增 queue、batch、run-all、night-run、scheduler 等多任务调度入口。四类改动：① `references/workflow.md` 新增第 7 节——7.1 载体与单一状态源（任务 README 的 YAML Front Matter 是唯一可变控制状态，正文与 handoff 保持人类可读，handoff 仍是不可变历史；禁止 state.json／status.json／runtime.json 第二状态源；verify 交付不改控制字段、init 不写契约；YAML 恒可解析，缺失或不合法由调用方判为协议输出不合法）；7.2 字段（task、status、execution_mode、stage_result.{stage,status,round}、candidate.{commit,snapshot}、findings.{blocking,non_blocking,unresolved}、acceptance.status、next.{stage,allowed,reason}、blocked.{value,reason}，与 cadra 第 6 节契约字段名逐字对齐，多出的字段为增量扩展；status 只取 in_progress／completed／blocked／failed，不引入 draft／ready／queued／running；blocked.reason 七值为 human_decision_required／missing_input／missing_permission／dependency_unavailable／environment_blocked／candidate_unavailable／other）；7.3 next 标准化（所有正式阶段交付后必须给出 next，给出六阶段出口映射表——review blocking=0 转 validate、blocking>0 转 fix 并写 blocking_findings、validate 仅 passed 且满足既有完成条件才 status=completed 且 reason=task_completed、受阻一律 next.allowed=false；正文「推荐下一步」须与 next 一致；blocked.value=true 时 next.allowed 必为 false）；7.4 执行上下文 unattended（不提问空等、不自行选择产品方向、不扩大范围、不产生新的隐含授权、不降低质量门禁，无法合法继续时 stage_result.status=blocked＋blocked 枚举原因＋next.allowed=false 后停止）；7.5 向后兼容（旧任务无 Front Matter 可继续读取、不批量迁移、首次写入时最小加入结构化状态、不重写历史 handoff、不重跑旧阶段）。术语表补「结构化状态（Orchestrator 契约）」「执行模式」；第 5 节落盘顺序改为固定七步（阶段完成 → 写 handoff → 回读 → 更新 Front Matter → 更新正文索引 → 回读 → 停止），README 更新失败时逐字报告 `handoff completed`、`index sync failed` 并注明机器状态停留在上一轮。② 模板：`assets/task-index.md` 加 Front Matter 骨架（全部字段、枚举与缺省约定，说明每个字段只写一个实际值），`assets/handoff.md`「身份与输入」加「执行模式」行。③ 阶段说明：review 输出 findings 结构化计数（blocking>0 即必做整改，next 指向 fix 并写 blocking_findings），fix 按裁决与修复更新未关闭计数，validate 给出 acceptance.status（passed／failed／pending／blocked，仅 passed 且满足既有完成条件才判任务 completed）。④ `SKILL.md` 协议字样 v0.8、执行规则增第 7 条（结构化状态写入、正文与 next 一致、不含多任务调度入口的边界声明）与第 8 条（unattended 语义）、描述元数据补机器契约提示；`release.json` 发行版 0.8.0 → 0.9.0、协议 v0.7 → v0.8（契约字段属交付契约层面的流程语义变化）；根 README 双语同步（cohestra 段补机器契约说明与「一次调用一个阶段、不含队列与调度」边界，维护段版本字样）。
+- 已执行（文档静态检查）：全包 17 份 Markdown 共 100 条相对链接全部解析、0 断链（本版改动净增 7 条；0.8.0 记录的 73 条与此刻 93 条基线之差来自其间并入 cadra 导致根 README 等文件增加的链接，不属本版）；版本字样 6 处一致（release.json 0.9.0／0.8，SKILL.md、workflow.md、assets/handoff.md、README.md、README.zh-CN.md 均 v0.8／0.9.0），旧字样 v0.7 与 0.8.0 在上述文件 0 残留；契约字段名与 `cadra/references/workflow.md` 第 6 节逐字比对一致（task／status／stage_result.{stage,status}／next.{stage,allowed,reason}／blocked.{value,reason}）；next.reason 八值、blocked.reason 七值、acceptance.status 四值、status 四值在 workflow.md 第 7.2 节与 task-index.md 骨架两处逐值一致；`cohestra/` 下无 state.json／status.json／runtime.json；queue／batch／run-all／scheduler 字样仅出现在「不含多任务调度入口」的否定式边界声明中，未新增对应入口。
+- 已执行（桌面推演）：任务书八场景（code 完成 → next=review；review blocking=0 不要求 fix；review blocking>0 → next=fix；validate acceptance=passed → 任务 completed；unattended 缺人工决策 → blocked 且 next.allowed=false；环境阻塞 → blocked；README 写入失败 → 报告 handoff completed／index sync failed；旧任务无 Front Matter → 读取成功、首次写入最小升级）加「外部编排只读控制流」「Front Matter 唯一状态源」「verify 不改控制字段」逐条推演，结果与场景表一致。
+- 未执行（如实列出）：未在独立智能体会话中实跑任何一次带 Front Matter 的阶段交付；unattended 语义未实跑；未用 skills CLI 做 0.9.0 的安装或更新实测；未做远程安装验证。
+- 待补证据：一次真实任务中「阶段完成 → 写 handoff → 回读 → 写 Front Matter → 同步正文 → 回读」的完整记录；一次 unattended 缺人工决策的受阻记录；一次 README 更新失败的 `handoff completed`／`index sync failed` 报告记录。
+- 遗留事项：① 消费侧「接口现状声明」已由并行 cadra 改动就地更新（`cadra/references/workflow.md` 现记「Cohestra v0.8 起在任务 README YAML Front Matter 提供 Orchestrator 契约」），本条原「将过时」表述随同轮整改一并修正（见 0.9.0 同轮整改 F9b）；cadra 侧其余口径仍归 cadra 任务，本次未触碰。② 本验证记录落盘时工作区内 `cadra/` 与 `tests/cadra-scenarios.md` 另有并行未提交改动，非本任务产生、未触碰，静态检查中涉及 cadra 文件的比对基于当时的磁盘内容。
+- 未做替代：未用桌面推演冒充智能体实测或 CLI 实测；契约字段与枚举以文档规则为准，实跑证据留待补。
+
+## 0.9.0 同轮整改（独立审阅 findings）
+
+仍在 0.9.0 发行内（本版尚未发布，契约补缺不另起版本）。阻塞三条（F1/F2/F3）与流程一条（F10）逐条处置，非阻塞五条（F4–F9b）除消费侧一条外一并整改：
+
+- **F1（P0，完成语义矛盾）**：`workflow.md` §7.2 补 `status` 写入规则并把「仅 passed 才 completed」限定为「validate 交付时」；§7.3 新增「用户声明的终点已到达」行（`next={stage: null, allowed: false, reason: task_completed}`、任务 status → completed、acceptance 可缺省），并注明 `task_completed` 两来源（validate 通过／终点到达）、终点前提（阶段自身交付完成、必做问题未关闭不按终点收尾）与优先级（受阻、失败路径优先）。链条外终点的任务（review-only、small-change 于 code／review 收尾）由此可合法写 `completed`，且与消费侧「completed + acceptance 缺省 → 标注 unknown」的口径衔接。
+- **F2（P1，无版本标记）**：§7.2 增必填字段 `contract: "0.8"`（取当前协作协议版本、随协议演进），消费方可核对版本；§7.5 明确向后兼容指「可读取、可继续使用」，契约就绪与否由消费方按 `contract` 或探测判定，无 Front Matter 视为「契约未就绪」，兼容声明与版本核对不再冲突。
+- **F3（P1，必填/可选冲突）**：§7.2 新增「必填与可选」条——必填集 `contract`／`task`／`status`／`execution_mode`／`stage_result`／`candidate`／`next`／`blocked`（每次正式阶段交付全部写出），可选集 `findings`（review/fix）、`acceptance`（validate）、`findings.unresolved`（缺省等价 `null`）；「协议输出不合法」只针对必填集；最小写入同样给出完整必填集、只含本次值。7.1 的「核心字段」措辞改为「必填字段」，三处规则（恒写出／可省／最小写入）的冲突消除。
+- **F5（P2，status: blocked 空转）**：补写入规则——`blocked.value: true` 时任务 `status` 同步写 `blocked`，受阻解除后回 `in_progress`；§7.3 受阻行、§7.4 受阻路径、SKILL 规则 8 与场景表同步。
+- **F6（P2，candidate 形状不唯一）**：统一「恒映射、叶子可 null」——无候选写 `candidate: {commit: null, snapshot: null}`，§7.2 与模板同步，取消 `candidate: null` 写法。
+- **F7（P2，模板占位符歧义）**：`assets/task-index.md` 占位符统一为 `<a|b|c>` 单值占位并加说明（无值叶子写 `null`），拷贝未填时不再产出「语法合法、取值非法」的 YAML。
+- **F8（P2，unattended × verify 单边）**：§7.4 与 SKILL 规则 8 补齐握手——unattended 下 verify 提议按跳过处理并记入交付物（理由 unattended）、不改控制字段、不降低也不替代 review／复审／验收要求，与消费侧既有处置对称。
+- **F4（检查方法缺口）**：原「契约字段名与 cadra 第 6 节逐字比对」只覆盖 task／status／stage_result／next／blocked 五组键，恰好漏掉 `acceptance`——正是并行实现自造 `accepted` 的位置，该口径不可能发现该偏差。整改后比对口径改为**契约键全集**（含 `contract`、`execution_mode`、`candidate`、`findings`、`acceptance` 及全部子字段）在 `workflow.md` §7.2 与 `task-index.md` 两处逐键核对，并核对消费侧载体（`cadra/references/workflow.md` 契约段引用的字段名）。
+- **F9（消费侧，不改）**：cadra 终态表第 2/3 行（completed + acceptance failed／pending）在 cohestra 语义下仍不可达（validate 未通过／未决不写 completed），属消费侧防御性行；F1 整改后第 4/8 行（completed + acceptance 缺省、以 flow 边界收尾）恢复可达。cadra 口径归 cadra 任务，本次不触碰。
+- **F9b（记录漂移）**：本文件 0.9.0 记录的「遗留事项①」已就地更新（见上文）。
+- **F10（候选未冻结）**：仓库规则要求提交需明确授权，本轮未获授权，候选以工作区相对 `HEAD`（7b9e57f）的 `git diff` 为可复核快照，整改前后均可复核；建议授权一次提交冻结候选后再做终验，本轮不以文档改动冒充已冻结候选。
+- 已执行（文档静态检查，整改后复测）：全包 17 份 Markdown 共 100 条相对链接全部解析、0 断链；契约键全集（20 键含子字段）在 §7.2 与模板逐键一致；`next.reason`／`blocked.reason`／`acceptance.status`／`status` 全部枚举值两处一致；`contract`、版本字样 6 文件一致；`cohestra/` 下仍无第二状态源文件。
+- 未执行（如实列出）：整改内容未在独立智能体会话实跑；消费侧联调（cadra run 探测与终态判定）未实测；仍未用 skills CLI 做安装/更新实测。
+- 未做替代：逐条整改以文档规则为准，F10 以可复核快照记录而非宣称候选已冻结；桌面推演不冒充实测。
+
+## 0.9.0 四项修复验证（2026-10-01）
+
+本节补充本轮结果；前述同版记录保留原事实，旧的分步 README 更新与“状态必然停留在上一轮”口径由本轮规则取代。发行版仍为 0.9.0、协议仍为 v0.8；没有提交、推送、发布或升级真实安装。
+
+- 修复：① validate 缺必要复审且可执行时输出 `acceptance=pending`、`next={review,true,stage_completed}`；已确认验收失败仍转整改，复审或补证据条件不足则受阻。② README 的 Front Matter 与正文完整准备、校验后写同目录临时文件、核对原文件未变、原子替换并回读；临时文件不作状态源、不替代单写入者。③ 发布或回读失败后报告 `handoff completed`、`index sync failed`，实际状态区分旧版（或未创建）/ 新版 / 无法确认；即使新版可读也要求消费方恢复核实后再继续。④ 旧任务仅在首次正式阶段交付成功同步时加入契约；verify 不触发迁移，已有控制字段原值保留。handoff 中记录写入时“待同步”，最终同步结果由回复报告，不回写已交付文件。
+- 文档静态检查：两技能与测试、根双语 README 共 30 份 Markdown、158 条相对链接，0 断链；生产契约与索引模板的 18 个叶子字段逐键一致，状态与原因枚举一致；契约版本按字符串解析、轮次按整数、布尔按布尔、candidate 恒映射。两技能元数据及当前发行/协议字样通过检查，release.json 相对本轮开始未变；`git diff --check` 通过。
+- 文件操作实测（隔离临时目录，6/6）：完整发布、首次创建、临时文件写入失败、原子替换失败、替换前并发修改、替换后回读失败。写入与替换失败通过临时文件/目录权限触发实际 `PermissionError`（errno 13），正式 README 保留旧版；并发修改保留另一写入者内容；回读失败通过替换后禁止读取触发，恢复权限后确认正式文件为完整新版。各分支无 Front Matter/正文混合版本，handoff 保留，本执行者临时文件已清理；失败信号不因读取到新版而取消。该结果验证文件操作方法，不证明任意环境均具备相同工具能力。
+- 阶段输出夹具演练（同会话、脚本辅助落盘，6/6）：整数加法候选的 `add(2,3)` 实际执行；正确候选但缺必要复审 → pending/review；复审权限未授予 → blocked/missing_permission；错误候选实际返回 -1 → failed/fix（不被缺复审改写为 pending）。三份 validate-01 写出五节交付与完整契约，候选内容未变，未执行 review/fix。旧任务 verify-01 仅更新正文；design-02 才加入本轮契约；随后 attended 的 verify-02 保留先前 unattended 契约全部原值，旧 need/design 文件摘要未变。YAML、完整发布及回读核对通过；这不是实际独立智能体调用或真实业务任务验收。
+- 消费侧桌面推演：18 个终态分支与 6 个本次结果核对分支通过，详见 cadra 场景记录；必做后续超出 flow 不完成，阶段轮次不跨阶段比较，同步失败不消费旧 next。
+- 工具限制与未执行：原生 `skill-creator/scripts/quick_validate.py` 因当前 Python 缺少 PyYAML 未完成；未安装依赖，采用 Ruby Psych 解析 YAML 并检查等价基本元数据。未执行独立智能体阶段调用、cadra 真实 run/resume 联调、skills CLI 安装/更新或远程验证。夹具演练、映射模型与文件操作实测各自报告，不互相替代。
