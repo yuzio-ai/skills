@@ -313,3 +313,23 @@
 - **静态检查（tests/cadra-v05-static-checks.py 重跑）**：cadra 12 份 Markdown / 60 条相对链接 / 0 断链，全仓 30 份 / 160 条 / 0 断链；新增断言——契约引用块字段集 ⊇ 且仅含 Cohestra 第 7.2 节十个字段、两技能契约版本字样一致、「依赖优先于优先级」在 cadra 包内零命中、run/resume/add 接入新规则文本、cohestra 侧两条互注齐备；双语 README 标题层级、表格行、代码块一致。
 - **未执行（如实列出）**：本轮仍为文档修订与模型推演；依赖兜底、收养核对未在独立智能体会话实测；未执行真实 run/resume、CLI 安装/升级或远程验证；未提交、推送或发布。
 - **待补证据**：一次依赖任务在排队期间被修订后 blocked 并经新 Run 解除的真实记录；一次 slug 同名既有 cohestra 任务的收养核对记录。
+
+## 0.5.0 同会话实测（2026-10-03）
+
+- 口径：同会话手工驱动实测，**不是独立智能体调度验证**。明确选定本仓库 Cadra 0.5.0/v0.5 与 Cohestra 0.9.0/v0.8 源规则，在隔离临时项目逐入口与阶段执行；中断、连败与模式违例均由显式故障注入产生，不声称自然会话断开或自然失败。临时 Python 辅助（scribe.py）只做文件写入/回读断言/同目录原子替换/SHA256，不做任何控制流判定，不作为技能安装器或调度运行时。
+- 项目：`/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/opencode/cadra-v05-actual/proj`（Git 工作区，9 个任务、7 个 Run）与 `…/legacy`（v0.4 旧记录场景）；候选均为未提交快照（记录基线、精确差异与字节 SHA256），项目未授权提交。
+
+| 实测 Run | 覆盖场景 | 结果 |
+|---|---|---|
+| run-20261003-01 | 双任务串行；**validate 三轮本阶段补证**（B1 豁免实测） | completed；completed=2。backfill-task validate-01/02 的 stage/status、candidate、findings（缺失≡null）、acceptance=pending 与 next=validate 全未变，checkpoint 记录「补证出口豁免、不判无进展、调用预算兜底」，第三轮 AC-3（wc -c = 16）补全后 passed；调用预算 5/16 |
+| run-20261003-02 → 03 → 04 | **依赖在执行窗口被修订**（A1 全链路） | run-02：filler-task completed 后中断注入，`add` 修订 dep-parent（rev-1，其原 Run 已结束、归属拒绝不触发）；resume 的 queued 重核发现 dep-parent=draft → dep-child **blocked（依赖未满足）、未调用任何阶段**、出队，run-02 completed。run-03：dep-parent 修订重启（requirement 变更 → 新 flow 首项 code，轮次继续递增 code/02…validate/02）→ completed，rev-1 关闭。run-04：显式恢复 dep-child（Gate 复核依赖满足 + 原因解除证据；原 checkpoint 无调用 → 沿用原「首次启动 code」动作）→ completed |
+| run-20261003-05 | **整改轮触顶 + 执行模式核对失败 + 失败后队列照常** | completed；completed=1、failed=2。loop-task：fix×3（整改轮 1/2/3，F-001/F-002/F-003 逐轮修复并复审关闭），review-04 必要复审（不耗轮）发现 F-004（loop.txt.bak 越界新建）→ 该原因第 4 次 fix 不再调用 → **failed（整改轮上限耗尽）**，调用 8/16；mode-task：code-01 契约记 `execution_mode: attended`（注入）→ **failed（执行模式核对失败）**，不消费 next（review 在 flow 内也不推进）；after-task 照常 completed（stop_queue_on_failure=false）。report-01 四类计数齐全、人工介入清单含两项上限/核对失败与 verify 跳过 |
+| run-20261003-06 | **入队中断补齐**（① 后中断） | resume：无结果快照 → 入队阶段，enq 编号与定义快照和实际 Task 一致、入队前状态且无调用记录 → 判同一次入队，按同一 `enq-run-20261003-06-01` 补 ②③，不新建 Run、补齐前不调用阶段；随后正常执行 code/review，flow [code, review] 正常边界截断 completed（标注未执行 validate/fix、验收 unknown、列入人工介入）；二次 resume 三文件 SHA256 不变（noop） |
+| run-20261003-07 | **无进展加速停止 + 出队中断补齐** | code 同因连败两轮（stage_result=code/failed/1→2、candidate 两叶 null、findings/acceptance 缺失、next 相同）→ **判无进展 failed（加速停止）**，重试预算 code 1/2 剩余额度不消费；出队中断（结果快照已写、Task running、队列缺 deq）→ resume 先分阶段（有快照→出队阶段）补 Task 终态 failed 与队列 deq，**不误判「入队前状态却已有阶段调用记录」**；二次 resume noop |
+| legacy 项目 | **v0.4 旧记录恢复**（无 enq-/deq- 编号、七列旧清单） | resume：旧记录例外——run-id + slug 定位唯一行、入队定义快照核对一致、有结果快照 → 出队阶段，就地写入旧行既有的「出队结论与时间」单元格（不新增列、不迁移）→ 旧 Run 收尾 completed；二次 resume noop；新 run 前置判定为「没有合格任务」而非「存在未完成 Run」（旧 Run 不再阻挡）；七列块列结构不变 |
+| run（未建 Run） | **slug 同名收养核对**（A3 实测） | 既有 `.cohestra/handoffs/orphan-probe/`（attended 诗歌任务，completed）与 cadra 新 Task orphan-probe（probe.txt 文本修改）同名：add 记录「绑定时已有交付（主题摘要）」并报告不符；run 前置收养核对判主题明显不对应 → 不接续、不入队、不建 Run（无 run-20261003-08、队列无行、Task 保持 ready），请用户选择 |
+
+- 不变量核对：proj 队列 11 行全部带 deq 结论；7 个 Run 全部 completed；9 任务终态 6 completed（dep-parent、backfill-task、filler-task、dep-child、after-task、resume-task）3 failed（loop-task、mode-task、fail-task）；legacy 七列块无编号列新增。
+- 关键哈希（SHA256，UTF-8）：loop.txt=39ecaae9b715b0495be311e4a4507b4057a304bfae631b9419da45cc5067d6ce（fix-03 后 AC 全满足，遗留 loop.txt.bak 为 F-004 证据）；parent.txt=28ec5132ab5ff91f794cf40d9fc2baaff816d367798360724d8d7c24f85b2a76（rev-1「Parent v2.」）；proj queue/order.md=d25653ce21fb6bb3bf3d054c4c19c8b75e645c8e927455375a7b55f280cf773a；run-20261003-05.md=3d1fcf4a13a8513fe955666b5282bec979c4553b68b44931fac99912e396be68；run-20261003-05-report-01.md=f35319ae703682073a26ec1988104bc95d2e7922891775dff954426f26ab35a9；legacy queue/order.md=4d2e0e3742b9f3d70ac2767f252b2c2404c1ed90613ccd56a595a0f84ecc7ce5。
+- 未执行（如实列出）：独立智能体会话实测；CLI 安装/升级与远程验证；真实长时运行的自然中断证据（本轮中断均为注入）。本轮未修改技能包与真实用户项目。
+- 闭合情况：0.5.0 与复核补正四列出的待补证据中，「整改三轮触顶」「入队中断补齐」「validate 多轮补证」「依赖排队期间被修订」「slug 同名收养核对」本轮已补同会话实测证据；仍缺独立智能体与 CLI 安装证据。
