@@ -8,6 +8,7 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 |---|---|---|
 | cohestra | Initializes project context; the six stages can start from any stage; initializes first when the container is missing; uses verify to check for drift between stages | [SKILL.md](cohestra/SKILL.md) |
 | cadra | Manages task preparation, queue, order, status, recovery and run reports; serial unattended execution; single-task engineering flow is delegated to Cohestra stages | [SKILL.md](cadra/SKILL.md) |
+| relatra | Reports agent outcomes, execution efficiency, rework and observed usage across selected projects; daily through yearly, Codex first, with evidence and visible unknowns | [SKILL.md](relatra/SKILL.md) |
 
 ## cohestra
 
@@ -42,6 +43,28 @@ For a new task without any prior delivery or call, `run` starts at the first sta
 | Task and run skeletons, `.cadra` container template | [assets/](cadra/assets/) |
 | Maintainer acceptance checklist | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
 
+## relatra
+
+Relatra supports personal reviews: daily, weekly, monthly, quarterly, yearly and custom periods. It counts independent goals, separates delivery from acceptance, and preserves missing time/token data as unknown. Defaults are the previous complete calendar period and Asia/Shanghai. Configure a project set and report directory once; receive a chat summary, versioned Markdown, statistics JSON and provenance.
+
+The adapter reads Codex active/archived logs and references existing Cadra/Cohestra evidence. The agent interprets goals and delivery proof; Python 3.9+ standard-library scripts deduplicate and aggregate. Explicit baseline comparisons and user corrections preserve old reports. Relatra does not execute original tasks or create a scheduler.
+
+```text
+$relatra weekly
+Projects: <explicit project set>
+Report directory: <absolute path, reused later>
+
+$relatra monthly
+Date: 2026-09-15
+
+$relatra
+Range: 2026-10-01 through 2026-10-12
+```
+
+See [the skill](relatra/SKILL.md), [data and invocation](relatra/references/data.md), and [metrics](relatra/references/metrics.md). Offline tests: `python3 -B -m unittest discover -s tests -p 'test_relatra.py'`. These fixtures do not establish real agent usability or complete cloud-history coverage.
+
+Plan coverage, review fixes, and native skill validation are recorded in [Relatra acceptance](tests/relatra-scenarios.md). Isolated installation, full invocation and minimum-runtime checks are recorded in [pre-push validation](tests/relatra-prepush.md).
+
 ## Install
 
 Run from the root of the target project; the default scope is project-level:
@@ -49,9 +72,10 @@ Run from the root of the target project; the default scope is project-level:
 ```sh
 npx skills add yuzio-ai/skills --skill cohestra
 npx skills add yuzio-ai/skills --skill cadra
+npx skills add yuzio-ai/skills --skill relatra
 ```
 
-Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/) or [cadra](cadra/) directory where your tool looks for skills.
+Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/), [cadra](cadra/), or [relatra](relatra/) directory where your tool looks for skills.
 
 The full command set, how to update, and how to diagnose a local source that silently no-ops when updated by name are in the [installation guide](cohestra/references/installation.md).
 
@@ -116,6 +140,6 @@ The labels are Chinese for the same reason as above. Task state lives in `.cadra
 
 ## Maintenance
 
-Release **0.9.0**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**. Release versions are maintained in [cohestra/release.json](cohestra/release.json) and [cadra/release.json](cadra/release.json). When the Cohestra collaboration protocol version changes, Cadra must ship a matching release that supports the new contract; until then Cadra runs stop at the contract-not-ready check. The skills are only Markdown, templates and metadata: no Python dependency and no installer of their own. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync when the content changes.
+Release **0.9.0**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**; Relatra is **0.1.0**, report schema **v1**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
 
 After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).
