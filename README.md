@@ -6,15 +6,17 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 
 | Skill | Purpose | Entry |
 |---|---|---|
-| cohestra | Initializes project context; the six stages can start from any stage; initializes first when the container is missing; uses verify to check for drift between stages | [SKILL.md](cohestra/SKILL.md) |
+| cohestra | Initializes project context; six stages can start from any stage; verify checks drift; report provides a read-only overview of tasks and outstanding findings | [SKILL.md](cohestra/SKILL.md) |
 | cadra | Manages task preparation, queue, order, status, recovery and run reports; serial unattended execution; single-task engineering flow is delegated to Cohestra stages | [SKILL.md](cadra/SKILL.md) |
 | relatra | Reports agent outcomes, execution efficiency, rework and observed usage across selected projects; daily through yearly, Codex first, with evidence and visible unknowns | [SKILL.md](relatra/SKILL.md) |
 
 ## cohestra
 
-One collaboration is split into six stages — **need → design → code → review → fix → validate** — plus `init`, which creates the project container, and `verify`, which checks for drift between stages. The six stages are a list of responsibilities, not a mandatory route: any stage can be the starting point, and the user decides where the work ends.
+One collaboration is split into six stages — **need → design → code → review → fix → validate** — plus `init`, which creates the project container, `verify`, which checks for drift between stages, and `report`, which provides a read-only overview of project tasks and outstanding findings. The six stages are a list of responsibilities, not a mandatory route: any stage can be the starting point, and the user decides where the work ends.
 
 Every task README carries a machine-readable contract as YAML front matter — task status, stage result, candidate, blocking state, the next stage and whether continuing is allowed — so an external orchestrator can drive single-stage calls without parsing prose; the fields and enums are defined in the common flow, section 7. The Markdown body stays human-readable. Cohestra runs one stage per call, stops when the stage ends, and knows nothing about queues or schedulers: orchestration stays outside the skill.
+
+`report` reads all tasks in the current project's `.cohestra/handoffs/`, including completed tasks with open findings. It shows task and acceptance states, outstanding findings and state inconsistencies, with source links; missing values stay unknown. Output stays in the conversation: it does not initialize projects, write files, advance stages or change deferral and closure rules.
 
 The rules and stage prompts live inside the skill package (currently documented in Chinese); this file is only a guide. The sources of truth are the files below.
 
@@ -23,6 +25,7 @@ The rules and stage prompts live inside the skill package (currently documented 
 | Routing, execution rules, version and provenance | [cohestra/SKILL.md](cohestra/SKILL.md) |
 | Common flow, terminology, artifact and shared-write rules | [references/workflow.md](cohestra/references/workflow.md) |
 | Per-stage responsibilities, with copy-pasteable invocation snippets | [references/](cohestra/references/) |
+| Read-only task overview, outstanding findings and state inconsistencies | [references/report.md](cohestra/references/report.md) |
 | Handoff and task-index skeletons | [assets/](cohestra/assets/) |
 | Install, update and tool boundaries | [references/installation.md](cohestra/references/installation.md) |
 | Maintainer acceptance checklist | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
@@ -81,7 +84,7 @@ The full command set, how to update, and how to diagnose a local source that sil
 
 ## Invocation
 
-The examples below are skill invocations typed into an agent, not terminal commands; other tools use their own entry points. When the target project has no `.cohestra`, the skill warns first and runs a minimal initialization, then starts from the stage you need, reading only the corresponding stage file each time.
+The examples below are skill invocations typed into an agent, not terminal commands; other tools use their own entry points. When the target project has no `.cohestra`, stage calls warn first and run a minimal initialization, then start from the stage you need, reading only the corresponding stage file each time. `report` only reports the missing container and does not initialize it.
 
 ```text
 $cohestra init
@@ -109,6 +112,8 @@ $cohestra validate
 $cohestra verify
 被核对：.cohestra/handoffs/<task-slug>/design-01.md
 上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+
+$cohestra report
 ```
 
 The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / 上游依据) are Chinese because the skill's own prompts are written in Chinese; keep them as shown, only the placeholders change. A handoff path may also be replaced by the corresponding task directory, whose task README points to the valid inputs. Starting-point selection, stop rules and each stage's paired verify convention are in [cohestra/SKILL.md](cohestra/SKILL.md) and the [common flow](cohestra/references/workflow.md).
@@ -140,6 +145,6 @@ The labels are Chinese for the same reason as above. Task state lives in `.cadra
 
 ## Maintenance
 
-Release **0.9.0**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**; Relatra is **0.1.0**, report schema **v1**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
+Release **0.10.0**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**; Relatra is **0.1.0**, report schema **v1**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
 
 After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).

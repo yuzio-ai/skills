@@ -6,15 +6,17 @@
 
 | Skill | 用途 | 入口 |
 |---|---|---|
-| cohestra | 初始化项目上下文，六阶段可从任意阶段起步，缺容器时先提醒并初始化，阶段间用 verify 核对偏差 | [SKILL.md](cohestra/SKILL.md) |
+| cohestra | 初始化项目上下文，六阶段可从任意阶段起步；verify 核对偏差，report 只读汇总任务与遗留问题 | [SKILL.md](cohestra/SKILL.md) |
 | cadra | 管理任务准备、队列、顺序、状态、恢复和执行报告，无人值守串行推进；单任务工程流程交由 Cohestra 阶段 | [SKILL.md](cadra/SKILL.md) |
 | relatra | 汇总指定项目的 agent 成果、执行效率、返工与资源，生成日报至年报；Codex 优先，保留证据与未知 | [SKILL.md](relatra/SKILL.md) |
 
 ## cohestra
 
-把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。
+把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差、`report` 只读汇总项目任务与遗留问题。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。
 
 每个任务 README 的 YAML Front Matter 提供机器可读契约——任务状态、阶段结果、候选、受阻状态、下一阶段与是否允许继续——外部编排系统无需解析正文即可驱动单阶段调用；字段与枚举定义在公共流程第 7 节。Markdown 正文保持人类可读。Cohestra 一次调用只执行一个阶段、阶段结束即停止，不感知队列与调度：编排留在技能之外。
+
+`report` 读取当前项目 `.cohestra/handoffs/` 下全部任务，包括已完成但仍有未关闭项的任务。展示任务与验收状态、遗留问题和状态异常，并链接来源；缺项保持未知。报告直接在对话中输出，不初始化项目、不写文件、不推进阶段，也不改变延期和关闭规则。
 
 规则与阶段提示词保存在技能包内，本文件只做导读；规则真源是下列文件。
 
@@ -23,6 +25,7 @@
 | 路由、执行规则、版本与来源 | [cohestra/SKILL.md](cohestra/SKILL.md) |
 | 公共流程、术语、落盘与共享写入规则 | [references/workflow.md](cohestra/references/workflow.md) |
 | 各阶段职责与可直接粘贴的调用片段 | [references/](cohestra/references/) |
+| 只读任务总览、遗留问题与状态异常 | [references/report.md](cohestra/references/report.md) |
 | 交付骨架与任务索引骨架 | [assets/](cohestra/assets/) |
 | 安装、更新与工具边界 | [references/installation.md](cohestra/references/installation.md) |
 | 维护者验收清单 | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
@@ -81,7 +84,7 @@ npx skills add yuzio-ai/skills --skill relatra
 
 ## 调用
 
-以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。目标项目没有 `.cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。
+以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。阶段调用遇到目标项目没有 `.cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。`report` 只报告容器缺失，不初始化。
 
 ```text
 $cohestra init
@@ -109,6 +112,8 @@ $cohestra validate
 $cohestra verify
 被核对：.cohestra/handoffs/<task-slug>/design-01.md
 上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+
+$cohestra report
 ```
 
 handoff 也可替换为对应任务目录，由任务 README 定位有效输入。起步选择、停止规则与各阶段的对口 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
@@ -140,6 +145,6 @@ Run：<run-id>
 
 ## 维护
 
-发行版 **0.9.0**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**；Relatra 版本 **0.1.0**，报告结构 **v1**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
+发行版 **0.10.0**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**；Relatra 版本 **0.1.0**，报告结构 **v1**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
 
 修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。
