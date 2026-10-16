@@ -33,5 +33,5 @@
 - 对口 verify 提议与用户选择：<need/design/code/fix 填建议核对范围与用户选择；review/validate 填不适用；verify 填不适用（交付后不再次提议）>
 - 负责人：<执行者或待指派>
 - 需要用户决定或补充授权的事项：
-- 索引状态：<本交付物写入时记待同步；README 原子发布并回读后的实际同步结果由最终回复记录。失败时报告 handoff completed、index sync failed，回读所得旧版（或未创建）/ 新版 / 无法确认及恢复条件，不回写已交付 handoff>
+- 索引状态：<本交付物写入时记待同步；README 原子发布并回读后的实际同步结果由最终回复记录。失败时报告 handoff completed、index sync failed，回读所得旧版（或未创建）/ 新版 / 无法确认及恢复条件；本轮 validate 验收通过时另报告「验收通过，完成状态待同步」，不回写已交付 handoff>
 - 派发：$cohestra <下一阶段>，后附本交付物或任务目录及本次补充；调用写法随工具调整。
