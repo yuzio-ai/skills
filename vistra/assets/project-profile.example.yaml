@@ -1,0 +1,45 @@
+# 虚构示例；按项目实际入口填写，不自动复制或初始化。
+profile_version: 1
+project: example-product
+
+sources:
+  canonical:
+    - docs/PRODUCT.md
+  design:
+    - docs/DESIGN.md
+  brand:
+    - docs/BRAND.md
+  policies:
+    - docs/DATA_POLICY.md
+
+domains:
+  desktop:
+    sources:
+      tokens:
+        - docs/ui/TOKENS.md
+      components:
+        - docs/ui/COMPONENTS.md
+
+targets:
+  workspace:
+    domains: [desktop]
+    purpose: product
+    surface: workspace
+    sources:
+      page_overlay:
+        - docs/ui/pages/workspace.md
+
+imports:
+  - source: .agents/skills/example-ui/SKILL.md
+    scope: project
+    role: project-design-rules
+    modes: [review, explore, compare, handoff]
+    domains: [mobile, desktop]
+
+defaults:
+  locale: zh-Hans
+  appearance: light
+  output_directory: null
+  budget:
+    variants: 3
+    refinement_rounds: 1

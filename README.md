@@ -9,6 +9,7 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 | cohestra | Initializes project context; six stages can start from any stage; verify checks drift; report provides a read-only overview of tasks and outstanding findings | [SKILL.md](cohestra/SKILL.md) |
 | cadra | Manages task preparation, queue, order, status, recovery and run reports; serial unattended execution; single-task engineering flow is delegated to Cohestra stages | [SKILL.md](cadra/SKILL.md) |
 | relatra | Reports agent outcomes, execution efficiency, rework and observed usage across selected projects; daily through yearly, Codex first, with evidence and visible unknowns | [SKILL.md](relatra/SKILL.md) |
+| vistra | Reviews, explores, compares and hands off mobile, desktop and brand visuals using project rules and traceable evidence | [SKILL.md](vistra/SKILL.md) |
 
 ## cohestra
 
@@ -68,6 +69,29 @@ See [the skill](relatra/SKILL.md), [data and invocation](relatra/references/data
 
 Plan coverage, review fixes, and native skill validation are recorded in [Relatra acceptance](tests/relatra-scenarios.md). Isolated installation, full invocation and minimum-runtime checks are recorded in [pre-push validation](tests/relatra-prepush.md).
 
+## vistra
+
+Vistra supports four independent modes: `review`, `explore`, `compare`, and `handoff` for static mobile, desktop, and brand visuals. It directly generates or edits images using the host's image capabilities, respects project and user UI/UX rules, and separates recommendations, selected directions, implementation authorization, and validation. It does not build HTML pages, interactive prototypes, or local rendering tools.
+
+The package owns customized Taste-derived methods; Taste is not a runtime dependency. Project references and visual artifacts default to `.yuzio/vistra`. Existing Cohestra, Cadra and Relatra directories and protocols remain unchanged. Vistra does not modify production code or publish engineering acceptance.
+
+```text
+$vistra review
+Object: <page, asset or source>
+Scope: <questions to inspect>
+
+$vistra explore
+Goal: <visual directions and constraints>
+
+$vistra compare
+Candidates: <exact artifact revisions>
+
+$vistra handoff
+Selected: <candidate and selection source>
+```
+
+First project-trial release **0.1.0**, artifact contract **1**: [entrypoint](vistra/SKILL.md), [development Spec](docs/vistra-v0.1-development-spec.md), [release checks and outstanding validation](tests/vistra-release-validation.md). Static package checks pass; static-image behavior and visual quality will be validated and refined in real projects. Offline packaging checks: `python3 -B -m unittest discover -s tests -p 'test_vistra.py'`.
+
 ## Install
 
 Run from the root of the target project; the default scope is project-level:
@@ -76,9 +100,10 @@ Run from the root of the target project; the default scope is project-level:
 npx skills add yuzio-ai/skills --skill cohestra
 npx skills add yuzio-ai/skills --skill cadra
 npx skills add yuzio-ai/skills --skill relatra
+npx skills add yuzio-ai/skills --skill vistra
 ```
 
-Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/), [cadra](cadra/), or [relatra](relatra/) directory where your tool looks for skills.
+Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/), [cadra](cadra/), [relatra](relatra/), or [vistra](vistra/) directory where your tool looks for skills.
 
 The full command set, how to update, and how to diagnose a local source that silently no-ops when updated by name are in the [installation guide](cohestra/references/installation.md).
 

@@ -9,6 +9,7 @@
 | cohestra | 初始化项目上下文，六阶段可从任意阶段起步；verify 核对偏差，report 只读汇总任务与遗留问题 | [SKILL.md](cohestra/SKILL.md) |
 | cadra | 管理任务准备、队列、顺序、状态、恢复和执行报告，无人值守串行推进；单任务工程流程交由 Cohestra 阶段 | [SKILL.md](cadra/SKILL.md) |
 | relatra | 汇总指定项目的 agent 成果、执行效率、返工与资源，生成日报至年报；Codex 优先，保留证据与未知 | [SKILL.md](relatra/SKILL.md) |
+| vistra | 依据项目规范与可追溯证据，评审、探索、比较和交接移动端、桌面端及品牌视觉 | [SKILL.md](vistra/SKILL.md) |
 
 ## cohestra
 
@@ -68,6 +69,29 @@ $relatra
 
 计划覆盖、审查修复及原生技能校验见 [Relatra 验收记录](tests/relatra-scenarios.md)。隔离安装、完整调用及最低运行版本验证见 [推送前验收](tests/relatra-prepush.md)。
 
+## vistra
+
+Vistra 支持 `review`、`explore`、`compare`、`handoff` 四种独立模式，按需加载移动端、桌面端和品牌静态视觉方法，配合项目级、用户级 UI/UX 规范使用。通过宿主图像能力直接生成或编辑图片，不制作 HTML、交互原型或本地渲染工具。推荐、方向选择、实现授权与验证分别记录。
+
+Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra、Cadra、Relatra 现有目录与协议保持不变。Vistra 不修改生产代码或发布工程验收结论。
+
+```text
+$vistra review
+对象：<页面、素材或源码>
+范围：<评审问题>
+
+$vistra explore
+目标：<视觉方向与约束>
+
+$vistra compare
+候选：<准确产物与修订>
+
+$vistra handoff
+采用：<候选与选择来源>
+```
+
+首个项目试用版 **0.1.0**，产物契约 **1**。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，发布检查与待验证项见 [首版验证记录](tests/vistra-release-validation.md)。静态包检查已通过；静态图片行为与视觉质量将在实际项目中验证和迭代。离线包检查：`python3 -B -m unittest discover -s tests -p 'test_vistra.py'`。
+
 ## 安装
 
 在目标项目根目录执行，默认项目级安装：
@@ -76,9 +100,10 @@ $relatra
 npx skills add yuzio-ai/skills --skill cohestra
 npx skills add yuzio-ai/skills --skill cadra
 npx skills add yuzio-ai/skills --skill relatra
+npx skills add yuzio-ai/skills --skill vistra
 ```
 
-用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra](cohestra/)、[cadra](cadra/) 或 [relatra](relatra/) 目录放入工具支持的技能位置。
+用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra](cohestra/)、[cadra](cadra/)、[relatra](relatra/) 或 [vistra](vistra/) 目录放入工具支持的技能位置。
 
 命令全集、更新方式，以及本地来源按名称更新会静默空转的排查，见 [安装说明](cohestra/references/installation.md)。
 
