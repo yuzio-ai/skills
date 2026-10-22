@@ -13,11 +13,11 @@ Reusable agent skills, maintained in one place. Installation is left to general-
 
 ## cohestra
 
-One collaboration is split into six stages — **need → design → code → review → fix → validate** — plus `init`, which creates the project container, `verify`, which checks for drift between stages, and `report`, which provides a read-only overview of project tasks and outstanding findings. The six stages are a list of responsibilities, not a mandatory route: any stage can be the starting point, and the user decides where the work ends.
+One collaboration is split into six stages — **need → design → code → review → fix → validate** — plus `init`, which creates the project container, `verify`, which checks for drift between stages, and `report`, which provides a read-only overview of project tasks and outstanding findings. The six stages are a list of responsibilities, not a mandatory route: any stage can be the starting point, and the user decides where the work ends. When no stage is named, a clear task goal selects the starting stage automatically; each call still executes one stage. Verify runs on request and is suggested only for a concrete drift concern.
 
 Every task README carries a machine-readable contract as YAML front matter — task status, stage result, candidate, blocking state, the next stage and whether continuing is allowed — so an external orchestrator can drive single-stage calls without parsing prose; the fields and enums are defined in the common flow, section 7. The Markdown body stays human-readable. Cohestra runs one stage per call, stops when the stage ends, and knows nothing about queues or schedulers: orchestration stays outside the skill.
 
-`report` reads all tasks in the current project's `.cohestra/handoffs/`, including completed tasks with open findings. It shows task and acceptance states, outstanding findings and state inconsistencies, with source links; missing values stay unknown. Output stays in the conversation: it does not initialize projects, write files, advance stages or change deferral and closure rules.
+`report` reads all tasks in the current project's `.yuzio/cohestra/handoffs/`, including completed tasks with open findings. It shows task and acceptance states, outstanding findings and state inconsistencies, with source links; missing values stay unknown. Output stays in the conversation: it does not initialize projects, write files, advance stages or change deferral and closure rules.
 
 The rules and stage prompts live inside the skill package (currently documented in Chinese); this file is only a guide. The sources of truth are the files below.
 
@@ -35,7 +35,7 @@ The rules and stage prompts live inside the skill package (currently documented 
 
 Cadra is task orchestration: it manages task preparation, queue, order, status, recovery and run reports, and advances queued tasks serially in unattended runs. It does not define the engineering stages — those belong to Cohestra; Cadra only declares a stage sequence (flow preset) and calls Cohestra stages, driven strictly by Cohestra's machine-readable state.
 
-A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages. A run is only created after the target passes the Git / `.cohestra` precondition check. Dependency chains advance one layer per run: a task passes the Ready Gate and enters the queue only after every dependency is completed, so a run never holds a task together with an unfinished dependency.
+A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages. A run is only created after the target passes the Git / `.yuzio/cohestra` precondition check. Dependency chains advance one layer per run: a task passes the Ready Gate and enters the queue only after every dependency is completed, so a run never holds a task together with an unfinished dependency.
 
 For a new task without any prior delivery or call, `run` starts at the first stage in its flow. To recover blocked or failed tasks, explicitly select them in a new `run`; the previous run keeps its recorded outcome. Editing the definition of a task that already reached a terminal state sends it back to draft and through the Ready Gate again, with the old and new definitions kept side by side. Requirement or flow changes restart at the new flow's first stage. Changes limited to dependencies or execution policy retry the verified pending stage for blocked/failed tasks, or close the revision without a stage call for completed tasks. Task definitions cannot be edited while their run is unfinished. Unattended execution is bounded by three limits: a per-stage failure retry budget (2 extra calls), a remediation-round cap (3 rounds) and a per-task call budget (16 calls); exhausting any of them records `failed` and adds the task to the human-intervention list. The no-progress check fires only when two consecutive calls of the same stage leave every structured field unchanged; the validate in-stage evidence backfill is exempt and bounded by the call budget instead. Enqueue and dequeue use a three-step write with an operation id, and `resume` idempotently completes a partially written enqueue or dequeue. An existing seven-column queue list is not migrated: a new eight-column block is appended and used from then on.
 
@@ -73,7 +73,7 @@ Plan coverage, review fixes, and native skill validation are recorded in [Relatr
 
 Vistra supports four independent modes: `review`, `explore`, `compare`, and `handoff` for static mobile, desktop, and brand visuals. It directly generates or edits images using the host's image capabilities, respects project and user UI/UX rules, and separates recommendations, selected directions, implementation authorization, and validation. It does not build HTML pages, interactive prototypes, or local rendering tools.
 
-The package owns customized Taste-derived methods; Taste is not a runtime dependency. Project references and visual artifacts default to `.yuzio/vistra`. Existing Cohestra, Cadra and Relatra directories and protocols remain unchanged. Vistra does not modify production code or publish engineering acceptance.
+The package owns customized Taste-derived methods; Taste is not a runtime dependency. Project references and visual artifacts default to `.yuzio/vistra`. Cohestra stores local records in `.yuzio/cohestra`; Cadra and Relatra keep their existing directories and protocols. Vistra does not modify production code or publish engineering acceptance.
 
 ```text
 $vistra review
@@ -109,7 +109,7 @@ The full command set, how to update, and how to diagnose a local source that sil
 
 ## Invocation
 
-The examples below are skill invocations typed into an agent, not terminal commands; other tools use their own entry points. When the target project has no `.cohestra`, stage calls warn first and run a minimal initialization, then start from the stage you need, reading only the corresponding stage file each time. `report` only reports the missing container and does not initialize it.
+The examples below are skill invocations typed into an agent, not terminal commands; other tools use their own entry points. When the target project has no `.yuzio/cohestra`, stage calls warn first and run a minimal initialization, then start from the stage you need, reading only the corresponding stage file each time. `report` only reports the missing container and does not initialize it.
 
 ```text
 $cohestra init
@@ -126,22 +126,22 @@ $cohestra code
 参考：<相关文件、接口文档或截图>
 
 $cohestra review
-.cohestra/handoffs/<task-slug>/code-01.md
+.yuzio/cohestra/handoffs/<task-slug>/code-01.md
 
 $cohestra fix
 问题：<症状、预期行为、范围和参考>
 
 $cohestra validate
-.cohestra/handoffs/<task-slug>/review-01.md
+.yuzio/cohestra/handoffs/<task-slug>/review-01.md
 
 $cohestra verify
-被核对：.cohestra/handoffs/<task-slug>/design-01.md
-上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+被核对：.yuzio/cohestra/handoffs/<task-slug>/design-01.md
+上游依据：.yuzio/cohestra/handoffs/<task-slug>/need-01.md
 
 $cohestra report
 ```
 
-The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / 上游依据) are Chinese because the skill's own prompts are written in Chinese; keep them as shown, only the placeholders change. A handoff path may also be replaced by the corresponding task directory, whose task README points to the valid inputs. Starting-point selection, stop rules and each stage's paired verify convention are in [cohestra/SKILL.md](cohestra/SKILL.md) and the [common flow](cohestra/references/workflow.md).
+The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / 上游依据) are Chinese because the skill's own prompts are written in Chinese; keep them as shown, only the placeholders change. A handoff path may also be replaced by the corresponding task directory, whose task README points to the valid inputs. Automatic stage selection, stop rules and on-demand verify are in [cohestra/SKILL.md](cohestra/SKILL.md) and the [common flow](cohestra/references/workflow.md).
 
 Cadra invocations manage the task queue around those stages; when the target project has no `.cadra`, the skill warns first and runs a minimal initialization:
 
@@ -166,7 +166,7 @@ $cadra report
 Run：<run-id>
 ```
 
-The labels are Chinese for the same reason as above. Task state lives in `.cadra`; the single-task flow and engineering evidence live in `.cohestra`, linked by reference and never copied across. The state machines, Ready Gate, Cohestra call contract and unattended rules are in [cadra/references/workflow.md](cadra/references/workflow.md).
+The labels are Chinese for the same reason as above. Task state lives in `.cadra`; the single-task flow and engineering evidence live in `.yuzio/cohestra`, linked by reference and never copied across. The state machines, Ready Gate, Cohestra call contract and unattended rules are in [cadra/references/workflow.md](cadra/references/workflow.md).
 
 ## Maintenance
 

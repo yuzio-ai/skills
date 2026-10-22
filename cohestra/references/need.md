@@ -44,6 +44,4 @@ $cohestra need
 
 新增 `need-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
-对口 verify：建议核对 need 是否忠实于原始请求、AC 是否可验证。确认需求始终是用户的动作，不由 verify 代替。
-
 推荐下一步 design，传递本轮 need、关键未决项和负责人。

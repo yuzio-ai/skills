@@ -58,9 +58,9 @@ def prepare(destination):
     if destination.exists():
         raise FileExistsError("Use a new destination; existing data is never overwritten")
     destination.mkdir(parents=True)
-    handoffs = destination / ".cohestra/handoffs"
+    handoffs = destination / ".yuzio/cohestra/handoffs"
     handoffs.mkdir(parents=True)
-    (destination / ".cohestra/README.md").write_text("# 测试项目协作上下文\n", encoding="utf-8")
+    (destination / ".yuzio/cohestra/README.md").write_text("# 测试项目协作上下文\n", encoding="utf-8")
     records = {
         "alpha-completed/README.md": index(
             "alpha-completed", "导出说明完善",

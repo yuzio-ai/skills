@@ -84,9 +84,9 @@ def prepare(suite):
 
     for case in cases:
         root = suite / case["id"]
-        task = root / ".cohestra/handoffs/sample"
+        task = root / ".yuzio/cohestra/handoffs/sample"
         task.mkdir(parents=True)
-        (root / ".cohestra/README.md").write_text("# 隔离验证项目\n")
+        (root / ".yuzio/cohestra/README.md").write_text("# 隔离验证项目\n")
         (root / "AGENTS.md").write_text(
             "本项目为隔离夹具。只执行 REQUEST.md 指定阶段。业务候选只读。\n"
             "README 的写入必须通过外部测试驱动 publish；其他交付物可正常写入。\n"
@@ -154,7 +154,7 @@ def prepare(suite):
                 draft_body += "必须继续 review 才能完成任务。\n"
             (root / "unpublished-draft.md").write_text(document(draft, draft_body))
         stage = case.get("stage", "validate")
-        request = f"使用指定 Cohestra skill 执行 ${'cohestra'} {stage}，目标项目为本目录，任务目录为 .cohestra/handoffs/sample。\n"
+        request = f"使用指定 Cohestra skill 执行 ${'cohestra'} {stage}，目标项目为本目录，任务目录为 .yuzio/cohestra/handoffs/sample。\n"
         request += f"执行模式：{case.get('mode', 'attended')}。本次允许运行 check.py 与写交付物。\n"
         if stage == "review":
             request += "本任务由用户明确指定以本轮 review 为终点。\n"
@@ -215,7 +215,7 @@ def preflight(root, draft, parser="ruby"):
 def publish(root, draft, base):
     suite = root.parent
     config = next(c for c in json.loads((suite / "controller.json").read_text()) if c["id"] == root.name)
-    task = root / ".cohestra/handoffs/sample"
+    task = root / ".yuzio/cohestra/handoffs/sample"
     target = task / "README.md"
     events = suite / "events"
     events.mkdir(exist_ok=True)

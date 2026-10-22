@@ -13,11 +13,11 @@
 
 ## cohestra
 
-把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差、`report` 只读汇总项目任务与遗留问题。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。
+把一次协作拆成六个阶段 **need → design → code → review → fix → validate**，另有 `init` 建立项目容器、`verify` 在阶段之间核对偏差、`report` 只读汇总项目任务与遗留问题。六阶段是职责清单而非必经路线：任何阶段都可以是起点，终点由用户决定。未指定阶段时按明确任务目标自动选择一个起点，不因缺少阶段名称而询问；一次调用仍只执行一个阶段。verify 仅按请求执行，发现具体偏差时才建议。
 
 每个任务 README 的 YAML Front Matter 提供机器可读契约——任务状态、阶段结果、候选、受阻状态、下一阶段与是否允许继续——外部编排系统无需解析正文即可驱动单阶段调用；字段与枚举定义在公共流程第 7 节。Markdown 正文保持人类可读。Cohestra 一次调用只执行一个阶段、阶段结束即停止，不感知队列与调度：编排留在技能之外。
 
-`report` 读取当前项目 `.cohestra/handoffs/` 下全部任务，包括已完成但仍有未关闭项的任务。展示任务与验收状态、遗留问题和状态异常，并链接来源；缺项保持未知。报告直接在对话中输出，不初始化项目、不写文件、不推进阶段，也不改变延期和关闭规则。
+`report` 读取当前项目 `.yuzio/cohestra/handoffs/` 下全部任务，包括已完成但仍有未关闭项的任务。展示任务与验收状态、遗留问题和状态异常，并链接来源；缺项保持未知。报告直接在对话中输出，不初始化项目、不写文件、不推进阶段，也不改变延期和关闭规则。
 
 规则与阶段提示词保存在技能包内，本文件只做导读；规则真源是下列文件。
 
@@ -73,7 +73,7 @@ $relatra
 
 Vistra 支持 `review`、`explore`、`compare`、`handoff` 四种独立模式，按需加载移动端、桌面端和品牌静态视觉方法，配合项目级、用户级 UI/UX 规范使用。通过宿主图像能力直接生成或编辑图片，不制作 HTML、交互原型或本地渲染工具。推荐、方向选择、实现授权与验证分别记录。
 
-Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra、Cadra、Relatra 现有目录与协议保持不变。Vistra 不修改生产代码或发布工程验收结论。
+Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra 本机资料使用 `.yuzio/cohestra`；Cadra、Relatra 的目录与协议保持不变。Vistra 不修改生产代码或发布工程验收结论。
 
 ```text
 $vistra review
@@ -109,7 +109,7 @@ npx skills add yuzio-ai/skills --skill vistra
 
 ## 调用
 
-以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。阶段调用遇到目标项目没有 `.cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。`report` 只报告容器缺失，不初始化。
+以下是在智能体中输入的技能调用示例，不是终端命令；其他工具使用各自入口。阶段调用遇到目标项目没有 `.yuzio/cohestra` 时会先提醒并执行一次最小初始化，再从需要的阶段开始，每次只读取对应说明。`report` 只报告容器缺失，不初始化。
 
 ```text
 $cohestra init
@@ -126,22 +126,22 @@ $cohestra code
 参考：<相关文件、接口文档或截图>
 
 $cohestra review
-.cohestra/handoffs/<task-slug>/code-01.md
+.yuzio/cohestra/handoffs/<task-slug>/code-01.md
 
 $cohestra fix
 问题：<症状、预期行为、范围和参考>
 
 $cohestra validate
-.cohestra/handoffs/<task-slug>/review-01.md
+.yuzio/cohestra/handoffs/<task-slug>/review-01.md
 
 $cohestra verify
-被核对：.cohestra/handoffs/<task-slug>/design-01.md
-上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+被核对：.yuzio/cohestra/handoffs/<task-slug>/design-01.md
+上游依据：.yuzio/cohestra/handoffs/<task-slug>/need-01.md
 
 $cohestra report
 ```
 
-handoff 也可替换为对应任务目录，由任务 README 定位有效输入。起步选择、停止规则与各阶段的对口 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
+handoff 也可替换为对应任务目录，由任务 README 定位有效输入。阶段自动选择、停止规则与按需 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
 
 Cadra 调用管理这些阶段外围的任务队列；目标项目没有 `.cadra` 时会先提醒并执行一次最小初始化：
 
@@ -166,7 +166,7 @@ $cadra report
 Run：<run-id>
 ```
 
-参数标签保持中文，原因同上。任务与调度状态保存在 `.cadra`；单任务流程与工程证据保存在 `.cohestra`，两者只通过引用关联，不互相复制内容。状态机、Ready Gate、Cohestra 调用契约与 unattended 规则见 [cadra/references/workflow.md](cadra/references/workflow.md)。
+参数标签保持中文，原因同上。任务与调度状态保存在 `.cadra`；单任务流程与工程证据保存在 `.yuzio/cohestra`，两者只通过引用关联，不互相复制内容。状态机、Ready Gate、Cohestra 调用契约与 unattended 规则见 [cadra/references/workflow.md](cadra/references/workflow.md)。
 
 ## 维护
 

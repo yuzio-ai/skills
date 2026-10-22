@@ -6,15 +6,15 @@
 
 ```text
 $cohestra verify
-被核对：.cohestra/handoffs/<task-slug>/design-01.md
-上游依据：.cohestra/handoffs/<task-slug>/need-01.md
+被核对：.yuzio/cohestra/handoffs/<task-slug>/design-01.md
+上游依据：.yuzio/cohestra/handoffs/<task-slug>/need-01.md
 ```
 
 从中间阶段起步、任务目录里没有上游交付时，把上游依据写成本次实际提供的材料：
 
 ```text
 $cohestra verify
-被核对：.cohestra/handoffs/<task-slug>/code-01.md
+被核对：.yuzio/cohestra/handoffs/<task-slug>/code-01.md
 上游依据：本次请求（<一句话复述>）与用户确认
 ```
 
@@ -37,7 +37,7 @@ $cohestra verify
    - **追溯断链**：本阶段结论找不到上游依据，或引用的文件与章节不存在。
 4. 逐条判定处置：接受偏差并说明依据、修订本阶段产出、回上游阶段补充，或转用户确认；标注是否阻塞后续阶段。
 5. 给出结论：一致 / 有偏差待处理 / 无法核对。无法核对时列出缺失的上游依据与恢复条件，不用空泛结论填充。
-6. 记录执行者与方式。同一执行者自核必须明示；verify 通过不等于独立审查完成，也不取消既定的 review、复审或验收要求。
+6. 记录执行者与方式，同一执行者自核必须明示；核对结果不取消既定的 review、复审或验收要求。
 
 本阶段结果写核对对象、偏差清单（类型、位置、上游依据、影响、处置）、结论与遗留项；一致时也要写明核对范围与未覆盖部分。
 
@@ -54,6 +54,6 @@ $cohestra verify
 
 ## 交付与停止
 
-新增 `verify-<轮次>.md`，编号独立于六阶段序列；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。「输入与上游依据」写明被核对阶段与上游文件，任务索引按 `verify-<轮次>` 登记该行。
+新增 `verify-<轮次>.md`，按[公共流程第 5 节](workflow.md#5-落盘与共享写入)登记实际核对；准备更新索引时读取[索引发布与恢复](publication.md)，仅更新正文，保留 Front Matter 原值，缺失时不添加。
 
-对口 verify：不适用——verify 本身不是被核对的阶段，交付后不再次提议。按原计划推荐下一阶段；有偏差待处理时推荐回上游阶段或补一轮修订，不自行改写被核对交付。
+按原计划推荐下一阶段；有偏差待处理时推荐回上游阶段或补一轮修订，不自行改写被核对交付。

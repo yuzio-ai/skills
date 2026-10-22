@@ -1,2 +1,2 @@
-# Task-local large logs, caches and build products are not handoff records.
-/handoffs/*/scratch/
+# Local execution data; also add /.yuzio/ to the project root .gitignore.
+*

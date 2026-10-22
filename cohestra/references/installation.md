@@ -39,6 +39,6 @@ CLI 功能随版本变化，先以实际 `npx skills --help` 为准；不支持�
 
 ## 保留的项目边界
 
-`$cohestra init` 是安装后交给智能体的指派，仅建立或复用上下文容器；`npx skills init` 创建新的 SKILL.md，二者不同。容器布局、多工具与 worktree 边界见 [init](init.md)。
+`$cohestra init` 是安装后交给智能体的指派，仅建立或复用上下文容器；`npx skills init` 创建新的 SKILL.md，二者不同。容器布局与多工具使用边界见 [init](init.md)。
 
 不把技能安装器的锁视为阶段或业务文件写入锁，普通阶段也不修改初始化布局。

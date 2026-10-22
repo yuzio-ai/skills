@@ -24,7 +24,7 @@ def check(suite):
     require_preflight = (suite / "suite.json").exists()
     for config in json.loads((suite / "controller.json").read_text()):
         root = suite / config["id"]
-        task = root / ".cohestra/handoffs/sample"
+        task = root / ".yuzio/cohestra/handoffs/sample"
         failures = []
 
         def expect(condition, message):
@@ -84,7 +84,7 @@ def check(suite):
                     expect(not any("replaced" in event["events"] for event in events),
                            "publication continued after failed prepublication validation")
         for relative, original_hash in config["input_hashes"].items():
-            if relative == ".cohestra/handoffs/sample/README.md":
+            if relative == ".yuzio/cohestra/handoffs/sample/README.md":
                 continue
             path = root / relative
             expect(path.exists() and fixture.digest(path) == original_hash, "changed input: " + relative)
