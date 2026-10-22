@@ -38,6 +38,39 @@ def resource_graph(package):
     return visited
 
 
+def validate_provenance(package):
+    """Check pinned sources and bidirectional mappings, not wording or visual quality."""
+    path = package / "references/provenance.md"
+    sections = re.split(r"^## ", path.read_text(), flags=re.MULTILINE)[1:]
+    mapped = set()
+    for section in sections:
+        anchor, body = section.split("\n", 1)
+        targets = re.findall(r"\[[^\]]+\]\(((?:domains|modes)/[^)]+\.md)\)", body)
+        if len(targets) != 1 or targets[0] in mapped:
+            raise ValueError("Missing or duplicate rule mapping")
+        mapped.add(targets[0])
+        target = path.parent / targets[0]
+        if not target.is_file() or f"../provenance.md#{anchor}" not in target.read_text():
+            raise ValueError("Missing rule file or source backlink")
+        sources = 0
+        for paragraph in body.split("\n\n"):
+            urls = re.findall(r"https://github.com/Leonxlnx/taste-skill/blob/([^/)]+)/([^\s)]+)", paragraph)
+            for commit, source in urls:
+                if not re.fullmatch(r"[0-9a-f]{40}", commit):
+                    raise ValueError("Unpinned source")
+                if not source.startswith("skills/") or not source.endswith("/SKILL.md"):
+                    raise ValueError("Invalid source path")
+                if not re.search(r"SHA-256 `[0-9a-f]{64}`", paragraph):
+                    raise ValueError("Missing source hash")
+                sources += 1
+        if not sources or not re.search(r"202\d-\d{2}-\d{2}", body):
+            raise ValueError("Missing source or read date")
+    expected = {str(p.relative_to(path.parent)) for p in (path.parent / "domains").glob("*.md")}
+    expected.update({"modes/review.md", "modes/handoff.md"})
+    if mapped != expected:
+        raise ValueError("Incomplete rule coverage")
+
+
 class VistraPackagingTests(unittest.TestCase):
     def test_standalone_install_resource_closure(self):
         # The install must work with only this skill, without sibling skills or Spec.
@@ -92,21 +125,26 @@ class VistraPackagingTests(unittest.TestCase):
                 self.assertTrue(all(line == line.rstrip() for line in text.splitlines()))
 
     def test_taste_provenance_is_pinned(self):
-        for reference in (PACKAGE / "references").rglob("*.md"):
-            content = reference.read_text()
-            for paragraph in content.split("\n\n"):
-                urls = re.findall(r"https://github.com/Leonxlnx/taste-skill/blob/([^/)]+)/([^\s)]+)", paragraph)
-                for commit, source in urls:
-                    with self.subTest(reference=reference.name, source=source):
-                        self.assertRegex(commit, r"^[0-9a-f]{40}$")
-                        self.assertTrue(source.startswith("skills/"))
-                        self.assertTrue(source.endswith("/SKILL.md"))
-                        self.assertRegex(paragraph, r"SHA-256 `[0-9a-f]{64}`")
-            if reference.parent.name == "domains":
-                self.assertIn("https://github.com/Leonxlnx/taste-skill/blob/", content)
+        validate_provenance(PACKAGE)
         license_text = (PACKAGE / "LICENSE").read_text()
         self.assertIn("Copyright (c) 2026 YUZIO", license_text)
         self.assertIn("Copyright (c) 2026 Leonxlnx", license_text)
+
+    def test_provenance_rejects_broken_sources_and_mappings(self):
+        mutations = [
+            (lambda s: s.replace("f624f37a8c650b9cc550253104925efe4c8de246", "main"), "Unpinned"),
+            (lambda s: re.sub(r"SHA-256 `[0-9a-f]{64}`", "", s, count=1), "Missing source hash"),
+            (lambda s: s.replace("(domains/mobile.md)", "(domains/missing.md)"), "Missing rule"),
+            (lambda s: re.sub(r"## mobile\n.*?(?=## desktop)", "", s, flags=re.DOTALL), "Incomplete rule"),
+        ]
+        for mutate, error in mutations:
+            with self.subTest(error=error), tempfile.TemporaryDirectory() as temp:
+                package = Path(temp) / "vistra"
+                shutil.copytree(PACKAGE, package)
+                source = package / "references/provenance.md"
+                source.write_text(mutate(source.read_text()))
+                with self.assertRaisesRegex(ValueError, error):
+                    validate_provenance(package)
 
 
 if __name__ == "__main__":

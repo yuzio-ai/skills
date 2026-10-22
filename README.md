@@ -90,7 +90,7 @@ $vistra handoff
 Selected: <candidate and selection source>
 ```
 
-First project-trial release **0.1.0**, artifact contract **1**: [entrypoint](vistra/SKILL.md), [development Spec](docs/vistra-v0.1-development-spec.md), [release checks and outstanding validation](tests/vistra-release-validation.md). Static package checks pass; static-image behavior and visual quality will be validated and refined in real projects. Offline packaging checks: `python3 -B -m unittest discover -s tests -p 'test_vistra.py'`.
+Current workspace version **0.1.1** keeps formal artifact contract **1** and profile format **1**. Everyday responses use concise mode-specific content; formal reports and cross-skill handoffs retain full traceability. Configuration details and provenance load only when needed. See the [entrypoint](vistra/SKILL.md), [development Spec](docs/vistra-v0.1-development-spec.md), [current validation](tests/vistra-simplification-validation.md), and [historical 0.1.0 checks](tests/vistra-release-validation.md). This update does not install or publish the skill. Offline checks: `python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`.
 
 ## Install
 

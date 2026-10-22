@@ -1,0 +1,31 @@
+{
+  "package_markdown_characters": {
+    "before": 32779,
+    "after": 30006
+  },
+  "mobile_review_load": {
+    "before_files": [
+      "SKILL.md",
+      "references/project-adapter.md",
+      "references/storage.md",
+      "references/constraints.md",
+      "references/art-direction.md",
+      "references/evidence.md",
+      "references/modes/review.md",
+      "references/domains/mobile.md",
+      "assets/report.template.md",
+      "assets/modes/review.section.md"
+    ],
+    "after_files": [
+      "SKILL.md",
+      "references/project-adapter.md",
+      "references/constraints.md",
+      "references/art-direction.md",
+      "references/evidence.md",
+      "references/modes/review.md",
+      "references/domains/mobile.md"
+    ],
+    "before_characters": 18785,
+    "after_characters": 13690
+  }
+}

@@ -90,7 +90,7 @@ $vistra handoff
 采用：<候选与选择来源>
 ```
 
-首个项目试用版 **0.1.0**，产物契约 **1**。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，发布检查与待验证项见 [首版验证记录](tests/vistra-release-validation.md)。静态包检查已通过；静态图片行为与视觉质量将在实际项目中验证和迭代。离线包检查：`python3 -B -m unittest discover -s tests -p 'test_vistra.py'`。
+当前工作区版本 **0.1.1**，正式报告与跨 Skill 产物契约 **1**、profile 格式 **1** 保持兼容。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，当前检查见 [精简验证](tests/vistra-simplification-validation.md)，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
 
 ## 安装
 
