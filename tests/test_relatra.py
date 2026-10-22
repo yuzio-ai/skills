@@ -5,6 +5,9 @@ import hashlib
 import importlib.util
 import io
 import json
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -22,7 +25,7 @@ class RelatraTests(unittest.TestCase):
         self.project = str(self.root / "project")
         self.logs = self.root / "logs"
         self.logs.mkdir()
-        self.config = {"schema_version": 1, "projects": [self.project], "source_roots": [str(self.logs)],
+        self.config = {"schema_version": r.SCHEMA, "projects": [self.project], "source_roots": [str(self.logs)],
                        "output": str(self.root / "reports"), "timezone": "Asia/Shanghai"}
         self.window = r.period_window("weekly", "Asia/Shanghai", r.stamp("2026-10-13T09:00:00+08:00"), "2026-10-07")
 
@@ -49,7 +52,7 @@ class RelatraTests(unittest.TestCase):
         return path
 
     def facts(self):
-        return r.scan(self.config, self.window)
+        return r.scan(self.config, self.window, "deep")
 
     def event(self, facts, kind="delivered", at="2026-10-06T09:10:00+08:00", **extra):
         eid = next(e["id"] for e in facts["evidence"] if e.get("turn_id") == "turn" and e["kind"] == "tool_result")
@@ -59,7 +62,7 @@ class RelatraTests(unittest.TestCase):
                 "basis": "build", "verified_excerpt": "Build succeeded; checked artifact navigation", **extra}
 
     def ledger(self, facts, events=None, refs=None):
-        return {"schema_version": 1, "tasks": [{"id": "goal", "revision": 1, "title": "目标", "project": self.project, "type": "implementation",
+        return {"schema_version": r.SCHEMA, "analysis": facts["analysis"], "process_reviewed": facts["analysis"] == "deep", "tasks": [{"id": "goal", "revision": 1, "title": "目标", "project": self.project, "type": "implementation",
                                                "started_at": "2026-10-06T09:00:00+08:00", "turn_ids": refs or ["turn"],
                                                "start_evidence": [next(e["id"] for e in facts["evidence"] if e.get("turn_id") == "turn" and e["kind"] == "task_started")],
                                                "start_note": "该轮次明确开始该目标，已核对用户输入",
@@ -250,14 +253,14 @@ class RelatraTests(unittest.TestCase):
     def test_unmapped_and_report_turn_exclusion(self):
         self.save(self.log())
         f = self.facts()
-        ledger = {"schema_version": 1, "tasks": [], "excluded_turns": []}
+        ledger = {"schema_version": r.SCHEMA, "analysis": "deep", "process_reviewed": True, "tasks": [], "excluded_turns": []}
         self.assertEqual(r.aggregate(f, ledger)["coverage"]["unmapped_turn_ids"], ["turn"])
         ledger["excluded_turns"] = [{"turn_id": "turn", "reason": "报告生成"}]
         self.assertEqual(r.aggregate(f, ledger)["execution"]["turns"], 0)
 
     def test_current_readme_cannot_rebuild_old_state(self):
         self.save(self.log())
-        folder = Path(self.project) / ".cohestra/handoffs/goal"
+        folder = Path(self.project) / ".yuzio/cohestra/handoffs/goal"
         folder.mkdir(parents=True)
         (folder / "README.md").write_text("status: completed", encoding="utf-8")
         f = self.facts()
@@ -298,18 +301,14 @@ class RelatraTests(unittest.TestCase):
         self.assertEqual(s["recorded_wait_seconds_union"], 600)
         self.assertEqual(s["process_events"]["wait"], 0)
 
-    def test_corrections_preserve_original(self):
+    def test_full_ledger_edit_preserves_original(self):
         self.save(self.log())
         f = self.facts()
         ledger = self.ledger(f)
-        task = copy.deepcopy(ledger["tasks"][0])
-        task["events"] = []
-        patch = {"schema_version": 1, "reason": "用户更正", "patch": [{"op": "replace", "task_id": "goal", "revision": 1, "task": task}]}
-        self.assertEqual(r.aggregate(f, r.apply_corrections(ledger, [patch]))["counts"]["delivered"], 0)
+        edited = copy.deepcopy(ledger)
+        edited["tasks"][0]["events"] = []
+        self.assertEqual(r.aggregate(f, edited)["counts"]["delivered"], 0)
         self.assertEqual(r.aggregate(f, ledger)["counts"]["delivered"], 1)
-        patch["patch"][0]["revision"] = 2
-        with self.assertRaises(r.DataError):
-            r.apply_corrections(ledger, [patch])
 
     def test_annual_trend_recomputes_from_base(self):
         self.save(self.log())
@@ -328,25 +327,46 @@ class RelatraTests(unittest.TestCase):
         return json.loads(stream.getvalue())
 
     def test_cli_versioned_reproducible_report_and_correction(self):
+        self.config["output"] = str(Path(self.project) / ".yuzio/relatra")
+        workflow_paths = [Path(self.project) / ".yuzio/cadra/runs/run.md",
+                          Path(self.project) / ".yuzio/cohestra/handoffs/goal/code-01.md"]
+        for workflow in workflow_paths:
+            workflow.parent.mkdir(parents=True, exist_ok=True)
+            workflow.write_text("- 时间：2026-10-06T09:05:00+08:00\nWorkflow evidence", encoding="utf-8")
+        workflow_before = {p: p.read_bytes() for p in workflow_paths}
         path = self.save(self.log())
         before = path.read_bytes()
         configured = self.cli(["configure", "--output", self.config["output"], "--project", self.project, "--source-root", str(self.logs)])
         collected = self.cli(["collect", "--config", configured["config"], "--date", "2026-10-07", "--now", "2026-10-13T09:00:00+08:00"])
         snapshot = Path(collected["snapshot"])
+        self.assertTrue(r.inside(snapshot, self.config["output"]))
         f = r.read_json(snapshot / "facts.json")
+        self.assertEqual({s["path"] for s in f["sources"] if s["kind"] == "workflow"},
+                         {str(p) for p in workflow_paths})
         r.write_json(snapshot / "tasks.json", self.ledger(f))
         first = self.cli(["report", "--snapshot", str(snapshot)])
+        self.assertTrue(r.inside(first["report"], self.config["output"]))
         second = self.cli(["report", "--snapshot", str(snapshot)])
         self.assertNotEqual(first["report"], second["report"])
         self.assertEqual(Path(first["statistics"]).read_bytes(), Path(second["statistics"]).read_bytes())
         self.assertIn("本期交付（含验收） 1", Path(first["report"]).read_text())
-        patch = self.root / "patch.json"
-        r.write_json(patch, [{"op": "remove", "task_id": "goal", "revision": 1}])
-        corrected = self.cli(["correct", "--config", configured["config"], "--patch", str(patch), "--reason", "用户确认重复"])
-        third = self.cli(["report", "--snapshot", str(snapshot), "--correction", corrected["correction"]])
+        edited = self.root / "edited.json"
+        ledger = r.read_json(Path(first["report"]).parent / "tasks.json")
+        ledger["tasks"] = []
+        r.write_json(edited, ledger)
+        first_folder = str(Path(first["report"]).parent)
+        frozen = {p.name: p.read_bytes() for p in Path(first_folder).iterdir()}
+        third = self.cli(["report", "--snapshot", first_folder, "--tasks", str(edited),
+                          "--revises", first_folder, "--reason", "用户确认重复"])
+        self.assertEqual({p.name: p.read_bytes() for p in Path(first_folder).iterdir()}, frozen)
+        manifest = r.read_json(Path(third["report"]).parent / "manifest.json")
+        self.assertEqual(manifest["revises"], first_folder)
+        self.assertEqual(manifest["reason"], "用户确认重复")
+        self.assertFalse((Path(third["report"]).parent / "corrections.json").exists())
         self.assertEqual(third["counts"]["delivered"], 0)
         self.assertEqual(r.read_json(first["statistics"])["counts"]["delivered"], 1)
         self.assertEqual(path.read_bytes(), before)
+        self.assertEqual({p: p.read_bytes() for p in workflow_paths}, workflow_before)
 
     def test_baseline_recomputed_and_hash_verified(self):
         self.save(self.log())
@@ -355,12 +375,12 @@ class RelatraTests(unittest.TestCase):
         old = copy.deepcopy(f)
         old["window"] = r.period_window("weekly", "Asia/Shanghai", r.stamp("2026-10-13T09:00:00Z"), "2026-09-30")
         old["turns"] = []
-        tasks = {"schema_version": 1, "tasks": [], "excluded_turns": []}
+        tasks = {"schema_version": r.SCHEMA, "analysis": "deep", "process_reviewed": True, "tasks": [], "excluded_turns": []}
         folder = self.root / "baseline"
         folder.mkdir()
         r.write_json(folder / "facts.json", old)
         r.write_json(folder / "tasks.json", tasks)
-        r.write_json(folder / "manifest.json", {"facts": str(folder / "facts.json"), "input_hashes": {"facts": r.digest(old), "ledger": r.digest(tasks)}})
+        r.write_json(folder / "manifest.json", {"schema_version": r.SCHEMA, "facts": str(folder / "facts.json"), "input_hashes": {"facts": r.digest(old), "ledger": r.digest(tasks)}})
         self.assertFalse(r.compare(s, f, folder)["comparable"])
         self.assertIn("缺少观察样本", r.compare(s, f, folder)["reason"])
         old["warnings"].append("tampered")
@@ -369,9 +389,26 @@ class RelatraTests(unittest.TestCase):
             r.compare(s, f, folder)
 
     def test_output_never_overlaps_sources_or_workflow_container(self):
-        for output in [str(self.logs), str(self.logs / "reports"), str(self.root), self.project + "/.cadra/reports"]:
-            with self.assertRaises(r.DataError):
+        outputs = [str(self.logs), str(self.logs / "reports"), str(self.root)]
+        outputs += [self.project + "/.yuzio/" + container + suffix
+                    for container in ("cadra", "cohestra") for suffix in ("", "/reports")]
+        for output in outputs:
+            with self.subTest(output=output), self.assertRaises(r.DataError):
                 r.validate_config(dict(self.config, output=output))
+
+    def test_output_allows_relatra_and_custom_directories(self):
+        for suffix in (".yuzio/relatra", "custom-reports", "cadra/reports", ".yuzio/cadra-reports"):
+            output = str(Path(self.project) / suffix)
+            with self.subTest(output=output):
+                self.assertEqual(r.validate_config(dict(self.config, output=output))["output"], output)
+
+    def test_output_symlink_into_workflow_container_is_rejected(self):
+        container = Path(self.project) / ".yuzio/cohestra"
+        container.mkdir(parents=True)
+        alias = self.root / "reports-alias"
+        alias.symlink_to(container, target_is_directory=True)
+        with self.assertRaises(r.DataError):
+            r.validate_config(dict(self.config, output=str(alias / "reports")))
 
     def test_historical_open_turn_does_not_imply_current_activity(self):
         self.save(self.log(start="2026-09-01T09:00:00+08:00", end=None, usage=False))
@@ -495,7 +532,7 @@ class RelatraTests(unittest.TestCase):
 
     def test_unknown_workflow_date_needs_dated_anchor(self):
         self.save(self.log())
-        folder = Path(self.project) / ".cadra/runs"
+        folder = Path(self.project) / ".yuzio/cadra/runs"
         folder.mkdir(parents=True)
         (folder / "future-run.md").write_text("completed: future", encoding="utf-8")
         f = self.facts()
@@ -547,7 +584,7 @@ class RelatraTests(unittest.TestCase):
 
     def test_explicit_future_workflow_does_not_leak_into_old_snapshot(self):
         self.save(self.log())
-        folder = Path(self.project) / ".cohestra/handoffs/goal"
+        folder = Path(self.project) / ".yuzio/cohestra/handoffs/goal"
         folder.mkdir(parents=True)
         (folder / "code-01.md").write_text("- 时间：2026-10-14T09:00:00+08:00\nWORKFLOW-FUTURE-SECRET", encoding="utf-8")
         (folder / "review-01.md").write_text("- 时间：2026-10-06T09:05:00+08:00\nReview evidence", encoding="utf-8")
@@ -559,7 +596,7 @@ class RelatraTests(unittest.TestCase):
 
     def test_mutable_run_with_future_update_is_not_old_state(self):
         self.save(self.log())
-        folder = Path(self.project) / ".cadra/runs"
+        folder = Path(self.project) / ".yuzio/cadra/runs"
         folder.mkdir(parents=True)
         (folder / "run.md").write_text("- 建立：agent 2026-10-06T09:00:00+08:00\n- 最近更新：2026-10-14T09:00:00+08:00\nFUTURE-RUN", encoding="utf-8")
         f = self.facts()
@@ -621,11 +658,20 @@ class RelatraTests(unittest.TestCase):
         def write_baseline():
             r.write_json(folder / "facts.json", old)
             r.write_json(folder / "tasks.json", ledger)
-            r.write_json(folder / "manifest.json", {"facts": str(folder / "facts.json"), "input_hashes": {"facts": r.digest(old), "ledger": r.digest(ledger)}})
+            r.write_json(folder / "manifest.json", {"schema_version": r.SCHEMA, "facts": str(folder / "facts.json"), "input_hashes": {"facts": r.digest(old), "ledger": r.digest(ledger)}})
         write_baseline()
         comparison = r.compare(s, f, folder)
         self.assertTrue(comparison["comparable"])
         self.assertEqual(comparison["groups"][0]["baseline"]["delivered"], 1)
+        basic_facts = dict(f, analysis="basic")
+        basic = r.aggregate(basic_facts, self.ledger(basic_facts))
+        mixed = r.compare(basic, basic_facts, folder)
+        self.assertTrue(mixed["comparable"])
+        self.assertFalse(mixed["process_comparable"])
+        self.assertIsNone(mixed["quality_current"])
+        self.assertTrue(comparison["process_comparable"])
+        self.assertIn("返工/重试：本期", r.render(dict(s, comparison=comparison), f))
+        self.assertIn("过程指标未比较", r.render(dict(basic, comparison=mixed), basic_facts))
         old["turns"][0]["usage"][0]["tokens"].pop("input_tokens")
         write_baseline()
         self.assertFalse(r.compare(s, f, folder)["comparable"])
@@ -785,6 +831,401 @@ class RelatraTests(unittest.TestCase):
             r.aggregate(f, ledger)
         event["verified_excerpt"] = "已核对验收问题及实际选择：已验收"
         self.assertEqual(r.aggregate(f, ledger)["counts"]["accepted"], 1)
+
+    def publish(self, facts=None, ledger=None):
+        facts = facts if facts is not None else self.facts()
+        ledger = ledger if ledger is not None else self.ledger(facts)
+        snapshot = r.new_directory(self.root / "snapshots")
+        r.write_json(snapshot / "facts.json", facts)
+        r.write_json(snapshot / "tasks.json", ledger)
+        r.write_json(snapshot / "manifest.json", {"schema_version": r.SCHEMA, "facts_hash": r.digest(facts)})
+        return Path(self.cli(["report", "--snapshot", str(snapshot)])["report"]).parent
+
+    def recollect(self, analysis="basic", date="2026-10-07", previous=None):
+        config = self.root / "config.json"
+        r.write_json(config, self.config)
+        args = ["collect", "--config", str(config), "--date", date, "--now", "2026-10-20T09:00:00+08:00", "--analysis", analysis]
+        if previous:
+            args += ["--previous-report", str(previous)]
+        result = self.cli(args)
+        folder = Path(result["snapshot"])
+        return result, r.read_json(folder / "facts.json"), r.read_json(folder / "tasks.json")
+
+    def test_candidates_only_seed_current_activity_keep_history_for_lookup(self):
+        self.save(self.log())
+        self.save(self.log(tid="old", thread="old", start="2026-01-01T09:00:00+08:00", end="2026-01-01T09:10:00+08:00"), "old.jsonl")
+        result, facts, ledger = self.recollect()
+        self.assertEqual(len(facts["turns"]), 2)
+        self.assertEqual([t["turn_ids"] for t in ledger["tasks"]], [["turn"]])
+        self.assertIsNone(result["previous_report"])
+        self.assertTrue(any("未全面盘点" in w for w in facts["warnings"]))
+
+    def test_reuse_completed_goal_without_new_review_or_delivery(self):
+        self.save(self.log())
+        previous = self.publish()
+        result, facts, ledger = self.recollect(date="2026-10-14")
+        self.assertEqual(result["previous_report"], str(previous))
+        self.assertEqual(result["review_queue"], [])
+        self.assertEqual(ledger["tasks"][0]["id"], "goal")
+        self.assertEqual(r.aggregate(facts, ledger)["counts"]["delivered"], 0)
+        self.assertEqual(r.aggregate(facts, ledger)["tasks"], [])
+
+    def test_reuse_keeps_unclosed_follow_up_without_current_activity(self):
+        self.save(self.log())
+        facts = self.facts()
+        ledger = self.ledger(facts)
+        ledger["tasks"][0]["next_step"] = "补运行时验收"
+        self.publish(facts, ledger)
+        result, facts, ledger = self.recollect(date="2026-10-14")
+        self.assertEqual([x["id"] for x in result["review_queue"]], ["goal"])
+        stats = r.aggregate(facts, ledger)
+        self.assertEqual(stats["counts"]["delivered"], 0)
+        self.assertEqual(stats["tasks"][0]["status"], "delivered")
+        self.assertIn("补运行时验收", r.render(stats, facts))
+
+    def test_new_turn_in_same_chat_requires_goal_judgment(self):
+        original = self.log()
+        self.save(original)
+        self.publish()
+        self.save(original + self.log(tid="new", start="2026-10-13T09:00:00+08:00", end="2026-10-13T09:10:00+08:00")[1:])
+        result, facts, ledger = self.recollect(date="2026-10-14")
+        self.assertEqual(len(ledger["tasks"]), 2)
+        self.assertEqual(ledger["tasks"][0]["turn_ids"], ["turn"])
+        self.assertEqual(ledger["tasks"][1]["turn_ids"], ["new"])
+        self.assertEqual(len(result["review_queue"]), 1)
+        self.assertEqual(r.aggregate(facts, ledger)["counts"]["delivered"], 0)
+
+    def test_retained_candidate_id_never_absorbs_new_goal(self):
+        records = self.log()
+        self.save(records)
+        facts = self.facts()
+        ledger = self.ledger(facts)
+        candidate_id = r.candidates(facts)["tasks"][0]["id"]
+        ledger["tasks"][0]["id"] = candidate_id
+        self.publish(facts, ledger)
+        self.save(records + self.log(tid="new", start="2026-10-13T09:00:00+08:00", end="2026-10-13T09:10:00+08:00")[1:])
+        result, facts, ledger = self.recollect(date="2026-10-14")
+        self.assertEqual(len(ledger["tasks"]), 2)
+        prior = next(t for t in ledger["tasks"] if t["id"] == candidate_id)
+        candidate = next(t for t in ledger["tasks"] if t["id"] != candidate_id)
+        self.assertEqual(prior["turn_ids"], ["turn"])
+        self.assertEqual(candidate["turn_ids"], ["new"])
+        self.assertEqual(candidate["events"], [])
+        self.assertEqual([q["id"] for q in result["review_queue"]], [candidate["id"]])
+        self.assertEqual(r.aggregate(facts, ledger)["end_states"]["pending_confirmation"], 1)
+
+    def test_removed_child_triggers_review_and_coverage_gap(self):
+        self.save(self.log())
+        child = self.save(self.log(tid="child", thread="child-thread", root="turn", child=True), "child.jsonl")
+        self.publish()
+        child.unlink()
+        result, facts, ledger = self.recollect()
+        self.assertEqual([q["id"] for q in result["review_queue"]], ["goal"])
+        self.assertTrue(any("轮次本次不可读取" in w for w in facts["warnings"]))
+        self.assertFalse(ledger["tasks"][0].get("review_required", False))
+        self.assertEqual(r.aggregate(facts, ledger)["counts"]["delivered"], 1)
+
+    def test_scope_notice_does_not_hide_comparison_diagnostics(self):
+        current_window = self.window
+        self.window = r.period_window("weekly", "Asia/Shanghai", r.stamp("2026-10-13T09:00:00Z"), "2026-09-30")
+        self.save(self.log(start="2026-09-29T09:00:00+08:00", end="2026-09-29T09:10:00+08:00"))
+        old = self.facts()
+        notice = "账本从周期活动建立，未全面盘点更早遗留目标"
+        old["warnings"].append(notice)
+        ledger = self.ledger(old, [self.event(old, at="2026-09-29T09:10:00+08:00")])
+        ledger["tasks"][0]["started_at"] = "2026-09-29T09:00:00+08:00"
+        prior = self.publish(old, ledger)
+        self.window = current_window
+        self.save(self.log())
+        facts = self.facts()
+        facts["warnings"].append(notice)
+        self.assertTrue(r.compare(r.aggregate(facts, self.ledger(facts)), facts, prior)["comparable"])
+        facts["warnings"].append("来源读取失败：fixture.jsonl：截断记录")
+        stats = r.aggregate(facts, self.ledger(facts))
+        self.assertFalse(r.compare(stats, facts, prior)["comparable"])
+        old["warnings"].append("未知记录类型：fixture")
+        prior = self.publish(old, ledger)
+        self.assertFalse(r.compare(stats, facts, prior)["comparable"])
+
+    def test_new_child_updates_parent_review_without_duplicate_candidate(self):
+        self.save(self.log())
+        self.publish()
+        self.save(self.log(tid="child", thread="child-thread", root="turn", child=True), "child.jsonl")
+        result, facts, ledger = self.recollect()
+        self.assertEqual(len(ledger["tasks"]), 1)
+        self.assertEqual([q["id"] for q in result["review_queue"]], ["goal"])
+        stats = r.aggregate(facts, ledger)
+        self.assertEqual(stats["counts"]["delivered"], 1)
+        self.assertEqual(stats["execution"]["turns"], 2)
+
+    def test_reuse_evidence_change_clears_claims_and_preserves_identity(self):
+        records = self.log()
+        self.save(records)
+        previous = self.publish()
+        records[-3]["payload"]["output"] = "Build failed"
+        self.save(records)
+        result, facts, ledger = self.recollect()
+        task = ledger["tasks"][0]
+        self.assertEqual(task["id"], "goal")
+        self.assertTrue(task["review_required"])
+        self.assertEqual(task["events"], [])
+        stats = r.aggregate(facts, ledger)
+        self.assertEqual(stats["counts"]["delivered"], 0)
+        self.assertEqual(stats["tasks"][0]["status"], "pending_confirmation")
+        self.assertIn(str(previous), result["review_queue"][0]["reason"])
+        task["events"] = [self.event(facts)]
+        with self.assertRaises(r.DataError):
+            r.aggregate(facts, ledger)
+
+    def test_missing_source_preserves_unknown_goal_in_report(self):
+        path = self.save(self.log())
+        self.publish()
+        path.unlink()
+        result, facts, ledger = self.recollect(date="2026-10-14")
+        self.assertEqual(ledger["tasks"][0]["turn_ids"], [])
+        stats = r.aggregate(facts, ledger)
+        self.assertEqual(stats["counts"]["delivered"], 0)
+        self.assertEqual(stats["end_states"]["pending_confirmation"], 1)
+        self.assertIn("前版依据缺失", r.render(stats, facts))
+
+    def test_reuse_prefers_latest_cutoff_then_latest_revision(self):
+        self.save(self.log())
+        first = self.publish()
+        second = self.publish()
+        result, facts, ledger = self.recollect()
+        self.assertEqual(result["previous_report"], str(second))
+        selected, _, _ = self.recollect(previous=first)
+        self.assertEqual(selected["previous_report"], str(first))
+        future = copy.deepcopy(facts)
+        future["window"] = r.period_window("weekly", "Asia/Shanghai", r.stamp("2026-11-01T09:00:00Z"), "2026-10-21")
+        self.publish(future, dict(ledger, analysis=future["analysis"]))
+        result, _, _ = self.recollect()
+        self.assertEqual(result["previous_report"], str(second))
+
+    def test_reuse_rejects_invalid_explicit_report_and_warns_in_auto(self):
+        self.save(self.log())
+        previous = self.publish()
+        old = r.read_json(previous / "tasks.json")
+        old["tasks"][0]["title"] = "tampered"
+        r.write_json(previous / "tasks.json", old)
+        result, facts, ledger = self.recollect()
+        self.assertIsNone(result["previous_report"])
+        self.assertTrue(any("哈希不符" in w for w in facts["warnings"]))
+        with self.assertRaises(r.DataError):
+            r.previous_report(facts, str(previous))
+
+    def test_malformed_manifest_is_reported_without_stopping_auto_collection(self):
+        self.save(self.log())
+        previous = self.publish()
+        r.write_json(previous / "manifest.json", [])
+        result, facts, _ = self.recollect()
+        self.assertIsNone(result["previous_report"])
+        self.assertTrue(any("manifest 必须是对象" in w for w in facts["warnings"]))
+        with self.assertRaises(r.DataError):
+            r.previous_report(facts, previous)
+
+    def test_reuse_rejects_different_scope_timezone_and_future_cutoff(self):
+        self.save(self.log())
+        facts = self.facts()
+        previous = self.publish(facts)
+        for change in ("projects", "source_roots", "timezone", "cutoff"):
+            current = copy.deepcopy(facts)
+            if change == "cutoff":
+                current["window"]["cutoff"] = "2026-10-06T00:00:00+00:00"
+            elif change == "timezone":
+                current["config"][change] = "UTC"
+            else:
+                current["config"][change] = [str(self.root / "different")]
+            with self.subTest(change=change), self.assertRaises(r.DataError):
+                r.previous_report(current, previous)
+
+    def test_basic_and_deep_agree_on_results_but_process_is_optional(self):
+        self.save(self.log())
+        deep_facts = self.facts()
+        deep_ledger = self.ledger(deep_facts, [self.event(deep_facts), self.event(deep_facts, "retry")])
+        deep = r.aggregate(deep_facts, deep_ledger)
+        basic_facts = dict(deep_facts, analysis="basic")
+        basic_ledger = dict(deep_ledger, analysis="basic", process_reviewed=False)
+        basic = r.aggregate(basic_facts, basic_ledger)
+        for key in ("counts", "end_states", "execution", "tasks"):
+            self.assertEqual(basic[key], deep[key])
+        for key in ("process_events", "interventions", "recorded_wait_seconds_union"):
+            self.assertIsNone(basic[key])
+        self.assertIsNone(basic["coverage"]["user_feedback"]["classified"])
+        self.assertEqual(deep["process_events"]["retry"], 1)
+        self.assertEqual(r.trend(basic, basic_facts), [])
+        self.assertIsNone(r.aggregate(deep_facts, dict(deep_ledger, process_reviewed=False))["process_events"])
+        with self.assertRaises(r.DataError):
+            r.aggregate(basic_facts, dict(basic_ledger, process_reviewed=True))
+
+    def test_deep_reuse_resets_process_review_for_current_snapshot(self):
+        self.save(self.log())
+        self.publish()
+        result, facts, ledger = self.recollect(analysis="deep")
+        self.assertFalse(ledger["process_reviewed"])
+        self.assertIsNone(r.aggregate(facts, ledger)["process_events"])
+        ledger["process_reviewed"] = True
+        self.assertEqual(r.aggregate(facts, ledger)["process_events"]["retry"], 0)
+
+    def test_basic_report_is_compact_and_keeps_material_limits(self):
+        self.save(self.log())
+        facts = dict(self.facts(), analysis="basic")
+        ledger = self.ledger(facts)
+        ledger["tasks"][0].update(outcome="三个入口可整行点击", limitations=["尚未运行时验收"], next_step="补运行时验收")
+        stats = r.aggregate(facts, ledger)
+        text = r.render(stats, facts)
+        for value in ("三个入口可整行点击", "尚未运行时验收", "补运行时验收", "未统计", "资源覆盖", "关键证据"):
+            self.assertIn(value, text)
+        for value in ("## 前期比较", "## 改进建议", "## 周期内趋势", "cached_input_tokens", "过程事件："):
+            self.assertNotIn(value, text)
+        self.assertLess(len(text.splitlines()), 55)
+        self.assertEqual(stats["execution"]["tokens"]["cached_input_tokens"], 40)
+
+    def test_cross_period_reuse_preserves_first_delivery_and_later_acceptance(self):
+        original = self.log()
+        self.save(original)
+        self.publish()
+        self.save(original + self.log(tid="new", start="2026-10-13T09:00:00+08:00", end="2026-10-13T09:10:00+08:00")[1:])
+        result, facts, ledger = self.recollect(date="2026-10-14", analysis="deep")
+        ledger["tasks"] = ledger["tasks"][:1]
+        task = ledger["tasks"][0]
+        task["turn_ids"].append("new")
+        proof = next(e["id"] for e in facts["evidence"] if e.get("turn_id") == "new" and e["kind"] == "tool_result")
+        task["events"] += [dict(self.event(facts, "reopened", "2026-10-13T09:00:00+08:00"), evidence=[proof]),
+                           dict(self.event(facts, "accepted", "2026-10-13T09:10:00+08:00"), evidence=[proof])]
+        ledger["process_reviewed"] = True
+        stats = r.aggregate(facts, ledger)
+        self.assertEqual(stats["counts"], {"delivered": 0, "accepted": 1, "failed": 0})
+        self.assertEqual(stats["process_events"]["reopened"], 1)
+        self.assertEqual(stats["end_states"]["accepted"], 1)
+        second = self.publish(facts, ledger)
+        result, facts, reused = self.recollect(date="2026-10-14")
+        self.assertEqual(result["previous_report"], str(second))
+        self.assertEqual(result["review_queue"], [])
+        self.assertEqual(r.aggregate(facts, reused)["counts"]["delivered"], 0)
+
+    def test_invalid_workflow_content_is_not_reused_under_same_evidence_id(self):
+        self.save(self.log())
+        source = Path(self.project) / ".yuzio/cohestra/handoffs/task/code.md"
+        source.parent.mkdir(parents=True)
+        source.write_text("- 时间：2026-10-06T09:05:00+08:00\nImplemented")
+        facts = self.facts()
+        ledger = self.ledger(facts)
+        proof = next(e["id"] for e in facts["evidence"] if e["kind"] == "workflow")
+        ledger["tasks"][0]["events"][0]["evidence"] = [proof]
+        self.publish(facts, ledger)
+        source.write_text("- 时间：2026-10-06T09:05:00+08:00\nImplementation withdrawn")
+        _, facts, ledger = self.recollect()
+        self.assertIn(proof, {e["id"] for e in facts["evidence"]})
+        self.assertTrue(ledger["tasks"][0]["review_required"])
+        self.assertEqual(r.aggregate(facts, ledger)["counts"]["delivered"], 0)
+
+    def test_revision_requires_parent_and_reason_and_matching_period(self):
+        self.save(self.log())
+        previous = self.publish()
+        for options in (["--revises", str(previous)], ["--reason", "原因"], ["--revises", str(previous), "--reason", "  "]):
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(r.main(["report", "--snapshot", str(previous)] + options), 2)
+        facts = self.facts()
+        facts["window"] = r.period_window("weekly", "Asia/Shanghai", r.stamp("2026-10-20T09:00:00Z"), "2026-10-14")
+        other = self.publish(facts)
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(r.main(["report", "--snapshot", str(other), "--revises", str(previous), "--reason", "不同时期"]), 2)
+
+    def test_changed_published_ledger_cannot_bypass_revision_metadata(self):
+        self.save(self.log())
+        previous = self.publish()
+        ledger = r.read_json(previous / "tasks.json")
+        ledger["tasks"][0]["title"] = "更正标题"
+        edited = self.root / "edited.json"
+        r.write_json(edited, ledger)
+        with contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual(r.main(["report", "--snapshot", str(previous), "--tasks", str(edited)]), 2)
+        same = self.cli(["report", "--snapshot", str(previous)])
+        self.assertEqual(Path(same["statistics"]).read_bytes(), (previous / "statistics.json").read_bytes())
+
+    def test_split_merge_corrections_keep_versions_and_totals(self):
+        self.save(self.log())
+        original = self.publish()
+        frozen = {p.name: p.read_bytes() for p in original.iterdir()}
+        ledger = r.read_json(original / "tasks.json")
+        second = copy.deepcopy(ledger["tasks"][0])
+        second.update(id="second-goal", title="另一个独立目标")
+        ledger["tasks"].append(second)
+        edited = self.root / "split.json"
+        r.write_json(edited, ledger)
+        split = Path(self.cli(["report", "--snapshot", str(original), "--tasks", str(edited),
+                               "--revises", str(original), "--reason", "用户确认两个独立目标"])["report"]).parent
+        stats = r.read_json(split / "statistics.json")
+        self.assertEqual(stats["counts"]["delivered"], 2)
+        self.assertEqual(stats["execution"]["tokens"]["total_tokens"], 120)
+        ledger["tasks"].pop()
+        r.write_json(edited, ledger)
+        merged = Path(self.cli(["report", "--snapshot", str(split), "--tasks", str(edited),
+                                "--revises", str(split), "--reason", "更正归并"])["report"]).parent
+        self.assertEqual(r.read_json(merged / "statistics.json")["counts"]["delivered"], 1)
+        self.assertEqual({p.name: p.read_bytes() for p in original.iterdir()}, frozen)
+        self.assertEqual(r.read_json(split / "statistics.json")["counts"]["delivered"], 2)
+
+    def test_isolated_package_cli_first_reuse_deep_and_revision(self):
+        package = self.root / "isolated-relatra"
+        shutil.copytree(Path(__file__).resolve().parents[1] / "relatra", package)
+        script = package / "scripts/relatra.py"
+        source = self.save(self.log())
+        original_source = source.read_bytes()
+        def run(*args):
+            result = subprocess.run([sys.executable, "-I", "-B", str(script), *args], check=True, capture_output=True, text=True)
+            return json.loads(result.stdout)
+        configured = run("configure", "--output", str(self.root / "isolated-output"), "--project", self.project, "--source-root", str(self.logs))
+        collect_args = ["collect", "--config", configured["config"], "--date", "2026-10-07", "--now", "2026-10-13T09:00:00+08:00"]
+        first = run(*collect_args)
+        snapshot = Path(first["snapshot"])
+        facts = r.read_json(snapshot / "facts.json")
+        r.write_json(snapshot / "tasks.json", self.ledger(facts))
+        first_report = run("report", "--snapshot", str(snapshot))
+        first_folder = Path(first_report["report"]).parent
+        frozen = {p.name: p.read_bytes() for p in first_folder.iterdir()}
+        reused = run(*collect_args)
+        self.assertEqual(reused["review_queue"], [])
+        self.assertEqual(reused["previous_report"], str(first_folder))
+        self.assertTrue(any("未全面盘点" in w for w in r.read_json(Path(reused["snapshot"]) / "facts.json")["warnings"]))
+        reused_report = run("report", "--snapshot", reused["snapshot"])
+        self.assertEqual(reused_report["counts"], first_report["counts"])
+        deeper = run(*collect_args, "--analysis", "deep")
+        snapshot = Path(deeper["snapshot"])
+        facts = r.read_json(snapshot / "facts.json")
+        ledger = r.read_json(snapshot / "tasks.json")
+        self.assertFalse(ledger["process_reviewed"])
+        ledger["tasks"][0]["events"].append(self.event(facts, "retry"))
+        ledger["process_reviewed"] = True
+        r.write_json(snapshot / "tasks.json", ledger)
+        deep_report = run("report", "--snapshot", str(snapshot))
+        deep_folder = Path(deep_report["report"]).parent
+        self.assertEqual(r.read_json(deep_folder / "statistics.json")["process_events"]["retry"], 1)
+        ledger["tasks"][0]["type"] = "documentation"
+        edited = self.root / "revised.json"
+        r.write_json(edited, ledger)
+        revised = run("report", "--snapshot", str(deep_folder), "--tasks", str(edited), "--revises", str(deep_folder), "--reason", "用户更正任务分类")
+        revised_folder = Path(revised["report"]).parent
+        self.assertEqual(r.read_json(revised_folder / "tasks.json")["tasks"][0]["type"], "documentation")
+        self.assertEqual(r.read_json(deep_folder / "tasks.json")["tasks"][0]["type"], "implementation")
+        self.assertEqual(r.read_json(revised_folder / "manifest.json")["revises"], str(deep_folder))
+        self.assertEqual({p.name: p.read_bytes() for p in first_folder.iterdir()}, frozen)
+        self.assertEqual(source.read_bytes(), original_source)
+
+    def test_old_schema_and_patch_interface_are_not_supported(self):
+        self.save(self.log())
+        previous = self.publish()
+        manifest = r.read_json(previous / "manifest.json")
+        manifest["schema_version"] = 1
+        r.write_json(previous / "manifest.json", manifest)
+        with self.assertRaises(r.DataError):
+            r.load_report(previous)
+        for args in (["correct"], ["report", "--snapshot", str(previous), "--correction", "old.json"]):
+            with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                r.parser().parse_args(args)
+        with self.assertRaises(r.DataError):
+            r.validate_config(dict(self.config, schema_version=1))
 
 
 if __name__ == "__main__":

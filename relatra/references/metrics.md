@@ -1,33 +1,41 @@
 # 统计口径
 
-## 任务与历史
+## 普通模式
 
-独立目标是任务，不是聊天、轮次、文件或提交。稳定 id 标识目标，revision 标识实质范围变化；缺陷重开同一修订。一个 turn 可以属于多个目标，但任务级资源归属共享未知，总体只计一次。子 turn 通过 root_turn_id 跟随父 turn；父关联未知时保留候选。
+独立目标是任务，不是聊天、轮次或提交。状态为 pending_confirmation/in_progress/delivered/accepted/blocked/failed/cancelled。按有日期事件的时间与记录顺序重放到截止，reopened 恢复 in_progress。未定日期事件单列，不计本期流量或截止状态。
 
-状态：pending_confirmation/in_progress/delivered/accepted/blocked/failed/cancelled。候选默认待确认。状态事件按时间与记录顺序重放到截止；交付/验收分别按首次发生时间计数，同 id/revision 重开后的再次交付不新增交付。日期未知事件单列，不计本期流量或截止状态。
+同 id/revision 的首次交付、首次验收各计一次；重开后再次交付不新增。只有每个目标最新修订计期末存量，旧修订保留历史交付流量。交付、验收、失败是本期流量，进行中、受阻和待确认是期末存量，不相加算成功率。用户未授权部署不等于未交付。
 
-每个目标的最新修订计期末存量，旧修订保留独立的历史交付流量，不能同时累加成两个期末目标。任务构成按主项目和任务类型列出最新修订。已知开始但仍未结束的目标可以保留为遗留；没有本期观测的历史 open turn 不算本期执行活动，也不推测其持续运行。
+跨期目标保留有证据的起点及首次交付，完成周期取二者全程；未知起点不补零。复用后未闭合目标仍列遗留，即使本期没有活动；历史 open turn 不据此推测本期执行时间。证据失配目标保持待核实，不把重新发现的旧成果计为新交付。
 
-交付引用实际产物、问题解决或目标终点证据；验收引用明确用户认可或满足既定条件的验证。咨询/审查/设计/文档可以独立交付。实现的静态、构建、运行时验证不能互相替代。交付、验收、失败是本期流量；进行中、受阻、待确认是期末存量，不能相加计算成功率。用户未授权部署不等于未交付。
+轮次时长取明确 task_started 到 task_complete/turn_aborted，并裁剪至统计窗口；缺端点为未知。累计时长是各 turn 之和，占用时长是区间并集，包含工具及轮内等待，不是人工时长。共享 turn 的任务级资源未知，总体只计一次。子 turn 通过 root_turn_id 跟随父目标，父关联未知保留候选。
 
-Cadra 本 Run 快照不能被后续成功覆盖；Cohestra README 是 current_only，只用于定位，不能补造旧周期状态。handoff/Run 没有明确时间时通过 dated turn 关联，仍不能猜日期或修订。
+资源优先 token_usage_record 的 response_id 增量，跨 fork/归档/复制去重，不与 token_count 相加。旧累计只取同 session 可归属的单调增量；无基线、跨未知归属或回退弃用，零增量不制造调用覆盖。独立调用实测零值有效，last_token_usage 不补调用。
 
-## 时间与交互
+缓存输入属于输入，推理输出属于输出，不重复加到总量。每个字段可独立未知，保留字段覆盖与无效值缺口；不换算账单。普通正文仅展示主要资源和覆盖，详细字段及完成周期保存在 JSON。
 
-完成周期是有证据的 started_at 至首次交付时间，跨周期保留全程；没有开始为未知。轮次执行时长是明确 task_started 至 task_complete/turn_aborted，含工具和轮内等待；仅计算与窗口相交部分，缺结束不估算。累计时长是各 turn 之和，占用时长是区间并集；两者不是人工时长。显式等待单列，不盲减执行时长。共享 turn 的任务级时间/token 为未知。
+basic 的 process_reviewed 必须为 false；process_events、interventions、recorded_wait_seconds_union 及用户答复分类统计为 null，含义是未统计，不是零。普通模式仍记录影响状态的重开、验收及重要阻碍；发现个别事件不能推断完整过程总量。
 
-只有本期出现用户消息且 turn_trigger=明确用户触发才算已确认交互轮；已核实 composer/user/user_message/plan_feedback，包括用户在计划中的反馈。缺失或未识别 trigger 为候选交互，不能既不确认又静默漏记；候选不证明人工介入。子 agent 或 owner 不明的继承轮次不确认为用户交互。跨日执行按区间裁剪，交互归到消息出现周期，不在后续日期重复计数。人工介入单独引证。中位数附有效/缺失样本数，不以零补缺。
+## 深度模式
 
-过程事件：reopened/rework/retry/scope_changed/validation_passed/validation_failed/intervention/wait。intervention.category 为 clarification/decision/authorization/manual_fix；wait.category 为 input/approval/environment/dependency；validation 分类 static/build/runtime/user_acceptance/other。分类由 agent 引证，脚本重放和计数，自述不等于独立验证。同一实际过程事件按稳定事件 id 全局去重；多目标共享事件不可重复算人工介入或返工。未记录不等于未发生。
+仅在 deep 时核读本期完整相关过程证据，再将账本 process_reviewed 设为 true。每次 collect 重置为 false，即使复用了深度报告；未完成时可生成报告，但过程汇总仍为 null。true 表示执行者已复核本期可读取记录，不保证未发现历史完整。
 
-提问工具中实际提交的用户答复也属于人工介入证据，不仅检查 user 消息。一次答复包含多个问题仍计一次介入；同轮多次真实答复各计一次，但确认交互轮只计一个 turn。coverage.user_feedback 单列本期已观测/已分类答复及未分类证据；有未分类答复时人工介入统计不完整，不能据此断言人工介入少。
+过程事件为 reopened/rework/retry/scope_changed/validation_passed/validation_failed/intervention/wait。同一真实过程事件使用同一 id 和内容，全局只计一次；不同介入或重试必须不同 id。正常范围补充不算返工，未记录不等于未发生。
 
-## 资源与覆盖
+分类：intervention.category 为 clarification/decision/authorization/manual_fix；wait.category 为 input/approval/environment/dependency；validation 的 category 与 basis 都为 static/build/runtime/user_acceptance/other，且必须一致。显式等待另给 until（未知 null），已知区间裁剪后取并集，不从执行时间盲扣；没有完整等待区间显示未知。
 
-优先 token_usage_record.usage 的 response_id 调用增量；跨 fork、归档、复制及重复记录按 response_id 去重，不与 token_count 相加。旧格式 total_token_usage 只取同 session 单调增量：首个累计值没有基线时未知，回退/缺 turn/继承归属不明的增量弃用并说明。last_token_usage 不补造调用。
+user_feedback 是按 call_id 配对到 request_user_input/request_user_input_async 的真实非空 answers，保留提问与答复引用。必须同时核读两者再分类，一次批答复计一次介入；默认选项、空答案或孤立结果不能证明选择，普通偏好不替代验收。coverage.user_feedback 保留已观测/已分类数量及未分类证据；有未分类答复时人工介入统计不完整。
 
-缓存输入属于输入，推理输出属于输出，不再加到总量；每个字段可独立未知。仅保存已定义的数值字段，无效值标缺口。显示有效资源 turn/观察执行 turn 覆盖，并保存各字段的 turn 覆盖。不是账单，不换算额度、订阅/API费用。
+确认用户交互轮必须有本期真实用户消息，且 turn_trigger 明确为 composer/user/user_message/plan_feedback。未知 trigger 保留候选；子 agent 或 owner 不明的继承轮次不确认为用户交互。跨日交互归消息所在周期，同轮多次答复只算一个交互轮，人工介入另计。
 
-范围是可读取本地记录，无法保证全部云端/删除历史。未映射 turn、截断/损坏行、未知格式、无父关联和未定日期事件单列。归并覆盖以发现的 turn 为分母，不推断未发现任务。时间窗口 `[start,end)`，按配置时区自然日历构造，DST 正确处理。未来状态不泄入旧周期，文件名/mtime 不作日期。facts/ledger/correction 哈希与版本保留；相同输入的 statistics.json 相同，生成时间放 manifest。
+深度报告按基础数据计算周期趋势：周报按日、月报按七日片段、季报/年报按月；日报无趋势表。过程分析未完成时趋势的过程字段也为 null。长周期不平均短周期中位数或比例。
 
-前期比较只用相同项目、类型、口径和覆盖的基础数据，附样本量及构成变化；没有前期数据不造趋势。
+## 比较与覆盖
+
+时间窗口为 `[start, cutoff)`，按配置时区自然日历构造并处理 DST。未知日期不猜，当前文档不能回填历史。相同 facts 和账本产生相同 statistics.json；生成时间与更正原因放 manifest，facts/ledger 哈希保留。
+
+覆盖只针对可读取本地记录，不保证云端、删除历史完整。未映射 turn、截断/损坏行、未知格式、无父关联和未定日期事件留在 JSON；正文保留覆盖不足及影响任务结论的限制。归并覆盖以发现的 turn 为分母，不推断未发现任务。
+
+前期比较从双方已封存基础输入重算，按相同项目与类型并列，并保存样本、构成和覆盖。项目、来源、版本、周期或时区不同，窗口重叠或阶段性窗口均不比较；自定义周期还要求天数一致。
+
+成果、时间、资源沿用归属、时间区间、字段覆盖和诊断缺口检查；模式不同不单独禁止这些指标比较。除固定范围提示外，任一方存在采集诊断时仅并列观察值，不判断改善；相同的警告数量或都有警告不证明缺口相同。过程指标须双方 process_reviewed 为 true、覆盖检查满足且不存在未分类工具用户答复，否则不比较。覆盖或构成改变不能直接解释为效率改善，不推断因果或模型排名。

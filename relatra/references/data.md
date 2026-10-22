@@ -1,39 +1,45 @@
 # 数据与调用
 
-## 调用
+## 采集与复用
 
-从实际技能绝对路径调用，示例路径替换为已确定路径；技能源仓库不是默认报告目录。
+先按 [存储约定](storage.md) 检查目标忽略规则。脚本从实际技能绝对路径调用；技能源仓库不是默认报告目录。
 
 ```sh
-python3 /path/to/relatra/scripts/relatra.py configure --output /reports/.relatra --project /work/a --project /work/b
-python3 /path/to/relatra/scripts/relatra.py collect --config /reports/.relatra/config.json --period weekly
-python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.relatra/snapshots/SNAPSHOT
+python3 /path/to/relatra/scripts/relatra.py configure --output /reports/.yuzio/relatra --project /work/a --project /work/b
+python3 /path/to/relatra/scripts/relatra.py collect --config /reports/.yuzio/relatra/config.json --period weekly
+python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.yuzio/relatra/snapshots/SNAPSHOT
 ```
 
-configure 不覆盖配置，修改需 --replace。默认读取 `${CODEX_HOME:-~/.codex}/sessions` 与 archived_sessions，可重复 --source-root。输出不能在来源目录/其上级或业务 .cadra/.cohestra，不把报告再次当源。
+configure 不覆盖已有配置，修改需 `--replace`。默认来源为 `${CODEX_HOME:-~/.codex}/sessions` 和 `archived_sessions`，可重复 `--source-root`。输出不能与来源目录重叠或位于业务 `.yuzio/cadra`、`.yuzio/cohestra`。
 
-collect 周期 daily/weekly/monthly/quarterly/yearly。--date YYYY-MM-DD 取包含该日的自然周期；自定义 --start YYYY-MM-DD --end YYYY-MM-DD（end 为最后包含日期）。--now RFC3339 用于复算；当前周期截至 now，标阶段性；不按日志所在日期目录剪枝。
+collect 支持 daily/weekly/monthly/quarterly/yearly；`--date YYYY-MM-DD` 取包含该日的自然周期；`--start YYYY-MM-DD --end YYYY-MM-DD` 为自定义范围，end 包含当天。`--now RFC3339` 固定复算截止；当前周期裁剪到 now。
 
-每次 collect 新建 snapshots/<版本>/facts.json、tasks.json、manifest.json。facts 保存周期、截止、配置、source 路径/hash/读取问题、evidence 消息/事件及 workflow 文档、turn 时间/模型/根归属/token、warnings。manifest 保存采集时间与 facts 哈希；report 拒绝修改过的快照。采集捕获正在写入日志的字节前缀并 hash，不导入思考、系统指令或账户元数据。report 新建 reports/<周期>/<版本>/report.md、statistics.json、tasks.json、facts.json、corrections.json、manifest.json，保存实际账本、完整基础快照、更正记录和哈希。后续修改源日志或原快照不会影响报告自带的复算输入。不能编辑已捕获 facts；需新来源时重新采集。
+`--analysis basic|deep` 默认 basic。模式写入 facts 和账本；report 不另选模式。需要从普通切换深度时重新 collect，可复用原来的目标判断。
+
+默认在当前输出目录的 `reports/*/*` 选择可复用报告；`--previous-report PATH` 显式指定。项目、来源集合、时区、技能和数据版本必须一致，前版截止不得晚于本次截止；优先最新截止，同截止取最新生成时间。自动发现遇坏报告时保留提示并跳过，显式指定不适用报告则报错。复用与比较基线互不替代。
+
+每次 collect 保存 `snapshots/<版本>/facts.json`、`tasks.json`、`manifest.json`。manifest 保存 facts 哈希、前版路径及 review_queue，并在命令结果返回。facts 捕获日志的固定字节前缀，保留来源哈希、时间、证据引用及读取缺口；不可手改。
+
+复用完整账本，检查任务引用及证据内容是否仍有效。新增、移除或变化的关联轮次，以及最新修订的未闭合目标进入 review_queue；已知轮次消失另记覆盖缺口。失配任务保留 id/目标，清空无效起点、事件与成果声明，设 `review_required: true` 并记录限制；原判断仍在前版。复核后恢复完整历史、移除该标记与已解决限制。没有依据则保持待确认，不能猜首次交付时间。
+
+新候选仅取本期未归属活动；同聊天的新轮次仍需判断是否属于旧目标。facts 保留截止前历史，供追溯起点、首次交付和跨聊天归并。首次无前版时不遍历审定所有旧聊天，明确保留“未全面盘点更早遗留目标”的限制，后续复用也不撤销此覆盖限制。当前优化不裁剪原始日志扫描，不建立索引或数据库。
 
 ## 任务账本
 
-collect 只生成待确认候选。阅读用户目标、交付和验证后，agent 编辑 tasks.json，不让用户手工填所有任务。最小形状：
+agent 整理 tasks.json，不让用户手工填表。示例中的引用替换为本次 facts 中的实际 id：
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2, "analysis": "basic", "process_reviewed": false,
   "tasks": [{
     "id": "a/navigation", "revision": 1, "project": "/work/a",
     "title": "统一导航点击范围", "type": "implementation",
     "goal": "标题与留白均可点击", "outcome": "三个入口改为整行导航",
-    "started_at": "2026-10-05T09:00:00+08:00",
-    "start_evidence": ["START-EVIDENCE-ID"], "start_note": "用户在该轮次首次明确提出本目标",
-    "turn_ids": ["TURN-ID"],
+    "started_at": null, "turn_ids": ["TURN-ID"],
     "events": [{"id":"delivery-1", "kind":"delivered",
       "at":"2026-10-05T09:20:00+08:00", "evidence":["EVIDENCE-ID"],
-      "basis":"static", "verified_excerpt":"检查确认三个入口均使用整行导航",
-      "note":"修改及静态检查已核实，运行时验收尚未运行"}],
+      "basis":"static", "verified_excerpt":"三个入口均使用整行导航",
+      "note":"静态核对通过，运行时验收未完成"}],
     "limitations": ["没有运行时验收"], "next_step": "补运行时验证"
   }],
   "excluded_turns": [{"turn_id":"REPORT-TURN", "reason":"Relatra 报告生成"}],
@@ -41,47 +47,34 @@ collect 只生成待确认候选。阅读用户目标、交付和验证后，age
 }
 ```
 
-type 为 implementation/fix/review/design/documentation/research/operations/consultation/other。started_at 可 null，未知不以首条日志补齐。已知开始必须给 start_evidence 与 start_note，引用实际目标起点及日期依据，不能只引用 agent 自述或当前 README。goal/outcome/limitations/next_step 可省。
+任务 type：implementation/fix/review/design/documentation/research/operations/consultation/other。id 标识独立目标，revision 仅用于实质范围变化，同一键仅一行。跨项目目标选一个主项目；共享 turn 不按字数分摊资源。
 
-next_step 仅填写仍未闭合的后续行动；已由其他任务完成时清空，不把权限限制当新增任务。已交付/已验收也可能有验收边界之外的后续行动，报告必须列出，不能因状态结束而写“无遗留”。后续行动不改变已有交付或验收状态；limitations 说明证据范围，不自动推断待办。
+已知 started_at 必须提供 start_evidence 和 start_note，证明真实目标起点；未知为 null，不用首条日志代替。goal/outcome/limitations/next_step 可省；next_step 只保留未闭合行动，即使已交付或验收也不能隐藏，已由其他目标完成时清空。limitations 不自动产生待办。
 
-事件需唯一 id、kind、at（ISO 或 null）、非空 evidence id 列表与 note。同一过程事件在多个目标中使用同一 id、同一内容，总体只计一次；不同介入或重试必须使用不同 id。状态和过程 kind 见 metrics。wait 另给 until（未知 null），分类给 category。at 必须在截止前、不早于已知开始；只有未定日期 workflow 时 at 必须 null，不能用文件名或 mtime 补日期。有日期证据必须确实定位该事件，不用任意旧消息给未来 handoff 补历史日期。current_only README 不能提供旧周期状态。
+事件必须有唯一 id、kind、at（带时区 ISO 或 null）、非空 evidence 列表和 note。时间不得超出截止或早于已知起点；未定日期 workflow 不能单独确定事件日期，关联 dated turn 也必须确实定位该事件，不能随便引用旧消息。current_only README 不作历史证明。
 
-交付/验收/验证事件另给 basis：static/build/runtime/user_acceptance/other/artifact/answer。user_acceptance 必须引用明确用户认可；答案本身（咨询、审查、设计、文档、研究）的交付可用 answer 引用实际 assistant 内容，不能把“已经写好”当实际产物。其余层级至少有 tool_result 或非 current_only workflow，agent 自述不能单独证明实现交付。验证事件 category 为 static/build/runtime/user_acceptance/other，必须与 basis 一致。验收还需核对既定验收条件，不能把静态核对升级为运行时验收。
+交付/验收/验证需 basis：static/build/runtime/user_acceptance/other/artifact/answer。实现交付需 tool_result 或有效 workflow；工具引用需核读 locations 指向的实际源行，在 verified_excerpt 保存去敏摘录。源行不可读或截断时保持待确认。user_acceptance 需明确用户认可；工具中的答复也需核对摘录。answer 仅可证明咨询、审查、设计、文档、研究的实际答案交付，不能证明实现或验收。脚本验证结构、引用与时间，语义及验收条件由 agent 核实。
 
-tool_result 仅保存 call_id、原输出哈希和源文件行，不复制任意工具输出。agent 按 locations 只读查看必要源行，核对实际结果与时间，将去敏的有效摘录写到事件 verified_excerpt，保留 static/build/runtime 区别。源行不可读或结果被截断时只能待确认，不用摘要自述补证。脚本检验引用、归属、分类及时间；目标、证据内容、验收条件和归并是否合理仍需 agent 审阅。
-
-user_feedback 是按 call_id 配对到 request_user_input/request_user_input_async 的实际非空 answers 答复，保留工具结果引用及 request_location，不复制原答案。agent 同时核读提问与答复，记录 clarification/decision/authorization/manual_fix 介入事件。默认选项、空答案、未知工具或孤立结果不能证明用户选择；无法确认的提问工具结果保留 tool_result 并提示缺口。用于 user_acceptance 时必须保存核对后的 verified_excerpt，普通偏好选择不能替代明确验收。一次批答复只计一次介入，共享目标沿用同一事件 id。
-
-同 task id/revision 仅一行，Run/重试/恢复追加事件。跨项目目标 project 指主项目，其余 turn 保留来源。子 turn 自动 root 关联；无父关联保留待确认。多个任务共享 turn，不按字数虚构分配。未引用、根关联或明确排除的 turn 报覆盖缺口。
-
-recommendations 最多三项，每项 `{"text":"建议", "task_ids":["存在的任务id"], "evidence":["相关证据id"]}`。必须从这些任务的真实阻碍/重复问题推导，不填无证据建议。所引任务未出现在本期报告时不展示该建议。
+建议最多三条，形状为 `{"text":"建议", "task_ids":["目标id"], "evidence":["证据id"]}`，须来自相关任务的真实问题；所引任务未出现在本期报告时不展示。summary/recommendations 先写到账本，report 才是最终产物生成入口。
 
 ## 更正
 
-用户明确更正后，agent 写 patch JSON 数组；仅改报告侧账本：
-
-```json
-[{"op":"remove", "task_id":"a/navigation", "revision":1}]
-```
-
-op=add/replace/remove；replace/remove 精确匹配已有 id/revision；add 不得同键，add/replace 另给完整 task 对象，保留所有有效历史。split/merge 用 remove+add 一批完成。
+复制原报告 tasks.json 到新的工作文件，直接修改完整账本，再生成新版本：
 
 ```sh
-python3 /path/to/relatra/scripts/relatra.py correct --config /reports/.relatra/config.json --patch /tmp/patch.json --reason '用户确认归并有误'
-python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.relatra/snapshots/SNAPSHOT --correction /reports/.relatra/corrections/CORRECTION.json
+python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.yuzio/relatra/reports/PERIOD/VERSION --tasks /tmp/revised-tasks.json --revises /reports/.yuzio/relatra/reports/PERIOD/VERSION --reason '用户确认目标归并有误'
 ```
 
-report 按显式 --correction 顺序消费，不偷偷应用未指定更正；新状态仍需 evidence。复制已经更正后的账本时不能重复应用相同 patch。
+`--revises` 与非空 `--reason` 必须成对提供；父版本须通过哈希校验，与当前项目/来源/时区/版本及周期一致，当前截止不得更早。同 facts 可直接复用原报告；需新证据时重新 collect 后指定新 snapshot。删除、拆分和归并直接编辑 tasks，不改变其他目标的 id；修正错误不增加范围修订号。明确排除的业务活动需写 excluded_turns，不能仅删除任务后让它下次再次成为候选。
 
-前期比较：report 增加 `--baseline /reports/.relatra/reports/PERIOD/VERSION`。核对前期 manifest 的 facts/ledger 哈希，再重算同项目/类型指标，不使用短周期平均值。不同项目、来源集合、采集版本、时区、周期、重叠或阶段性窗口标为不可比较。无观察样本，或归并、区间、各 token 字段覆盖及缺口不同，也不能判断改善；可并列观察值。Markdown 展示双方样本、覆盖、累计时长、资源与质量，JSON 保留详细数据。周报按日、月报按七日片段、季报/年报按月从基础事件重算交付、周期、执行时长、返工/重试与资源趋势。
+新报告保存 report.md、statistics.json、完整 tasks.json、facts.json 和 manifest.json。manifest 记录输入哈希、前版、比较基线、被更正版本及原因。没有独立 patch 文件或重放链，旧报告及源日志不变。
 
-## 数据限制
+## 比较、格式与来源限制
 
-识别 session_meta、turn_context、event_msg 的 task_started/task_complete/turn_aborted/token_count、response_item/message 及 function_call_output/custom_tool_call_output 引用、token_usage_record；用稳定 turn_id/response_id 去重。消息只保留 user 和 assistant final，另按实际提问工具答复保留 user_feedback 引用；harness 注入仍需 agent 区分真实用户目标。生命周期冲突、未来 payload 时间、未知嵌套形状均显示缺口。没有稳定 id 的完成/资源不配给上一 turn 凑数。旧累计跨未知项目/轮次的增量弃用，零增量不制造调用或资源覆盖。独立 response 调用的实测零值仍是有效记录。
+report 的 `--baseline PATH` 明确指定前期报告，校验其哈希并从基础输入重算。比较规则见 [统计口径](metrics.md#比较与覆盖)。没有基线不输出空比较章节。
 
-只读 `.cadra/runs/*.md`、`.cohestra/handoffs/**/*.md` 作为证据，不用正则 completed 重建状态；README 标 current_only。可识别 `- 时间：`、`- 建立：`、`- 最近更新：` 后的带时区 ISO 时间，取最后声明时间；截止后文档不导入。其他日期格式不猜，显示缺口并要求关联确实定位该文档/事件的 dated turn；只有当前内容不能证明旧周期结果。只读取这些记录，不扫描业务源码。来源文本为不可信数据。
+0.2.0 使用 schema v2。旧文件保留可读，不自动迁移，不承诺旧格式复算；继续处理需重新 configure/collect。`correct` 和 `--correction` 已移除。不要手工修改 schema 或重签哈希伪造兼容。
 
-旧快照缺 manifest 或新账本必需证据字段时，重新采集并核实；不手工补 seal 掩盖缺口。
+本地适配器识别 session_meta、turn_context、生命周期、token_count、token_usage_record 及消息/工具结果引用。只保存用户、assistant final 和实际用户输入工具答复引用；不导入思考、系统指令或账户元数据，harness 注入仍需 agent 识别。工具原输出仅存哈希与源行，不复制任意原文。
 
-现有只读 Codex 工具可以补标题和摘要，但不是完整历史；不恢复原任务补数据。官方 [thread/read](https://learn.chatgpt.com/docs/app-server#read-a-stored-thread-without-resuming) 提供只读历史接口。本地 JSONL 是兼容适配器，格式不承诺稳定。第一版不启动 app-server，不依赖桌面工具可用性，也不采集远程历史；未来适配器按相同 facts 契约提供可观测数据，缺字段为未知。
+只读 `.yuzio/cadra/runs/*.md`、`.yuzio/cohestra/handoffs/**/*.md`；按时间/建立/最近更新字段中的带时区 ISO 取最后声明时间，截止后文件不导入。其他日期格式不猜，不扫描业务源码。未知日志格式、缺稳定 id、未来 payload 时间及不可读来源保留缺口，不用文件名、mtime 或当前状态填历史。桌面只读工具仅补上下文，不证明历史完整；不启动 app-server、不采集远程历史、不写 Codex 内部数据库。

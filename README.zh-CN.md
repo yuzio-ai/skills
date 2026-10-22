@@ -51,7 +51,7 @@ Task 走 **draft → ready → queued → running → completed / blocked / fail
 
 Relatra 面向个人复盘，按独立目标统计，不把聊天结束或文件数当成果。支持日报、周报、月报、季报、年报和自定义范围，默认上一完整自然周期、Asia/Shanghai。首次固定项目集合和报告目录，生成简报、版本化 Markdown、统计 JSON 与来源清单。
 
-Codex 活动/归档日志只读采集，Cadra Run 与 Cohestra 交付物补充证据。agent 识别目标及完成证据，Python 3.9+ 标准库脚本计算去重统计；交付与验收分开，缺失时间/token 为未知。支持显式前期比较和用户更正，不执行原任务或创建定时服务。
+Codex 活动/归档日志只读采集，Cadra Run 与 Cohestra 交付物补充证据。agent 识别目标及完成证据，Python 3.9+ 标准库脚本计算去重统计；交付与验收分开，缺失时间/token 为未知。默认复用已审定账本，仅审阅新增活动、证据变化和遗留目标。普通模式生成简洁成果报告；明确要求效率、返工或人工介入分析时采用深度模式。支持显式前期比较；更正通过完整账本生成新版并记录原因，不再使用 patch 接口。不执行原任务或创建定时服务。
 
 ```text
 $relatra 周报
@@ -67,13 +67,13 @@ $relatra
 
 入口见 [relatra/SKILL.md](relatra/SKILL.md)，调用契约见 [数据与调用](relatra/references/data.md)，统计规则见 [统计口径](relatra/references/metrics.md)。离线测试：`python3 -B -m unittest discover -s tests -p 'test_relatra.py'`，不等于真实 agent 使用或云端历史覆盖验收。
 
-计划覆盖、审查修复及原生技能校验见 [Relatra 验收记录](tests/relatra-scenarios.md)。隔离安装、完整调用及最低运行版本验证见 [推送前验收](tests/relatra-prepush.md)。
+0.2.0/schema v2 的当前检查见 [精简验证](tests/relatra-simplification-validation.md)。旧格式保留可读，不自动迁移，复算需重新配置和采集。历史计划覆盖、审查修复及原生技能校验见 [Relatra 验收记录](tests/relatra-scenarios.md)。隔离安装、完整调用及最低运行版本验证见 [推送前验收](tests/relatra-prepush.md)。
 
 ## vistra
 
 Vistra 支持 `review`、`explore`、`compare`、`handoff` 四种独立模式，按需加载移动端、桌面端和品牌静态视觉方法，配合项目级、用户级 UI/UX 规范使用。通过宿主图像能力直接生成或编辑图片，不制作 HTML、交互原型或本地渲染工具。推荐、方向选择、实现授权与验证分别记录。
 
-Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra 本机资料使用 `.yuzio/cohestra`；Cadra、Relatra 的目录与协议保持不变。Vistra 不修改生产代码或发布工程验收结论。
+Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra 本机资料使用 `.yuzio/cohestra`；Cadra 的目录与协议保持不变。Relatra 本机资料使用 `.yuzio/relatra`，报告结构版本见下文。Vistra 不修改生产代码或发布工程验收结论。
 
 ```text
 $vistra review
@@ -170,6 +170,6 @@ Run：<run-id>
 
 ## 维护
 
-发行版 **0.10.1**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**；Relatra 版本 **0.1.0**，报告结构 **v1**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
+发行版 **0.10.1**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**；Relatra 版本 **0.2.0**，报告结构 **v2**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
 
 修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。

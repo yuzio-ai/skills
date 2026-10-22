@@ -1,4 +1,4 @@
 interface:
   display_name: "Relatra"
-  short_description: "统计 agent 任务成果、执行效率与资源消耗，生成可追溯的周期工作报告"
-  default_prompt: "使用 $relatra 生成指定项目的周报，汇总交付成果、执行效率与待办。"
+  short_description: "汇总 agent 成果、遗留与已观测资源，按需深入分析执行过程"
+  default_prompt: "使用 $relatra 生成指定项目的周报，汇总交付成果、遗留与已观测资源。"

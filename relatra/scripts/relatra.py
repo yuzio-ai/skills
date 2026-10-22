@@ -17,8 +17,8 @@ import uuid
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-VERSION = "0.1.0"
-SCHEMA = 1
+VERSION = "0.2.0"
+SCHEMA = 2
 STATES = {"pending_confirmation", "in_progress", "delivered", "accepted", "blocked", "failed", "cancelled"}
 PROCESS = {"reopened", "rework", "retry", "scope_changed", "validation_passed", "validation_failed", "intervention", "wait"}
 TYPES = {"implementation", "fix", "review", "design", "documentation", "research", "operations", "consultation", "other"}
@@ -109,7 +109,9 @@ def validate_config(config):
     require(isinstance(config.get("output"), str) and Path(config["output"]).is_absolute(), "输出必须是绝对路径")
     require(all(isinstance(p, str) and Path(p).is_absolute() for p in config["source_roots"]), "来源必须是绝对路径")
     output = Path(config["output"]).resolve()
-    require(not any(part in {".cadra", ".cohestra"} for part in output.parts), "报告不能写入 Cadra/Cohestra 容器")
+    require(not any(parent == ".yuzio" and child in {"cadra", "cohestra"}
+                    for parent, child in zip(output.parts, output.parts[1:])),
+            "报告不能写入 Cadra/Cohestra 容器")
     for root in config["source_roots"]:
         require(not inside(output, root) and not inside(root, output), "输出目录不能与日志来源目录重叠")
     ZoneInfo(config["timezone"])
@@ -182,7 +184,7 @@ def new_directory(parent):
     return target
 
 
-def scan(config, window):
+def scan(config, window, analysis="basic"):
     """Capture bounded byte prefixes. No DB writes, source mutation or execution."""
     cutoff = stamp(window["cutoff"])
     sources, evidence, turns, warnings = {}, {}, {}, []
@@ -433,8 +435,8 @@ def scan(config, window):
             turns[tid]["usage"].append({"id": digest([thread_id, iso(at), tid, delta]), "at": iso(at), "method": "cumulative_delta", "tokens": delta})
 
     for project in config["projects"]:
-        files = set((Path(project) / ".cadra" / "runs").glob("*.md"))
-        files.update((Path(project) / ".cohestra" / "handoffs").rglob("*.md"))
+        files = set((Path(project) / ".yuzio" / "cadra" / "runs").glob("*.md"))
+        files.update((Path(project) / ".yuzio" / "cohestra" / "handoffs").rglob("*.md"))
         for path in sorted(files):
             if not inside(path, project):
                 warning(f"工作流引用越出项目：{path}")
@@ -479,62 +481,165 @@ def scan(config, window):
             turn["end"] = None
         if turn["child"] and (turn["root_turn_id"] not in turns or turn["root_turn_id"] == turn["id"]):
             warning(f"子 agent 无父轮次：{turn['id']}")
-    return {"schema_version": SCHEMA, "version": VERSION, "config": config, "window": window,
+    return {"schema_version": SCHEMA, "version": VERSION, "config": config, "window": window, "analysis": analysis,
             "sources": sorted(sources.values(), key=lambda s: s["path"]),
             "evidence": sorted(evidence.values(), key=lambda e: e["id"]),
             "turns": sorted(turns.values(), key=lambda t: (t["observed_at"], t["id"])), "warnings": sorted(set(warnings))}
 
 
-def candidates(facts):
+def candidates(facts, assigned=()):
     turns = {t["id"]: t for t in facts["turns"]}
+    start, end = stamp(facts["window"]["start"]), stamp(facts["window"]["cutoff"])
     groups = {}
     for turn in turns.values():
+        if turn["id"] in assigned or not observed(turn, start, end):
+            continue
         root = turns.get(turn["root_turn_id"], turn)
         key = (root["project"], root["thread_id"])
         groups.setdefault(key, []).append(turn["id"])
-    tasks = [{"id": "candidate-" + digest(key)[:16], "revision": 1, "project": key[0],
+    tasks = [{"id": "candidate-" + digest([key, sorted(ids)])[:16], "revision": 1, "project": key[0],
               "title": "待确认目标 · " + key[1], "type": "other", "started_at": None,
               "turn_ids": sorted(ids), "events": [], "limitations": ["尚未按独立目标归并并核实交付"], "next_step": "核实目标及交付证据"}
              for key, ids in sorted(groups.items())]
-    return {"schema_version": SCHEMA, "tasks": tasks, "excluded_turns": [], "summary": "", "recommendations": []}
+    return {"schema_version": SCHEMA, "analysis": facts["analysis"], "process_reviewed": False,
+            "tasks": tasks, "excluded_turns": [], "summary": "", "recommendations": []}
+
+
+def load_report(folder):
+    """Read sealed, self-contained v2 inputs, never follow old absolute pointers."""
+    folder = Path(folder)
+    manifest = read_json(folder / "manifest.json")
+    require(isinstance(manifest, dict), "报告 manifest 必须是对象")
+    require(manifest.get("schema_version") == SCHEMA, "旧报告仅供阅读；请重新配置和采集 v2 数据")
+    facts, ledger = read_json(folder / "facts.json"), read_json(folder / "tasks.json")
+    hashes = manifest.get("input_hashes", {})
+    require(isinstance(hashes, dict), "报告 input_hashes 必须是对象")
+    require(digest(facts) == hashes.get("facts") and digest(ledger) == hashes.get("ledger"),
+            "报告基础快照/账本与 manifest 哈希不符")
+    validate_ledger(facts, ledger)
+    return facts, ledger, manifest
+
+
+def same_scope(a, b):
+    return (a["schema_version"] == b["schema_version"] and a["version"] == b["version"] and
+            all(set(a["config"][k]) == set(b["config"][k]) for k in ("projects", "source_roots")) and
+            a["config"]["timezone"] == b["config"]["timezone"])
+
+
+def previous_report(facts, explicit=None):
+    paths = [Path(explicit).resolve()] if explicit else sorted((Path(facts["config"]["output"]) / "reports").glob("*/*"))
+    selected, warnings = None, []
+    for folder in paths:
+        if not folder.is_dir():
+            if explicit:
+                raise DataError("指定的前版报告目录不存在")
+            continue
+        try:
+            old, ledger, manifest = load_report(folder)
+            compatible = same_scope(facts, old) and stamp(old["window"]["cutoff"]) <= stamp(facts["window"]["cutoff"])
+            if explicit:
+                require(compatible, "指定前版的项目、来源、时区、版本或截止时间不适用")
+            if compatible:
+                generated = stamp(manifest.get("generated_at"))
+                require(generated is not None, "前版缺生成时间")
+                choice = (stamp(old["window"]["cutoff"]), generated, str(folder), old, ledger)
+                if selected is None or choice[:3] > selected[:3]:
+                    selected = choice
+        except (ValueError, OSError, TypeError, KeyError) as exc:
+            if explicit:
+                raise DataError(f"前版报告不可复用：{exc}") from exc
+            warnings.append(f"前版报告未复用：{folder}：{exc}")
+    return selected, warnings
+
+
+def task_status(task):
+    events = sorted(enumerate(task.get("events", [])), key=lambda p: (stamp(p[1].get("at")) or datetime.max.replace(tzinfo=timezone.utc), p[0]))
+    state = "pending_confirmation"
+    for _, event in events:
+        if event.get("at") is not None:
+            if event["kind"] in STATES:
+                state = event["kind"]
+            elif event["kind"] == "reopened":
+                state = "in_progress"
+    return state
+
+
+def reuse_ledger(facts, previous):
+    """Reuse semantic decisions only while their referenced evidence still matches."""
+    if previous is None:
+        ledger = candidates(facts)
+        queue = [{"id": t["id"], "revision": t["revision"], "reason": "本期未归属活动"} for t in ledger["tasks"]]
+        return ledger, queue
+    _, _, folder, old, prior = previous
+    turns, old_turns = ({t["id"]: t for t in value["turns"]} for value in (facts, old))
+    evidence, old_evidence = ({e["id"]: e for e in value["evidence"]} for value in (facts, old))
+    missing_turns = old_turns.keys() - turns.keys()
+    if missing_turns:
+        facts["warnings"].append(f"前版 {len(missing_turns)} 个轮次本次不可读取，历史与资源覆盖有缺口")
+    ledger = candidates(facts, set(turns))
+    ledger["excluded_turns"] = [copy.deepcopy(e) for e in prior.get("excluded_turns", []) if e["turn_id"] in turns]
+    queue = []
+    latest = {}
+    for task in prior["tasks"]:
+        latest[task["id"]] = max(latest.get(task["id"], 0), task["revision"])
+    for original in prior["tasks"]:
+        task = copy.deepcopy(original)
+        refs = set(task.get("turn_ids", []))
+        proof = set(task.get("start_evidence", [])) | {eid for e in task.get("events", []) for eid in e["evidence"]}
+        def signature(item):
+            return {k: v for k, v in item.items() if k != "locations"}
+        invalid = not refs <= turns.keys() or any(
+            eid not in evidence or eid not in old_evidence or signature(evidence[eid]) != signature(old_evidence[eid]) for eid in proof)
+        # Revalidate ownership and temporal constraints against the fresh facts too.
+        try:
+            validate_ledger(facts, dict(ledger, tasks=[task]))
+        except (ValueError, KeyError, TypeError):
+            invalid = True
+        if invalid:
+            task.update(turn_ids=sorted(tid for tid in refs & turns.keys()
+                                        if task["project"] in turns[tid].get("projects", [turns[tid]["project"]])),
+                        started_at=None, events=[], outcome="", review_required=True)
+            task.pop("start_evidence", None)
+            task.pop("start_note", None)
+            task["limitations"] = list(dict.fromkeys(task.get("limitations", []) + ["前版依据缺失或变化，原状态及交付时间尚未重新核实"]))
+            task["next_step"] = "核读当前证据并恢复完整历史；不能作为新的首次交付"
+            reason = "前版引用失配；原判断保留在 " + folder
+        else:
+            related = descendants(refs, turns)
+            changed = (related != descendants(refs, old_turns) or
+                       any(tid not in old_turns or turns[tid] != old_turns[tid] for tid in related))
+            unresolved = task["revision"] == latest[task["id"]] and (
+                task_status(task) not in {"delivered", "accepted", "cancelled"} or task.get("next_step", "").strip())
+            reason = "关联轮次有新增、移除或变化" if changed else "未闭合目标" if unresolved else None
+        ledger["tasks"].append(task)
+        if reason:
+            queue.append({"id": task["id"], "revision": task["revision"], "reason": reason})
+    assigned = descendants({tid for t in ledger["tasks"] for tid in t.get("turn_ids", [])} |
+                           {e["turn_id"] for e in ledger["excluded_turns"]}, turns)
+    for task in candidates(facts, assigned)["tasks"]:
+        ledger["tasks"].append(task)
+        queue.append({"id": task["id"], "revision": task["revision"], "reason": "本期未归属活动"})
+    return ledger, queue
 
 
 def collect(args):
     config = validate_config(read_json(args.config))
     now = stamp(args.now) if args.now else datetime.now(timezone.utc)
     window = period_window(args.period, config["timezone"], now, args.date, args.start, args.end)
-    facts = scan(config, window)
+    facts = scan(config, window, args.analysis)
+    previous, warnings = previous_report(facts, args.previous_report)
+    facts["warnings"] = sorted(set(facts["warnings"] + warnings + ["账本从周期活动建立，未全面盘点更早遗留目标"]))
+    ledger, queue = reuse_ledger(facts, previous)
+    validate_ledger(facts, ledger)
     target = new_directory(Path(config["output"]) / "snapshots")
     write_json(target / "facts.json", facts)
-    write_json(target / "tasks.json", candidates(facts))
-    write_json(target / "manifest.json", {"schema_version": SCHEMA, "version": VERSION,
-                                         "captured_at": iso(datetime.now(timezone.utc)), "facts_hash": digest(facts)})
-    return {"snapshot": str(target), "turns": len(facts["turns"]), "warnings": facts["warnings"]}
-
-
-def apply_corrections(ledger, records):
-    result = copy.deepcopy(ledger)
-    for record in records:
-        require(isinstance(record, dict), "更正记录必须是对象")
-        require(record.get("schema_version") == SCHEMA and record.get("reason"), "更正缺版本或原因")
-        require(isinstance(record.get("patch"), list) and record["patch"], "更正 patch 必须是非空数组")
-        for change in record["patch"]:
-            require(isinstance(change, dict), "更正操作必须是对象")
-            key = (change.get("task_id"), change.get("revision"))
-            matches = [i for i, task in enumerate(result["tasks"]) if (task.get("id"), task.get("revision")) == key]
-            op = change.get("op")
-            require(op in {"add", "replace", "remove"}, "未知更正操作")
-            require(len(matches) == (0 if op == "add" else 1), "更正对象不存在或重复")
-            if op == "remove":
-                result["tasks"].pop(matches[0])
-            else:
-                task = change.get("task")
-                require(isinstance(task, dict) and (task.get("id"), task.get("revision")) == key, "更正 task 键不一致")
-                if op == "add":
-                    result["tasks"].append(task)
-                else:
-                    result["tasks"][matches[0]] = task
-    return result
+    write_json(target / "tasks.json", ledger)
+    manifest = {"schema_version": SCHEMA, "version": VERSION,
+                "captured_at": iso(datetime.now(timezone.utc)), "facts_hash": digest(facts),
+                "previous_report": previous[2] if previous else None, "review_queue": queue}
+    write_json(target / "manifest.json", manifest)
+    return {"snapshot": str(target), "turns": len(facts["turns"]), "previous_report": manifest["previous_report"],
+            "review_queue": queue, "warnings": facts["warnings"]}
 
 
 def descendants(refs, turns):
@@ -549,6 +654,9 @@ def descendants(refs, turns):
 def validate_ledger(facts, ledger):
     require(isinstance(facts, dict) and isinstance(ledger, dict), "facts/ledger 必须是对象")
     require(facts.get("schema_version") == SCHEMA and ledger.get("schema_version") == SCHEMA, "不支持的数据版本")
+    require(facts.get("analysis") in {"basic", "deep"} and ledger.get("analysis") == facts["analysis"], "账本分析模式必须与快照一致")
+    require(type(ledger.get("process_reviewed")) is bool, "process_reviewed 必须明确为布尔值")
+    require(not ledger["process_reviewed"] or facts["analysis"] == "deep", "普通模式不能声明过程分析完成")
     validate_config(facts["config"])
     require(isinstance(ledger.get("tasks"), list), "tasks 必须是数组")
     require(isinstance(ledger.get("summary", ""), str), "summary 必须是字符串")
@@ -580,6 +688,8 @@ def validate_ledger(facts, ledger):
             require(any(ev[e].get("at") is not None for e in start_evidence), "未定日期来源不能单独确定开始时间")
         ids = set()
         require(isinstance(task.get("events", []), list), "events 必须是数组")
+        require(type(task.get("review_required", False)) is bool, "review_required 必须是布尔值")
+        require(not task.get("review_required") or not task.get("events"), "依据失配目标须重新核实完整历史并解除 review_required 后才能记录状态")
         for event in task.get("events", []):
             require(isinstance(event, dict), "event 必须是对象")
             require(isinstance(event.get("id"), str) and event["id"] and event["id"] not in ids, "事件 id 缺失或重复")
@@ -696,6 +806,7 @@ def execution(turns, start, end):
 
 def aggregate(facts, ledger):
     validate_ledger(facts, ledger)
+    reviewed = facts["analysis"] == "deep" and ledger["process_reviewed"]
     start, end = stamp(facts["window"]["start"]), stamp(facts["window"]["cutoff"])
     turns = {t["id"]: t for t in facts["turns"]}
     excluded = descendants({item["turn_id"] for item in ledger.get("excluded_turns", [])}, turns)
@@ -731,7 +842,9 @@ def aggregate(facts, ledger):
         period_events = [e for e in events if start <= stamp(e["at"]) < end]
         started = stamp(task.get("started_at"))
         unknown = [e for e in task.get("events", []) if e.get("at") is None]
-        if not active and not period_events and not unknown and not (started and started < end and status not in {"delivered", "accepted", "cancelled"}):
+        if not active and not period_events and not unknown and not task.get("review_required") and not (
+                task["revision"] == latest[task["id"]] and (task.get("next_step", "").strip() or
+                status not in {"delivered", "accepted", "cancelled"})):
             continue
         superseded = task["revision"] < latest[task["id"]]
         if not superseded:
@@ -780,16 +893,19 @@ def aggregate(facts, ledger):
             key = (row["project"], row["type"])
             composition[key] = composition.get(key, 0) + 1
     return {"schema_version": SCHEMA, "version": VERSION, "window": facts["window"],
+            "analysis": facts["analysis"], "process_reviewed": reviewed,
             "input_hashes": {"facts": digest(facts), "ledger": digest(ledger)},
-            "counts": counts, "end_states": stock, "process_events": process,
-            "interventions": dict(sorted(interventions.items())), "recorded_wait_seconds_union": union_seconds(waits) if waits else None,
+            "counts": counts, "end_states": stock, "process_events": process if reviewed else None,
+            "interventions": dict(sorted(interventions.items())) if reviewed else None,
+            "recorded_wait_seconds_union": union_seconds(waits) if reviewed and waits else None,
             "completion_cycle": {"median_seconds": statistics.median(cycles) if cycles else None,
                                  "known_samples": len(cycles), "missing_samples": counts["delivered"] - len(cycles)},
             "execution": execution(active_turns, start, end),
             "task_composition": [{"project": p, "type": typ, "tasks": n} for (p, typ), n in sorted(composition.items())],
             "coverage": {"observed_period_turns": len(active_turns), "mapped_period_turns": len(active_turns) - len(missing),
                          "unmapped_turn_ids": missing, "excluded_turns": sorted(excluded), "unknown_date_events": unknown_events,
-                         "user_feedback": {"observed": len(feedback), "classified": len(classified), "unclassified_evidence_ids": sorted(feedback - classified)},
+                         "user_feedback": {"observed": len(feedback), "classified": len(classified) if reviewed else None,
+                                           "unclassified_evidence_ids": sorted(feedback - classified) if reviewed else None},
                          "historical_completeness": "unknown", "scope": "readable_local_logs"},
             "tasks": sorted(rows, key=lambda r: (r["project"], r["id"], r["revision"])),
             "summary": ledger.get("summary", ""), "recommendations": [item for item in ledger.get("recommendations", []) if set(item["task_ids"]) <= {t["id"] for t in rows}],
@@ -802,7 +918,7 @@ def trend(stats, facts):
     tz = ZoneInfo(window["timezone"])
     begin, finish = stamp(window["start"]), stamp(window["cutoff"])
     kind = window["kind"]
-    if kind == "daily":
+    if kind == "daily" or stats["analysis"] != "deep":
         return []
     day = begin.astimezone(tz).date()
     buckets = []
@@ -824,17 +940,14 @@ def trend(stats, facts):
         buckets.append({"start": iso(first), "end": iso(last), "label": day.isoformat(), "delivered": len(delivered),
                         "cycle_median_seconds": statistics.median(cycles) if cycles else None,
                         "cycle_samples": len(cycles), "execution": execution(active, first, last),
-                        "process_events": {kind: sum(e["kind"] == kind for e in events.values()) for kind in sorted(PROCESS)}})
+                        "process_events": {kind: sum(e["kind"] == kind for e in events.values()) for kind in sorted(PROCESS)} if stats["process_reviewed"] else None})
         day = following
     return buckets
 
 
 def compare(stats, facts, baseline_folder):
     """Explicit baseline only; verify and recompute saved inputs, not averages."""
-    folder = Path(baseline_folder)
-    manifest = read_json(folder / "manifest.json")
-    old_facts, old_tasks = read_json(manifest["facts"]), read_json(folder / "tasks.json")
-    require(digest(old_facts) == manifest["input_hashes"]["facts"] and digest(old_tasks) == manifest["input_hashes"]["ledger"], "前期基础快照/账本与 manifest 哈希不符")
+    old_facts, old_tasks, _ = load_report(baseline_folder)
     baseline = aggregate(old_facts, old_tasks)
     same = (set(facts["config"]["projects"]) == set(old_facts["config"]["projects"]) and
             set(facts["config"]["source_roots"]) == set(old_facts["config"]["source_roots"]) and
@@ -868,15 +981,21 @@ def compare(stats, facts, baseline_folder):
         c, ex = value["coverage"], value["execution"]
         n = c["observed_period_turns"]
         return (c["mapped_period_turns"] / n, ex["token_turn_coverage"]["known"] / n, ex["timed_turns"] / n,
-                bool(c["unknown_date_events"]), bool(ex["partial_usage_turns"]), bool(c["user_feedback"]["unclassified_evidence_ids"]),
-                any(not w.startswith("覆盖范围仅为") for w in value["warnings"]),
+                bool(c["unknown_date_events"]), bool(ex["partial_usage_turns"]),
                 tuple(ex["token_field_turn_coverage"][k] / n for k in TOKENS)) if n else None
-    comparable = coverage_profile(stats) is not None and coverage_profile(stats) == coverage_profile(baseline)
-    return {"comparable": comparable, "reason": None if comparable else "覆盖情况不同或缺少观察样本；仅并列观察值，不能判断效率改善",
+    diagnostics = any(not w.startswith(("覆盖范围仅为", "账本从周期活动建立"))
+                      for value in (stats, baseline) for w in value["warnings"])
+    comparable = not diagnostics and coverage_profile(stats) is not None and coverage_profile(stats) == coverage_profile(baseline)
+    process_comparable = (comparable and stats["process_reviewed"] and baseline["process_reviewed"] and
+                          not stats["coverage"]["user_feedback"]["unclassified_evidence_ids"] and
+                          not baseline["coverage"]["user_feedback"]["unclassified_evidence_ids"])
+    return {"comparable": comparable, "reason": None if comparable else "存在采集诊断、覆盖不同或缺少观察样本；仅并列观察值，不能判断效率改善",
             "baseline_window": baseline["window"], "baseline_hashes": baseline["input_hashes"],
             "coverage_current": stats["coverage"], "coverage_baseline": baseline["coverage"],
             "execution_current": stats["execution"], "execution_baseline": baseline["execution"],
-            "quality_current": stats["process_events"], "quality_baseline": baseline["process_events"],
+            "process_comparable": process_comparable,
+            "quality_current": stats["process_events"] if process_comparable else None,
+            "quality_baseline": baseline["process_events"] if process_comparable else None,
             "note": "仅并列同类观察值；样本构成与缺失仍需审阅，不推断因果或模型排名", "groups": [
                 {"project": k[0], "type": k[1], "current": current.get(k), "baseline": prior.get(k)} for k in sorted(set(current) | set(prior))]}
 
@@ -890,112 +1009,104 @@ def display(value, suffix=""):
 
 
 def render(stats, facts):
-    window = stats["window"]
-    title = PERIODS[window["kind"]]
-    counts, ex = stats["counts"], stats["execution"]
-    evidence = {e["id"]: e for e in facts["evidence"]}
-    sources = {s["id"]: s for s in facts["sources"]}
+    window, ex, coverage = stats["window"], stats["execution"], stats["coverage"]
+    deep = stats["analysis"] == "deep"
     cutoff = stamp(window["cutoff"]).astimezone(ZoneInfo(window["timezone"])).isoformat()
-    output = [f"# Relatra {title} · {window['label']}", "",
+    counts = stats["counts"]
+    output = [f"# Relatra {PERIODS[window['kind']]} · {window['label']}", "",
               f"范围：指定项目的可读取本地记录；时区：{window['timezone']}；截止：{cutoff}。",
-              "阶段性报告，周期尚未结束。" if window["partial"] else "完整指定周期；历史来源完整性未知。", "", "## 周期概览", "",
+              "阶段性报告，周期尚未结束。" if window["partial"] else "完整指定周期；历史来源完整性未知。", "",
+              "## 周期概览", "",
               f"本期交付（含验收） {counts['delivered']}；首次验收 {counts['accepted']}；发生失败的任务 {counts['failed']}。",
               "期末状态：" + ("；".join(f"{LABELS[k]} {v}" for k, v in sorted(stats["end_states"].items()) if v) or "未发现可归属任务") + "。", ""]
     if stats["summary"]:
         output += [stats["summary"], ""]
-    if not counts["delivered"]:
-        output += ["本期没有已核实的新增交付。", ""]
-    output += ["交付按目标修订计首次流量；期末状态只计每个目标最新修订。", "",
-               "| 项目 | 任务类型 | 期末目标数 |", "|---|---|---|"]
-    output += [f"| {md_text(t['project'])} | {TYPE_LABELS[t['type']]} | {t['tasks']} |" for t in stats["task_composition"]]
-    output += [""]
     output += ["## 具体任务与成果", ""]
-    for task in stats["tasks"]:
-        output += [f"### {md_text(task['title'])}", "", f"项目：{task['project']}；任务：{task['id']} / rev-{task['revision']}；状态：{LABELS[task['status']]}。", "",
-                   f"目标：{task['goal'] or '待确认'}", "", f"实际变化：{task['outcome'] or '尚未核实'}", ""]
-        if task["limitations"]:
-            output += ["限制：" + "；".join(task["limitations"]), ""]
-        task_execution = task["execution"]
-        if task["superseded"]:
-            output += ["本修订已由后续修订替代，保留历史交付，不计期末存量。", ""]
-        output += [f"完成周期：{display(task['cycle_seconds'], ' 秒')}；本期轮次执行时长：" +
-                   (display(task_execution["execution_seconds_sum"], " 秒") if task_execution else "共享轮次，归属未知") + "。", ""]
-        judgments = [e["note"] for e in task["events"] if e["kind"] in STATES | {"validation_passed", "validation_failed"}]
-        if judgments:
-            output += ["证据判断：" + "；".join(dict.fromkeys(judgments)), ""]
-        for event in task["events"] + task["unknown_date_events"]:
-            if event.get("basis"):
-                output += [f"验证层级：{BASIS_LABELS[event['basis']]}；事件时间：{event.get('at') or '未知'}。", ""]
-            if event.get("verified_excerpt"):
-                output += [f"已核对证据摘录：{md_text(event['verified_excerpt'])}", ""]
-        refs = sorted({eid for e in task["events"] + task["unknown_date_events"] for eid in e["evidence"]})
-        for eid in refs:
-            item = evidence[eid]
-            loc = item["locations"][0]
-            path = sources[loc["source_id"]]["path"]
-            output.append(f"- 证据 `{eid}`：[{md_text(Path(path).name)}](<{path}:{loc['line']}>)；来源前缀哈希在 facts.json。")
-        if not refs:
-            output.append("- 尚无已核实的状态事件；候选 turn 引用见 statistics.json。")
-        output += ["", f"下一步：{task['next_step'] or '无已确定下一步'}", ""]
-    if not stats["tasks"]:
+    projects = sorted({t["project"] for t in stats["tasks"]})
+    for project in projects:
+        output += [f"### {md_text(project)}", ""]
+        for task in (t for t in stats["tasks"] if t["project"] == project):
+            output += [f"- **{md_text(task['title'])}**（{LABELS[task['status']]}" + ("，历史修订" if task["superseded"] else "") +
+                       f"）：{md_text(task['outcome'] or '实际变化待核实')}。"]
+            if task["goal"]:
+                output += [f"  目标：{md_text(task['goal'])}。"]
+            judgments = [e for e in task["events"] if e["kind"] in STATES | {"reopened", "validation_passed", "validation_failed"}]
+            if judgments:
+                event = judgments[-1]
+                output += [f"  证据判断：{md_text(event['note'])}；验证层级：{BASIS_LABELS.get(event.get('basis'), '状态记录')}。"]
+                output += [f"  关键证据：{', '.join(event['evidence'])}（详见 statistics.json）。"]
+            else:
+                output += ["  交付证据尚待核实。"]
+            if task["limitations"]:
+                output += ["  限制：" + md_text("；".join(task["limitations"])) + "。"]
+        output += [""]
+    if not projects:
         output += ["本期未发现范围内可归属的任务。", ""]
-    cycle = stats["completion_cycle"]
-    output += ["## 执行效率与质量", "", "| 指标 | 本期观察值 |", "|---|---|",
-               f"| 完成周期中位数 | {display(cycle['median_seconds'], ' 秒')}；有效 {cycle['known_samples']} / 缺失 {cycle['missing_samples']} |",
-               f"| 轮次累计执行时长 | {display(ex['execution_seconds_sum'], ' 秒')} |",
-               f"| 去重占用时长 | {display(ex['occupied_seconds'], ' 秒')} |",
-               f"| 有明确区间的轮次 | {ex['timed_turns']} / {ex['turns']} |",
-               f"| 已确认/候选用户交互轮 | {ex['confirmed_user_turns']} / {ex['candidate_user_turns']} |",
-               f"| 明确等待区间并集 | {display(stats['recorded_wait_seconds_union'], ' 秒')} |", "",
-               "执行时间含工具及轮内等待，不代表纯模型计算或人工投入。共享轮次的任务级资源未知，总体只计一次。", "",
-               "过程事件：" + "；".join(f"{PROCESS_LABELS[k]} {v}" for k, v in sorted(stats["process_events"].items())) + "。", "",
-               "过程事件只统计已核实的账本记录；未记录不等于未发生。", "",
-               "人工介入分类：" + ("；".join(f"{CATEGORY_LABELS[k]} {v}" for k, v in sorted(stats["interventions"].items())) if stats["interventions"] else "未记录；不能推断为没有人工介入") + "。", ""]
+    output += ["## 资源与覆盖", "",
+               f"累计执行 {display(ex['execution_seconds_sum'], ' 秒')}；去重占用 {display(ex['occupied_seconds'], ' 秒')}；已观测 token 总量 {display(ex['tokens']['total_tokens'])}。",
+               f"时间区间覆盖 {ex['timed_turns']}/{ex['turns']} 轮；资源覆盖 {ex['token_turn_coverage']['known']}/{ex['turns']} 轮；资源不完整轮 {ex['partial_usage_turns']}。",
+               f"任务归属覆盖 {coverage['mapped_period_turns']}/{coverage['observed_period_turns']} 轮；未定日期事件 {coverage['unknown_date_events']}。",
+               "执行时间包含工具及轮内等待，不代表人工投入；未知不补零，不换算费用。", ""]
+    if not deep:
+        output += ["返工、重试、人工介入与等待未统计；不能解释为零次。", ""]
+    diagnostics = [w for w in stats["warnings"] if not w.startswith("覆盖范围仅为")]
+    if diagnostics:
+        output += [f"采集与历史覆盖有 {len(diagnostics)} 条提示，成果和资源可能不完整；详情见 statistics.json 的 warnings。"]
+        if any("未全面盘点更早遗留" in w for w in diagnostics):
+            output += ["账本未全面盘点更早遗留目标。"]
+        output += [""]
+    if deep:
+        cycle = stats["completion_cycle"]
+        output += ["## 执行效率与质量", "",
+                   f"完成周期中位数 {display(cycle['median_seconds'], ' 秒')}；有效 {cycle['known_samples']} / 缺失 {cycle['missing_samples']}。",
+                   f"已确认/候选用户交互轮 {ex['confirmed_user_turns']} / {ex['candidate_user_turns']}。"]
+        if stats["process_reviewed"]:
+            output += ["过程事件：" + "；".join(f"{PROCESS_LABELS[k]} {v}" for k, v in sorted(stats["process_events"].items())) + "。",
+                       "人工介入分类：" + ("；".join(f"{CATEGORY_LABELS[k]} {v}" for k, v in stats["interventions"].items()) or "未记录") + "。",
+                       f"明确等待区间并集 {display(stats['recorded_wait_seconds_union'], ' 秒')}；未记录不等于未发生。"]
+            feedback = coverage["user_feedback"]
+            output += [f"工具用户答复：已分类 {feedback['classified']} / 已观察 {feedback['observed']}。"]
+            if feedback["unclassified_evidence_ids"]:
+                output += ["工具用户答复尚未分类，人工介入统计不完整。"]
+        else:
+            output += ["本期过程分析尚未完成，过程指标未统计；不能沿用前版的完整性结论。"]
+        output += [""]
     if stats.get("trend"):
         output += ["## 周期内趋势", "", "| 区间起点 | 首次交付 | 周期中位数 / 样本 | 累计 / 占用秒 | 返工 / 重试 | token 总量 / 覆盖轮 |", "|---|---|---|---|---|---|"]
-    for b in stats.get("trend", []):
-        bx = b["execution"]
-        output.append(f"| {b['label']} | {b['delivered']} | {display(b['cycle_median_seconds'])} / {b['cycle_samples']} | {display(bx['execution_seconds_sum'])} / {display(bx['occupied_seconds'])} | {b['process_events']['rework']} / {b['process_events']['retry']} | {display(bx['tokens']['total_tokens'])} / {bx['token_turn_coverage']['known']}:{bx['turns']} |")
+        for bucket in stats["trend"]:
+            bx, process = bucket["execution"], bucket["process_events"]
+            quality = f"{process['rework']} / {process['retry']}" if process is not None else "未统计"
+            output.append(f"| {bucket['label']} | {bucket['delivered']} | {display(bucket['cycle_median_seconds'])} / {bucket['cycle_samples']} | {display(bx['execution_seconds_sum'])} / {display(bx['occupied_seconds'])} | {quality} | {display(bx['tokens']['total_tokens'])} / {bx['token_turn_coverage']['known']}:{bx['turns']} |")
+        output += [""]
     comparison = stats.get("comparison")
-    output += ["", "## 前期比较", ""]
-    if comparison and comparison.get("groups"):
+    if comparison:
+        output += ["## 前期比较", ""]
         if not comparison["comparable"]:
             output += [comparison["reason"], ""]
-        output += [comparison["note"], "", "| 项目 / 类型 | 本期交付 / 有效周期样本 | 前期交付 / 有效周期样本 | 本期 / 前期周期中位数（秒） |", "|---|---|---|---|"]
-        for group in comparison["groups"]:
-            a, b = group["current"] or {}, group["baseline"] or {}
-            output.append(f"| {md_text(group['project'])} / {TYPE_LABELS[group['type']]} | {a.get('delivered', '未知')} / {a.get('cycle_samples', 0)} | {b.get('delivered', '未知')} / {b.get('cycle_samples', 0)} | {display(a.get('cycle_median_seconds'))} / {display(b.get('cycle_median_seconds'))} |")
-        a, b = comparison["execution_current"], comparison["execution_baseline"]
-        ca, cb = comparison["coverage_current"], comparison["coverage_baseline"]
-        output += ["", f"观察目标构成：本期 {sum((g['current'] or {}).get('observed_tasks', 0) for g in comparison['groups'])} / 前期 {sum((g['baseline'] or {}).get('observed_tasks', 0) for g in comparison['groups'])}，各类型样本见 statistics.json。",
-                   f"归并覆盖：本期 {ca['mapped_period_turns']}/{ca['observed_period_turns']}；前期 {cb['mapped_period_turns']}/{cb['observed_period_turns']}。",
-                   f"资源覆盖：本期 {a['token_turn_coverage']['known']}/{a['turns']}；前期 {b['token_turn_coverage']['known']}/{b['turns']}。",
-                   f"累计执行秒：本期 {display(a['execution_seconds_sum'])} / 前期 {display(b['execution_seconds_sum'])}；token 总量：本期 {display(a['tokens']['total_tokens'])} / 前期 {display(b['tokens']['total_tokens'])}。",
-                   f"返工/重试：本期 {comparison['quality_current']['rework']}/{comparison['quality_current']['retry']}；前期 {comparison['quality_baseline']['rework']}/{comparison['quality_baseline']['retry']}。",
-                   "样本构成或覆盖改变时不得直接解释为效率改善。"]
-    else:
-        output += [comparison["reason"] if comparison else "没有显式提供前期基础报告，无法比较。"]
-    output += ["", "## 资源与覆盖", "",
-               "| token 字段 | 已观测总量 | 有效记录数 |", "|---|---|---|"]
-    output += [f"| {k} | {display(ex['tokens'][k])} | {ex['token_field_samples'][k]} |" for k in TOKENS]
-    coverage = stats["coverage"]
-    output += ["", f"资源覆盖 {ex['token_turn_coverage']['known']} / {ex['token_turn_coverage']['observed']} 轮；资源不完整轮 {ex['partial_usage_turns']}。",
-               f"任务归属覆盖 {coverage['mapped_period_turns']} / {coverage['observed_period_turns']} 轮；未定日期事件 {coverage['unknown_date_events']}。", "",
-               "缓存/推理 token 是输入/输出的子集；未知不补零，不换算账单或节省人工时间。", ""]
-    output += [f"- {md_text(w)}" for w in stats["warnings"]]
-    if coverage["unmapped_turn_ids"]:
-        output += ["", "未归属轮次：" + ", ".join(coverage["unmapped_turn_ids"])]
-    feedback = coverage["user_feedback"]
-    output += ["", f"工具用户答复：已分类 {feedback['classified']} / 已观察 {feedback['observed']}；一份实际答复按一次介入分类，不按其中问题数量累计。"]
-    if feedback["unclassified_evidence_ids"]:
-        output += ["工具用户答复尚未分类，人工介入统计不完整；证据：" + ", ".join(feedback["unclassified_evidence_ids"])]
-    output += ["", "## 遗留与下一步", ""]
+        if comparison.get("groups"):
+            output += ["| 项目 / 类型 | 本期 / 前期交付 | 本期 / 前期周期中位数（秒） |", "|---|---|---|"]
+            for group in comparison["groups"]:
+                a, b = group["current"] or {}, group["baseline"] or {}
+                output.append(f"| {md_text(group['project'])} / {TYPE_LABELS[group['type']]} | {a.get('delivered', '未知')} / {b.get('delivered', '未知')} | {display(a.get('cycle_median_seconds'))} / {display(b.get('cycle_median_seconds'))} |")
+            ca, cb = comparison["coverage_current"], comparison["coverage_baseline"]
+            a, b = comparison["execution_current"], comparison["execution_baseline"]
+            output += ["", f"归属覆盖：本期 {ca['mapped_period_turns']}/{ca['observed_period_turns']}；前期 {cb['mapped_period_turns']}/{cb['observed_period_turns']}。",
+                       f"累计执行秒：本期 {display(a['execution_seconds_sum'])} / 前期 {display(b['execution_seconds_sum'])}；token 总量：本期 {display(a['tokens']['total_tokens'])} / 前期 {display(b['tokens']['total_tokens'])}。",
+                       "样本及资源字段覆盖见 statistics.json；覆盖或构成改变时不能直接解释为效率改善。"]
+            if comparison["process_comparable"]:
+                a, b = comparison["quality_current"], comparison["quality_baseline"]
+                output += [f"返工/重试：本期 {a['rework']}/{a['retry']}；前期 {b['rework']}/{b['retry']}。"]
+            else:
+                output += ["过程指标未比较：双方须完成深度分析并满足覆盖条件。"]
+            output += [""]
+    output += ["## 遗留与下一步", ""]
     pending = [t for t in stats["tasks"] if not t["superseded"] and
                (t["status"] in {"blocked", "failed", "pending_confirmation", "in_progress"} or t["next_step"].strip())]
     output += [f"- {md_text(t['title'])}（{LABELS[t['status']]}）：{md_text(t['next_step'] or '需要核实下一步')}" for t in pending] or ["无已记录的遗留事项；来源完整性仍未知。"]
-    output += ["", "## 改进建议", ""]
-    output += [f"- {item['text']}（任务：{', '.join(item['task_ids'])}；证据：{', '.join(item['evidence'])}）" for item in stats["recommendations"]] or ["暂无足够证据支持具体改进建议。"]
-    output += ["", "来源与复算：见同目录 manifest.json、tasks.json、statistics.json，以及 manifest 指向的 facts.json。", ""]
+    if stats["recommendations"]:
+        output += ["", "## 改进建议", ""]
+        output += [f"- {item['text']}（任务：{', '.join(item['task_ids'])}；证据：{', '.join(item['evidence'])}）" for item in stats["recommendations"]]
+    output += ["", "详细事件、证据、资源字段及诊断见同目录 statistics.json；复算输入见 facts.json、tasks.json 和 manifest.json。", ""]
     return "\n".join(output)
 
 
@@ -1003,14 +1114,22 @@ def report(args):
     snapshot = Path(args.snapshot).resolve()
     facts = read_json(snapshot / "facts.json")
     seal = read_json(snapshot / "manifest.json")
-    require(seal.get("schema_version") == SCHEMA and seal.get("facts_hash") == digest(facts), "采集快照与原始 manifest 哈希不符；请重新采集，不能改写 facts")
+    require(isinstance(seal, dict), "快照 manifest 必须是对象")
+    require(seal.get("schema_version") == SCHEMA, "旧快照仅供阅读；请重新采集 v2 数据")
+    if "input_hashes" in seal:
+        facts, _, seal = load_report(snapshot)
+    else:
+        require(seal.get("facts_hash") == digest(facts), "采集快照与原始 manifest 哈希不符；请重新采集，不能改写 facts")
     tasks_path = Path(args.tasks).resolve() if args.tasks else snapshot / "tasks.json"
     ledger = read_json(tasks_path)
-    records = [read_json(p) for p in args.correction]
-    require(len({digest(r) for r in records}) == len(records), "同一更正不能重复应用")
-    ledger = apply_corrections(ledger, records)
+    require(bool(args.revises) == bool(args.reason and args.reason.strip()), "更正必须成对提供 --revises 与非空 --reason")
+    require("input_hashes" not in seal or digest(ledger) == seal["input_hashes"]["ledger"] or args.revises,
+            "修改已生成报告的账本必须提供 --revises 与 --reason")
+    if args.revises:
+        parent, _, _ = load_report(args.revises)
+        require(same_scope(facts, parent) and all(facts["window"][k] == parent["window"][k] for k in ("kind", "start", "end")) and
+                stamp(facts["window"]["cutoff"]) >= stamp(parent["window"]["cutoff"]), "被更正报告与当前范围或周期不一致")
     stats = aggregate(facts, ledger)
-    stats["input_hashes"]["corrections"] = [digest(r) for r in records]
     stats["trend"] = trend(stats, facts)
     stats["comparison"] = compare(stats, facts, args.baseline) if args.baseline else None
     config = validate_config(facts["config"])
@@ -1018,23 +1137,14 @@ def report(args):
     write_json(target / "statistics.json", stats)
     write_json(target / "tasks.json", ledger)
     write_json(target / "facts.json", facts)
-    write_json(target / "corrections.json", records)
     write_json(target / "manifest.json", {"schema_version": SCHEMA, "version": VERSION, "generated_at": iso(datetime.now(timezone.utc)),
-                                         "facts": str(target / "facts.json"), "snapshot": str(snapshot), "tasks_input": str(tasks_path), "corrections": [absolute(p) for p in args.correction],
-                                         "input_hashes": stats["input_hashes"], "baseline": absolute(args.baseline) if args.baseline else None})
+                                         "facts": str(target / "facts.json"), "snapshot": str(snapshot), "tasks_input": str(tasks_path),
+                                         "input_hashes": stats["input_hashes"], "baseline": absolute(args.baseline) if args.baseline else None,
+                                         "previous_report": seal.get("previous_report"),
+                                         "revises": absolute(args.revises) if args.revises else None,
+                                         "reason": args.reason.strip() if args.reason else None})
     (target / "report.md").write_text(render(stats, facts), encoding="utf-8")
     return {"report": str(target / "report.md"), "statistics": str(target / "statistics.json"), "counts": stats["counts"], "coverage": stats["coverage"]}
-
-
-def correct(args):
-    config = validate_config(read_json(args.config))
-    patch = read_json(args.patch)
-    require(isinstance(patch, list) and patch and args.reason.strip(), "更正必须有 patch 和用户更正原因")
-    require(all(isinstance(p, dict) and p.get("op") in {"add", "replace", "remove"} for p in patch), "更正操作无效")
-    folder = new_directory(Path(config["output"]) / "corrections")
-    path = folder / "correction.json"
-    write_json(path, {"schema_version": SCHEMA, "recorded_at": iso(datetime.now(timezone.utc)), "reason": args.reason, "patch": patch})
-    return {"correction": str(path)}
 
 
 def parser():
@@ -1053,22 +1163,21 @@ def parser():
     coll.add_argument("--start")
     coll.add_argument("--end")
     coll.add_argument("--now")
+    coll.add_argument("--analysis", choices=["basic", "deep"], default="basic")
+    coll.add_argument("--previous-report", help="指定复用报告；默认在当前报告目录自动选择")
     rep = sub.add_parser("report", help="校验语义账本，新增报告版本")
     rep.add_argument("--snapshot", required=True)
     rep.add_argument("--tasks")
-    rep.add_argument("--correction", action="append", default=[])
+    rep.add_argument("--revises", help="被更正的报告目录")
+    rep.add_argument("--reason", help="本次完整账本更正原因，与 --revises 成对使用")
     rep.add_argument("--baseline", help="显式前期报告目录；核对基础输入并重算同类趋势")
-    fix = sub.add_parser("correct", help="追加用户已授权的报告更正")
-    fix.add_argument("--config", required=True)
-    fix.add_argument("--patch", required=True)
-    fix.add_argument("--reason", required=True)
     return root
 
 
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
-        result = {"configure": configure, "collect": collect, "report": report, "correct": correct}[args.command](args)
+        result = {"configure": configure, "collect": collect, "report": report}[args.command](args)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0
     except (ValueError, OSError, TypeError, KeyError) as exc:
