@@ -1,0 +1,966 @@
+{
+  "project": "/private/tmp/cadra-engineering-recovery-kvs3043i",
+  "executor": "engineering_continuous_revisions",
+  "captured_at": "2026-10-22T13:36:21.859567+08:00",
+  "skill_sources": {
+    "cadra": "/Users/zhubowen/Documents/yuzio-ai/skills/cadra/SKILL.md",
+    "cadra_version": "0.6.0",
+    "cadra_protocol": "0.6",
+    "cohestra": "/Users/zhubowen/Documents/yuzio-ai/skills/cohestra/SKILL.md",
+    "cohestra_version": "0.10.1",
+    "cohestra_protocol": "0.8"
+  },
+  "operations": [
+    "ready prefix-source",
+    "run scope prefix-source",
+    "add greeting-service stop_queue_on_failure=true only",
+    "ready greeting-service",
+    "run scope greeting-service",
+    "add greeting-service stop_queue_on_failure=false only",
+    "ready greeting-service",
+    "run scope greeting-service",
+    "report run-20261022-06",
+    "list all",
+    "resume run-20261022-06 (already closed)"
+  ],
+  "runs": [
+    {
+      "run": "run-20261022-04",
+      "path": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/runs/run-20261022-04.md",
+      "sha256": "92227242dd8d83a08dd23a08e7c14067ef4a92cd92303acd66e462f593dc5550",
+      "status": "completed",
+      "slug": "prefix-source",
+      "revision": 2,
+      "previous_run": "run-20261022-01",
+      "definition": {
+        "protocol": "0.6",
+        "slug": "prefix-source",
+        "title": "问候前缀",
+        "revision": 2,
+        "preparation": "ready",
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "small-change",
+        "execution_policy": {
+          "stop_queue_on_failure": true
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/prefix-source/",
+        "revision_base": {
+          "run": "run-20261022-01",
+          "revision": 1
+        },
+        "changed_fields": [
+          "execution_policy"
+        ],
+        "requirement": "在 prefix.py 实现 greeting_prefix() 恒返回字符串 Hello。用标准库 unittest 验证；不做其他业务改动。AC-1：每次无参数调用均返回字符串 Hello。AC-2：标准库 unittest 通过。",
+        "gate_snapshot": " 失效\n\n策略定义已变化，preparation=draft。revision 1 Gate 保留为历史，不放行 revision 2。本次未执行 ready、run 或 Cohestra 阶段；仅策略变化且原执行 completed 的后续修订收尾，仍需先重新 Gate 并核实旧契约和来源。\n\n## Ready Gate · revision 2\n\n2026-10-22T13:29:52.009863+08:00；Cadra 0.6.0 / 协议 0.6；engineering_continuous_revisions。\n- 目标：通过，恒返回 Hello。\n- 范围：通过，原业务范围不变，仅策略修订。\n- 验收：通过，原 AC-1/AC-2 明确且未改。\n- 人类决定：通过，用户明确授权本次 ready/run。\n- 输入：通过，原代码、候选、验收与契约可读取且哈希一致。\n- 依赖：通过，无依赖。\n- 起点：通过，唯一来源 run-20261022-01 completed，完整契约相符；仅 execution_policy 变化，修订核对收尾，无需阶段调用。\n- 范围配置：通过，small-change 未变。\n本 Gate 只绑定 revision 2，旧 Gate 保留。\n"
+      },
+      "start_action": {
+        "kind": "修订收尾",
+        "stage": null,
+        "basis": "仅 execution_policy 变化；run-20261022-01 为唯一执行依据 completed，旧契约完整一致；候选与原验收核实可沿用。用户明确范围 prefix-source。"
+      },
+      "authorization_consumed": true,
+      "budget": {
+        "calls": 0,
+        "remediation": 0,
+        "retries": {}
+      },
+      "calls": [],
+      "result": {
+        "state": "completed",
+        "last_delivery": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/prefix-source/validate-01.md",
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/prefix-source/code-01.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": "passed",
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": {
+          "file": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/prefix-source/README.md",
+          "stage": "validate",
+          "round": 1
+        },
+        "time": "2026-10-22T13:30:19.430327+08:00",
+        "summary": "仅策略修订核对收尾，未调用阶段；候选与验收均沿用 run-20261022-01 的 code-01 / validate-01。",
+        "reused_from": {
+          "run": "run-20261022-01",
+          "revision": 1
+        },
+        "verified_contract": {
+          "contract": "0.8",
+          "task": "prefix-source",
+          "status": "completed",
+          "execution_mode": "unattended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/prefix-source/code-01.md"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          }
+        }
+      }
+    },
+    {
+      "run": "run-20261022-05",
+      "path": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/runs/run-20261022-05.md",
+      "sha256": "9c5a93b8b5f5cdfb4bc641e96900ea4e11a7b459712a60c6857ac31fcff45c54",
+      "status": "completed",
+      "slug": "greeting-service",
+      "revision": 3,
+      "previous_run": "run-20261022-03",
+      "definition": {
+        "protocol": "0.6",
+        "slug": "greeting-service",
+        "title": "问候服务",
+        "revision": 3,
+        "preparation": "ready",
+        "priority": "medium",
+        "dependencies": [
+          "prefix-source"
+        ],
+        "flow": "small-change",
+        "execution_policy": {
+          "stop_queue_on_failure": true
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/greeting-service/",
+        "revision_base": {
+          "run": "run-20261022-03",
+          "revision": 2
+        },
+        "changed_fields": [
+          "execution_policy"
+        ],
+        "requirement": "在 greeting.py 的 greet(name: str) 中先对 name 执行 strip()，去除首尾空白；strip 后为空则返回 Hello, world!，非空则返回 Hello, <trimmed name>!，保留内部空白。继续调用 prefix.py 的 greeting_prefix() 获取前缀。仍仅处理字符串，不处理非字符串；只修改问候行为及必要标准库 unittest，不做其他业务改动。AC-1：非空裁剪结果使用裁剪后的名称，内部空白及 Unicode 保留；AC-2：空串或仅含空白的字符串均使用 world；AC-3：前缀仍来自 greeting_prefix()；AC-4：相关 unittest 通过。",
+        "gate_snapshot": "\n\n2026-10-22T13:30:30.637021+08:00；Cadra 0.6.0 / 协议 0.6。\n- 目标：通过，strip 后问候输出确定。\n- 范围：通过，字符串、内部空白与 Unicode 保留，非字符串排除。\n- 验收：通过，当前 AC-1 至 AC-4 明确，旧需求验收不覆盖新需求。\n- 人类决定：通过，用户明确授权顺序 add/ready/run。\n- 输入：通过，原业务、候选、交付与 Python 标准库可用。\n- 依赖：通过，prefix-source 当前 revision 2 / run-04 completed；原 dependency_unavailable 已解除。\n- 起点：通过，唯一来源 run-02 → run-03，run-03 无调用；执行依据 run-02 的完整合法契约已核实，累计 requirement/execution_policy，修订重启 code 一次。\n- 范围配置：通过，small-change 未变，允许 code/review/fix/validate。\n"
+      },
+      "start_action": {
+        "kind": "修订重启",
+        "stage": "code",
+        "basis": "最近执行依据 run-02 revision 1 completed；链尾 run-03 首调用前依赖受阻，0 calls且授权未消费；prefix-source revision 2 已由 run-04 completed 解除。累计 requirement/execution_policy 变化，small-change start=code。用户明确范围 greeting-service，修订普通范围，恢复列表空。"
+      },
+      "authorization_consumed": true,
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "calls": [
+        {
+          "id": 1,
+          "stage": "code",
+          "round": 2,
+          "dispatch": "dispatched",
+          "closed": true,
+          "charged": {
+            "calls": 1,
+            "remediation": 0,
+            "retry_stage": null
+          },
+          "prepared_at": "2026-10-22T13:30:52.285470+08:00",
+          "dispatched_at": "2026-10-22T13:31:07.922907+08:00",
+          "result": {
+            "contract": {
+              "contract": "0.8",
+              "task": "greeting-service",
+              "status": "in_progress",
+              "execution_mode": "unattended",
+              "stage_result": {
+                "stage": "code",
+                "status": "completed",
+                "round": 2
+              },
+              "candidate": {
+                "commit": null,
+                "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+              },
+              "next": {
+                "stage": "review",
+                "allowed": true,
+                "reason": "stage_completed"
+              },
+              "blocked": {
+                "value": false,
+                "reason": null
+              }
+            },
+            "handoff": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md",
+            "index_sync": "success",
+            "index_sha256": "5268cb8f70a7cf96cc706e84f1da90bdc90aaece6a7c1480ae85d6ed86ecb4f5",
+            "verified_at": "2026-10-22T13:32:16.716215+08:00"
+          }
+        },
+        {
+          "id": 2,
+          "stage": "review",
+          "round": 2,
+          "dispatch": "dispatched",
+          "closed": true,
+          "charged": {
+            "calls": 1,
+            "remediation": 0,
+            "retry_stage": null
+          },
+          "prepared_at": "2026-10-22T13:32:22.251940+08:00",
+          "dispatched_at": "2026-10-22T13:32:35.703681+08:00",
+          "result": {
+            "contract": {
+              "contract": "0.8",
+              "task": "greeting-service",
+              "status": "in_progress",
+              "execution_mode": "unattended",
+              "stage_result": {
+                "stage": "review",
+                "status": "completed",
+                "round": 2
+              },
+              "candidate": {
+                "commit": null,
+                "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+              },
+              "next": {
+                "stage": "validate",
+                "allowed": true,
+                "reason": "stage_completed"
+              },
+              "blocked": {
+                "value": false,
+                "reason": null
+              },
+              "findings": {
+                "blocking": 0,
+                "non_blocking": 0,
+                "unresolved": 0
+              }
+            },
+            "handoff": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/review-02.md",
+            "index_sync": "success",
+            "index_sha256": "f1a49aae2bab387bbe500acefa4ba8e27c74b4b6e62b1a29534f762bb65ce1ef",
+            "verified_at": "2026-10-22T13:33:30.287086+08:00"
+          }
+        },
+        {
+          "id": 3,
+          "stage": "validate",
+          "round": 2,
+          "dispatch": "dispatched",
+          "closed": true,
+          "charged": {
+            "calls": 1,
+            "remediation": 0,
+            "retry_stage": null
+          },
+          "prepared_at": "2026-10-22T13:33:35.378474+08:00",
+          "dispatched_at": "2026-10-22T13:33:45.266258+08:00",
+          "result": {
+            "contract": {
+              "contract": "0.8",
+              "task": "greeting-service",
+              "status": "completed",
+              "execution_mode": "unattended",
+              "stage_result": {
+                "stage": "validate",
+                "status": "completed",
+                "round": 2
+              },
+              "candidate": {
+                "commit": null,
+                "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+              },
+              "next": {
+                "stage": null,
+                "allowed": false,
+                "reason": "task_completed"
+              },
+              "blocked": {
+                "value": false,
+                "reason": null
+              },
+              "findings": {
+                "blocking": 0,
+                "non_blocking": 0,
+                "unresolved": 0
+              },
+              "acceptance": {
+                "status": "passed"
+              }
+            },
+            "handoff": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/validate-02.md",
+            "index_sync": "success",
+            "index_sha256": "0e59bb50248d937e772cff32caa53fbb4453e13f574e8999ed3302e8bd9ba38f",
+            "verified_at": "2026-10-22T13:34:20.759435+08:00"
+          }
+        }
+      ],
+      "result": {
+        "state": "completed",
+        "last_delivery": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/validate-02.md",
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": "passed",
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": {
+          "file": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/README.md",
+          "stage": "validate",
+          "round": 2
+        },
+        "time": "2026-10-22T13:34:20.759930+08:00",
+        "summary": "revision 3 当前 strip 需求经 code-02、作者 review-02、validate-02 验收通过；旧验收未冒用于新需求。"
+      }
+    },
+    {
+      "run": "run-20261022-06",
+      "path": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/runs/run-20261022-06.md",
+      "sha256": "1ee6bd510ab2469737626f33517f64158f2c95f8d30eb5989d7ddfbde9aadd08",
+      "status": "completed",
+      "slug": "greeting-service",
+      "revision": 4,
+      "previous_run": "run-20261022-05",
+      "definition": {
+        "protocol": "0.6",
+        "slug": "greeting-service",
+        "title": "问候服务",
+        "revision": 4,
+        "preparation": "ready",
+        "priority": "medium",
+        "dependencies": [
+          "prefix-source"
+        ],
+        "flow": "small-change",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/greeting-service/",
+        "revision_base": {
+          "run": "run-20261022-05",
+          "revision": 3
+        },
+        "changed_fields": [
+          "execution_policy"
+        ],
+        "requirement": "在 greeting.py 的 greet(name: str) 中先对 name 执行 strip()，去除首尾空白；strip 后为空则返回 Hello, world!，非空则返回 Hello, <trimmed name>!，保留内部空白。继续调用 prefix.py 的 greeting_prefix() 获取前缀。仍仅处理字符串，不处理非字符串；只修改问候行为及必要标准库 unittest，不做其他业务改动。AC-1：非空裁剪结果使用裁剪后的名称，内部空白及 Unicode 保留；AC-2：空串或仅含空白的字符串均使用 world；AC-3：前缀仍来自 greeting_prefix()；AC-4：相关 unittest 通过。",
+        "gate_snapshot": "\n\n2026-10-22T13:34:45.740296+08:00；Cadra 0.6.0 / 协议 0.6。\n- 目标：通过，strip 问候目标保持。\n- 范围：通过，仍限定字符串和必要测试。\n- 验收：通过，当前 AC-1 至 AC-4 未变化。\n- 人类决定：通过，用户明确授权策略改回 false 与 ready/run/report/list/resume。\n- 输入：通过，candidate-02、code/review/validate-02 和契约可核对。\n- 依赖：通过，prefix-source 当前 revision 2/run-04 completed。\n- 起点：通过，最近执行依据 run-05 completed/验收 passed；累计仅 execution_policy，修订核对收尾，不调用阶段。\n- 范围配置：通过，small-change 未变。\n"
+      },
+      "start_action": {
+        "kind": "修订收尾",
+        "stage": null,
+        "basis": "最近执行依据 run-05 revision 3 completed/验收 passed；累计仅 execution_policy true → false；当前 requirement/flow/dependencies 不变，完整旧契约已核实，候选和验收沿用。用户明确范围 greeting-service。"
+      },
+      "authorization_consumed": true,
+      "budget": {
+        "calls": 0,
+        "remediation": 0,
+        "retries": {}
+      },
+      "calls": [],
+      "result": {
+        "state": "completed",
+        "last_delivery": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/validate-02.md",
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": "passed",
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": {
+          "file": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/README.md",
+          "stage": "validate",
+          "round": 2
+        },
+        "time": "2026-10-22T13:35:07.716346+08:00",
+        "summary": "仅策略修订收尾，未调用任何 Cohestra 阶段。candidate-02、code-02 和 validate-02 当前需求验收沿用 run-05，原模式 unattended。",
+        "reused_from": {
+          "run": "run-20261022-05",
+          "revision": 3
+        },
+        "verified_contract": {
+          "contract": "0.8",
+          "task": "greeting-service",
+          "status": "completed",
+          "execution_mode": "unattended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 2
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          }
+        }
+      }
+    }
+  ],
+  "publication_checks": [
+    {
+      "stage": "code",
+      "round": 2,
+      "pending": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-index.pending.md",
+      "validation": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-index.pending.md.validation.json",
+      "expected": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-index.expected.json",
+      "old_index_sha256": "f6f1539db1b90bb04cf60e3f940db0a7bb5a89508473c69a19ce3a4ce33d7750",
+      "new_index_sha256": "5268cb8f70a7cf96cc706e84f1da90bdc90aaece6a7c1480ae85d6ed86ecb4f5",
+      "validation_time": "2026-10-22T13:32:06.958648+08:00",
+      "independent_validation_call": true,
+      "subsequent_separate_publication_call": true,
+      "index_sync": "success"
+    },
+    {
+      "stage": "review",
+      "round": 2,
+      "pending": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-index.pending.md",
+      "validation": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-index.pending.md.validation.json",
+      "expected": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-index.expected.json",
+      "old_index_sha256": "5268cb8f70a7cf96cc706e84f1da90bdc90aaece6a7c1480ae85d6ed86ecb4f5",
+      "new_index_sha256": "f1a49aae2bab387bbe500acefa4ba8e27c74b4b6e62b1a29534f762bb65ce1ef",
+      "validation_time": "2026-10-22T13:33:17.515238+08:00",
+      "independent_validation_call": true,
+      "subsequent_separate_publication_call": true,
+      "index_sync": "success"
+    },
+    {
+      "stage": "validate",
+      "round": 2,
+      "pending": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/validate-02-index.pending.md",
+      "validation": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/validate-02-index.pending.md.validation.json",
+      "expected": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/validate-02-index.expected.json",
+      "old_index_sha256": "f1a49aae2bab387bbe500acefa4ba8e27c74b4b6e62b1a29534f762bb65ce1ef",
+      "new_index_sha256": "0e59bb50248d937e772cff32caa53fbb4453e13f574e8999ed3302e8bd9ba38f",
+      "validation_time": "2026-10-22T13:34:07.497430+08:00",
+      "independent_validation_call": true,
+      "subsequent_separate_publication_call": true,
+      "index_sync": "success"
+    }
+  ],
+  "tests": {
+    "code": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-test-evidence.json",
+    "review": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-check-evidence.json",
+    "validation": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/validate-02-evidence.json",
+    "raw_logs": [
+      "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-tests.log",
+      "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-check.log"
+    ],
+    "unittest_count": 5,
+    "review_boundary_cases": 10,
+    "review_dynamic_prefix_calls": 2,
+    "all_exit_codes": 0,
+    "review_mode": "author review; same agent as code-02; no independent-review requirement introduced or claimed"
+  },
+  "candidate": {
+    "manifest": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-02/manifest.json",
+    "sha256": "986b3358924ecf9b81505c512f5861922f6498f864f0196e3081cfc3babf94ce",
+    "baseline": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/manifest.json"
+  },
+  "hashes": {
+    "prefix.py": {
+      "before": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "after": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "unchanged": true
+    },
+    "test_greeting.py": {
+      "before": "8d6e666e4841d0f3db2f05165be2ce65467f39276844faf1864c339bdc87d0ff",
+      "after": "bdbf6bbb6ff38156e2358ead0fa508507e7bdb01064fbe81c7054c99c635500f",
+      "unchanged": false
+    },
+    "greeting.py": {
+      "before": "261d7e215779b473c1fd3e1b63e61bb4ca3c1d751274639cf86f00915cee0024",
+      "after": "16e3de0f36bbcd1467dc30e784064a0f16cacc09638b9a8a3b5fe7577772545e",
+      "unchanged": false
+    },
+    "test_prefix.py": {
+      "before": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "after": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "unchanged": true
+    },
+    ".gitignore": {
+      "before": "2f49a020a2914d9e1043172b94434e536361df437f1c2b094b3d33f0d99f9fae",
+      "after": "2f49a020a2914d9e1043172b94434e536361df437f1c2b094b3d33f0d99f9fae",
+      "unchanged": true
+    },
+    "AGENTS.md": {
+      "before": "983b3431fbdc7ddfd21184cec25e0c0856850f34549ada248d4ab1c84fcacae6",
+      "after": "983b3431fbdc7ddfd21184cec25e0c0856850f34549ada248d4ab1c84fcacae6",
+      "unchanged": true
+    },
+    "verification/run-02-first-completion.json": {
+      "before": "30d1b5aa0ace4fff74d856ae596dd570ee2a596de90ce830095b45d484a7b20e",
+      "after": "30d1b5aa0ace4fff74d856ae596dd570ee2a596de90ce830095b45d484a7b20e",
+      "unchanged": true
+    },
+    "verification/validate_index.py": {
+      "before": "990a8789fbb58b0ed4d333e91689afaf7ae89286536ca8ec5ea76009d3b4662a",
+      "after": "990a8789fbb58b0ed4d333e91689afaf7ae89286536ca8ec5ea76009d3b4662a",
+      "unchanged": true
+    },
+    "verification/revision-02-ready.json": {
+      "before": "66bae7fec3f0cd4617b360da783635b559dbb2afbd62e0e34d7d5ce5e35899c6",
+      "after": "66bae7fec3f0cd4617b360da783635b559dbb2afbd62e0e34d7d5ce5e35899c6",
+      "unchanged": true
+    },
+    "verification/validate_delivery_index.py": {
+      "before": "fb74e5f44a466090e79292f77e89678ef09ba6742ae67523699088e499781aea",
+      "after": "fb74e5f44a466090e79292f77e89678ef09ba6742ae67523699088e499781aea",
+      "unchanged": true
+    },
+    "verification/run-02-report-registration.json": {
+      "before": "d5acaf42ed4a4b0a4aea68616980923722efabbe78a53d9bd2f1d895450055e7",
+      "after": "d5acaf42ed4a4b0a4aea68616980923722efabbe78a53d9bd2f1d895450055e7",
+      "unchanged": true
+    },
+    "verification/publish_index.py": {
+      "before": "497363aa57bfcc8c2e54137044ad37171f044534e902063480f07bf0c531aa5e",
+      "after": "497363aa57bfcc8c2e54137044ad37171f044534e902063480f07bf0c531aa5e",
+      "unchanged": true
+    },
+    "verification/checkpoint-01.json": {
+      "before": "267f016fe3ee1d5d9a91098fed6c157cc70f1ef9615017d53cd1f19e0aadbe9d",
+      "after": "267f016fe3ee1d5d9a91098fed6c157cc70f1ef9615017d53cd1f19e0aadbe9d",
+      "unchanged": true
+    },
+    "verification/run-02-repeat-resume.json": {
+      "before": "7ad3927121f74a447d223d24dcaa054a14be2226eb9fe5a4a104966dddb0b37b",
+      "after": "7ad3927121f74a447d223d24dcaa054a14be2226eb9fe5a4a104966dddb0b37b",
+      "unchanged": true
+    },
+    "verification/publication-call-01.json": {
+      "before": "3da57e2336455ac918e5cee0a39d0b1cd754f05ae0d18c528014cc93fdbac0ab",
+      "after": "3da57e2336455ac918e5cee0a39d0b1cd754f05ae0d18c528014cc93fdbac0ab",
+      "unchanged": true
+    },
+    "verification/dispatch-call-01.json": {
+      "before": "e04c77475fd218d4823797b121c587b63c6a47bc4eb635969e9d298bee6c253e",
+      "after": "e04c77475fd218d4823797b121c587b63c6a47bc4eb635969e9d298bee6c253e",
+      "unchanged": true
+    },
+    "verification/checkpoint-04-before.json": {
+      "before": "8b608791fad561a5006356d881c026c86dbd3a997611e75351e4f59cb7250201",
+      "after": "8b608791fad561a5006356d881c026c86dbd3a997611e75351e4f59cb7250201",
+      "unchanged": true
+    },
+    "verification/checkpoint-03.json": {
+      "before": "b5f80b3b4ca76bb9a552bb3178fcb5df29d34bf5ba7fabdc47b0868530233668",
+      "after": "b5f80b3b4ca76bb9a552bb3178fcb5df29d34bf5ba7fabdc47b0868530233668",
+      "unchanged": true
+    },
+    "verification/resume-call-01-recovered.json": {
+      "before": "3c920da896435e772e83bbda7921a94bf8cd7bc5d7e763e0d81406498e4ad3b1",
+      "after": "3c920da896435e772e83bbda7921a94bf8cd7bc5d7e763e0d81406498e4ad3b1",
+      "unchanged": true
+    },
+    "verification/record_io.py": {
+      "before": "a7fb80388fa73d17688abb4523447e8678f973f2ee6ec6d841e8a7c0edf9f9f9",
+      "after": "a7fb80388fa73d17688abb4523447e8678f973f2ee6ec6d841e8a7c0edf9f9f9",
+      "unchanged": true
+    },
+    "verification/dispatch-call-03.json": {
+      "before": "d0b0a92cfe448a289d8ba5f959a831dd4e41dba5c83d8ce09d80795d190bbb94",
+      "after": "d0b0a92cfe448a289d8ba5f959a831dd4e41dba5c83d8ce09d80795d190bbb94",
+      "unchanged": true
+    },
+    "verification/publication-call-03.json": {
+      "before": "1d528431fe4544356de3f1628c85044d89a37838d6d2986b265e962d0f61fbe8",
+      "after": "1d528431fe4544356de3f1628c85044d89a37838d6d2986b265e962d0f61fbe8",
+      "unchanged": true
+    },
+    "verification/publication-call-02.json": {
+      "before": "6d86a0872174423767b52c6fd09a39b8c1fd98f6bca63e3cb230cdf876d027fb",
+      "after": "6d86a0872174423767b52c6fd09a39b8c1fd98f6bca63e3cb230cdf876d027fb",
+      "unchanged": true
+    },
+    "verification/dispatch-call-02.json": {
+      "before": "5f69ae0e2fbfe83f0a13f82fe0d0b7f850ea1e15f821c56befb5f19baf638f1f",
+      "after": "5f69ae0e2fbfe83f0a13f82fe0d0b7f850ea1e15f821c56befb5f19baf638f1f",
+      "unchanged": true
+    },
+    "verification/checkpoint-02.json": {
+      "before": "219e067a89d1b378c1f8cc79f2e7c83a47acc52a661d42fb790a7665f2e89f6a",
+      "after": "219e067a89d1b378c1f8cc79f2e7c83a47acc52a661d42fb790a7665f2e89f6a",
+      "unchanged": true
+    },
+    "verification/validate_greeting_index.py": {
+      "before": "8e1bb7d772042ea07e1f3f01b147155c2e950fcd8bc26c0cd687c80f698e1e13",
+      "after": "8e1bb7d772042ea07e1f3f01b147155c2e950fcd8bc26c0cd687c80f698e1e13",
+      "unchanged": true
+    },
+    "verification/checkpoint-04.json": {
+      "before": "b21cb3a94023fd054d3c5d4e1a5721e7d76576197bcb1b6a56d332e8b7e61025",
+      "after": "b21cb3a94023fd054d3c5d4e1a5721e7d76576197bcb1b6a56d332e8b7e61025",
+      "unchanged": true
+    },
+    "verification/revision-02-add.json": {
+      "before": "1247748159aa17e75e51eb51481161316bf24208f4aa3a4248c26cd9de04f741",
+      "after": "1247748159aa17e75e51eb51481161316bf24208f4aa3a4248c26cd9de04f741",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/README.md": {
+      "before": "02c7cdd8a0ea9174faec8ecc677f33f548a3b820ff39721e0a616ca81b8b1397",
+      "after": "02c7cdd8a0ea9174faec8ecc677f33f548a3b820ff39721e0a616ca81b8b1397",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/.gitignore": {
+      "before": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "after": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "unchanged": true
+    },
+    ".yuzio/cadra/README.md": {
+      "before": "90deae4b7c1d0a3e1277a57ec50a662d1835eea979a9b3a281b3c54d9eeb4d73",
+      "after": "90deae4b7c1d0a3e1277a57ec50a662d1835eea979a9b3a281b3c54d9eeb4d73",
+      "unchanged": true
+    },
+    ".yuzio/cadra/.gitignore": {
+      "before": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "after": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "unchanged": true
+    },
+    ".yuzio/cadra/tasks/greeting-service.md": {
+      "before": "8f64f89610d721a756650294b35690fee17cdfb03995cd64875f7d256a968879",
+      "after": "642ab7dd30c20300ba7ada1dd56f4524e0759fa7a95518a1a0ac50bc46d62595",
+      "unchanged": false
+    },
+    ".yuzio/cadra/tasks/prefix-source.md": {
+      "before": "6779654ab672b0dc5b3cb3990a54876933a0dd255dbac10ee318b22bae1542f1",
+      "after": "9f9bca6dfdf3c847676feff36b14f19683962c1ca0168261eebc968dda9eeffb",
+      "unchanged": false
+    },
+    ".yuzio/cadra/runs/run-20261022-02-report-01.md": {
+      "before": "e603a554776bab001afb4cf654306741bd245b30ff680460e9d890eac6ec119c",
+      "after": "e603a554776bab001afb4cf654306741bd245b30ff680460e9d890eac6ec119c",
+      "unchanged": true
+    },
+    ".yuzio/cadra/runs/run-20261022-01.md": {
+      "before": "d317060e576fa85191495c03d54b72be4b794edffee8b2757eab76586d15b8c6",
+      "after": "d317060e576fa85191495c03d54b72be4b794edffee8b2757eab76586d15b8c6",
+      "unchanged": true
+    },
+    ".yuzio/cadra/runs/run-20261022-02.md": {
+      "before": "f2da63fda26b71a2f044c385be50a7f850b5a7166ab2dd38f8c4c9ac7886446f",
+      "after": "f2da63fda26b71a2f044c385be50a7f850b5a7166ab2dd38f8c4c9ac7886446f",
+      "unchanged": true
+    },
+    ".yuzio/cadra/runs/run-20261022-03.md": {
+      "before": "2b728a4e10cb4041f72fec5b267f87f882d1ab027acac9242b318a8ca55cb076",
+      "after": "2b728a4e10cb4041f72fec5b267f87f882d1ab027acac9242b318a8ca55cb076",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/retrospectives/.gitkeep": {
+      "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/.gitkeep": {
+      "before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "after": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/code-01.md": {
+      "before": "137aa9c465a7944d629e253b95647df5e0b78562553b7be3e268855bd099bb22",
+      "after": "137aa9c465a7944d629e253b95647df5e0b78562553b7be3e268855bd099bb22",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/README.md": {
+      "before": "7f590d22a279f0dae06e2d003e908cc5d2190c428d3e2c6c75adb022f245151a",
+      "after": "7f590d22a279f0dae06e2d003e908cc5d2190c428d3e2c6c75adb022f245151a",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/validate-01.md": {
+      "before": "e6148a6ec4c060af5da2906dfed82ec661bf3416194e132352ec01b8f1090800",
+      "after": "e6148a6ec4c060af5da2906dfed82ec661bf3416194e132352ec01b8f1090800",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/review-01.md": {
+      "before": "a039389d6603f266d24c12b5678ea885655acc1e73b562411e8cd3b6ac9a2a1f",
+      "after": "a039389d6603f266d24c12b5678ea885655acc1e73b562411e8cd3b6ac9a2a1f",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/code-01.md": {
+      "before": "80628989773835e94c2c75fd2b4b8de25ebafad81576f37ad0e759a6feb6bd8a",
+      "after": "80628989773835e94c2c75fd2b4b8de25ebafad81576f37ad0e759a6feb6bd8a",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/README.md": {
+      "before": "f6f1539db1b90bb04cf60e3f940db0a7bb5a89508473c69a19ce3a4ce33d7750",
+      "after": "0e59bb50248d937e772cff32caa53fbb4453e13f574e8999ed3302e8bd9ba38f",
+      "unchanged": false
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/validate-01.md": {
+      "before": "9c293655227fffe7ff0cb951f0ef0b9c37ff6338292d5db46b14cfbd86bd5357",
+      "after": "9c293655227fffe7ff0cb951f0ef0b9c37ff6338292d5db46b14cfbd86bd5357",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/review-01.md": {
+      "before": "a54cc6490e563201c58e6d1d9ccc38003e90f582b9479a4ae3d0187ce8d812a2",
+      "after": "a54cc6490e563201c58e6d1d9ccc38003e90f582b9479a4ae3d0187ce8d812a2",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/code-index.pending.md": {
+      "before": "e262524465185ee2901ae1d4b5d770874397744ba62b7ff1d498be57111224ec",
+      "after": "e262524465185ee2901ae1d4b5d770874397744ba62b7ff1d498be57111224ec",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/validate-evidence.json": {
+      "before": "f0eee126668d5bb3704747830b16dd58d646349841a0ce4017ab02ee6c7df861",
+      "after": "f0eee126668d5bb3704747830b16dd58d646349841a0ce4017ab02ee6c7df861",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/code-test-evidence.json": {
+      "before": "052b605a6ff714ae2099074a63e0fbe539ed231ae011c2decdae43e13c2439b4",
+      "after": "052b605a6ff714ae2099074a63e0fbe539ed231ae011c2decdae43e13c2439b4",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/validate-index.expected.json": {
+      "before": "9e3196aa1cf676092ea0938d3b6e27fb122ff51197f3cd7c3f7fd6d148d692a2",
+      "after": "9e3196aa1cf676092ea0938d3b6e27fb122ff51197f3cd7c3f7fd6d148d692a2",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/validate-index.pending.md": {
+      "before": "f6f1539db1b90bb04cf60e3f940db0a7bb5a89508473c69a19ce3a4ce33d7750",
+      "after": "f6f1539db1b90bb04cf60e3f940db0a7bb5a89508473c69a19ce3a4ce33d7750",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/review-index.pending.md.validation.json": {
+      "before": "df244b0ee9c70647fcecfcf2be32bd98e0cdb945212b8ef69be8bd421bc053d5",
+      "after": "df244b0ee9c70647fcecfcf2be32bd98e0cdb945212b8ef69be8bd421bc053d5",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/review-index.pending.md": {
+      "before": "60250b4d95797798714e0297bf845f6b3450bba7a0f9428e24e04674bbbf45a0",
+      "after": "60250b4d95797798714e0297bf845f6b3450bba7a0f9428e24e04674bbbf45a0",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/code-index.pending.md.validation.json": {
+      "before": "80de9149e4982d2a836def1eecc8bcd2f82d419e0660eb40b5ad34f4d312fa35",
+      "after": "80de9149e4982d2a836def1eecc8bcd2f82d419e0660eb40b5ad34f4d312fa35",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/code-index.expected.json": {
+      "before": "7888d5c8231654d16328de0aea40af515b8aa8ed3cae4eec036061d78d7466c8",
+      "after": "7888d5c8231654d16328de0aea40af515b8aa8ed3cae4eec036061d78d7466c8",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/review-check-evidence.json": {
+      "before": "bedf573263134d980123ba36c9f8b8753f4b259f051b090f3072d7f1b74df09d",
+      "after": "bedf573263134d980123ba36c9f8b8753f4b259f051b090f3072d7f1b74df09d",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/review-index.expected.json": {
+      "before": "613940f2399e0fdf7e35f04680bee365aeb7d905928680cbc250040c5a400fa5",
+      "after": "613940f2399e0fdf7e35f04680bee365aeb7d905928680cbc250040c5a400fa5",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/validate-index.pending.md.validation.json": {
+      "before": "842a2abe2bcdf272f96c98b337d493035cb028ed7e32eaa1f7c3be03f077d99a",
+      "after": "842a2abe2bcdf272f96c98b337d493035cb028ed7e32eaa1f7c3be03f077d99a",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/prefix.py": {
+      "before": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "after": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/test_greeting.py.diff": {
+      "before": "602480f0d6d777f33f393362c6602d9cdc6ea10df43e01d6843dc8dc2c0474f2",
+      "after": "602480f0d6d777f33f393362c6602d9cdc6ea10df43e01d6843dc8dc2c0474f2",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/test_greeting.py": {
+      "before": "8d6e666e4841d0f3db2f05165be2ce65467f39276844faf1864c339bdc87d0ff",
+      "after": "8d6e666e4841d0f3db2f05165be2ce65467f39276844faf1864c339bdc87d0ff",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/greeting.py.diff": {
+      "before": "1c3c45c6b0e60aa654b03dd18c387be53dc59a0e10adb91f360e5b2f7980c8e7",
+      "after": "1c3c45c6b0e60aa654b03dd18c387be53dc59a0e10adb91f360e5b2f7980c8e7",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/greeting.py": {
+      "before": "261d7e215779b473c1fd3e1b63e61bb4ca3c1d751274639cf86f00915cee0024",
+      "after": "261d7e215779b473c1fd3e1b63e61bb4ca3c1d751274639cf86f00915cee0024",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/test_prefix.py": {
+      "before": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "after": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/manifest.json": {
+      "before": "3e64a66955863bf22ef1b03b1430444bbadea0c6492611664b1bc66c2a46d33d",
+      "after": "3e64a66955863bf22ef1b03b1430444bbadea0c6492611664b1bc66c2a46d33d",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/code-index.pending.md": {
+      "before": "5f57c4df107a428dbd725e57fe82d85a905ce9051499e42f58416da644ec060b",
+      "after": "5f57c4df107a428dbd725e57fe82d85a905ce9051499e42f58416da644ec060b",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/code-test-evidence.json": {
+      "before": "b435688b99c619b7db79d9cebdb5833c64d7dcec589bf2ca5a256b5078baefe1",
+      "after": "b435688b99c619b7db79d9cebdb5833c64d7dcec589bf2ca5a256b5078baefe1",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/validate-index.expected.json": {
+      "before": "d82b2f4dd85a800223e00acc692c5b6d801df6e56beafb8d832fdf1c0a002493",
+      "after": "d82b2f4dd85a800223e00acc692c5b6d801df6e56beafb8d832fdf1c0a002493",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/validate-index.pending.md": {
+      "before": "7f590d22a279f0dae06e2d003e908cc5d2190c428d3e2c6c75adb022f245151a",
+      "after": "7f590d22a279f0dae06e2d003e908cc5d2190c428d3e2c6c75adb022f245151a",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/review-index.pending.md.validation.json": {
+      "before": "42faba28059a0843ca1ed4e8e58db190c5652f94d06065328e93f5d45e3d7f5f",
+      "after": "42faba28059a0843ca1ed4e8e58db190c5652f94d06065328e93f5d45e3d7f5f",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/review-index.pending.md": {
+      "before": "1a3517db3d446e880ba09b5c57e5249951d91cc48e81f773f8bd2478a64fa21c",
+      "after": "1a3517db3d446e880ba09b5c57e5249951d91cc48e81f773f8bd2478a64fa21c",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/code-index.pending.md.validation.json": {
+      "before": "b17e3a68869b2b54aedbfa06f9411033abf1b1eeed67ef0cb2c90867c5b97fdb",
+      "after": "b17e3a68869b2b54aedbfa06f9411033abf1b1eeed67ef0cb2c90867c5b97fdb",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/code-index.expected.json": {
+      "before": "b481199621eb5ed1a2ab91879f25a7ba1b76c2c23e49aba8efd822e7930ddfdf",
+      "after": "b481199621eb5ed1a2ab91879f25a7ba1b76c2c23e49aba8efd822e7930ddfdf",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/review-index.expected.json": {
+      "before": "3155a7df2f2a5082f7bdab74cb57b243c092345d563bc985483c843677da9e16",
+      "after": "3155a7df2f2a5082f7bdab74cb57b243c092345d563bc985483c843677da9e16",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/validate-index.pending.md.validation.json": {
+      "before": "9f97288a0d6864a188d630eaa22d4dc3890a85a6a3b1fa542e49c7a3b1998be3",
+      "after": "9f97288a0d6864a188d630eaa22d4dc3890a85a6a3b1fa542e49c7a3b1998be3",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/candidate-01/prefix.py": {
+      "before": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "after": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/candidate-01/test_prefix.py": {
+      "before": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "after": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/candidate-01/test_prefix.py.diff": {
+      "before": "ac665905198635c1116ca1b403385a95c6d568b7edef1a49c07eadee3b3f801e",
+      "after": "ac665905198635c1116ca1b403385a95c6d568b7edef1a49c07eadee3b3f801e",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/candidate-01/manifest.json": {
+      "before": "4f0ed99f383a13fee1efd58c09543c8db4eafbaa6ccffae17d3ad9e6866b4e20",
+      "after": "4f0ed99f383a13fee1efd58c09543c8db4eafbaa6ccffae17d3ad9e6866b4e20",
+      "unchanged": true
+    },
+    ".yuzio/cohestra/handoffs/prefix-source/scratch/candidate-01/prefix.py.diff": {
+      "before": "f385c69e2279df6ea488d8db82c16004580c36a78889279ffc08a7d3d7b03ee1",
+      "after": "f385c69e2279df6ea488d8db82c16004580c36a78889279ffc08a7d3d7b03ee1",
+      "unchanged": true
+    }
+  },
+  "immutable_old_files_count": 45,
+  "immutable_old_files_preserved": true,
+  "repeat_resume": {
+    "evidence": "/private/tmp/cadra-engineering-recovery-kvs3043i/verification/run-06-repeat-resume.json",
+    "all_unchanged": true,
+    "files_compared": 119
+  },
+  "list_result": {
+    "prefix-source": {
+      "revision": 2,
+      "display_state": "completed",
+      "current_run": "run-20261022-04"
+    },
+    "greeting-service": {
+      "revision": 4,
+      "display_state": "completed",
+      "current_run": "run-20261022-06"
+    },
+    "unfinished_runs": 0,
+    "historical_run_03": "completed with blocked item; retained"
+  },
+  "report": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/runs/run-20261022-06-report-01.md",
+  "source_repository_tests_reports_models_read": false,
+  "network_install_commit_performed": false,
+  "programmatic_scheduler_or_model_used": false,
+  "rule_gaps": [],
+  "limitations": [
+    "No independent reviewer for the new candidate; author review accurately recorded. Existing task did not mandate independent review.",
+    "No business commit or release; fixed candidate snapshot retained."
+  ],
+  "boundary": "All requested engineering operations complete; stopped for parent session archival. No further stage or mutation authorized by this record."
+}

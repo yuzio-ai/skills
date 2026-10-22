@@ -1,0 +1,9 @@
+{
+  "call_id": 2,
+  "stage": "review",
+  "at": "2026-10-22T14:18:15.092828+08:00",
+  "intent_readback_confirmed": true,
+  "run_sha256": "e8224fd194386513af3baec2dcb9f936a1b4cb6729423ad31a9113b36726a1d7",
+  "executor": "/root/crash_atomic_recovery",
+  "historical_author": "engineering_resume_first"
+}

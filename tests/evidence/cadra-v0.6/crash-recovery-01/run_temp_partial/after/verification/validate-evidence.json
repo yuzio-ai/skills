@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-22T14:19:42.518242+08:00",
+  "candidate_unchanged": {
+    "greeting.py": true,
+    "test_greeting.py": true,
+    "prefix.py": true,
+    "test_prefix.py": true
+  },
+  "review_sha256": "1f4add869ac02fb415525dd9b86f0c06376f5445c9ce73afdb5203ff93a2266a",
+  "reused_current_review_test_evidence": "verification/review-test-evidence.json",
+  "log_sha256": "99c918aefed2eb64c90fb9f529f7c50bff3ffd5834a11ac7057462c4b84f518a",
+  "AC-1": "passed: named nonempty test includes exact whitespace and Unicode preservation",
+  "AC-2": "passed: empty string test",
+  "AC-3": "passed: prefix patch with two call values and source import",
+  "AC-4": "passed: 5 unittest tests; current-review raw log",
+  "findings_open": 0,
+  "acceptance": "passed",
+  "new_test_execution": false,
+  "reason": "Current recovery review executed full required suite; same candidate and interpreter; reuse valid evidence."
+}

@@ -1,0 +1,19 @@
+test_blank (test_alpha.AlphaTests.test_blank) ... ok
+test_named (test_alpha.AlphaTests.test_named) ... ok
+test_values (test_beta.BetaTests.test_values) ... ERROR
+
+======================================================================
+ERROR: test_values (test_beta.BetaTests.test_values)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/tests/test_beta.py", line 5, in test_values
+    for value in [-3, 0, 4]: self.assertEqual(square(value), value * value)
+                                              ~~~~~~^^^^^^^
+  File "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/beta.py", line 2, in square
+    raise NotImplementedError
+NotImplementedError
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (errors=1)

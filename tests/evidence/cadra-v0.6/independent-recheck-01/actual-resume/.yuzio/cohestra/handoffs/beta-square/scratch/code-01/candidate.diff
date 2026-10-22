@@ -1,0 +1,6 @@
+--- baseline/beta.py
++++ candidate/beta.py
+@@ -1,2 +1,2 @@
+ def square(value):
+-    raise NotImplementedError
++    return value * value

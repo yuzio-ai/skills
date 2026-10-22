@@ -1,0 +1,9 @@
+{
+  "time": "2026-10-22T13:24:28.587664+08:00",
+  "report": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/runs/run-20261022-02-report-01.md",
+  "report_sha256": "e603a554776bab001afb4cf654306741bd245b30ff680460e9d890eac6ec119c",
+  "run_before_report": "ab5380c065aed4b43ab8c61af5094971e0b2f3b5ed87d7957ecf0dc9e21eba2f",
+  "run_after_report": "f2da63fda26b71a2f044c385be50a7f850b5a7166ab2dd38f8c4c9ac7886446f",
+  "only_reports_metadata_changed": true,
+  "result_preserved": true
+}

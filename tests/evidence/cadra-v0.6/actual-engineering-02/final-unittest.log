@@ -1,0 +1,10 @@
+test_empty_or_whitespace_name_uses_world (test_greeting.GreetingTests.test_empty_or_whitespace_name_uses_world) ... ok
+test_names_trim_only_surrounding_whitespace (test_greeting.GreetingTests.test_names_trim_only_surrounding_whitespace) ... ok
+test_prefix_is_obtained_on_each_call (test_greeting.GreetingTests.test_prefix_is_obtained_on_each_call) ... ok
+test_prefix_is_hello_string (test_prefix.GreetingPrefixTests.test_prefix_is_hello_string) ... ok
+test_repeated_calls_are_stable (test_prefix.GreetingPrefixTests.test_repeated_calls_are_stable) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK

@@ -1,0 +1,14 @@
+{
+  "validated": true,
+  "parser": "JSON parser for JSON subset of YAML 1.2 Front Matter",
+  "pending_path": ".yuzio/cohestra/handoffs/greeting-service/scratch/code-index.pending.md",
+  "sha256": "99e50a248066c4bfd71ea583c36e90a41e9027ea6b5e3f5a79a2c4fd7fd1d4d5",
+  "stage": "code",
+  "round": 1,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_primary_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+  },
+  "handoff_sha256": "00bef7fcae0f1d52e33030f3785f44603d7c7b79f342a0916a2cf3e4525ac62c",
+  "time": "2026-10-22T13:19:52.085640+08:00"
+}

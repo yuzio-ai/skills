@@ -1,0 +1,48 @@
+{
+  "time": "2026-10-22T12:31:56.253486+08:00",
+  "before": {
+    "protocol": "0.6",
+    "slug": "alpha-greeting",
+    "title": "alpha-greeting",
+    "revision": 2,
+    "preparation": "ready",
+    "priority": "medium",
+    "dependencies": [],
+    "flow": "small-change",
+    "execution_policy": {
+      "stop_queue_on_failure": false
+    },
+    "cohestra_task": ".yuzio/cohestra/handoffs/alpha-greeting/",
+    "revision_base": {
+      "run": "run-20261022-01",
+      "revision": 1
+    },
+    "changed_fields": [
+      "requirement"
+    ]
+  },
+  "after": {
+    "protocol": "0.6",
+    "slug": "alpha-greeting",
+    "title": "alpha-greeting",
+    "revision": 3,
+    "preparation": "draft",
+    "priority": "medium",
+    "dependencies": [],
+    "flow": "small-change",
+    "execution_policy": {
+      "stop_queue_on_failure": true
+    },
+    "cohestra_task": ".yuzio/cohestra/handoffs/alpha-greeting/",
+    "revision_base": {
+      "run": "run-20261022-02",
+      "revision": 2
+    },
+    "changed_fields": [
+      "execution_policy"
+    ]
+  },
+  "requirement_unchanged": true,
+  "flow_unchanged": true,
+  "decision": "revision 3 draft; previous completed Run preserved"
+}

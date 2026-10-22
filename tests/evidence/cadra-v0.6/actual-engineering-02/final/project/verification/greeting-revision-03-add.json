@@ -1,0 +1,56 @@
+{
+  "before": {
+    "protocol": "0.6",
+    "slug": "greeting-service",
+    "title": "问候服务",
+    "revision": 2,
+    "preparation": "ready",
+    "priority": "medium",
+    "dependencies": [
+      "prefix-source"
+    ],
+    "flow": "small-change",
+    "execution_policy": {
+      "stop_queue_on_failure": false
+    },
+    "cohestra_task": ".yuzio/cohestra/handoffs/greeting-service/",
+    "revision_base": {
+      "run": "run-20261022-02",
+      "revision": 1
+    },
+    "changed_fields": [
+      "requirement"
+    ]
+  },
+  "after": {
+    "protocol": "0.6",
+    "slug": "greeting-service",
+    "title": "问候服务",
+    "revision": 3,
+    "preparation": "draft",
+    "priority": "medium",
+    "dependencies": [
+      "prefix-source"
+    ],
+    "flow": "small-change",
+    "execution_policy": {
+      "stop_queue_on_failure": true
+    },
+    "cohestra_task": ".yuzio/cohestra/handoffs/greeting-service/",
+    "revision_base": {
+      "run": "run-20261022-03",
+      "revision": 2
+    },
+    "changed_fields": [
+      "execution_policy"
+    ]
+  },
+  "requirement_unchanged": true,
+  "cumulative_changed_fields": [
+    "requirement",
+    "execution_policy"
+  ],
+  "execution_basis": "run-20261022-02",
+  "non_execution_tail": "run-20261022-03",
+  "time": "2026-10-22T13:30:19.432567+08:00"
+}

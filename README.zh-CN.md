@@ -33,18 +33,20 @@
 
 ## cadra
 
-Cadra 是任务编排：管理任务准备、队列、顺序、状态、恢复和执行报告，在无人值守 Run 中按既定顺序串行推进。它不定义单任务内部的工程流程——那归 Cohestra；Cadra 只声明阶段序列（flow preset）并调用 Cohestra 阶段，且只依据 Cohestra 的机器可读状态驱动。
+Cadra 管理任务准备、执行顺序、状态、恢复和报告，在无人值守 Run 中串行调用 Cohestra。Task 保存定义修订、draft/ready 准备状态与 Ready Gate；Run 保存固定任务顺序、执行状态、checkpoint 和结果快照。list 根据 Run 来源链展示当前状态与队列，不创建独立队列文件。
 
-Task 走 **draft → ready → queued → running → completed / blocked / failed**；Run 串行执行（`parallelism = 1`），终态为 completed、stopped 或 interrupted，`resume` 从持久化状态恢复未完成 Run，不重复已完成任务与已完成阶段。建 Run 前先检查目标与 Cohestra 初始化前提（Git 工作区）。依赖链按层级逐 Run 推进：一层全部 completed 后，下一层才能通过 Ready Gate 入队，同一 Run 不含任务与其未完成依赖。
+flow 接受 preset 或非空阶段列表：首项是起点，所有项去重后是允许范围，中间排列不规定执行顺序。首次启动从起点进入，之后只消费 Cohestra 的合法 next；必做后续超出范围时受阻。任务只在依赖当前定义已 completed 后通过 Gate 并进入 Run，依赖链逐层推进。
 
-新任务没有既往交付或调用时，run 从 flow 首项启动。blocked/failed 通过新 run 的显式恢复选择重新执行，旧 Run 保留本轮结果。已到终态的任务修改定义会回到 draft、重新过 Ready Gate，旧定义与旧结论并列保留。requirement 或 flow 变更从新 flow 首项重启；仅 dependencies 或 execution policy 变更时，blocked/failed 重试核实后的待调用阶段，completed 不调用阶段、只作修订收尾。所属 Run 未完成时不允许编辑任务定义。无人值守推进受三项上限约束：逐阶段失败重试预算（2 次）、整改轮上限（3 轮）与任务调用预算（16 次），任一耗尽即记 failed 并列入需人工介入；无进展判定只在同阶段连续两次结构化状态全未变时成立，validate 的本阶段补证出口除外，由调用预算兜底。入队与出队按三步写入并带操作编号，中断留下部分写入时由 resume 按同一编号幂等补齐；旧版七列队列清单不迁移历史行，改为追加八列表块后继续使用。
+同一项目至多一个未完成 Run，所属任务不能编辑。resume 续跑原 Run；blocked/failed 的显式恢复进入新 Run，不改旧结果。影响准入的定义修改回 draft；已入 Run 的定义分代，重新 Gate 后按变化字段选择重启或核对收尾。历史报告始终取原 Run 快照。
+
+执行受逐阶段失败重试 2 次、整改 3 轮、总调用 16 次约束；不以摘要字段相同提前停止。调用意图、预算和结果写入同一个 Run 文件，采用临时文件检查、替换与回读；派发或交付无法确认时停止，不盲目重跑。仅支持当前任务/Run 协议，不自动迁移旧记录。
 
 | 想了解 | 读 |
 |---|---|
 | 路由、执行规则、边界、版本与来源 | [cadra/SKILL.md](cadra/SKILL.md) |
 | Task/Run 状态机、队列顺序、Flow Preset、Cohestra 调用契约、unattended 规则 | [references/workflow.md](cadra/references/workflow.md) |
 | 各入口职责（add / ready / list / run / resume / report） | [references/](cadra/references/) |
-| 任务与 Run 骨架、`.cadra` 容器模板 | [assets/](cadra/assets/) |
+| 任务与 Run 骨架、`.yuzio/cadra` 容器模板 | [assets/](cadra/assets/) |
 | 维护者验收清单 | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
 
 ## relatra
@@ -143,7 +145,7 @@ $cohestra report
 
 handoff 也可替换为对应任务目录，由任务 README 定位有效输入。阶段自动选择、停止规则与按需 verify 约定见 [cohestra/SKILL.md](cohestra/SKILL.md) 与 [公共流程](cohestra/references/workflow.md)。
 
-Cadra 调用管理这些阶段外围的任务队列；目标项目没有 `.cadra` 时会先提醒并执行一次最小初始化：
+Cadra 调用管理这些阶段外围的任务队列；目标项目没有 `.yuzio/cadra` 时会先提醒并执行一次最小初始化：
 
 ```text
 $cadra add
@@ -166,10 +168,10 @@ $cadra report
 Run：<run-id>
 ```
 
-参数标签保持中文，原因同上。任务与调度状态保存在 `.cadra`；单任务流程与工程证据保存在 `.yuzio/cohestra`，两者只通过引用关联，不互相复制内容。状态机、Ready Gate、Cohestra 调用契约与 unattended 规则见 [cadra/references/workflow.md](cadra/references/workflow.md)。
+参数标签保持中文，原因同上。任务与调度状态保存在 `.yuzio/cadra`；单任务流程与工程证据保存在 `.yuzio/cohestra`，两者只通过引用关联，不互相复制内容。状态机、Ready Gate、Cohestra 调用契约与 unattended 规则见 [cadra/references/workflow.md](cadra/references/workflow.md)。
 
 ## 维护
 
-发行版 **0.10.1**，协作协议 **v0.8**；cadra 发行版 **0.5.0**，任务/Run 协议 **v0.5**；Relatra 版本 **0.2.0**，报告结构 **v2**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
+发行版 **0.10.1**，协作协议 **v0.8**；cadra 发行版 **0.6.0**，任务/Run 协议 **v0.6**；Relatra 版本 **0.2.0**，报告结构 **v2**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
 
 修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。

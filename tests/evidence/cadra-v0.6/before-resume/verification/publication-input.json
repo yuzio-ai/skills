@@ -1,0 +1,13 @@
+{
+  "target": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-v06-forward-g23hpb67/.yuzio/cohestra/handoffs/alpha-greeting/README.md",
+  "expected_old": "---\n{\n  \"contract\": \"0.8\",\n  \"task\": \"alpha-greeting\",\n  \"status\": \"completed\",\n  \"execution_mode\": \"unattended\",\n  \"stage_result\": {\n    \"stage\": \"validate\",\n    \"status\": \"completed\",\n    \"round\": 1\n  },\n  \"candidate\": {\n    \"commit\": null,\n    \"snapshot\": \".yuzio/cohestra/handoffs/alpha-greeting/code-01.md\"\n  },\n  \"next\": {\n    \"stage\": null,\n    \"allowed\": false,\n    \"reason\": \"task_completed\"\n  },\n  \"blocked\": {\n    \"value\": false,\n    \"reason\": null\n  },\n  \"findings\": {\n    \"blocking\": 0,\n    \"non_blocking\": 0,\n    \"unresolved\": 0\n  },\n  \"acceptance\": {\n    \"status\": \"passed\"\n  }\n}\n---\n\n# alpha-greeting\n\n- 任务目标与有效决定：见 validate-01.md，当前 requirement revision 1。从 code 起步；无补造 need/design。\n- 索引维护者：forward_validation。\n- 工作项：实现与作者检查见 code；同一执行者 review，不能视为独立审查；用户与项目无强制独立审查要求。验收依据见实际 validate 轮次。无提交或发布授权。\n- 正式文档：局部函数变更，无共享文档需求；保留本机记录。\n- 最近更新：2026-10-22T11:27:55.079399+08:00\n\n| 阶段/轮次 | 交付物及覆盖职责 | 结论 | 输入/目标候选 |\n|---|---|---|---|\n| code-01 | [code-01.md](code-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n| review-01 | [review-01.md](review-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n| validate-01 | [validate-01.md](validate-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n",
+  "pending": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-v06-forward-g23hpb67/verification/alpha-greeting-code-02-pending.md",
+  "sha256": "43c4520224b016238f918222a416567decb09ac785ce97be09bc2cf87e39c9d0",
+  "stage": "code",
+  "round": 2,
+  "candidate": {
+    "commit": null,
+    "snapshot": ".yuzio/cohestra/handoffs/alpha-greeting/code-02.md"
+  },
+  "handoff": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-v06-forward-g23hpb67/.yuzio/cohestra/handoffs/alpha-greeting/code-02.md"
+}

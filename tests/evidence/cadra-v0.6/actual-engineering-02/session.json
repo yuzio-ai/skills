@@ -1,0 +1,9 @@
+{
+  "project": "/private/tmp/cadra-engineering-recovery-kvs3043i",
+  "source_skills": [
+    "/Users/zhubowen/Documents/yuzio-ai/skills/cadra",
+    "/Users/zhubowen/Documents/yuzio-ai/skills/cohestra"
+  ],
+  "test_kind": "Fresh real engineering work with controlled checkpoint interruptions; not a spontaneous crash",
+  "fixture": "Two independent functions with a task dependency; no copied execution history"
+}

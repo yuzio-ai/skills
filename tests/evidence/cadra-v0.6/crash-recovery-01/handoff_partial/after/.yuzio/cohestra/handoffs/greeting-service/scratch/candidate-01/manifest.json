@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-10-22T13:18:53.745322+08:00",
+  "baseline": {
+    "commit": null,
+    "reason": "Git repository has unborn HEAD; greeting.py and test_greeting.py absent at call start",
+    "preexisting_dependency_hashes": {
+      "prefix.py": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "test_prefix.py": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118"
+    }
+  },
+  "task_files": {
+    "greeting.py": {
+      "sha256": "261d7e215779b473c1fd3e1b63e61bb4ca3c1d751274639cf86f00915cee0024",
+      "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/greeting.py",
+      "diff_sha256": "1c3c45c6b0e60aa654b03dd18c387be53dc59a0e10adb91f360e5b2f7980c8e7"
+    },
+    "test_greeting.py": {
+      "sha256": "8d6e666e4841d0f3db2f05165be2ce65467f39276844faf1864c339bdc87d0ff",
+      "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/test_greeting.py",
+      "diff_sha256": "602480f0d6d777f33f393362c6602d9cdc6ea10df43e01d6843dc8dc2c0474f2"
+    }
+  },
+  "dependencies": {
+    "prefix.py": {
+      "sha256": "b1d2a51599e982c264e7ea40bcfd7141c644fe60b526506b153649378e084507",
+      "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/prefix.py"
+    },
+    "test_prefix.py": {
+      "sha256": "be84736cd04ad08f6059c17fabebc15c6fc3cb59ed8131c8f19947f0f7315118",
+      "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01/test_prefix.py"
+    }
+  }
+}

@@ -1,0 +1,329 @@
+--- before/cadra/references/workflow.md
++++ after/cadra/references/workflow.md
+@@ -31,7 +31,7 @@
+ 5. `ready` 复核失败可使 preparation 回 draft；对尚未执行的 skipped 条目，显示 draft，不继续沿用旧 Gate。终态不能被准备状态覆盖，必须由 add 建立新定义修订。
+ 6. 依赖只认可上述**当前定义的展示状态**为 completed。旧修订的成功不放行新定义；开始或续跑每项前重核依赖。
+ 
+-执行依据是沿来源链最近一条已记录调用意图，或已核实契约并保存无需调用收尾结果的条目；授权消费须与 calls/result 一致。calls 为空且 authorization_consumed=false 的条目不构成执行依据，包括首调用前 blocked/failed 和 skipped；它们的受阻原因、未消费动作与修订变更仍须核对。字段缺失或相互矛盾时停止，不能推定未调用；prepared 或派发不明的调用也不能跳过。
++执行依据是沿来源链最近一条已记录调用意图，或已核实契约并保存无需调用收尾结果的条目。authorization_consumed 只表示一次性恢复/修订授权消费；普通调用或普通核对收尾可为 false，不影响其执行依据资格。既无调用意图也无有效核对收尾的条目不构成执行依据，包括首调用前 blocked/failed 和 skipped；它们的受阻原因、未消费动作与修订变更仍须核对。字段缺失、无执行证据却标记已消费等矛盾时停止，不能推定未调用；prepared 或派发不明的调用也不能跳过。
+ 
+ 再次选入新 Run 时重新通过相应准入，不自动继承旧授权。没有执行依据且无 Cohestra 正式交付时可按首次启动核对；有交付则先核实来源与契约，不能只凭 Run 是否存在判断。
+ 
+--- before/cadra/references/resume.md
++++ after/cadra/references/resume.md
+@@ -14,6 +14,7 @@
+ 
+ 1. 核对协议、来源链、唯一未完成 Run、定义快照与条目完整性。条目全部已结束但 Run 还在 running/interrupted 时，仅补 Run 收尾。只收尾不要求 Cohestra 可用或 Git；继续阶段须满足 run 的执行前提。
+ 2. completed/blocked/failed/skipped 条目保留本 Run 结果，不重新执行。准备继续 queued 项时重核依赖与未消费首个动作的准入；失败按既定规则记录，不沿用失效授权。
++   running 且 calls=[] 时，只有预算为零、授权未消费、result 及 checkpoint 均无调用/交付记录、start_action 完整，并核实尚未派发且无本次交付，才按同样准入重核原首个动作；可继续调用或无需调用的核对收尾。准入不通过则记录受阻，派发/交付不明或记录矛盾则停止并记录失败；不清零记录、不用旧 next 替代 start_action。此分支的核对本身不消费授权或预算，实际意图/收尾仍按 Run 规则落盘。
+ 3. running 且有未闭合调用时，读取调用前记录、实际派发证据、Cohestra README 与对应 handoff：
+    - 新的完整交付可核实且同步/模式一致：补同一 call id 的结果并闭合，不重新调用。
+    - 有明确证据调用尚未发起、且无交付：可继续已记录的同一调用，沿用其预算与授权消费，不新增 call id。
+--- before/cadra/references/recovery.md
++++ after/cadra/references/recovery.md
+@@ -9,6 +9,6 @@
+ 3. 已交付且终态映射为 completed 时，作恢复核对收尾，不调用阶段。否则，合法 next 允许且位于 flow 内时正常续接；旧结果仍为 blocked/failed 且 stage_result 同为 blocked/failed 时，原因解除、阶段与原 checkpoint 一致且在 flow 内，才允许恢复重试该阶段一次。
+ 4. 无合法动作（例如必做阶段仍在 flow 外）时说明缺口；不清除 Cohestra blocked、不伪造 next、不从正文猜阶段。
+ 
+-恢复通过后在新 Run 保存来源与首个动作。一次恢复授权只提供一个起点，消费写在 Run 的首次调用意图中；之后只消费新契约。新 Run 有自身预算，resume 不重置同一 Run 的预算。
++恢复通过后在新 Run 保存来源与首个动作。一次恢复授权只提供一个起点，与首次调用意图或无需调用的核对收尾结果同写已消费；之后只消费新契约。新 Run 有自身预算，resume 不重置同一 Run 的预算。
+ 
+ 若此前恢复项在任何调用/收尾前被 skipped，展示状态为 ready，但不能作为普通任务绕过本页准入。用户此次显式 slug 选择才构成重新恢复选择，不要求把 ready 写入恢复列表；“全部 ready”跳过此类任务并说明。每次核对重新取得解除证据，不自动复用旧授权。
+--- before/cadra/references/flow.md
++++ after/cadra/references/flow.md
+@@ -10,7 +10,7 @@
+ | bugfix | fix | fix, review, validate |
+ | review-only | review | review |
+ 
+-例如 `[review, fix, review]` 规范化为 `[review, fix]`；`[code, validate, review, fix]` 与 small-change 的起点和允许范围相同。preset 与等价列表必须得到相同判定。Flow 变更按规范化语义判断，只有列表排列或重复写法变化不使 Gate 失效。
++例如 `[review, fix, review]` 规范化为 `[review, fix]`；`[code, validate, review, fix]` 与 small-change 的起点和允许范围相同。preset 与等价列表必须得到相同判定。只有 start 与 allowed 均不变的排列或重复写法变化不使 Gate 失效；首项改变使 start 改变时，须按规范化 flow 变更重新 Gate，已入 Run 的任务建立修订并按新起点重启。
+ 
+ 首次启动及改变 requirement/flow 的修订重启从 start 调用一次；其他入口的起点见 [恢复](recovery.md) 与 [修订](revision-rules.md)。后续仅按合法 `next.allowed`、`next.stage` 与 allowed 决定动作，不机械遍历列表。允许重复进入同一阶段，包括复审与补证，次数由 [预算](contract.md#调用预算) 约束。
+ 
+--- before/tests/cadra_v06_model.py
++++ after/tests/cadra_v06_model.py
+@@ -13,6 +13,11 @@
+     'review-only': ['review'],
+ }
+ END = {'completed', 'blocked', 'failed', 'skipped'}
++NEXT_REASONS = {'stage_completed', 'blocking_findings', 'acceptance_failed',
++                'stage_failed', 'task_completed', 'human_decision_required', 'blocked', 'other'}
++BLOCK_REASONS = {'human_decision_required', 'missing_input', 'missing_permission',
++                 'dependency_unavailable', 'environment_blocked', 'candidate_unavailable', 'other', None}
++ACCEPTANCE = {'passed', 'failed', 'pending', 'blocked'}
+ 
+ 
+ def flow(value):
+@@ -101,16 +106,15 @@
+         calls, consumed = item.get('calls'), item.get('authorization_consumed')
+         if not isinstance(calls, list) or type(consumed) is not bool:
+             raise ValueError('missing execution evidence')
+-        if not consumed:
+-            if calls or item['state'] == 'completed':
+-                raise ValueError('inconsistent consumption evidence')
+-            continue
+-        if item['state'] == 'skipped':
+-            raise ValueError('skipped authorization consumed')
++        closeout = (item.get('result') or {}).get('last_delivery')
++        if item['state'] == 'skipped' and (calls or closeout or consumed):
++            raise ValueError('skipped item has execution evidence')
+         # Prepared intent is evidence too; an unclosed call must be reconciled.
+-        if calls or (item.get('result') or {}).get('last_delivery'):
++        # Special authorization is independent of ordinary call/closeout evidence.
++        if calls or closeout:
+             return item
+-        raise ValueError('consumed authorization lacks call or closeout evidence')
++        if consumed or item['state'] == 'completed':
++            raise ValueError('missing call or closeout evidence')
+     return None
+ 
+ 
+@@ -141,22 +145,31 @@
+ def result_valid(state, expected=None, before=None, synced=True):
+     try:
+         sr, nxt = state['stage_result'], state['next']
++        candidate = state['candidate']
++        if (not isinstance(candidate, dict) or set(candidate) != {'commit', 'snapshot'}
++                or any(value is not None and not isinstance(value, str) for value in candidate.values())):
++            return False
++        acceptance = state.get('acceptance')
++        if acceptance is not None and (not isinstance(acceptance, dict)
++                                       or acceptance.get('status') not in ACCEPTANCE):
++            return False
+         valid = (state['contract'] == '0.8' and state['task'] == 'a'
+                  and state['execution_mode'] == 'unattended'
+                  and state['status'] in {'in_progress', 'completed', 'blocked', 'failed'}
+                  and sr['stage'] in STAGES and sr['status'] in {'completed', 'blocked', 'failed'}
+                  and type(sr['round']) is int and sr['round'] > 0
+                  and type(nxt['allowed']) is bool
++                 and nxt['reason'] in NEXT_REASONS
+                  and (nxt['stage'] in STAGES if nxt['allowed'] else nxt['stage'] is None)
+                  and type(state['blocked']['value']) is bool
+-                 and (state['blocked']['value'] or state['blocked']['reason'] is None)
+-                 and set(state['candidate']) == {'commit', 'snapshot'})
++                 and state['blocked']['reason'] in BLOCK_REASONS
++                 and (state['blocked']['value'] or state['blocked']['reason'] is None))
+         if expected:
+             valid &= synced and sr['stage'] == expected
+             if before and before['stage_result']['stage'] == expected:
+                 valid &= sr['round'] > before['stage_result']['round']
+         return bool(valid)
+-    except (KeyError, TypeError):
++    except (KeyError, TypeError, AttributeError):
+         return False
+ 
+ 
+@@ -208,6 +221,26 @@
+         raise ValueError('budget mismatch')
+ 
+ 
++def resume_unstarted(item, admission_passed, evidence):
++    """Select an unstarted action only after external Gate/dispatch checks.
++
++    Returns no action when those checks do not establish safe continuation.
++    This does not dispatch, consume authorization, or charge a call.
++    """
++    action = item.get('start_action')
++    if (item.get('state') != 'running' or item.get('calls') != []
++            or item.get('authorization_consumed') is not False
++            or item.get('result') is not None
++            or item.get('checkpoint') != {'pending_call': None, 'last_delivery': None}
++            or not isinstance(action, dict) or 'stage' not in action
++            or action['stage'] not in (*STAGES, None)):
++        raise ValueError('not a verifiable unstarted action')
++    check_budget(item)
++    if admission_passed is not True or evidence != 'not_dispatched_no_delivery':
++        return None
++    return deepcopy(action)
++
++
+ def prepare(item, state, configured_flow, authorization=False):
+     check_budget(item)
+     if any(not c['closed'] for c in item['calls']):
+--- before/tests/test_cadra.py
++++ after/tests/test_cadra.py
+@@ -5,6 +5,7 @@
+ from pathlib import Path
+ import tempfile
+ import unittest
++import cadra_v06_model as model
+ 
+ from cadra_v06_model import (PRESETS, chain, decision, execution_basis, flow,
+                             new_item, prepare, recover_call, result_valid,
+@@ -22,7 +23,7 @@
+                        'definition': task(revision)['definition'], 'state': state,
+                        'calls': [{'id': 1, 'stage': 'code', 'dispatch': 'dispatched'}]
+                        if state in {'completed', 'failed', 'blocked'} else [],
+-                       'authorization_consumed': state in {'completed', 'failed', 'blocked'},
++                       'authorization_consumed': False,
+                        'result': {'state': state} if state in {'completed', 'failed', 'blocked', 'skipped'} else None}]}
+ 
+ 
+@@ -42,6 +43,15 @@
+ 
+ 
+ class FlowTests(unittest.TestCase):
++    def test_changed_start_is_a_flow_revision(self):
++        before, after = ['code', 'review'], ['review', 'code']
++        self.assertNotEqual(flow(before), flow(after))
++        self.assertEqual(flow(before)[1], flow(after)[1])
++        current = task(2)
++        current['changed_fields'] = ['flow'] if flow(before) != flow(after) else []
++        self.assertEqual(revision_action(current, [run()]), 'start')
++        self.assertEqual(flow(after)[0], 'review')
++
+     def test_presets_equal_lists(self):
+         for name, values in PRESETS.items():
+             with self.subTest(name=name): self.assertEqual(flow(name), flow(values))
+@@ -191,12 +201,29 @@
+         record['tasks'][0]['definition'].update(requirement='R2', changed_fields=['execution_policy'])
+         current = task(4); current['changed_fields'] = ['execution_policy']
+         current['definition']['requirement'] = 'R2'
+-        self.assertEqual(execution_basis('a', [original, record])['revision'], 3)
+-        self.assertEqual(revision_action(current, [original, record]), 'verify_only')
++        for consumed in (False, True):
++            record['tasks'][0]['authorization_consumed'] = consumed
++            with self.subTest(consumed=consumed):
++                self.assertEqual(execution_basis('a', [original, record])['revision'], 3)
++                self.assertEqual(revision_action(current, [original, record]), 'verify_only')
++
++    def test_ordinary_call_failure_then_policy_revision(self):
++        item = new_item()
++        prepare(item, contract('code', 'review', 'stage_completed'), 'small-change')
++        self.assertFalse(item['authorization_consumed'])
++        recover_call(item, None, 'unknown')
++        item.update(slug='a', revision=1, previous_run=None, definition={'requirement': 'R1'})
++        record = run(); record['tasks'] = [item]
++        current = task(2); current['definition']['requirement'] = 'R1'
++        current['changed_fields'] = ['execution_policy']
++        self.assertEqual(revision_action(current, [record]), 'check_recovery')
++        self.assertEqual(revision_action(current, [record], False), 'reject')
++        self.assertEqual(item['budget']['calls'], 1)
++        self.assertFalse(item['calls'][0]['closed'])
+ 
+     def test_missing_consumption_evidence_does_not_mean_unstarted(self):
+         for fields in ({'calls': None}, {'authorization_consumed': None},
+-                       {'authorization_consumed': False}, {'calls': []}):
++                       {'calls': [], 'authorization_consumed': True}):
+             record = run(state='blocked')
+             record['tasks'][0].update(fields)
+             with self.subTest(fields=fields), self.assertRaises(ValueError):
+@@ -231,6 +258,66 @@
+ 
+ 
+ class ContractTests(unittest.TestCase):
++    def test_malformed_candidate_cannot_close_or_complete(self):
++        for candidate in (['commit', 'snapshot'], {'commit': 12, 'snapshot': None},
++                          {'commit': None, 'snapshot': {'path': 'code.md'}}, None, {}):
++            item = new_item(); prepare(item, contract('code', 'review', 'stage_completed'), 'full')
++            live = contract('review', None, 'task_completed')
++            live.update(status='completed', candidate=candidate, acceptance={'status': 'passed'})
++            live['next']['allowed'] = False
++            with self.subTest(candidate=candidate):
++                self.assertEqual(decision(live, 'full'), 'failed')
++                self.assertEqual(recover_call(item, live, 'complete'), 'failed')
++                self.assertFalse(item['calls'][0]['closed'])
++                self.assertEqual(item['budget']['calls'], 1)
++
++    def test_valid_candidate_sources_remain_accepted(self):
++        for candidate in ({'commit': None, 'snapshot': None},
++                          {'commit': 'a' * 40, 'snapshot': None},
++                          {'commit': None, 'snapshot': 'code-01.md'}):
++            live = contract(); live['candidate'] = candidate
++            with self.subTest(candidate=candidate): self.assertTrue(result_valid(live))
++
++    def test_invalid_control_enums_never_complete(self):
++        for field, leaf in [('next', 'reason'), ('acceptance', 'status'), ('blocked', 'reason')]:
++            for invalid in ('NOT_VALID', [], {}, 42, False):
++                state = contract('review', 'validate', 'stage_completed')
++                state['status'] = 'completed'
++                state['next'].update(allowed=False, stage=None, reason='task_completed')
++                state.setdefault(field, {})[leaf] = invalid
++                if field == 'blocked': state['blocked']['value'] = True
++                with self.subTest(field=field, invalid=invalid):
++                    self.assertFalse(result_valid(state))
++                    self.assertEqual(decision(state, 'review-only'), 'failed')
++
++    def test_acceptance_optional_but_present_value_must_be_valid(self):
++        state = contract('review', 'validate', 'stage_completed')
++        state['status'] = 'completed'
++        state['next'].update(allowed=False, stage=None, reason='task_completed')
++        self.assertEqual(decision(state, 'review-only'), 'completed')
++        for value, expected in [(None, 'completed'), ({'status': 'passed'}, 'completed'),
++                                ({'status': 'failed'}, 'blocked'), ({'status': 'pending'}, 'completed'),
++                                ({'status': 'blocked'}, 'completed'), ({}, 'failed'),
++                                ({'status': None}, 'failed'), ('passed', 'failed'), ([], 'failed')]:
++            state['acceptance'] = value
++            with self.subTest(value=value): self.assertEqual(decision(state, 'review-only'), expected)
++
++    def test_invalid_result_cannot_close_call_or_trigger_next(self):
++        item = new_item(); prepare(item, contract('code', 'review', 'stage_completed'), 'full')
++        live = contract('review', 'validate', 'NOT_VALID')
++        self.assertEqual(recover_call(item, live, 'complete'), 'failed')
++        self.assertFalse(item['calls'][0]['closed'])
++        self.assertEqual(item['budget']['calls'], 1)
++        fresh = new_item(); saved = deepcopy(fresh)
++        self.assertEqual(prepare(fresh, live, 'full'), 'failed')
++        self.assertEqual(fresh, saved)
++
++    def test_disallowed_next_requires_null_stage(self):
++        state = contract(); state['next']['allowed'] = False
++        self.assertEqual(decision(state, 'full'), 'failed')
++        state['next']['stage'] = None
++        self.assertEqual(decision(state, 'full'), 'blocked')
++
+     def test_same_stage_round_must_increase(self):
+         before = contract()
+         self.assertFalse(result_valid(before, 'review', before))
+@@ -309,6 +396,51 @@
+     def test_corrupt_budget_is_not_reconstructed(self):
+         item = new_item(); item['budget']['calls'] = 3
+         with self.assertRaises(ValueError): prepare(item, contract(), 'full')
++
++
++class UnstartedRecoveryTests(unittest.TestCase):
++    def item(self, stage='code'):
++        item = new_item()
++        item['start_action'] = {'stage': stage, 'source': 'Gate and source checked'}
++        return item
++
++    def test_persisted_running_without_intent_rechecks_start(self):
++        for stage in ('code', None):
++            item = self.item(stage)
++            with tempfile.TemporaryDirectory() as folder:
++                path = Path(folder) / 'run.json'; path.write_text(json.dumps(item))
++                recovered = json.loads(path.read_text())
++                action = model.resume_unstarted(recovered, True, 'not_dispatched_no_delivery')
++            self.assertEqual(action, item['start_action'])
++            self.assertEqual(recovered, item)
++            self.assertEqual(recovered['budget']['calls'], 0)
++
++    def test_gate_failure_or_uncertain_dispatch_cannot_use_start(self):
++        for admitted, evidence in [(False, 'not_dispatched_no_delivery'), (True, 'unknown'), (True, 'partial')]:
++            item = self.item(); saved = deepcopy(item)
++            with self.subTest(admitted=admitted, evidence=evidence):
++                self.assertIsNone(model.resume_unstarted(item, admitted, evidence))
++                self.assertEqual(item, saved)
++
++    def test_recorded_call_cannot_reenter_unstarted_branch(self):
++        item = self.item()
++        self.assertIsNotNone(model.resume_unstarted(item, True, 'not_dispatched_no_delivery'))
++        prepare(item, contract('design', 'code', 'stage_completed'), 'small-change')
++        saved = deepcopy(item)
++        with self.assertRaises(ValueError):
++            model.resume_unstarted(item, True, 'not_dispatched_no_delivery')
++        self.assertEqual(item, saved)
++        self.assertEqual(recover_call(item, None, 'not_dispatched_no_delivery'), 'dispatch_same_id')
++        self.assertEqual(item['calls'][0]['id'], 1)
++        self.assertEqual(item['budget']['calls'], 1)
++
++    def test_inconsistent_unstarted_state_stops(self):
++        for fields in ({'authorization_consumed': True}, {'calls': None}, {'start_action': None},
++                       {'result': {'state': 'completed'}}, {'budget': {'calls': 1, 'remediation': 0, 'retries': {}}},
++                       {'checkpoint': {'pending_call': 1, 'last_delivery': None}}):
++            item = self.item(); item.update(fields)
++            with self.subTest(fields=fields), self.assertRaises(ValueError):
++                model.resume_unstarted(item, True, 'not_dispatched_no_delivery')
+ 
+ 
+ class RecoveryTests(unittest.TestCase):

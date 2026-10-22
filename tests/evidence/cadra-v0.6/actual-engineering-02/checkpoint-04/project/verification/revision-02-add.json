@@ -1,0 +1,20 @@
+{
+  "time": "2026-10-22T13:24:46.604607+08:00",
+  "task_sha256": "121620df19ad963e3a3a2e354f3a0947e352fe0c2bd051c62ccfc209ea23f1ea",
+  "revision": 2,
+  "preparation": "draft",
+  "changed_fields": [
+    "requirement"
+  ],
+  "source_run_sha256": "f2da63fda26b71a2f044c385be50a7f850b5a7166ab2dd38f8c4c9ac7886446f",
+  "unchanged_fields": [
+    "dependencies",
+    "flow",
+    "execution_policy",
+    "title",
+    "priority",
+    "slug",
+    "cohestra_task"
+  ],
+  "schema_normalized_at": "2026-10-22T13:24:56.018810+08:00"
+}

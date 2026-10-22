@@ -1,0 +1,17 @@
+{
+  "time": "2026-10-22T13:21:31.270485+08:00",
+  "call_id": 1,
+  "action": "close_existing_delivery",
+  "before_budget": {
+    "calls": 1,
+    "remediation": 0,
+    "retries": {}
+  },
+  "after_budget": {
+    "calls": 1,
+    "remediation": 0,
+    "retries": {}
+  },
+  "no_redispatch": true,
+  "run_sha256": "94cccb44d3bc3171fb5e7250f5d174fabb17f04a9bc6e10d4d1b2fd1d7859a3e"
+}

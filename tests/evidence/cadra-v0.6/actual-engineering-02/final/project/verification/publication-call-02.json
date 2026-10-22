@@ -1,0 +1,10 @@
+{
+  "published": true,
+  "readback": true,
+  "sha256": "60250b4d95797798714e0297bf845f6b3450bba7a0f9428e24e04674bbbf45a0",
+  "stage": "review",
+  "round": 1,
+  "time": "2026-10-22T13:22:35.589536+08:00",
+  "validation_proof": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-index.pending.md.validation.json",
+  "validation_was_confirmed_before_separate_publish_call": true
+}

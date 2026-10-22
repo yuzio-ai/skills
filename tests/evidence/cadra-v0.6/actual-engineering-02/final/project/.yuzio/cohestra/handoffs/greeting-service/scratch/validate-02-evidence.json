@@ -1,0 +1,22 @@
+{
+  "time": "2026-10-22T13:33:45.268111+08:00",
+  "candidate_manifest_sha256": "986b3358924ecf9b81505c512f5861922f6498f864f0196e3081cfc3babf94ce",
+  "all_worktree_and_snapshot_hashes_match": true,
+  "environment_matches": true,
+  "evidence_reused": [
+    "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-test-evidence.json",
+    "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-check-evidence.json"
+  ],
+  "raw_logs": [
+    "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/code-02-tests.log",
+    "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/review-02-check.log"
+  ],
+  "AC-1": "passed: named explicit cases including Unicode and internal whitespace",
+  "AC-2": "passed: empty and whitespace-only tests",
+  "AC-3": "passed: dynamic prefix calls in both evidence sets",
+  "AC-4": "passed: 5 unittest tests exit 0",
+  "blocking_findings": 0,
+  "required_rereview": false,
+  "new_tests_needed": false,
+  "acceptance": "passed"
+}

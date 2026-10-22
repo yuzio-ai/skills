@@ -1,0 +1,9 @@
+{
+  "basis_revision": 1,
+  "cumulative_fields": [
+    "execution_policy",
+    "requirement"
+  ],
+  "action_resolved": "start",
+  "action_unresolved": "reject"
+}

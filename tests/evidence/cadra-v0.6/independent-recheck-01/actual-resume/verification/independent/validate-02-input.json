@@ -1,0 +1,13 @@
+{
+  "target": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/.yuzio/cohestra/handoffs/alpha-greeting/README.md",
+  "expected_old": "---\n{\n  \"contract\": \"0.8\",\n  \"task\": \"alpha-greeting\",\n  \"status\": \"in_progress\",\n  \"execution_mode\": \"unattended\",\n  \"stage_result\": {\n    \"stage\": \"review\",\n    \"status\": \"completed\",\n    \"round\": 2\n  },\n  \"candidate\": {\n    \"commit\": null,\n    \"snapshot\": \".yuzio/cohestra/handoffs/alpha-greeting/code-02.md\"\n  },\n  \"next\": {\n    \"stage\": \"validate\",\n    \"allowed\": true,\n    \"reason\": \"stage_completed\"\n  },\n  \"blocked\": {\n    \"value\": false,\n    \"reason\": null\n  },\n  \"findings\": {\n    \"blocking\": 0,\n    \"non_blocking\": 0,\n    \"unresolved\": 0\n  }\n}\n---\n\n# alpha-greeting\n\n- 任务目标与有效决定：见 code-02.md，当前 requirement revision 2。从 code 起步；无补造 need/design。\n- 索引维护者：independent_resume_recheck。\n- 工作项：实现与作者检查见 code；review-01 是同作者审查；review-02 由 independent_resume_recheck 审查 code-02；用户与项目无强制独立审查要求。验收依据见实际 validate 轮次。无提交或发布授权。\n- 正式文档：局部函数变更，无共享文档需求；保留本机记录。\n- 最近更新：2026-10-22T11:29:51.767646+08:00\n\n| 阶段/轮次 | 交付物及覆盖职责 | 结论 | 输入/目标候选 |\n|---|---|---|---|\n| code-01 | [code-01.md](code-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n| review-01 | [review-01.md](review-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n| validate-01 | [validate-01.md](validate-01.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-01.md |\n| code-02 | [code-02.md](code-02.md) | completed | .yuzio/cohestra/handoffs/alpha-greeting/code-02.md |\n\n| review-02 | [review-02.md](review-02.md) | completed；无 findings | code-02.md |\n\n下一步输入与责任：/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/.yuzio/cohestra/handoffs/alpha-greeting/review-02.md；independent_resume_recheck 由 Cadra 按 next 派发。\n",
+  "pending": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/verification/independent/validate-02-pending.md",
+  "sha256": "350ef138ff7396d73859a63192fbb2b39119508288c74c6460b49ae56ffe269a",
+  "handoff": "/private/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-independent-resume-4h6ml3bw/.yuzio/cohestra/handoffs/alpha-greeting/validate-02.md",
+  "stage": "validate",
+  "round": 2,
+  "candidate": {
+    "commit": null,
+    "snapshot": ".yuzio/cohestra/handoffs/alpha-greeting/code-02.md"
+  }
+}

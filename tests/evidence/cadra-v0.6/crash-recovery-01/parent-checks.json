@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "cases": {
+    "run_temp_partial": {
+      "passed": true,
+      "status": "completed",
+      "calls": 3,
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "original_call_preserved": true,
+      "old_files_changed": [
+        ".yuzio/cadra/runs/run-20261022-02.md",
+        ".yuzio/cohestra/handoffs/greeting-service/README.md"
+      ],
+      "all_other_old_files_unchanged": 51
+    },
+    "run_replace_ack_lost": {
+      "passed": true,
+      "status": "completed",
+      "calls": 3,
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "original_call_preserved": true,
+      "old_files_changed": [
+        ".yuzio/cadra/runs/run-20261022-02.md",
+        ".yuzio/cohestra/handoffs/greeting-service/README.md"
+      ],
+      "all_other_old_files_unchanged": 50
+    },
+    "handoff_partial": {
+      "passed": true,
+      "status": "failed",
+      "calls": 1,
+      "budget": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "original_call_preserved": true,
+      "old_files_changed": [
+        ".yuzio/cadra/runs/run-20261022-02.md"
+      ],
+      "all_other_old_files_unchanged": 47
+    },
+    "index_temp_partial": {
+      "passed": true,
+      "status": "completed",
+      "calls": 3,
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "original_call_preserved": true,
+      "old_files_changed": [
+        ".yuzio/cadra/runs/run-20261022-02.md"
+      ],
+      "all_other_old_files_unchanged": 48
+    },
+    "run_primary_partial": {
+      "passed": true,
+      "status": "record_unknown_stop",
+      "budget": "unknown; not reconstructed",
+      "old_files_changed": []
+    }
+  },
+  "skill_source_files_unchanged": 45
+}

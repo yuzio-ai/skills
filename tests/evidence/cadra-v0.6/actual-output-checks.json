@@ -1,0 +1,39 @@
+{
+  "first_run": {
+    "tasks": 2,
+    "stage_calls": 6,
+    "completed": true,
+    "executor": "independent agent"
+  },
+  "second_run": {
+    "revision": 2,
+    "stage_calls": 3,
+    "completed": true,
+    "executor": "independent agent code; main session index recovery/review/validate"
+  },
+  "recovered_call": {
+    "id": 1,
+    "stage": "code",
+    "round": 2,
+    "duplicate_calls": 0,
+    "budget_after_recovery": 1
+  },
+  "closed_resume_repeated": 2,
+  "unchanged_files": {
+    ".yuzio/cadra/runs/run-20261022-01.md": "f35ebdf80df0f6abab94a04720a4f1bb756e8fe289b2a844ca509a516af117e3",
+    ".yuzio/cadra/runs/run-20261022-01-report-01.md": "47e6ff9bb4b37a4963ae8fca2ea253dcc51cc3973eda73a2d69da4dfb8ec85ac",
+    ".yuzio/cadra/tasks/alpha-greeting.md": "9212b3ad6a90eb0084b4d61b161fa624f48e913717a3985f8d1a88e2df015a6a",
+    ".yuzio/cadra/tasks/beta-square.md": "72c8048bdb6b07d3fad29ad7ea141024ec0d48ae400cab28a3a0e5de209bf424",
+    ".yuzio/cohestra/handoffs/alpha-greeting/code-02.md": "2e1cd245316ae3faf7d2ac3065bb2de81453c179a1c276f6a2c87efe7e802351",
+    "alpha.py": "520f74b43ac1677324716877c2dee1b24f2178dea492f67ebfc6a7aa1028d6ec",
+    "tests/test_alpha.py": "315f911810b6d6399a101c9bdf4b9abf406a92e6b1ec2907d53474cc4b30286c",
+    "beta.py": "5f18e6721c5c11cabeaee4c53bb0514950330c9bad5ee9ae256c59ec82ea3957",
+    "tests/test_beta.py": "fe1eefe69ce1b5b7c91da4a0ab3630e2fd3cf1ef3abad20d9a196b32212f4010"
+  },
+  "no_queue_file": true,
+  "limitations": [
+    "Independent agent hit usage limit before code-02 index publication.",
+    "Independent protocol reviewer did not execute because of usage limit.",
+    "Recovery was completed by the main session, not a fresh independent evaluator."
+  ]
+}

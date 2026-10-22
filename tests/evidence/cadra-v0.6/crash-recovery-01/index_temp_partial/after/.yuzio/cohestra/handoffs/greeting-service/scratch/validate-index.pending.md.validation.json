@@ -1,0 +1,23 @@
+{
+  "validated": true,
+  "path": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/validate-index.pending.md",
+  "sha256": "8cd027e1f99bad7655c071e72ede554d7ddd309491dc3c6d62986bea58723883",
+  "stage": "validate",
+  "round": 1,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+  },
+  "handoff_sha256": "e11a4891488e5041cfa91e29c44e438cdf53e59f565653557b22fbcaade2b606",
+  "candidate_manifest_sha256": "52f574ad2961cb386f63d1245b42491b0ca413250eee8c0d01b1b6f49111de85",
+  "checks": [
+    "JSON YAML-subset parse",
+    "complete required contract",
+    "stage/round/mode",
+    "handoff readback",
+    "candidate and dependency bytes",
+    "body/next agreement",
+    "joint completion fields if validate"
+  ],
+  "time": "2026-10-22T14:21:46.305407+08:00"
+}

@@ -1,0 +1,51 @@
+{
+  "contract": {
+    "contract": "0.8",
+    "task": "greeting-service",
+    "status": "completed",
+    "execution_mode": "unattended",
+    "stage_result": {
+      "stage": "validate",
+      "status": "completed",
+      "round": 2
+    },
+    "candidate": {
+      "commit": null,
+      "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+    },
+    "next": {
+      "stage": null,
+      "allowed": false,
+      "reason": "task_completed"
+    },
+    "blocked": {
+      "value": false,
+      "reason": null
+    },
+    "findings": {
+      "blocking": 0,
+      "non_blocking": 0,
+      "unresolved": 0
+    },
+    "acceptance": {
+      "status": "passed"
+    }
+  },
+  "stage": "validate",
+  "round": 2,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-02.md"
+  },
+  "old_sha256": "f1a49aae2bab387bbe500acefa4ba8e27c74b4b6e62b1a29534f762bb65ce1ef",
+  "handoff": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/validate-02.md",
+  "handoff_sha256": "88be56b74f32348c5c83064f1f27de6a62023e40dd99903258951f9d61068ed0",
+  "manifest": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-02/manifest.json",
+  "manifest_sha256": "986b3358924ecf9b81505c512f5861922f6498f864f0196e3081cfc3babf94ce",
+  "required_body": [
+    "validate-02",
+    "当前 strip 需求验收通过",
+    "无后续必做阶段"
+  ],
+  "next_stage": null
+}

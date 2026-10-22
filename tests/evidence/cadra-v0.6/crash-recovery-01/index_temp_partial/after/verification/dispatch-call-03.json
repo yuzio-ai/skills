@@ -1,0 +1,17 @@
+{
+  "call_id": 3,
+  "run_id": "run-20261022-02",
+  "at": "2026-10-22T14:21:01.493462+08:00",
+  "invocation": {
+    "skill": "/Users/zhubowen/Documents/yuzio-ai/skills/cohestra/SKILL.md",
+    "entry": "validate",
+    "project": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial",
+    "task": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial/.yuzio/cadra/tasks/greeting-service.md",
+    "cohestra_task": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial/.yuzio/cohestra/handoffs/greeting-service",
+    "execution_mode": "unattended",
+    "executor": "/root/crash_index_recovery"
+  },
+  "intent_readback_confirmed": true,
+  "stage_execution_started": true,
+  "run_sha256": "2ee533b42f65e0408de49dc07a584351af39fdb5bdd6a545dee5810e10cb3624"
+}

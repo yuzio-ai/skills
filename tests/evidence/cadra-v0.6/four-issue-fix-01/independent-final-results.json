@@ -1,0 +1,140 @@
+{
+  "baseline": {
+    "ran": 72,
+    "failures": 0,
+    "errors": 0,
+    "excluded": "test_pre_call_blocked_revision_keeps_requirement_change reads prior report fixture"
+  },
+  "ordinary_recovery_revision": {
+    "calls": 2,
+    "authorization_consumed": false,
+    "policy_only": "verify_only",
+    "requirement": "start"
+  },
+  "flow_equivalence_checks": 22032,
+  "unstarted_selector": "3 actions preserve evidence; rejected Gate and unknown dispatch return None",
+  "unstarted_start_composition": {
+    "selected": {
+      "stage": "code",
+      "source": "requirement revision"
+    },
+    "prepare_from_old": "completed",
+    "calls": [],
+    "authorization_consumed": false
+  },
+  "invalid_contract_rejected": [
+    {
+      "path": [
+        "candidate"
+      ],
+      "value": [
+        "commit",
+        "snapshot"
+      ],
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "candidate",
+        "commit"
+      ],
+      "value": 12,
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "candidate",
+        "snapshot"
+      ],
+      "value": {
+        "path": "handoff.md"
+      },
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "stage_result",
+        "round"
+      ],
+      "value": true,
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "stage_result",
+        "stage"
+      ],
+      "value": "deploy",
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "next",
+        "allowed"
+      ],
+      "value": 1,
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "next",
+        "reason"
+      ],
+      "value": [],
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "blocked",
+        "reason"
+      ],
+      "value": "unavailable",
+      "valid": false,
+      "decision": "failed"
+    },
+    {
+      "path": [
+        "acceptance",
+        "status"
+      ],
+      "value": {},
+      "valid": false,
+      "decision": "failed"
+    }
+  ],
+  "invalid_contract_accepted": [
+    {
+      "path": [
+        "findings"
+      ],
+      "value": "invalid",
+      "valid": true,
+      "decision": "completed"
+    },
+    {
+      "path": [
+        "findings"
+      ],
+      "value": {
+        "blocking": true,
+        "non_blocking": "zero"
+      },
+      "valid": true,
+      "decision": "completed"
+    }
+  ],
+  "invalid_candidate_recovery_composition": {
+    "recovery": "failed",
+    "terminal_decision": "ValueError: unclosed call",
+    "direct_decision": "failed",
+    "fresh_prepare": "failed",
+    "closed": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "call_id": 3,
+  "stage": "validate",
+  "at": "2026-10-22T14:19:42.516128+08:00",
+  "intent_readback_confirmed": true,
+  "run_sha256": "0aea4d4a1a30bdc0e6404044619df127e4fc98be3bd9f73d25906a1c1704034c",
+  "executor": "/root/crash_atomic_recovery"
+}

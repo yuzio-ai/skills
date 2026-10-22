@@ -1,93 +1,47 @@
 # Cadra 验证场景
 
-这是维护者的验收清单，不是每次入口执行的必读文件。不创建自动安装器或将模拟结果冒充实际智能体执行。
+当前验收口径为 0.6.0 / v0.6。技能本身无脚本运行依赖；下面的模型测试不是调度运行时，也不能代替实际智能体调用。后面的 v0.3–v0.5 记录只保留历史事实，不作为现行兼容要求。
 
-当前验收口径为 0.5.0 / v0.5；文末旧版本记录保留当时事实，不作为当前状态转换规则。
+## 结构与接口
 
-## 文件与路由
+- 六入口可发现，按需加载；状态解析、Gate、契约、预算和恢复只有一处权威定义。
+- Task 保存 revision、preparation、定义及 Gate，Run 保存有序任务数组、previous_run、定义快照、调用与结果；没有独立队列文件或 Task 执行状态副本。
+- flow 首项加允许集合，preset 与等价列表一致；未知阶段与空值拒绝，后续重复去重，不限制中间链序。
+- Markdown 链接、元数据、模板字段、版本与契约匹配；双语说明内容对应，不锁定措辞或排版数量。
+- .yuzio 本机存储、忽略规则、正式总结范围保留；旧协议停止相关操作，不迁移、不双写、不覆盖。
 
-- SKILL.md 前置元数据有效，发行版与任务/Run 协议版本明确，六个入口（add、ready、list、run、resume、report）均能定位对应说明文件；只加载公共流程、所选入口说明与对应模板，不预读其他入口。
-- Markdown 相对链接存在，模板占位符可识别，技能包无脚本和测试运行时依赖；无失效路由或模板管理清单。
-- 公共流程含 Task/Run 状态机、唯一 Ready Gate 定义、串行队列、Flow Preset、首次启动、显式恢复、Cohestra 契约、unattended 与落盘规则；入口引用公共规则，不重复 Gate 表或自设终态口径。
-- 任务骨架、Run 骨架、队列清单模板与 `.cadra` 容器模板可以定位全部契约字段：title、slug、requirement、priority、dependencies、flow、execution policy、status、cohestra_task、checkpoint，以及 Cohestra 结构化状态字段（`status`、`stage_result`、`next`、`acceptance`、`blocked`，含 `task` 与 slug 一致性校验）。
-- 根 README 为双语版（`README.md` 英文、`README.zh-CN.md` 中文），顶部语言切换行双向可达；两版的标题层级、表格行列、代码块内容与相对链接目标一致，改一版必须同步另一版。
-- `cohestra/` 目录零改动：本技能不修改 Cohestra 协议、阶段定义、README schema 或 handoff 语义；缺失接口只在 Cadra 文档中声明。
+## 行为场景
 
-## 项目容器与状态机桌面推演
-
-| 场景 | 预期结果 |
+| 场景 | 预期 |
 |---|---|
-| 目标项目缺 `.cadra` 时调用写入口 | 先报告目标绝对路径并按容器模板执行一次最小初始化（README、tasks/、queue/ 表头、runs/ 与忽略规则），再继续本入口；不生成任务、不建 Run、不提交 |
-| 已有容器缺项（半初始化） | 最小补齐缺失项，不重写既有文件；`list` 在容器缺失时只报告“未初始化”与目标绝对路径，不写文件、不触发初始化 |
-| 目标不明确或指向技能源仓库 | 不初始化，先澄清或报告 |
-| add 新任务 | `tasks/<slug>.md` 落盘，status 为 draft，七项定义字段齐全，默认 priority=medium、flow=full、stop_queue_on_failure=false，并记录 cohestra_task 引用 |
-| add 同 slug | 先查 Run 归属；未完成 Run 内拒绝定义修改，不写文件；结束后只改明确字段，影响准入的修改必须回 draft |
-| 只改 title/priority | Gate 不失效；不改变 completed/blocked/failed 的执行结论，不改旧 Run 快照 |
-| queued/running 无 Run 或归属矛盾 | add 停止，报告矛盾，不通过改 Task 绕过队列 |
-| slug/cohestra_task 编辑 | 拒绝重命名/改绑，不迁移或覆盖旧任务 |
-| 依赖悬空或成环 | 拒绝创建/修改并列出问题，不建立引用 |
-| Ready Gate 八条全过 | draft → ready，记录逐条结论与放行时间；不入队、不建 Run |
-| Ready Gate 任一条不过 | draft 保持 draft；ready 复核失败回 draft，追加失败记录并保留旧放行事实 |
-| 依赖未满足时执行 ready | 第 6 条不通过，保持 draft 并指出依赖状态 |
-| list | 只读展示七种状态、priority、dependencies、flow、当前执行状态、队列位次与出队结论及 Run 一览，不写任何文件、不触发初始化 |
-| run 建立 | 先过目标/初始化前提与契约检查（Git 工作区、可安全写入、非技能源仓库）；普通 ready、显式恢复项或修订重启项通过全部前置检查后才建新 Run、入队；无合格任务不空建 Run |
-| 已有未完成 Run 时再 run | 报告未完成 Run，请先 resume 或显式停止，不并行开新 Run |
-| 排序 | 按 priority 排序，同优先级按 slug 字典序稳定排序，结果可复现；同一 Run 不含任务与其未完成依赖，依赖链按层级逐 Run 推进 |
-| 串行 | parallelism=1，同一时间至多一个 running Task，不做 DAG/并行/定时器/daemon |
-| flow preset 执行 | 首次启动和显式恢复首个动作按第 6.1/6.2 节；其后只消费合法 next，不机械执行全部阶段 |
-| next.stage 不在 flow 内或 allowed=false | 正常推进不调用；恢复准入不是消费旧 next，按第 6.2 节核对一次重试资格 |
-| run 启动 | 向下游声明 execution_mode: unattended；调用后核对契约 execution_mode，不符即停止该 Task |
-| unattended 遇需人类决定/缺权限/缺输入/依赖未满足 | 该 Task 记 blocked 并记录原因，继续下一个 Task |
-| unattended 边界 | 不等待交互提问、不替用户做产品决策、不扩大范围、不获得新隐含授权 |
-| Cohestra blocked.value=true | 调用后 Task 记 blocked；旧受阻状态仅能在原因解除且显式恢复准入通过后重试，定义已修订的走第 6.3 节修订重启（原因解除同样必需），不修改 Cohestra 字段 |
-| 契约载体与一致性 | 只读任务 README Front Matter；调用后字段非法/task 不符 → failed，调用前已损坏则停止 run、不入队；均不从正文倒推 |
-| 终态映射：status=completed 且 acceptance.status=passed | Task 记 completed |
-| 终态映射：status=completed 且 acceptance.status=failed | Task 记 blocked（验收未通过，缺人工决定后续处置） |
-| 终态映射：status=completed 且验收非 passed/failed（缺失、pending、blocked），flow 含 validate | Task 记 blocked（验收无结论，缺人工决定） |
-| 终态映射：status=completed 且验收非 passed/failed，flow 不含 validate | Task 记 completed，保留 pending/blocked，无结论才标注 unknown，列入需人工介入 |
-| 终态映射：status=failed，或 next.reason=stage_failed 且 next.allowed=false | Task 记 failed，记录错误与恢复条件 |
-| 终态映射：status=blocked 或 blocked.value=true 或 next.allowed=false | Task 记 blocked，记录 reason；该行先于推进判定，next.allowed=false 不得越过 failed/blocked 判成 completed |
-| 终态映射：next.allowed=true 且 next.stage 在 flow 内 | 非终态，执行下一阶段 |
-| 正常边界：next.allowed=true 且 stage 在 flow 外、非必做后续 | Task 记 completed，标注截断与未执行阶段；保留已知验收结论，无结论才写 unknown，列入需人工介入 |
-| 验收失败且整改在 flow 内 | status=in_progress、stage_result.stage=validate、acceptance=failed、next={fix,true,acceptance_failed}，flow 含 fix → 继续 fix，不提前判终态 |
-| 验收失败且整改超出 flow | 同上，flow=[validate] → blocked，保留 acceptance=failed，不放行依赖任务、不执行 flow 外的 fix |
-| review-only 有必做整改 | status=in_progress、stage_result.stage=review、findings.blocking>0、next={fix,true,blocking_findings} → blocked，不按正常边界完成 |
-| 必要复审超出 flow | stage_result.stage=fix 或 validate、next={review,true,stage_completed}、flow 不含 review → blocked；validate 保留 acceptance=pending |
-| 可重试失败但本阶段超出 flow | next.reason=stage_failed、allowed=true、next.stage 不在 flow → blocked，不按正常边界完成 |
-| 协议不合法同时表面上已完成 | status=completed 但字段不合法、task 不符或本次结果核对失败 → failed；协议核对优先于完成判定 |
-| 同步失败但新版契约可读 | 收到 index sync failed → failed，停止该 Task；即使 next 允许继续也不推进，恢复核实后才能消费 |
-| 调用后仍是旧结果或错误阶段 | 返回 stage 不等于拟调用阶段，或同阶段 round 未增加 → failed，不消费旧 next |
-| 同阶段新轮次 | 调用前后 stage 相同且 round 增加、同步确认成功 → 按本次 next 判定；同轮失败不假定已完成 |
-| 跨阶段轮次较小 | 调用前 review-03、本次 fix-01 → stage 匹配且同步成功则合法，各阶段轮次不跨阶段比较 |
-| 终态映射：stage_result.status=failed 且 next.allowed=true（可重试） | 非终态，重试本阶段；受第 6 节上限约束（最多 2 次重试、无进展即停），上限耗尽记 failed |
-| 调用后结构化状态缺失、不可读或不合法 | Task 记 failed（无法读取必要状态／协议输出不合法），不解析自然语言正文倒推 |
-| Agent 执行异常／工具调用失败／无法恢复执行状态 | Task 记 failed，记录错误与恢复条件；不宣告成功、不猜测进度 |
-| 契约就绪探测失败 | 建 Run/入队前停止，Task 状态不变，不建空 Run、不逐个判 failed、不提供忽略缺口的继续选项 |
-| cohestra 技能缺失 | run/resume 前置检查一次性报告缺依赖并停止，不建 Run、不逐任务判 failed |
-| 阶段调用输入 | 后附 cohestra_task 与 `.cadra/tasks/<slug>.md` 路径，声明 requirement 为本次上游依据；feature/small-change/bugfix 中链起步不因缺 need 交付判缺输入 |
-| slug 绑定 | cohestra_task 任务目录名等于 Task slug，add 与 run 校验；不另立对照表 |
-| unattended 的 verify 处置 | Cadra 不调用 verify，记“verify 跳过 + 理由（unattended）”并列入需人工介入清单，不降低 review/验收要求 |
-| 禁止解析正文 | 不依据 README 中“建议下一步进行 fix”之类的句子选阶段 |
-| blocked/failed 默认 | 记录后继续下一个 Task |
-| stop_queue_on_failure: true 且任务 blocked/failed | 队列停止，Run 记 stopped 并写原因；剩余入队任务出队回 ready，报告记 skipped 并注明原因 |
-| Run 收尾（用户放弃续跑） | 先核对 running 结果；能确认则记实际终态或用户停止的 blocked，无法确认记 failed；queued 回 ready/skipped，全部写完才记 stopped/已收尾 |
-| queued 出队回退 | 仅经 Run 停止收尾发生；V1 无单项移出入口，不静默丢任务 |
-| queue/order.md 不存在 | 表示尚无队列记录，不算缺口；首次入队按模板创建，列定义固定 |
-| 显式 flow 序列校验 | 与 preset 同口径：须为 `need → design → code → review → fix → review → validate` 的子序列（`review` 至多两次且第二次在 `fix` 之后，其余阶段各至多一次），`[fix, review, validate]` ≡ `bugfix`，此外的逆序、乱序或重复由 add 拒绝；首项用于确认首次启动，也作修订重启起点 |
-| 队列走完 | Run 记 completed，queue/order.md 出队结果回写 |
-| 中断（会话断开、checkpoint 未闭合） | Run 记 interrupted，状态即时落盘可恢复，不宣告成功 |
-| resume 选取 Run | 取唯一未完成 Run；多个候选列出请用户指定，不凭时间或“最新”猜测 |
-| resume 不重复已完成 Task | completed/blocked/failed 不重跑，按原记录计入 |
-| resume 不重复已完成阶段 | 按 checkpoint 的拟调用阶段、调用前状态和最后交付阶段/结果/轮次核对本次同步后按 next 继续；next 指回本阶段则是新轮次，不凭修改时间推断 |
-| resume 遇索引同步中断 | 未核实同步前保持停止；完整新版与本轮 handoff 核对一致才补记 checkpoint，不重跑已落盘阶段；旧结果、缺调用前记录或无法确认则报告失败 |
-| resume 重新核对 running/queued | 中断点核对本次结果；queued 沿用已记录动作；blocked/failed 保留本轮终态，不重新入队 |
-| resume 续跑 | 沿用原 Run 的 unattended 与策略；不建 Run；已 completed 或 stopped/已收尾时只报告，恢复指向新 run |
-| report 汇总 | completed/blocked/failed/skipped 四类计数与清单齐全 |
-| report 逐任务 | 七项齐全：最终状态、最后完成阶段、当前候选引用、findings 摘要、validation 结果、是否需人工介入、下一步 |
-| report 材料边界 | 只写引用加短摘要，不复制 handoff 正文进 .cadra；契约缺口如实标注 |
-| report 轮次 | 每次新增 `<run-id>-report-<轮次>.md` 并引用旧版，不覆盖历史 |
-| 状态所有权 | Task 状态只由 Cadra 写；`.cohestra` 内容零写入 |
-| 写入失败或状态矛盾 | 如实报告未完成/缺口与待写内容，不宣称事务回滚、不猜测补齐 |
+| add/ready | 只写定义与准入；八项 Gate；未完成 Run 所属任务不编辑 |
+| 普通串行执行 | Run 固定顺序；只写 Run 执行状态；默认失败继续，策略停止时未执行项 skipped |
+| 来源链 | 显式 previous_run；分叉、缺失、循环、重复 slug、修订倒退停止；不以时间选来源 |
+| 新定义与依赖 | 旧 completed 不放行新修订；开始与续跑前重核依赖 |
+| Flow | 等价 preset/列表同结果；正常范围边界收尾，必做后续超范围 blocked；复审不按列表位置推进 |
+| 相同结果 | 无额外提前停止，允许契约许可且预算内的重试或补证 |
+| 三项预算 | 重试 2、整改 3、调用 16；第三轮 fix 后仍可复审；第 16 次刚完成时保留完成结果 |
+| 契约核对 | 缺字段、错 task/模式/阶段、旧轮次、同步失败停止；跨阶段独立轮次合法 |
+| 中断边界 | Run 建立后、调用意图后、Cohestra 交付后、结果已写但 Run 未收尾分别恢复 |
+| 派发不明 | 旧契约不证明未调用；无确证停止，只有明确未发起才沿用原 call id |
+| 重复 resume | 已结束项不重跑，预算不重复消费；只补收尾，不重开结束 Run |
+| 定义连续编辑 | 未入 Run 的同修订累计变更；requirement/flow 曾变更从新 start 起步 |
+| skipped 与修订 | 未调用不消费授权；重新核对原准入；跨 skipped 修订累计变化不丢失 |
+| 首调用前受阻与修订 | blocked/failed 无调用且未消费时不截断累计变更；仍核对原因解除；后续仅改策略也保留未执行的 requirement/flow 重启 |
+| 执行依据 | prepared 意图须核对而非跳过；合法无调用收尾可作为依据；缺少消费证据不推定未启动 |
+| 普通调用与特殊授权 | 普通调用及普通核对收尾可保持 authorization_consumed=false；失败后策略修订仍能找到执行依据 |
+| 首调用前 running 中断 | 无调用、零预算、未消费且可证未派发时重核 start_action；准入失败或派发不明不调用；已有 prepared 只核对原调用 |
+| Flow 起点改变 | allowed 相同但 start 改变仍使 Gate 失效；只有 start 与 allowed 都相同才等价 |
+| 非法控制枚举 | next.reason、blocked.reason、acceptance.status 非法时 failed；缺省/null 的可选 acceptance 合法；不闭合调用或推进 next |
+| 显式恢复 | 新 Run 引用旧来源，原 Run 不变；解除证据、旧调用核对及一次授权必需 |
+| 历史报告 | 新成功不覆盖旧失败；新修订不改旧定义和报告，缺材料 unknown |
+| 原子保存失败 | 原目标不被半写文件替换，回读失败不推进；无跨系统事务承诺 |
+
+## 本轮证据
+
+现行静态检查：`python3 -B tests/cadra-static-checks.py`。行为模型：`python3 -B -m unittest discover -s tests -p 'test_cadra.py' -v`。实际智能体执行及限制见 [v0.6 验证记录](cadra-v06-validation.md)。历史 v05 脚本与结果仅作历史模型，不是当前验收入口。
+
+## 历史验证记录（非现行规则）
 
 ## v0.3 首次启动、恢复与历史回归
 
@@ -127,8 +81,8 @@
 | 修订重启准入未通过 | 缺 rev 记录、定义与记录矛盾或原因未解除 → Task 保持 ready 不入队，记录缺口；不把修订当作绕过旧受阻状态的通道 |
 | 修订重启授权与历史 | 首个调用落盘前记已消费，一次修订只给一个起点；旧 Run 的 blocked/failed/completed 不被改写，报告同时标注 rev-N 与原终态 |
 | 执行模式核对失败 | 声明 unattended 而契约记为 attended（或字段缺失、非法）→ 本次结果不成立，Task 记 failed，即使 next.allowed=true 且阶段在 flow 内也不推进；列入需人工介入 |
-| 非 Git 目标、目标不明或不可安全写入 | run/resume 前置检查停止：不建 Run、不入队、不代建 .cohestra、不执行 git init |
-| Git 工作区缺 .cohestra | 不作为停止条件；由 Cohestra 在首个阶段调用时最小初始化，Run 与 Task 记录标注“本轮需先初始化” |
+| 非 Git 目标、目标不明或不可安全写入 | run/resume 前置检查停止：不建 Run、不入队、不代建 .yuzio/cohestra、不执行 git init |
+| Git 工作区缺 .yuzio/cohestra | 不作为停止条件；由 Cohestra 在首个阶段调用时最小初始化，Run 与 Task 记录标注“本轮需先初始化” |
 | flow 等价写法 | `flow: bugfix` 与显式 `[fix, review, validate]` 准入结果相同；`[review, fix, review]`、`[need, design, code, review, fix, review, validate]` 合法，`[review, review]`、`[fix, validate, review]`、`[validate, fix]` 拒绝；序列含阶段名即可承接对应 next.stage |
 | 可重试失败达到上限 | 逐阶段失败重试预算各 2 次：该阶段第 3 次调用仍可重试失败 → 不再调用，Task 记 failed（重试上限耗尽）；预算是许可上限而非必须用满，比较字段完全相同的重复失败由无进展先停、不消费剩余额度；预算不因穿插其他阶段或某次成功返还；stop_queue_on_failure: true 时停止队列，未执行任务出队回 ready |
 | 重试无进展 | 连续两次调用后 stage_result.status、candidate、findings、acceptance 与 next 全未变（轮次增加不算进展）→ 立即停止并记 failed，不等上限；validate 本阶段补证出口豁免，改由任务调用预算兜底 |
@@ -158,15 +112,12 @@
 | 补齐的幂等边界 | 补齐只写尚未写入的步骤：不重复追加队列行、不重写已有结论、不动其他 Run 的行；补齐后再次 resume 判定为已完成 |
 | 补齐的停止条件 | 编号缺失或无法对应、定义快照与实际 Task 不一致、入队前状态却已有阶段调用记录、同一编号多行、Run 快照与队列结论矛盾 → 停止并报告，不补写、不猜测 |
 | 出队部分写入 | Run 已保存结果快照与出队结论、队列行未回写 → resume 按 deq- 编号只补回写步骤，不重复追加 |
-| 旧版队列清单读取 | 缺「入队操作编号」或「出队操作编号与结论」列时按表头读取，缺失列写 unknown，不回填、不重排、不迁移历史行 |
-| 旧清单升级方式 | 七列表头时不得向旧表块追加八列行（会列含义错位），改为在文件末尾追加一个完整八列表块；读取按表块合并、旧块缺列写 unknown |
-| 行定位键 | 新表块的行以 enq-<run-id>-<NN> 定位并以 run-id + slug 复核；旧表块或缺少该列的行只用 run-id + slug 定位 |
-| 旧行收尾路径 | 旧表块的行就地写入它既有的「出队结论与时间」单元格，作为合法收尾；不新增列、不迁移、不改列序，旧行不因缺 deq- 编号而无收尾路径 |
-| 逐行完成判据 | 某行只要自身结论列非空即为已出队（新表块看出队操作编号与结论，旧表块看出队结论与时间）；判定 Run 是否还有未出队任务时按合并视图，不只看是否存在新表块 |
-| 旧行冻结范围 | 冻结的是旧表块的列结构与已有结论的行；仍未出队的行只允许补写它本来就有的结论单元格一次，已出队的旧行不得再改写 |
-| 混合表块收尾 | 新旧表块并存时，收尾只改目标行，新表块字节与其余待出队行不受影响，也不新增表块 |
-| 旧记录经恢复入口可达 | v0.4 及更早的 Run 与队列行没有 enq-/deq- 编号：编号缺失不构成停止条件，resume 以 run-id + slug 定位、以 checkpoint 入队定义快照与结果快照核对，回写落在该行既有结论列；该路径必须可达，不把旧 Run 永久留在未完成状态 |
-| 旧记录定位歧义 | 同一 run-id + slug 匹配到多行且无法用 enq- 编号区分时仍停止并报告，不因兼容旧记录放宽停止条件 |
+| 旧版队列清单读取 | 当前只支持八列格式；不支持时报告状态未知与缺口，不转换、不补写、不据此放行新 Run |
+| 旧清单升级方式 | 不自动追加新表头或迁移旧记录，保留原文并报告格式不支持 |
+| 行定位键 | 以 enq-<run-id>-<NN> 定位，并以 run-id + slug 复核；必要编号缺失时停止 |
+| 逐行完成判据 | 对应 deq- 编号、结论与时间齐全，且 Run 结果快照、Task 状态与队列行一致才确认收尾 |
+| 旧记录经恢复入口可达 | 格式不支持或必要编号缺失时停止并报告，不建立无编号恢复分支 |
+| 旧记录定位歧义 | 多行无法唯一匹配时停止并报告，不猜测目标行 |
 | 出队三步写入 | 出队按 Run 结果快照 → Task 终态（或 skipped 回退 ready）→ 队列行 deq- 编号顺序写入并逐份回读；Run 结果、Task 状态与队列行三者一致才算收尾，未一致不放行新 Run |
 | 补齐先分阶段 | 读 Run 中该 Task 有无结果快照：无 → 入队阶段按入队规则补齐；有 → 出队阶段以快照为唯一依据补 Task 终态与队列回写；不得只凭 Task 状态字面值判断——blocked/failed 既可能是入队前原状态也可能是本轮终态 |
 | 终态任务出队补齐 | failed/blocked 终态在队列缺行时判为出队部分写入并补齐，不误报「入队前状态却已有阶段调用记录」；completed 补齐后不停在 running；skipped 补齐后 Task 回到 ready 并记队列结论 |
@@ -181,9 +132,10 @@
 
 ## 安装
 
-安装走通用技能管理器（如 skills CLI），Cadra 不提供自研安装器。安装副本须包含 references、assets 与隐藏模板文件；安装本身不创建 `.cadra`。没有对应实测时标明未实测，不能用文件复制代替 CLI 安装证据。
+安装走通用技能管理器（如 skills CLI），Cadra 不提供自研安装器。安装副本须包含 references、assets 与隐藏模板文件；安装本身不创建 `.yuzio/cadra`。没有对应实测时标明未实测，不能用文件复制代替 CLI 安装证据。
 
 交付检查结果时分开标注：文档静态检查、文件/CLI 实测、桌面推演、独立智能体实测。未执行项如实列出。
+
 
 ## 0.1.0 本地验证记录
 
@@ -196,7 +148,7 @@
 
 ## 0.2.0 修订记录
 
-- 变更：针对独立审阅意见的 P0/P1/P2 逐条修订，契约与状态机语义变化，协议 v0.1 → v0.2、发行版 0.1.0 → 0.2.0。① **P0-1**：最小初始化限定为写入口（add/ready/run/resume/report），`list` 纯只读、容器缺失只报告“未初始化”与目标路径，消除“任意入口初始化 vs list 不写文件”的矛盾（SKILL.md 规则 2、list.md、场景表两行）。② **P0-2**：契约载体钉死为 `cohestra_task` 任务 README 的 YAML Front Matter（Cohestra v0.8「Orchestrator 契约」），字段名与取值**逐字采用 Cohestra 公共流程第 7.2 节原文**（`status`、`stage_result`、`next`、`acceptance.status`、`blocked`），Cadra 不另立别名——首轮实现曾自造 `accepted.value`，与 Cohestra 契约不符（该字段在 Cohestra 中不存在），复核后改为 `acceptance.status`；保留 `task` 与 slug 一致性校验；终态判定改写为**穷尽映射表且行序即优先级**——`status` 为终态时先于 `next` 判定，`next.allowed = false` 不得越过 failed/blocked 行（Cohestra 在受阻与不可继续时同样给 `allowed=false` + `stage=null`，首版行序会把这类状态误判为 completed，复核后已按状态优先重排）。映射结果：completed+passed → completed；completed+failed → blocked；completed 且验收无结论时按 flow 是否含 validate 分流（含 → blocked，不含 → completed 并强制标注 acceptance=unknown）；failed 或 stage_failed 不可继续 → failed；blocked 或 allowed=false → blocked；allowed=true 且 stage 在 flow 内 → 推进；allowed=true 且 stage 是六阶段名但在 flow 外 → completed（flow 边界）并强制标注与人工介入；stage 为空／非法、status 越界、task 不一致 → failed。run.md 不再自设终态口径。③ **P1-3**：新增调度回边（`queued → ready` 出队回退、`blocked`/`failed → queued` 仅经 resume）、明确「未完成 Run」定义与 **Run 收尾**（放弃续跑后剩余任务回 ready、Run 标注已收尾、不再阻塞新 Run），`skipped` 口径随之改为“本轮未执行且已出队回 ready”。④ **P1-4**：阶段调用后附 `.cadra/tasks/<slug>.md` 并声明 requirement 为本次上游依据（feature/small-change/bugfix 中链起步不再必然缺输入）；`cohestra_task` 目录名与 Task slug 绑定并校验。⑤ **P1-5**：unattended 写入对 Cohestra 的接口要求（不交互提问、需人类决定表达为受阻）；verify 处置落定——unattended 下 Cadra 不调用 verify，记“跳过+理由”并列入人工介入清单。⑥ **P1-6**：run/resume 前置 cohestra 技能可用性检查，缺失一次性报告缺依赖。⑦ **P2**：最小初始化绑定容器模板并补半初始化最小补齐；新增 `queue/order.md` 模板（七列定义，缺失不算缺口）；`.gitignore` 删除永不匹配的 `/runs/*/scratch/` 规则；§4.4 标注为非法状态兜底；preset 首项改为“声明的期望起始阶段”并要求显式序列为链序单调子序列（add 校验）；定义报告轮次（与 Cohestra 阶段轮次无关）；tests 标准放宽为“公共规则只引用、不重复定义”并清理 run/resume 复述；list 展示队列位次与出队结论；验证记录改用 `git show --stat` 可复核表述。
+- 变更：针对独立审阅意见的 P0/P1/P2 逐条修订，契约与状态机语义变化，协议 v0.1 → v0.2、发行版 0.1.0 → 0.2.0。① **P0-1**：最小初始化限定为写入口（add/ready/run/resume/report），`list` 纯只读、容器缺失只报告“未初始化”与目标路径，消除“任意入口初始化 vs list 不写文件”的矛盾（SKILL.md 规则 2、list.md、场景表两行）。② **P0-2**：契约载体钉死为 `cohestra_task` 任务 README 的 YAML Front Matter（Cohestra v0.8「Orchestrator 契约」），字段名与取值**逐字采用 Cohestra 公共流程第 7.2 节原文**（`status`、`stage_result`、`next`、`acceptance.status`、`blocked`），Cadra 不另立别名——首轮实现曾自造 `accepted.value`，与 Cohestra 契约不符（该字段在 Cohestra 中不存在），复核后改为 `acceptance.status`；保留 `task` 与 slug 一致性校验；终态判定改写为**穷尽映射表且行序即优先级**——`status` 为终态时先于 `next` 判定，`next.allowed = false` 不得越过 failed/blocked 行（Cohestra 在受阻与不可继续时同样给 `allowed=false` + `stage=null`，首版行序会把这类状态误判为 completed，复核后已按状态优先重排）。映射结果：completed+passed → completed；completed+failed → blocked；completed 且验收无结论时按 flow 是否含 validate 分流（含 → blocked，不含 → completed 并强制标注 acceptance=unknown）；failed 或 stage_failed 不可继续 → failed；blocked 或 allowed=false → blocked；allowed=true 且 stage 在 flow 内 → 推进；allowed=true 且 stage 是六阶段名但在 flow 外 → completed（flow 边界）并强制标注与人工介入；stage 为空／非法、status 越界、task 不一致 → failed。run.md 不再自设终态口径。③ **P1-3**：新增调度回边（`queued → ready` 出队回退、`blocked`/`failed → queued` 仅经 resume）、明确「未完成 Run」定义与 **Run 收尾**（放弃续跑后剩余任务回 ready、Run 标注已收尾、不再阻塞新 Run），`skipped` 口径随之改为“本轮未执行且已出队回 ready”。④ **P1-4**：阶段调用后附 `.yuzio/cadra/tasks/<slug>.md` 并声明 requirement 为本次上游依据（feature/small-change/bugfix 中链起步不再必然缺输入）；`cohestra_task` 目录名与 Task slug 绑定并校验。⑤ **P1-5**：unattended 写入对 Cohestra 的接口要求（不交互提问、需人类决定表达为受阻）；verify 处置落定——unattended 下 Cadra 不调用 verify，记“跳过+理由”并列入人工介入清单。⑥ **P1-6**：run/resume 前置 cohestra 技能可用性检查，缺失一次性报告缺依赖。⑦ **P2**：最小初始化绑定容器模板并补半初始化最小补齐；新增 `queue/order.md` 模板（七列定义，缺失不算缺口）；`.gitignore` 删除永不匹配的 `/runs/*/scratch/` 规则；§4.4 标注为非法状态兜底；preset 首项改为“声明的期望起始阶段”并要求显式序列为链序单调子序列（add 校验）；定义报告轮次（与 Cohestra 阶段轮次无关）；tests 标准放宽为“公共规则只引用、不重复定义”并清理 run/resume 复述；list 展示队列位次与出队结论；验证记录改用 `git show --stat` 可复核表述。
 - 已执行（文档静态检查，复核轮实测）：cadra 包内 12 份 Markdown、59 条相对链接、0 断链（全仓 30 份、159 条、0 断链；全仓数字随 cohestra 侧并发改动浮动，故以包内数字为准，首轮记录的“152 条”不可复现已修正）；SKILL.md 路由表与 references 六文件一一对应；`release.json`、`SKILL.md`、`workflow.md`、双语 README 的版本字样一致（0.2.0 / v0.2）；契约字段与 Cohestra v0.8 第 7.2 节及 `assets/task-index.md` 骨架逐值比对（`status` 4 值、`stage_result.status` 3 值、`next.reason` 8 值、`blocked.reason` 8 值、`acceptance.status` 4 值），自造字段零命中（首轮自造的验收字段名已全部替换为 Cohestra 原生的 `acceptance`）；终态映射表与各入口引用无互相矛盾的旧口径（“状态保持 queued”“是终态，回到队列”等字样零命中）；双语 README 标题层级（6）、表格行数（19）、表格数（3）、代码块数（3）逐一对齐。
 - 已执行（桌面推演）：上表新增场景（终态映射各分支、出队回退、Run 收尾、verify 跳过、中链起步输入、半初始化补齐）逐行推演可闭合；resume 三分支与调度回边不冲突。终态映射另做脚本枚举：按 Cohestra 第 7.3 节标准化出口与边界态共 17 类输入逐条套用映射表，结果与预期一致，假完成／假 blocked 0 条（含两项回归：受阻态 `allowed=false` + `stage=null` 不再被判 completed；`allowed=true` 但 `next.stage` 为空或非六阶段名判 failed）。
 - 未执行（如实列出）：六入口仍未在独立智能体会话实跑；无人值守闭环未实测——Cohestra v0.8 的 Orchestrator 契约仍在该技能的进行中改动里、尚未发布，本次实际加载的 Cohestra 尚无结构化状态；未用 skills CLI 实测安装或升级。
@@ -211,7 +163,7 @@
 - 本次结果核对：调用前落盘拟调用阶段和已有 stage_result.stage/status/round；调用后先核实同步结果，再核对阶段、同阶段轮次增加，跨阶段不比较轮次大小。索引同步失败、旧结果或阶段不匹配时记 failed，不消费旧 next。Run checkpoint 模板与 run/resume 同步记录；中断恢复先核对完整 README 与本轮 handoff，不自动重跑已落盘阶段。report 同步保留已知验收结论。
 - 桌面推演（脚本化映射模型，18/18）：验收失败的整改在 flow 内/外、review-only 有必做整改、fix 必要复审在 flow 外、validate 必要复审在 flow 内/外、正常 code/review 边界、passed 完成、completed+failed 防御分支、completed+pending 在含/不含 validate 的 flow、协议错误优先于完成、同步失败但新版 next 可读、可重试失败在 flow 内/外、非法 next、不可重试失败。已知 acceptance 在判定前后保持原值；失败或必要后续被截断时不产生 completed。
 - 本次结果推演（6/6）：同阶段轮次不增拒绝、同阶段新轮次接受、review-03 → fix-01 接受、返回错误阶段拒绝、首次合法结果接受、即使阶段正确但同步失败仍拒绝。该模型按文档表构造，不是 Cadra 运行时实现或真实 run/resume 实测。
-- 静态与文件证据：两技能共 30 份 Markdown、158 条相对链接检查通过，元数据/字段/枚举/版本与 `git diff --check` 通过；README 发布的 6 个实际文件操作分支与 Cohestra 同会话夹具演练见其本轮记录，Cadra 不自行写 `.cohestra`。
+- 静态与文件证据：两技能共 30 份 Markdown、158 条相对链接检查通过，元数据/字段/枚举/版本与 `git diff --check` 通过；README 发布的 6 个实际文件操作分支与 Cohestra 同会话夹具演练见其本轮记录，Cadra 不自行写 `.yuzio/cohestra`。
 - 未执行：独立智能体调用、真实 cadra run/resume、CLI 安装/更新与远程验证；原生 quick_validate.py 缺 PyYAML，已用 Ruby Psych 做 YAML 与等价基本元数据检查。未把桌面推演或脚本化输出夹具写成独立智能体实测。
 
 ## 0.3.0 首次启动与恢复修复验证（2026-10-01）
@@ -237,12 +189,12 @@
 | sync.txt | Sync ready. | 5685961a12ed4a7ccee78f4cb010e8c7de9ec1dd4b4a8d944274b5f2a9fac9b1 |
 | small.txt | Small change ready. | 75bd5f6c7fa36708dbbcbbf0e8ef645381e393b9e92ab3c1d6c975ff2d6238df |
 
-- 证据入口：本轮临时目录 /private/tmp/cadra-v03-nK9pF3，项目中的 .cadra/runs、.cohestra/handoffs 和 evidence 保存交付、调用前记录、快照与故障操作；static-results.json、model-results.json、actual-results.json 保存检查结果。上述关键结果与候选哈希已记录在本文件，临时文件不是唯一依据。
+- 证据入口：本轮临时目录 /private/tmp/cadra-v03-nK9pF3，项目中的 .yuzio/cadra/runs、.yuzio/cohestra/handoffs 和 evidence 保存交付、调用前记录、快照与故障操作；static-results.json、model-results.json、actual-results.json 保存检查结果。上述关键结果与候选哈希已记录在本文件，临时文件不是唯一依据。
 - 限制与未执行：原生 skill-creator quick_validate.py 本次实际运行因缺 PyYAML 未通过环境启动；已用 Ruby Psych 做 YAML 和等价基本元数据检查，未安装依赖。不把本会话手工选择入口/阶段与实际文件执行写成独立智能体调度验证；未执行独立智能体调用、CLI 安装/升级或远程验证。中断/输入丢失/发布失败由显式故障注入产生，不声称自然会话断开。未提交、推送、发布、更新已安装技能或操作真实业务项目。
 
 ## 0.4.0 修订重启与执行边界修复验证（2026-10-01）
 
-- 变更：协议 v0.3 → v0.4、发行版 0.3.0 → 0.4.0，针对综合审阅的 4 项问题与 1 项运行风险。① **P1 终态任务定义修订后的重新执行**：新增调度回边 completed/blocked/failed → draft、第 2.2 节（修订记录 `rev-<N>`、新旧两代定义与结论绑定、准入未通过保持 ready 不入队）与第 6.3 节（按「变更字段 + 原终态」确定重启起点：requirement/flow 变更取新 flow 首项；仅 dependencies/execution policy 变更时 blocked/failed 重试原待调用阶段、completed 只作修订收尾）；修订后的任务不进入恢复列表，两者不并行。② **P2 执行模式核对失败映射为停止**：第 6 节读取规则、终态映射表第 1 行与第 7 节改为——声明 unattended 而契约记为 attended（或字段缺失、非法）即记 `failed`、不消费本次 `next`，即使 `next.allowed = true` 且阶段在 flow 内也不推进；调用前记录与 checkpoint 增加本次声明的 execution_mode。③ **P2 flow 校验口径统一**：显式序列与 preset 同口径，须为 `need → design → code → review → fix → review → validate` 的子序列（`review` 至多两次且第二次在 `fix` 之后，其余阶段各至多一次），`[fix, review, validate]` ≡ `bugfix`。④ **P2 建 Run 前检查初始化前提**：第 6.1 节新增「目标与初始化前提」前置检查（Git 工作区根、可安全写入、非技能源仓库），非 Git 停止且不代建 `.cohestra`、不执行 `git init`；缺容器由 Cohestra 在首个阶段调用时最小初始化。⑤ **运行风险（可重试上限）**：新增「重试与无进展上限」——同一阶段可重试失败最多重试 2 次，第 3 次仍失败记 `failed`（重试上限耗尽）；连续两次调用后结构化状态全未变即判无进展、立即停止；计数写入 checkpoint 且 resume 沿用不清零，落 failed 后 `stop_queue_on_failure` 照常生效。⑥ 联动更新 SKILL.md、add/ready/run/resume/report/list、assets/task.md、assets/run.md、assets/project/README.md、assets/project/queue/order.md 与双语 README。
+- 变更：协议 v0.3 → v0.4、发行版 0.3.0 → 0.4.0，针对综合审阅的 4 项问题与 1 项运行风险。① **P1 终态任务定义修订后的重新执行**：新增调度回边 completed/blocked/failed → draft、第 2.2 节（修订记录 `rev-<N>`、新旧两代定义与结论绑定、准入未通过保持 ready 不入队）与第 6.3 节（按「变更字段 + 原终态」确定重启起点：requirement/flow 变更取新 flow 首项；仅 dependencies/execution policy 变更时 blocked/failed 重试原待调用阶段、completed 只作修订收尾）；修订后的任务不进入恢复列表，两者不并行。② **P2 执行模式核对失败映射为停止**：第 6 节读取规则、终态映射表第 1 行与第 7 节改为——声明 unattended 而契约记为 attended（或字段缺失、非法）即记 `failed`、不消费本次 `next`，即使 `next.allowed = true` 且阶段在 flow 内也不推进；调用前记录与 checkpoint 增加本次声明的 execution_mode。③ **P2 flow 校验口径统一**：显式序列与 preset 同口径，须为 `need → design → code → review → fix → review → validate` 的子序列（`review` 至多两次且第二次在 `fix` 之后，其余阶段各至多一次），`[fix, review, validate]` ≡ `bugfix`。④ **P2 建 Run 前检查初始化前提**：第 6.1 节新增「目标与初始化前提」前置检查（Git 工作区根、可安全写入、非技能源仓库），非 Git 停止且不代建 `.yuzio/cohestra`、不执行 `git init`；缺容器由 Cohestra 在首个阶段调用时最小初始化。⑤ **运行风险（可重试上限）**：新增「重试与无进展上限」——同一阶段可重试失败最多重试 2 次，第 3 次仍失败记 `failed`（重试上限耗尽）；连续两次调用后结构化状态全未变即判无进展、立即停止；计数写入 checkpoint 且 resume 沿用不清零，落 failed 后 `stop_queue_on_failure` 照常生效。⑥ 联动更新 SKILL.md、add/ready/run/resume/report/list、assets/task.md、assets/run.md、assets/project/README.md、assets/project/queue/order.md 与双语 README。
 - 静态检查：Cadra 包内 12 份 Markdown、53 条相对链接、0 断链（Cohestra 包 14 份、48 条、0 断链；全仓 30 份、153 条、0 断链）；六入口齐全；0.4.0 / v0.4 版本字样在 release.json、SKILL.md、workflow.md、双语 README 与测试口径间一致；旧口径表述（现行规则中的“单调子序列”、“不静默当作无人值守结果”、checkpoint 的“恢复授权：”栏）在当前 Cadra 包内零命中，历史记录节保留当时事实；双语 README 标题层级 6/6、表格行 19/19、代码块 3/3（内容逐字一致）、相对链接目标 26/26 一致；`git diff --check` 通过。本轮只改 `cadra/`、`tests/cadra-scenarios.md` 与双语 README：按 mtime 核对，`cohestra/` 下 0 个文件被本轮触碰，`tests/cohestra-scenarios.md` 未改。
 - 既有桌面推演记录：原总数标为 35/35，但分组列为 flow 15、修订重启起点 6、执行模式 5、重试与无进展 5、建 Run 前提 5，合计 36；原脚本未在仓库归档，不能据此确认原总数。flow 的首轮模型曾暴露“不重复”与必要复审的冲突，规则改为「子序列 + review 至多两次」；该历史记录不作为运行时或独立智能体证据。重新核对结果见下方本轮记录。
 - 未执行（如实列出）：本轮为文档修订与边界推演，未在独立智能体会话中实跑 cadra run/resume；未做真实项目的修订重启与重试上限实测；未用 skills CLI 做安装、升级或远程验证；未执行阶段调用联调。Cohestra 包本轮零改动，其场景与验证记录维持原事实。
@@ -266,7 +218,7 @@
 - 脚本化文档模型 23/23（三项上限 7、无进展 7、部分写入 9）：上限组覆盖失败重试预算按比较字段有变化计 2 次后耗尽、无进展优先于预算、预算不因穿插返还、整改 3 轮后耗尽、整改轮与重试预算独立、acceptance_failed 往复在 16 次调用后兜底、完整路径 8/16 次调用与 1/3 轮不误伤；无进展组覆盖 validate 补证第二轮不再 failed、补证重复 16 次后由预算停止、豁免只限 validate 出口、仅轮次增加不算进展、缺失与显式 null 等价、写有内容的映射与 null 不等价、完成优先于无进展；部分写入组覆盖建 Run 后中断可补齐、补齐幂等、已 queued 只补队列行、快照不一致停止、状态与调用记录不相容停止、同编号多行停止、出队只补回写、add 归属拒绝不放宽、无 enq 记录不进入补齐。模型从现行文档构造，不是 Cadra 运行时，未调用 Cohestra 阶段，也未读写任何项目文件；结果 JSON 在同目录 model-results.json。
 - 模型暴露并已回写的两处口径：一是「最多追加 2 次失败重试」与无进展判据的相互作用——比较字段完全相同的重复失败会先被无进展停住，已在第 6 节写明两者取先到者、重试预算是许可上限；二是写有内容的可选字段（如 findings {blocking: 0}）与 null 不等价，可用于规避无进展，但受 16 次调用预算兜底，作为残余口径如实记录，本轮未额外收紧。
 - 本轮未改 `cohestra/`：其文件最新 mtime 为 2026-10-01 10:59（`assets/handoff.md`；`references/workflow.md`／`references/validate.md`、`assets/task-index.md` 为 2026-10-01 10:57），早于本轮全部写入（2026-10-02 10:21 起），本轮写操作只落在 `cadra/`、`tests/cadra-scenarios.md` 与两份根 README。**证据限制**：mtime 只作时间线旁证，不能证明字节未变；本轮开始时未取基线哈希，故不主张字节级未变。Cohestra 协议、阶段定义与 handoff 语义零改动，未采用契约扩展路线。**（补正 2026-10-03）** 本行原记最新 mtime 为 2026-09-29 10:06，比实测更早，漏掉 2026-10-01 的改动（09-29 10:06 实为 `SKILL.md` 的时间）；「本轮未改 cohestra」的结论仍成立。另 `cohestra/` 相对 HEAD 有 8 个未提交改动（属更早一轮），故「未改」只限定在本次 cadra 0.5.0 窗口内。
-- 未执行（如实列出）：未在独立智能体会话中实跑 cadra run/resume；未做真实项目的整改轮耗尽、调用预算耗尽与入队中断实测；未用 skills CLI 做安装、升级或远程验证；未执行阶段调用联调，也未对真实 `.cohestra` 任务验证 validate 补证路径。
+- 未执行（如实列出）：未在独立智能体会话中实跑 cadra run/resume；未做真实项目的整改轮耗尽、调用预算耗尽与入队中断实测；未用 skills CLI 做安装、升级或远程验证；未执行阶段调用联调，也未对真实 `.yuzio/cohestra` 任务验证 validate 补证路径。
 - 待补证据：一次真实 review→fix 整改三轮触顶的记录；一次入队三步写入中途中断后由 resume 补齐的真实记录；一次真实 validate 多轮补证未被判无进展的记录。
 
 ### 0.5.0 复核补正（2026-10-02）
@@ -327,9 +279,17 @@
 | run-20261003-06 | **入队中断补齐**（① 后中断） | resume：无结果快照 → 入队阶段，enq 编号与定义快照和实际 Task 一致、入队前状态且无调用记录 → 判同一次入队，按同一 `enq-run-20261003-06-01` 补 ②③，不新建 Run、补齐前不调用阶段；随后正常执行 code/review，flow [code, review] 正常边界截断 completed（标注未执行 validate/fix、验收 unknown、列入人工介入）；二次 resume 三文件 SHA256 不变（noop） |
 | run-20261003-07 | **无进展加速停止 + 出队中断补齐** | code 同因连败两轮（stage_result=code/failed/1→2、candidate 两叶 null、findings/acceptance 缺失、next 相同）→ **判无进展 failed（加速停止）**，重试预算 code 1/2 剩余额度不消费；出队中断（结果快照已写、Task running、队列缺 deq）→ resume 先分阶段（有快照→出队阶段）补 Task 终态 failed 与队列 deq，**不误判「入队前状态却已有阶段调用记录」**；二次 resume noop |
 | legacy 项目 | **v0.4 旧记录恢复**（无 enq-/deq- 编号、七列旧清单） | resume：旧记录例外——run-id + slug 定位唯一行、入队定义快照核对一致、有结果快照 → 出队阶段，就地写入旧行既有的「出队结论与时间」单元格（不新增列、不迁移）→ 旧 Run 收尾 completed；二次 resume noop；新 run 前置判定为「没有合格任务」而非「存在未完成 Run」（旧 Run 不再阻挡）；七列块列结构不变 |
-| run（未建 Run） | **slug 同名收养核对**（A3 实测） | 既有 `.cohestra/handoffs/orphan-probe/`（attended 诗歌任务，completed）与 cadra 新 Task orphan-probe（probe.txt 文本修改）同名：add 记录「绑定时已有交付（主题摘要）」并报告不符；run 前置收养核对判主题明显不对应 → 不接续、不入队、不建 Run（无 run-20261003-08、队列无行、Task 保持 ready），请用户选择 |
+| run（未建 Run） | **slug 同名收养核对**（A3 实测） | 既有 `.yuzio/cohestra/handoffs/orphan-probe/`（attended 诗歌任务，completed）与 cadra 新 Task orphan-probe（probe.txt 文本修改）同名：add 记录「绑定时已有交付（主题摘要）」并报告不符；run 前置收养核对判主题明显不对应 → 不接续、不入队、不建 Run（无 run-20261003-08、队列无行、Task 保持 ready），请用户选择 |
 
 - 不变量核对：proj 队列 11 行全部带 deq 结论；7 个 Run 全部 completed；9 任务终态 6 completed（dep-parent、backfill-task、filler-task、dep-child、after-task、resume-task）3 failed（loop-task、mode-task、fail-task）；legacy 七列块无编号列新增。
 - 关键哈希（SHA256，UTF-8）：loop.txt=39ecaae9b715b0495be311e4a4507b4057a304bfae631b9419da45cc5067d6ce（fix-03 后 AC 全满足，遗留 loop.txt.bak 为 F-004 证据）；parent.txt=28ec5132ab5ff91f794cf40d9fc2baaff816d367798360724d8d7c24f85b2a76（rev-1「Parent v2.」）；proj queue/order.md=d25653ce21fb6bb3bf3d054c4c19c8b75e645c8e927455375a7b55f280cf773a；run-20261003-05.md=3d1fcf4a13a8513fe955666b5282bec979c4553b68b44931fac99912e396be68；run-20261003-05-report-01.md=f35319ae703682073a26ec1988104bc95d2e7922891775dff954426f26ab35a9；legacy queue/order.md=4d2e0e3742b9f3d70ac2767f252b2c2404c1ed90613ccd56a595a0f84ecc7ce5。
 - 未执行（如实列出）：独立智能体会话实测；CLI 安装/升级与远程验证；真实长时运行的自然中断证据（本轮中断均为注入）。本轮未修改技能包与真实用户项目。
 - 闭合情况：0.5.0 与复核补正四列出的待补证据中，「整改三轮触顶」「入队中断补齐」「validate 多轮补证」「依赖排队期间被修订」「slug 同名收养核对」本轮已补同会话实测证据；仍缺独立智能体与 CLI 安装证据。
+
+
+## 2026-10-21 规则精简检查
+
+- 取消固定 verify 提议和未执行记录；Cohestra 根据明确目标自动选择一个起步阶段，显式入口优先；初始化与队列不再执行旧格式兼容。Cadra 通过公共流程索引按入口及条件读取规则。
+- 对照修改前文件，Task 状态与 Gate、终态定义修订、修订重启、Cohestra 契约/终态映射/预算原规则完整保留；索引发布校验、checkpoint、轮次与预算恢复仍适用。
+- 验证：现有 unittest 82/82；更新后的 Cadra 文档模型 47/47（在临时目录运行，未覆盖历史结果 JSON）；两技能 quick_validate、双语结构、全仓相对链接与 diff 空白检查通过。
+- 以上为静态检查与模型推演；阶段自动选择和按需读取尚未进行新的实际智能体调用验证。历史验证记录保留当时事实，不作为现行兼容规则。

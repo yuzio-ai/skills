@@ -1,0 +1,37 @@
+{
+  "task": "greeting-service",
+  "stage": "code",
+  "round": 1,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_primary_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+  },
+  "contract": {
+    "contract": "0.8",
+    "task": "greeting-service",
+    "status": "in_progress",
+    "execution_mode": "unattended",
+    "stage_result": {
+      "stage": "code",
+      "status": "completed",
+      "round": 1
+    },
+    "candidate": {
+      "commit": null,
+      "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_primary_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+    },
+    "next": {
+      "stage": "review",
+      "allowed": true,
+      "reason": "stage_completed"
+    },
+    "blocked": {
+      "value": false,
+      "reason": null
+    }
+  },
+  "handoff": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_primary_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md",
+  "handoff_sha256": "00bef7fcae0f1d52e33030f3785f44603d7c7b79f342a0916a2cf3e4525ac62c",
+  "old_sha256": null,
+  "candidate_manifest_sha256": "8ca4e3f66e148455a98025298fb52cd8c4f1b2aec4547c729b7553611aaa337b"
+}

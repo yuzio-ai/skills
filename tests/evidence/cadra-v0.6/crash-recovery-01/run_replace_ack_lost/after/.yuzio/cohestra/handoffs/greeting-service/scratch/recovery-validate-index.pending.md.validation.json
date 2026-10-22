@@ -1,0 +1,14 @@
+{
+  "validated": true,
+  "parser": "JSON parser for YAML 1.2 JSON subset",
+  "pending_path": ".yuzio/cohestra/handoffs/greeting-service/scratch/recovery-validate-index.pending.md",
+  "sha256": "1ca79c5dea1f20143e9678aedf4a9e63d6766b2b7bef3aa108d3dc397d6250a8",
+  "stage": "validate",
+  "round": 1,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_replace_ack_lost/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+  },
+  "handoff_sha256": "376fea8c1b5a7bb6de3efd11529ebd4a5b439acb95821e05bf2dba6154bc1ee9",
+  "time": "2026-10-22T14:23:28.872063+08:00"
+}

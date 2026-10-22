@@ -1,0 +1,69 @@
+{
+  "checkpoint_01": {
+    "ordinary_authorization_false": true,
+    "dependency_completed_with_3_real_calls": true,
+    "main_running_zero_intents": true,
+    "main_budget_zero": true,
+    "main_not_yet_implemented": true
+  },
+  "checkpoint_02": {
+    "prior_files_changed": [
+      ".yuzio/cadra/runs/run-20261022-02.md"
+    ],
+    "ordinary_authorization_false": true,
+    "one_charged_unclosed_code_call": true,
+    "actual_handoff_present": true
+  },
+  "checkpoint_03": {
+    "prior_files_changed": [
+      ".yuzio/cadra/runs/run-20261022-02.md",
+      ".yuzio/cadra/tasks/greeting-service.md",
+      ".yuzio/cohestra/handoffs/greeting-service/README.md"
+    ],
+    "original_call_id_and_charge_preserved": true,
+    "first_revision_completed_calls": 3,
+    "pending_requirement_revision": 2,
+    "pending_calls": 0,
+    "initial_business_and_handoff_unchanged": true,
+    "repeat_resume_hashes_and_budget_unchanged": true
+  },
+  "checkpoint_04": {
+    "prior_files_changed": [
+      ".yuzio/cadra/runs/run-20261022-03.md",
+      ".yuzio/cadra/tasks/prefix-source.md"
+    ],
+    "dependency_revision_2_draft": true,
+    "requirement_revision_2_blocked_before_call": true,
+    "no_calls_or_authorization_consumed": true,
+    "business_and_historical_evidence_unchanged": true
+  },
+  "final": {
+    "passed": true,
+    "runs": 6,
+    "actual_stage_calls": 9,
+    "archive_hashes_verified": 122,
+    "prior_files_changed": [
+      ".yuzio/cadra/tasks/greeting-service.md",
+      ".yuzio/cadra/tasks/prefix-source.md",
+      ".yuzio/cohestra/handoffs/greeting-service/README.md",
+      "greeting.py",
+      "test_greeting.py"
+    ],
+    "old_files_unchanged": 77,
+    "same_interrupted_call_preserved": true,
+    "pending_requirement_retained_and_executed": true,
+    "policy_closeouts_have_zero_calls": true,
+    "historical_runs_handoffs_candidates_unchanged": true,
+    "repeat_resume": [
+      {
+        "file": "run-02-repeat-resume.json",
+        "files_unchanged": 56
+      },
+      {
+        "file": "run-06-repeat-resume.json",
+        "files_unchanged": 119
+      }
+    ],
+    "skill_source_files_unchanged": 45
+  }
+}

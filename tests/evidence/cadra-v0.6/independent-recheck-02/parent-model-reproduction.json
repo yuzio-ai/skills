@@ -1,0 +1,88 @@
+{
+  "scope": "Composition of test-only model functions, not a runtime execution",
+  "prepare": "prepared",
+  "recover_call": "failed",
+  "run": {
+    "protocol": "0.6",
+    "run_id": "r1",
+    "status": "completed",
+    "tasks": [
+      {
+        "budget": {
+          "calls": 1,
+          "remediation": 0,
+          "retries": {}
+        },
+        "calls": [
+          {
+            "id": 1,
+            "stage": "review",
+            "before": {
+              "contract": "0.8",
+              "task": "a",
+              "execution_mode": "unattended",
+              "status": "in_progress",
+              "stage_result": {
+                "stage": "code",
+                "status": "completed",
+                "round": 1
+              },
+              "candidate": {
+                "commit": null,
+                "snapshot": null
+              },
+              "next": {
+                "stage": "review",
+                "allowed": true,
+                "reason": "stage_completed"
+              },
+              "blocked": {
+                "value": false,
+                "reason": null
+              }
+            },
+            "dispatch": "prepared",
+            "closed": false,
+            "result": null,
+            "charged": {
+              "calls": 1,
+              "remediation": 0,
+              "retry_stage": null
+            }
+          }
+        ],
+        "authorization_consumed": false,
+        "checkpoint": {
+          "pending_call": 1,
+          "last_delivery": null
+        },
+        "state": "failed",
+        "result": {
+          "state": "failed",
+          "reason": "unconfirmed delivery"
+        },
+        "slug": "a",
+        "revision": 1,
+        "previous_run": null,
+        "definition": {
+          "requirement": "R1"
+        }
+      }
+    ]
+  },
+  "current": {
+    "protocol": "0.6",
+    "slug": "a",
+    "revision": 2,
+    "preparation": "ready",
+    "definition": {
+      "requirement": "R1"
+    },
+    "changed_fields": [
+      "execution_policy"
+    ]
+  },
+  "revision_action": {
+    "exception": "inconsistent consumption evidence"
+  }
+}

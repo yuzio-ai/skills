@@ -1,0 +1,12 @@
+{
+  "time": "2026-10-22T12:28:45.482434+08:00",
+  "run": "run-20261022-02",
+  "last_call": 1,
+  "original_budget": {
+    "calls": 1,
+    "remediation": 0,
+    "retries": {}
+  },
+  "recovery": "code-02 handoff complete; README old; restore by Cohestra publication rules",
+  "checks": "source chain, definition, dispatch, snapshot hashes, expected old README all verified"
+}

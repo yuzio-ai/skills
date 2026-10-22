@@ -1,0 +1,8 @@
+test_blank (test_alpha.AlphaTests.test_blank) ... ok
+test_named (test_alpha.AlphaTests.test_named) ... ok
+test_values (test_beta.BetaTests.test_values) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK

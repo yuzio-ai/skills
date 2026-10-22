@@ -1,0 +1,6 @@
+--- baseline/alpha.py
++++ candidate/alpha.py
+@@ -1,2 +1,2 @@
+ def greet(name):
+-    raise NotImplementedError
++    return f"Hello, {name or 'world'}!"

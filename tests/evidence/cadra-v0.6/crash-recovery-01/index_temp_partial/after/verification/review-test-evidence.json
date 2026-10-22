@@ -1,0 +1,22 @@
+{
+  "stage": "review",
+  "executor": "/root/crash_index_recovery",
+  "started_at": "2026-10-22T14:19:36.134804+08:00",
+  "completed_at": "2026-10-22T14:19:36.207151+08:00",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "test_prefix",
+    "test_greeting"
+  ],
+  "cwd": "/private/tmp/cadra-crash-recovery-xjhbj4gn/index_temp_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01",
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "test_prefix_is_hello_string (test_prefix.GreetingPrefixTests.test_prefix_is_hello_string) ... ok\ntest_repeated_calls_are_stable (test_prefix.GreetingPrefixTests.test_repeated_calls_are_stable) ... ok\ntest_empty_name_uses_world (test_greeting.GreetingTests.test_empty_name_uses_world) ... ok\ntest_nonempty_names_are_preserved (test_greeting.GreetingTests.test_nonempty_names_are_preserved) ... ok\ntest_prefix_is_obtained_on_each_call (test_greeting.GreetingTests.test_prefix_is_obtained_on_each_call) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+  "scope": "fixed candidate; actual tests during independent source review"
+}

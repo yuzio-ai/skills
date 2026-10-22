@@ -1,0 +1,11 @@
+test_blank (test_alpha.AlphaTests.test_blank) ... ok
+test_internal_whitespace (test_alpha.AlphaTests.test_internal_whitespace) ... ok
+test_named (test_alpha.AlphaTests.test_named) ... ok
+test_surrounding_whitespace (test_alpha.AlphaTests.test_surrounding_whitespace) ... ok
+test_whitespace_only (test_alpha.AlphaTests.test_whitespace_only) ... ok
+test_values (test_beta.BetaTests.test_values) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK

@@ -1,0 +1,50 @@
+{
+  "id": 2,
+  "reason": "已恢复 code-01 完整交付，合法 next=review；续跑依赖 prefix-source 当前 revision 1 completed 已核对；原实施授权与 resume 授权",
+  "stage": "review",
+  "execution_mode": "unattended",
+  "before": {
+    "contract": "0.8",
+    "task": "greeting-service",
+    "status": "in_progress",
+    "execution_mode": "unattended",
+    "stage_result": {
+      "stage": "code",
+      "status": "completed",
+      "round": 1
+    },
+    "candidate": {
+      "commit": null,
+      "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+    },
+    "next": {
+      "stage": "review",
+      "allowed": true,
+      "reason": "stage_completed"
+    },
+    "blocked": {
+      "value": false,
+      "reason": null
+    }
+  },
+  "dispatch": "dispatched",
+  "closed": false,
+  "result": null,
+  "charged": {
+    "calls": 1,
+    "remediation": 0,
+    "retry_stage": null
+  },
+  "prepared_at": "2026-10-22T13:21:39.243456+08:00",
+  "dispatched_at": "2026-10-22T13:21:51.180507+08:00",
+  "invocation": {
+    "skill": "/Users/zhubowen/Documents/yuzio-ai/skills/cohestra/SKILL.md",
+    "entry": "review",
+    "project": "/private/tmp/cadra-engineering-recovery-kvs3043i",
+    "cohestra_task": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service",
+    "input": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-01.md",
+    "execution_mode": "unattended",
+    "executor": "engineering_resume_delivered",
+    "mechanism": "agent follows loaded Cohestra review instructions"
+  }
+}

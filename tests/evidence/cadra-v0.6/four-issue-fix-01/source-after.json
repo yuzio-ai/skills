@@ -1,0 +1,22 @@
+{
+  "cadra/SKILL.md": "e22303f955e177f0fe7297bfbd841aa02a809457e13c51bfe2d03ee574a30c19",
+  "cadra/references/storage.md": "2ca62f46ac97c261e684243aca629e474a881bf15ab8b293ba2ee29428b6b259",
+  "cadra/references/ready.md": "c39f93fc244c20ac459454d907489183d5a781f5c882a95bc864ea7be07b2aca",
+  "cadra/references/report.md": "61dd7f44ab93d0b9634a6bdcb3c38b5e84992c217d2a1ca6d5af30d93cccb332",
+  "cadra/references/revision-rules.md": "febecfe6e41498c6afdc023cfdfdf0e07c71467fac62b3c3f6cc4c278fa6aebd",
+  "cadra/references/workflow.md": "a640b90bd9ae555c0152477217abf16e4d689ed32541f1355d6abba0ce390bb1",
+  "cadra/references/contract.md": "f01d400115a76df0ea3153eb1418eea28f2310c6b8d8855678b1e761e116e3fe",
+  "cadra/references/task-rules.md": "1d97ad052c3cd72177a648f0609722b7ae7bfe6f30af989bd1e8b6950605b716",
+  "cadra/references/add.md": "889bea1a750c1783093c176c466034b98e75a71f593032b87db14de5821e7f7e",
+  "cadra/references/list.md": "45ffb80f8609abb2b158cab34d0f02e17566d74bc57c51738dd18355b898bd6d",
+  "cadra/references/resume.md": "ad07e924af6aab5e2e5e21ac3f8ac189b9c19f4623f73319ac4cf4516582f301",
+  "cadra/references/recovery.md": "abb4f7b8913495236f20154e033a2ea5b86898cc3eaf9e7e215064544e7f764d",
+  "cadra/references/run-rules.md": "af714222071075e8da540f18b89461d5accacdafc1bb22d45fedde4adde2631c",
+  "cadra/references/run.md": "daafe53471d12e5dc234b3b92dc51ed363af2eef17622d0f88a938164c0be319",
+  "cadra/references/flow.md": "2ffda731b8dd4f53f8c74cebac6057e786111284fc8c0354544c154a6444c719",
+  "cadra/assets/run.md": "823dbdc794fb041255e25a83104c69f4a157ce77db87abf0d8fad88072f3f5bf",
+  "cadra/assets/task.md": "da1fccc119d1ae09cbfad68493aa46be74fe9564637e6ee51dede41c926f93fc",
+  "cadra/assets/project/README.md": "ee28f32fac08bb4c4ecdd44af6aea5571cbab50303d6b14634dfaacf4de09411",
+  "tests/cadra_v06_model.py": "f3e35a42a5c11dcf167b82e9410bf3bd61fe882ebc351c8688849e1b6f34894b",
+  "tests/test_cadra.py": "f99741d59ed05b0f96c4888c08c4f9c71658c8f3a6134dc44802f41dd88e32d9"
+}

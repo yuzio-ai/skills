@@ -1,0 +1,16 @@
+{
+  "case": "handoff_partial",
+  "mechanism": "actual file-writer subprocess SIGKILL; relocated replay fixture",
+  "writer_pid": 78180,
+  "writer_exit_code": -9,
+  "boundary": "primary_partial",
+  "target": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/code-01.md",
+  "temporary": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/.yuzio/cohestra/handoffs/greeting-service/.code-01.md.crashed.tmp",
+  "bytes_written": 1939,
+  "complete_payload_bytes": 3879,
+  "readback_acknowledgement_received": false,
+  "original_call_stage": "code",
+  "original_call_id": 1,
+  "original_budget_calls": 1,
+  "dispatch_evidence": "/private/tmp/cadra-crash-recovery-xjhbj4gn/handoff_partial/verification/dispatch-call-01.json"
+}

@@ -1,0 +1,11 @@
+'' => 'Hello, world!'
+' \t\n' => 'Hello, world!'
+'\xa0' => 'Hello, world!'
+'\u2003 Ada \u3000' => 'Hello, Ada!'
+' A\t B ' => 'Hello, A\t B!'
+' \x00 ' => 'Hello, \x00!'
+' \u200b ' => 'Hello, \u200b!'
+' é ' => 'Hello, é!'
+' 你好🌍 ' => 'Hello, 你好🌍!'
+' world ' => 'Hello, world!'
+10 boundary cases and 2 dynamic-prefix calls passed

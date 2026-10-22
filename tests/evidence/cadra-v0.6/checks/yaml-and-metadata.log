@@ -1,0 +1,4 @@
+PASS: YAML syntax and applicable metadata checks cadra/SKILL.md
+PASS: YAML syntax and applicable metadata checks cadra/assets/task.md
+PASS: YAML syntax and applicable metadata checks cadra/assets/run.md
+Fallback only: native quick_validate unavailable (PyYAML missing).

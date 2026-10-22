@@ -1,0 +1,18 @@
+{
+  "time": "2026-10-22T13:21:51.238360+08:00",
+  "executor": "engineering_resume_delivered",
+  "independent_of_author": "engineering_resume_first",
+  "python": "3.14.8",
+  "cwd": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "-c",
+    "from greeting import greet\nfrom unittest.mock import patch\ncases = ['', 'Ada', ' ', '  Ada  ', '\\t\\n', 'A B', '你好🌍', 'e\\u0301', '\\0']\nfor name in cases:\n    expected = 'Hello, ' + ('world' if name == '' else name) + '!'\n    assert greet(name) == expected, repr(name)\nwith patch('greeting.greeting_prefix', side_effect=['Good day', 'Hola']) as provider:\n    assert greet('A') == 'Good day, A!'\n    assert greet('') == 'Hola, world!'\n    assert provider.call_count == 2\nprint('9 boundary cases and 2 dynamic-prefix assertions passed')\n"
+  ],
+  "returncode": 0,
+  "stdout": "9 boundary cases and 2 dynamic-prefix assertions passed\n",
+  "stderr": "",
+  "manifest_sha256": "3e64a66955863bf22ef1b03b1430444bbadea0c6492611664b1bc66c2a46d33d",
+  "permissions": "default sandbox; no network/install/commit"
+}

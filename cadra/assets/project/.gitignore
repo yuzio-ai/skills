@@ -1,2 +1,2 @@
-# Local artifacts are not run records.
-.DS_Store
+# Local execution data; also add /.yuzio/ to the project root .gitignore.
+*

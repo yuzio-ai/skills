@@ -1,0 +1,8 @@
+{
+  "cadra/references/workflow.md": "eb848b735a0edd5e77c7f5b7cb6c4f8e61a2e2d557152e8f0d62c1d70ee033ef",
+  "cadra/references/revision-rules.md": "febecfe6e41498c6afdc023cfdfdf0e07c71467fac62b3c3f6cc4c278fa6aebd",
+  "cadra/references/recovery.md": "ad0897e400735b7cc5804c8a1e0800638f611cfc6aac9a42eccccab2baca770d",
+  "tests/cadra_v06_model.py": "d5cff2f0c282918890f43608e8f8cfd0f367d001dc97b8e89cfac8dabf5dac7a",
+  "tests/test_cadra.py": "c0d439cd312dceb22e22177ebc088630777556ee19e64e387700ea19f1f6786b",
+  "tests/cadra-scenarios.md": "0083907646a2539252e558fe4ee3d4286956b64db1e2a9624b4ec319970a00d6"
+}

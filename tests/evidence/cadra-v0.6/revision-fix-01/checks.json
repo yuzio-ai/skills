@@ -1,0 +1,21 @@
+{
+  "full_unittest": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "tests": 168,
+    "exit_code": 0
+  },
+  "cadra_tests": 61,
+  "added_regressions": 6,
+  "red_before_fix": {
+    "failures": 4,
+    "tests": 61
+  },
+  "static": {
+    "documents": 21,
+    "relative_links": 161,
+    "broken": 0,
+    "exit_code": 0
+  },
+  "diff_check_exit_code": 0,
+  "quick_validate_exit_code": 1
+}

@@ -33,18 +33,20 @@ The rules and stage prompts live inside the skill package (currently documented 
 
 ## cadra
 
-Cadra is task orchestration: it manages task preparation, queue, order, status, recovery and run reports, and advances queued tasks serially in unattended runs. It does not define the engineering stages — those belong to Cohestra; Cadra only declares a stage sequence (flow preset) and calls Cohestra stages, driven strictly by Cohestra's machine-readable state.
+Cadra prepares tasks and manages execution order, state, recovery and reports, calling Cohestra stages serially in unattended runs. Task files hold definitions, revisions, draft/ready preparation state and the Ready Gate. Run files hold the ordered task list, execution state, checkpoints and fixed results. `list` derives current task and queue views from explicit Run provenance; no separate queue file is maintained.
 
-A task moves through **draft → ready → queued → running → completed / blocked / failed**; a run is serial (`parallelism = 1`) and ends as completed, stopped or interrupted, and `resume` continues unfinished runs from persisted state without repeating finished tasks or finished stages. A run is only created after the target passes the Git / `.yuzio/cohestra` precondition check. Dependency chains advance one layer per run: a task passes the Ready Gate and enters the queue only after every dependency is completed, so a run never holds a task together with an unfinished dependency.
+A flow accepts a preset or a nonempty stage list: its first entry is the start, and its distinct entries are the allowed stages. Intermediate order does not prescribe execution order. First execution starts there; subsequent calls follow Cohestra's legal `next`. Required follow-up outside the allowed set blocks the task. Dependencies must be completed for their current definitions before admission; dependency chains advance one layer per Run.
 
-For a new task without any prior delivery or call, `run` starts at the first stage in its flow. To recover blocked or failed tasks, explicitly select them in a new `run`; the previous run keeps its recorded outcome. Editing the definition of a task that already reached a terminal state sends it back to draft and through the Ready Gate again, with the old and new definitions kept side by side. Requirement or flow changes restart at the new flow's first stage. Changes limited to dependencies or execution policy retry the verified pending stage for blocked/failed tasks, or close the revision without a stage call for completed tasks. Task definitions cannot be edited while their run is unfinished. Unattended execution is bounded by three limits: a per-stage failure retry budget (2 extra calls), a remediation-round cap (3 rounds) and a per-task call budget (16 calls); exhausting any of them records `failed` and adds the task to the human-intervention list. The no-progress check fires only when two consecutive calls of the same stage leave every structured field unchanged; the validate in-stage evidence backfill is exempt and bounded by the call budget instead. Enqueue and dequeue use a three-step write with an operation id, and `resume` idempotently completes a partially written enqueue or dequeue. An existing seven-column queue list is not migrated: a new eight-column block is appended and used from then on.
+A project has at most one unfinished Run, whose tasks cannot be edited. `resume` continues that Run; explicit recovery of blocked/failed tasks starts a new Run without changing old outcomes. Definition changes affecting admission return preparation to draft. Definitions already included in a Run get a new revision, pass the Gate again, and restart or close by verification according to the changed fields. Historical reports use the original Run snapshots.
+
+Execution has three limits: two extra failure retries per stage, three remediation rounds and sixteen total calls per task per Run. Identical summary fields do not cause early termination. Call intent, budget and result are stored in one Run file using validated temporary-file replacement and readback. Uncertain dispatch or delivery stops execution rather than triggering a blind retry. Only the current task/Run protocol is supported; old records are not automatically migrated.
 
 | To learn about | Read |
 |---|---|
 | Routing, execution rules, boundaries, version and provenance | [cadra/SKILL.md](cadra/SKILL.md) |
 | Task/Run state machines, queue order, flow presets, Cohestra contract, unattended rules | [references/workflow.md](cadra/references/workflow.md) |
 | Per-entry responsibilities (add / ready / list / run / resume / report) | [references/](cadra/references/) |
-| Task and run skeletons, `.cadra` container template | [assets/](cadra/assets/) |
+| Task and run skeletons, `.yuzio/cadra` container template | [assets/](cadra/assets/) |
 | Maintainer acceptance checklist | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
 
 ## relatra
@@ -143,7 +145,7 @@ $cohestra report
 
 The argument labels in these examples (需求 / 参考 / 问题 / 被核对 / 上游依据) are Chinese because the skill's own prompts are written in Chinese; keep them as shown, only the placeholders change. A handoff path may also be replaced by the corresponding task directory, whose task README points to the valid inputs. Automatic stage selection, stop rules and on-demand verify are in [cohestra/SKILL.md](cohestra/SKILL.md) and the [common flow](cohestra/references/workflow.md).
 
-Cadra invocations manage the task queue around those stages; when the target project has no `.cadra`, the skill warns first and runs a minimal initialization:
+Cadra invocations manage the task queue around those stages; when the target project has no `.yuzio/cadra`, the skill warns first and runs a minimal initialization:
 
 ```text
 $cadra add
@@ -166,10 +168,10 @@ $cadra report
 Run：<run-id>
 ```
 
-The labels are Chinese for the same reason as above. Task state lives in `.cadra`; the single-task flow and engineering evidence live in `.yuzio/cohestra`, linked by reference and never copied across. The state machines, Ready Gate, Cohestra call contract and unattended rules are in [cadra/references/workflow.md](cadra/references/workflow.md).
+The labels are Chinese for the same reason as above. Task state lives in `.yuzio/cadra`; the single-task flow and engineering evidence live in `.yuzio/cohestra`, linked by reference and never copied across. The state machines, Ready Gate, Cohestra call contract and unattended rules are in [cadra/references/workflow.md](cadra/references/workflow.md).
 
 ## Maintenance
 
-Release **0.10.1**, collaboration protocol **v0.8**; cadra is release **0.5.0**, task/run protocol **v0.5**; Relatra is **0.2.0**, report schema **v2**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
+Release **0.10.1**, collaboration protocol **v0.8**; cadra is release **0.6.0**, task/run protocol **v0.6**; Relatra is **0.2.0**, report schema **v2**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
 
 After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).

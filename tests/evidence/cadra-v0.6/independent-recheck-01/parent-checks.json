@@ -1,0 +1,26 @@
+{
+  "checked_files": 47,
+  "changed_files": [],
+  "protocol_model_reproduction": {
+    "basis_revision": 2,
+    "cumulative_fields": [
+      "execution_policy"
+    ],
+    "revision_action": "check_recovery",
+    "old_R1_contract_decision": "completed"
+  },
+  "interpretation": "Individual model functions reproduced. No end-to-end agent acceptance of old requirement was demonstrated.",
+  "actual_evidence_checked": {
+    "all_recorded_hashes_match": true,
+    "changed_existing_files": [
+      ".yuzio/cadra/runs/run-20261022-02.md",
+      ".yuzio/cadra/tasks/alpha-greeting.md",
+      ".yuzio/cohestra/handoffs/alpha-greeting/README.md"
+    ],
+    "repeat_resume_unchanged": true,
+    "policy_preserved_cohestra_and_run02": true,
+    "run02_calls": 3,
+    "run03_calls": 0,
+    "requirement_and_flow_unchanged": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "entry": "$cohestra code",
+  "target": "/private/tmp/cadra-engineering-recovery-kvs3043i",
+  "task": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cadra/tasks/greeting-service.md",
+  "revision": 3,
+  "execution_mode": "unattended",
+  "input_requirement": "在 greeting.py 的 greet(name: str) 中先对 name 执行 strip()，去除首尾空白；strip 后为空则返回 Hello, world!，非空则返回 Hello, <trimmed name>!，保留内部空白。继续调用 prefix.py 的 greeting_prefix() 获取前缀。仍仅处理字符串，不处理非字符串；只修改问候行为及必要标准库 unittest，不做其他业务改动。AC-1：非空裁剪结果使用裁剪后的名称，内部空白及 Unicode 保留；AC-2：空串或仅含空白的字符串均使用 world；AC-3：前缀仍来自 greeting_prefix()；AC-4：相关 unittest 通过。",
+  "revision_basis": {
+    "kind": "修订重启",
+    "stage": "code",
+    "basis": "最近执行依据 run-02 revision 1 completed；链尾 run-03 首调用前依赖受阻，0 calls且授权未消费；prefix-source revision 2 已由 run-04 completed 解除。累计 requirement/execution_policy 变化，small-change start=code。用户明确范围 greeting-service，修订普通范围，恢复列表空。"
+  },
+  "call": 1,
+  "time": "2026-10-22T13:31:07.923868+08:00"
+}

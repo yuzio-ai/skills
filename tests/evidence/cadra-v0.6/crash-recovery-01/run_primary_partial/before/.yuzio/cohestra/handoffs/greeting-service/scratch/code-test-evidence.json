@@ -1,0 +1,21 @@
+{
+  "started_at": "2026-10-22T13:18:53.746741+08:00",
+  "completed_at": "2026-10-22T13:18:53.856108+08:00",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "-m",
+    "unittest",
+    "-v",
+    "test_prefix",
+    "test_greeting"
+  ],
+  "cwd": "/private/tmp/cadra-crash-recovery-xjhbj4gn/run_primary_partial/.yuzio/cohestra/handoffs/greeting-service/scratch/candidate-01",
+  "python": "3.14.8",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "permission": "default sandbox; local standard library, no network or packages",
+  "candidate_manifest_sha256": "8ca4e3f66e148455a98025298fb52cd8c4f1b2aec4547c729b7553611aaa337b",
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "test_prefix_is_hello_string (test_prefix.GreetingPrefixTests.test_prefix_is_hello_string) ... ok\ntest_repeated_calls_are_stable (test_prefix.GreetingPrefixTests.test_repeated_calls_are_stable) ... ok\ntest_empty_name_uses_world (test_greeting.GreetingTests.test_empty_name_uses_world) ... ok\ntest_nonempty_names_are_preserved (test_greeting.GreetingTests.test_nonempty_names_are_preserved) ... ok\ntest_prefix_is_obtained_on_each_call (test_greeting.GreetingTests.test_prefix_is_obtained_on_each_call) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n"
+}

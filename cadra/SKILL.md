@@ -1,51 +1,35 @@
 ---
 name: cadra
-description: 通过 add 创建或编辑任务、ready 执行准入门、list 查看状态、run 按既定顺序无人值守串行推进、resume 中断恢复、report 输出执行摘要；管理任务准备、队列、顺序、状态、恢复和执行报告，结果落到 .cadra。单任务工程流程由 Cohestra 阶段提供，Cadra 只声明阶段序列并按机器可读状态调用；不并行、不调度 DAG、不做运行时；仅讨论流程不触发执行。
+description: 通过 add、ready 准备任务，list 查询，run 按既定顺序无人值守串行调用 Cohestra，resume 恢复中断，report 汇总结果。Task 保存定义与准入，Run 保存执行事实，资料位于 .yuzio/cadra。仅讨论流程不触发执行。
 license: MIT
 ---
 
 # Cadra
 
-一个任务编排技能：管理多个待执行任务，并在无人值守场景下按既定顺序串行推进。Cadra = Task Orchestration，负责任务准备、队列、顺序、状态、恢复和执行报告；单个任务内部的工程流程协议由 Cohestra 提供，Cadra 只声明阶段序列并调用其阶段。技能版本见 [release.json](release.json)，任务与 Run 协议为 v0.5。Task、Run、Ready Gate、checkpoint、结构化状态等术语见 [公共流程](references/workflow.md)。
+任务编排技能。任务准备、顺序、执行状态与恢复归 Cadra；单任务工程阶段和证据归 Cohestra。发行版与任务/Run 协议见 [release.json](release.json)。
 
-## 路由
+## 入口与读取
 
-`$cadra <入口>` 表示技能调用意图，不是终端命令；其他工具采用其技能调用写法。调用后附任务描述、任务 slug、run-id 或本次补充。
+`$cadra <入口>` 是技能调用意图，不是终端命令。先读 [公共流程](references/workflow.md)、本次入口和 release.json，再按入口条件加载规则；不要预读其他入口、全部任务或全部 Run 正文。
 
-| 入口 | 按需读取 | 职责 |
-|---|---|---|
-| add | [add](references/add.md) | 创建或编辑 Task，落盘为 draft |
-| ready | [ready](references/ready.md) | 执行 Ready Gate，draft → ready |
-| list | [list](references/list.md) | 只读展示任务与 Run 状态 |
-| run | [run](references/run.md) | 建立新 Run，支持首次启动、显式恢复 blocked/failed 与终态修订后的重启 |
-| resume | [resume](references/resume.md) | 从持久化状态恢复未完成 Run |
-| report | [report](references/report.md) | 生成本轮执行摘要 |
+| 入口 | 职责 |
+|---|---|
+| [add](references/add.md) | 创建或编辑任务定义 |
+| [ready](references/ready.md) | 检查 Ready Gate |
+| [list](references/list.md) | 只读展示任务、队列和 Run |
+| [run](references/run.md) | 建立并串行执行新 Run |
+| [resume](references/resume.md) | 续跑或收尾未完成 Run |
+| [report](references/report.md) | 生成指定 Run 的执行摘要 |
 
-## 执行规则
+## 共同边界
 
-以下规则适用于所有入口。
-
-1. 先固定目标项目绝对路径并读取适用项目规则；目标不因技能安装位置或切换目录而改变。未给路径时使用当前任务项目，多个候选无法区分时再询问。
-2. 进入写入口（add、ready、run、resume、report）前先确认目标项目已有 `.cadra`：缺失时报告目标绝对路径并说明将执行一次最小初始化——按 [容器模板](assets/project/) 建 `README.md`、`tasks/`、`queue/`（含清单表头）、`runs/` 与忽略规则，不生成任务、不建 Run、不暂存或提交——完成后继续本入口；已有容器缺项时最小补齐，不重写既有文件。`list` 保持纯只读：容器缺失时只报告“未初始化”与目标绝对路径，不执行初始化。目标不明确、指向技能源仓库或无法安全写入时不初始化，先澄清或报告。
-3. 每次只读取 [公共流程](references/workflow.md)、所选入口说明和 [release.json](release.json)，写交付时再读对应骨架。不预读其他入口、全部任务或全部 Run 记录。
-4. Cadra 只写 `.cadra`，不写 `.cohestra`：单任务流程与工程证据归 Cohestra，Cadra 通过 `cohestra_task` 引用关联，不把 handoff 内容复制进 `.cadra`。阶段的业务语义、review 与 validate 标准、代码修改均不属于 Cadra。
-5. 只执行指定的入口，不因入口相邻或任务仍在队列内而自动继续；`run` 内部的串行推进属该入口自身行为，不算跨入口继续。用户只讨论流程或调用含义时解释清楚即可，不隐式建任务、不隐式启动 Run。
-6. 不做并行执行、DAG 并发调度、OS 定时器、Runtime/daemon 或 Agent 动态选择；V1 `parallelism = 1`，同一项目同时至多一个未完成 Run。
-7. run 建立与入队前完成目标/初始化前提与契约检查（公共流程第 6.1 节）；首次启动、显式恢复与修订重启的首个调用分别见第 6.1、6.2、6.3 节。无人值守推进受三项上限约束——逐阶段失败重试预算、整改轮上限（3 轮）与任务调用预算（16 次），任一耗尽即记 failed 并列入需人工介入，不无限重试、不无限整改。入队与出队按公共流程第 4 节的三步写入与操作编号落盘；中断留下部分写入时不重写、不新建 Run，由 resume 按同一编号幂等补齐。resume 只续未完成 Run，不重开终态任务；add 不编辑未完成 Run 中的任务定义，终态任务的定义修订按第 2.2 节回退、重新 Gate 后重启，结束结果按各 Run 的快照保留。
-
-## 边界
-
-Cadra 负责：创建与编辑任务、Ready Gate、优先级、依赖关系、Queue、串行执行、Blocked/Failed 处理、中断恢复、终态修订后的重启准入、Run Report、调用 Cohestra 阶段。
-
-Cadra 不负责：定义 need/design/code/review/fix/validate 的具体规则；自己实现代码修改；自己定义 review 或 validate 标准；并行执行与 DAG 调度；OS 定时器；Runtime/daemon；Agent 动态选择；代替 Cohestra 初始化 `.cohestra`，或在非 Git、不可安全写入的目标上就地开工。Cohestra 若尚未提供 Cadra 所需的机器可读状态，只在 [公共流程](references/workflow.md) 的调用契约中声明接口要求，不替另一个技能实现。
-
-## 来源与版本
-
-- 从本次实际加载的技能目录读取规则和模板，不从工作目录猜测技能位置。
-- 每轮落盘记录实际 Skill 发行版本与任务/Run 协议版本；技能升级不改写任务定义、已确认决定或历史 Run 记录。
-- 同名技能存在多份时使用明确选择的入口；无法确定来源时报告位置并澄清。
-- 不提供 `update` 入口；升级交给技能管理器，项目需要独立固定版本时用项目级安装并随 Git 管理。
+- 固定目标项目绝对路径，读取适用项目规则及 [存储约定](references/storage.md)。未指定时使用当前任务项目；候选无法区分时澄清。技能来源使用本次选定的实际安装目录，不用源仓库规则代替旧安装副本。
+- 只执行指定入口；run 内的串行推进属于该入口。只讨论规则时不创建资料、不启动执行。list 不写文件、不初始化。
+- 写入口缺容器时先报告路径，再按 [容器模板](assets/project/) 最小建立 README、tasks、runs 与忽略规则；已有缺项仅补齐。接续指定任务或 Run 却找不到记录时报告缺口，不能用空初始化代替恢复。目标不明确、指向技能源仓库或不可安全写入时停止。
+- Task 只保存定义与准入；Run 是执行状态的唯一来源。实际工程阶段通过 Cohestra 调用，Cadra 不写 `.yuzio/cohestra`，不复制 handoff 正文。正式执行总结按存储约定处理。
+- 同一项目至多一个未完成 Run，同一时刻至多一个执行中的 Task。不做并行、DAG 调度、定时器、daemon 或 Agent 动态选择。
+- 新版不迁移旧协议或双写。读取到不支持的项目协议时报告路径与版本，停止相关操作，不改旧记录；缺版本视为协议不明。技能升级不重写历史。
 
 ## 交付
 
-结果必须先落盘再汇报。最终回复给出交付物绝对路径、任务或 Run 的状态结论、必要待办、需要人工介入的事项，以及下一步入口调用（`$cadra <入口>` 加准确输入，可直接执行）；无需复述整份文档。
+写入口先落盘回读再汇报。回复交付物绝对路径、状态结论、必要待办与需人工介入事项，附准确的下一入口调用。推荐下一步不等于执行授权。安装、提交和发布不属于普通入口。

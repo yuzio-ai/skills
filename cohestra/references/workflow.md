@@ -153,7 +153,7 @@ blocked:
 
 - `task_completed` 有两种来源：validate 验收通过，或用户声明的终点已到达。两者都写任务 `status: completed`；后者 `acceptance` 可缺省，消费方按其口径标注 `acceptance = unknown`。
 - **validate 完成一致性**：本轮 validate 只有在范围完成、必做问题关闭、所需复审完成且必要证据齐全时才写 `acceptance.status: passed`。一旦本轮判为 passed，待发布 README 必须同时满足：`stage_result: {stage: validate, status: completed, round: 本轮轮次}`、任务 `status: completed`、`acceptance.status: passed`、`next: {stage: null, allowed: false, reason: task_completed}`、`blocked: {value: false, reason: null}`；正文如有状态说明须与之相符，不得留下后续必做阶段；无需重复抄写完成字段。发布前与发布后回读均逐项核对，并与本轮 handoff、候选及完成条件一致；缺项或任一冲突都不能报告索引同步成功。不将仅有 `stage_result.status: completed` 或部分检查通过当作验收 passed；也不把历史 passed 套用到另一轮次或候选。此约束不改变用户声明的非 validate 终点及 verify 不改控制字段的规则。
-- 「用户声明的终点」只存在于对话与交付记录，不进契约；外部编排系统无法读取该声明，只能按任务 flow 推断终点合法性（如 Cadra 终态映射第 7、8 行：flow 含 validate 而验收缺省时判 blocked）。与外部编排配合使用时，终点范围用任务 flow 表达——以 review 收尾选 `review-only` 或显式序列，不靠 `small-change` 等含 validate 的序列提前声明。
+- 「用户声明的终点」只存在于对话与交付记录，不进契约；外部编排系统无法读取该声明，只能按任务 flow 推断终点合法性（如 Cadra 终态映射：flow 允许范围含 validate 而验收缺省时判 blocked）。与外部编排配合使用时，阶段范围用任务 flow 表达——仅允许 review 时选 `review-only` 或 `[review]`，不靠 `small-change` 等允许 validate 的配置提前声明。
 - validate 已确认验收失败时优先推荐 fix/design/need，不因还缺复审改为 pending；缺必要复审且可执行时推荐 review，不能用重复 validate 代替。复审或补证据缺输入、权限、执行条件，或需要人工决定时走受阻路径；不能仅因缺口将来可恢复就允许重复本阶段。
 - 终点到达以该阶段自身交付完成为前提（如 review 必做问题未关闭时不能按终点收尾，仍走 `blocking_findings`）；受阻与失败路径优先于终点表达。
 - `blocked` 优先于 `next` 表达「禁止继续」：`blocked.value: true` 时 `next.allowed` 必为 `false`，任务 `status` 写 `blocked`。

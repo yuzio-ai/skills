@@ -1,0 +1,14 @@
+{
+  "validated": true,
+  "parser": "JSON subset of YAML 1.2",
+  "pending_path": ".yuzio/cohestra/handoffs/greeting-service/scratch/validate-index.pending.md",
+  "sha256": "f6f1539db1b90bb04cf60e3f940db0a7bb5a89508473c69a19ce3a4ce33d7750",
+  "stage": "validate",
+  "round": 1,
+  "candidate": {
+    "commit": null,
+    "snapshot": "/private/tmp/cadra-engineering-recovery-kvs3043i/.yuzio/cohestra/handoffs/greeting-service/code-01.md"
+  },
+  "handoff_sha256": "9c293655227fffe7ff0cb951f0ef0b9c37ff6338292d5db46b14cfbd86bd5357",
+  "time": "2026-10-22T13:23:26.205241+08:00"
+}

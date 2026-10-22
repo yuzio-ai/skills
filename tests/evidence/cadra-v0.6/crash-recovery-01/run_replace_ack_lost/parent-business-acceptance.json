@@ -1,0 +1,47 @@
+{
+  "mode": "raw",
+  "cases": 8,
+  "passed": true,
+  "results": [
+    {
+      "input": "",
+      "expected": "Hello, world!",
+      "actual": "Hello, world!"
+    },
+    {
+      "input": "Ada",
+      "expected": "Hello, Ada!",
+      "actual": "Hello, Ada!"
+    },
+    {
+      "input": " Ada ",
+      "expected": "Hello,  Ada !",
+      "actual": "Hello,  Ada !"
+    },
+    {
+      "input": "   ",
+      "expected": "Hello,    !",
+      "actual": "Hello,    !"
+    },
+    {
+      "input": "\tAda\n",
+      "expected": "Hello, \tAda\n!",
+      "actual": "Hello, \tAda\n!"
+    },
+    {
+      "input": "\t\n",
+      "expected": "Hello, \t\n!",
+      "actual": "Hello, \t\n!"
+    },
+    {
+      "input": "Ada Lovelace",
+      "expected": "Hello, Ada Lovelace!",
+      "actual": "Hello, Ada Lovelace!"
+    },
+    {
+      "input": "  Ada  Lovelace  ",
+      "expected": "Hello,   Ada  Lovelace  !",
+      "actual": "Hello,   Ada  Lovelace  !"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "run_temp_partial": {
+    "sigkill_confirmed": true,
+    "changed_by_injection": [],
+    "new_files": [
+      ".yuzio/cadra/runs/.run-20261022-02.md.crashed.tmp",
+      "verification/fault.json"
+    ],
+    "bytes_written": 2579,
+    "complete_bytes": 5158
+  },
+  "run_replace_ack_lost": {
+    "sigkill_confirmed": true,
+    "changed_by_injection": [
+      ".yuzio/cadra/runs/run-20261022-02.md"
+    ],
+    "new_files": [
+      "verification/fault.json"
+    ],
+    "bytes_written": 7479,
+    "complete_bytes": 7479
+  },
+  "handoff_partial": {
+    "sigkill_confirmed": true,
+    "changed_by_injection": [
+      ".yuzio/cohestra/handoffs/greeting-service/code-01.md"
+    ],
+    "new_files": [
+      "verification/fault.json"
+    ],
+    "bytes_written": 1939,
+    "complete_bytes": 3879
+  },
+  "index_temp_partial": {
+    "sigkill_confirmed": true,
+    "changed_by_injection": [],
+    "new_files": [
+      ".yuzio/cohestra/handoffs/greeting-service/.README.md.crashed.tmp",
+      "verification/fault.json"
+    ],
+    "bytes_written": 792,
+    "complete_bytes": 1585
+  },
+  "run_primary_partial": {
+    "sigkill_confirmed": true,
+    "changed_by_injection": [
+      ".yuzio/cadra/runs/run-20261022-02.md"
+    ],
+    "new_files": [
+      "verification/fault.json"
+    ],
+    "bytes_written": 2585,
+    "complete_bytes": 5170
+  }
+}
