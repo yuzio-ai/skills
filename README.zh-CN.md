@@ -71,11 +71,21 @@ $relatra
 
 0.2.0/schema v2 的当前检查见 [精简验证](tests/relatra-simplification-validation.md)。旧格式保留可读，不自动迁移，复算需重新配置和采集。历史计划覆盖、审查修复及原生技能校验见 [Relatra 验收记录](tests/relatra-scenarios.md)。隔离安装、完整调用及最低运行版本验证见 [推送前验收](tests/relatra-prepush.md)。
 
+## 本机资料与正式文档
+
+`.yuzio/` 统一定义为当前工作区的本机执行资料。四个 skill 在写入时维护项目根 `.gitignore` 的 `/.yuzio/` 规则；安装和纯只读入口不修改项目，已有跟踪文件只报告，不自动取消跟踪。规则不覆盖嵌套测试夹具。
+
+- 本机保存任务状态、阶段交接、队列、checkpoint、候选、快照和可复算账本。忽略不等于可丢弃，也不等于已有备份。
+- skill 根据任务目标、交付用途和适用项目规范自动判断并整理必要的正式文档，无需另行要求。优先更新项目已有文档；无目录约定时用 `docs/`。必要结论与附件必须脱离 `.yuzio` 仍可读取；无正式交付需要的过程记录留在本机，纯只读入口及用户的明确输出限制保持不变。
+- 在当前项目工作区执行和接续任务。中断恢复读取已有任务记录与 checkpoint，保留轮次和预算；资料缺失时报告缺口，不猜测执行状态。
+
+各包独立携带约定：[Cohestra](cohestra/references/storage.md)、[Cadra](cadra/references/storage.md)、[Vistra](vistra/references/storage.md)、[Relatra](relatra/references/storage.md)。
+
 ## vistra
 
 Vistra 支持 `review`、`explore`、`compare`、`handoff` 四种独立模式，按需加载移动端、桌面端和品牌静态视觉方法，配合项目级、用户级 UI/UX 规范使用。通过宿主图像能力直接生成或编辑图片，不制作 HTML、交互原型或本地渲染工具。推荐、方向选择、实现授权与验证分别记录。
 
-Taste 方法已在包内定制，不是运行依赖。项目资料与视觉产物默认写入 `.yuzio/vistra`。Cohestra 本机资料使用 `.yuzio/cohestra`；Cadra 的目录与协议保持不变。Relatra 本机资料使用 `.yuzio/relatra`，报告结构版本见下文。Vistra 不修改生产代码或发布工程验收结论。
+Taste 方法已在包内定制，不是运行依赖。本机过程资料与探索产物默认写入 `.yuzio/vistra`，正式设计交付进入项目文档目录。Cohestra、Cadra、Relatra 的项目资料分别使用 `.yuzio/cohestra`、`.yuzio/cadra`、`.yuzio/relatra`；本机资料路径调整不改变技能安装路径，各技能协议以版本说明为准。当前路径约定不提供旧目录迁移、回退读取或双写逻辑；历史发布及验证记录保留各自的版本边界。Vistra 不修改生产代码或发布工程验收结论。
 
 ```text
 $vistra review
@@ -92,7 +102,7 @@ $vistra handoff
 采用：<候选与选择来源>
 ```
 
-当前工作区版本 **0.1.1**，正式报告与跨 Skill 产物契约 **1**、profile 格式 **1** 保持兼容。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，当前检查见 [精简验证](tests/vistra-simplification-validation.md)，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
+当前工作区版本 **0.1.2**，正式报告与跨 Skill 产物契约保持 **1**。profile 格式升级为 **2**，只保留来源和默认值，不兼容 v1 的领域、目标和导入继承；旧配置不自动迁移，仅继续不依赖该配置的工作。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，当前检查见 [提交前验证](tests/workspace-review-validation.md)；[0.1.1 精简验证](tests/vistra-simplification-validation.md) 保留当时边界，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
 
 ## 安装
 

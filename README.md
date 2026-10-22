@@ -71,11 +71,21 @@ See [the skill](relatra/SKILL.md), [data and invocation](relatra/references/data
 
 Current 0.2.0/schema v2 checks are recorded in [simplification validation](tests/relatra-simplification-validation.md). Old files remain readable without automatic migration; recomputation requires fresh configuration and collection. Historical plan coverage, review fixes, and native skill validation are recorded in [Relatra acceptance](tests/relatra-scenarios.md). Isolated installation, full invocation and minimum-runtime checks are recorded in [pre-push validation](tests/relatra-prepush.md).
 
+## Local execution data and project documents
+
+`.yuzio/` contains execution data local to the current project workspace. Before writing, the four skills maintain `/.yuzio/` in the project root `.gitignore`; installation and read-only entrypoints do not modify the project. Already tracked files are reported, not automatically untracked. Nested test fixtures remain outside this root-only rule.
+
+- Task state, stage handoffs, queues, checkpoints, candidates, snapshots and reproducible ledgers stay local. Ignored data is neither disposable nor automatically backed up.
+- Skills assess task goals, delivery purpose and applicable project rules, then automatically prepare or update the necessary formal documents without a separate request. Prefer existing project documents, falling back to `docs/` when no directory convention exists. Required conclusions and attachments must remain readable without `.yuzio`. Process records without a formal delivery need stay local; read-only entrypoints and explicit output limits remain unchanged.
+- Execute and continue tasks in the current project workspace. Recover from existing task records and checkpoints, preserving rounds and budgets. Report missing data instead of guessing execution state.
+
+Each standalone package carries its own contract: [Cohestra](cohestra/references/storage.md), [Cadra](cadra/references/storage.md), [Vistra](vistra/references/storage.md), [Relatra](relatra/references/storage.md).
+
 ## vistra
 
 Vistra supports four independent modes: `review`, `explore`, `compare`, and `handoff` for static mobile, desktop, and brand visuals. It directly generates or edits images using the host's image capabilities, respects project and user UI/UX rules, and separates recommendations, selected directions, implementation authorization, and validation. It does not build HTML pages, interactive prototypes, or local rendering tools.
 
-The package owns customized Taste-derived methods; Taste is not a runtime dependency. Project references and visual artifacts default to `.yuzio/vistra`. Cohestra stores local records in `.yuzio/cohestra`; Cadra keeps its existing directory and protocol. Relatra stores local records in `.yuzio/relatra`; its schema is listed below. Vistra does not modify production code or publish engineering acceptance.
+The package owns customized Taste-derived methods; Taste is not a runtime dependency. Local process records and exploratory images default to `.yuzio/vistra`; formal design deliveries belong in the project documentation directory. Cohestra, Cadra and Relatra project data uses `.yuzio/cohestra`, `.yuzio/cadra` and `.yuzio/relatra`, respectively. Storage path changes do not alter skill installation paths; protocols follow each skill’s version notes. The current storage convention provides no legacy-directory migration, fallback reads or dual writes; historical release and validation records retain their original version scope. Vistra does not modify production code or publish engineering acceptance.
 
 ```text
 $vistra review
@@ -92,7 +102,7 @@ $vistra handoff
 Selected: <candidate and selection source>
 ```
 
-Current workspace version **0.1.1** keeps formal artifact contract **1** and profile format **1**. Everyday responses use concise mode-specific content; formal reports and cross-skill handoffs retain full traceability. Configuration details and provenance load only when needed. See the [entrypoint](vistra/SKILL.md), [development Spec](docs/vistra-v0.1-development-spec.md), [current validation](tests/vistra-simplification-validation.md), and [historical 0.1.0 checks](tests/vistra-release-validation.md). This update does not install or publish the skill. Offline checks: `python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`.
+Current workspace version **0.1.2** keeps formal artifact contract **1**. Profile format **2** retains sources and defaults and is incompatible with v1 domain, target and import inheritance. Old profiles are not migrated automatically; only work independent of that configuration may continue. Everyday responses use concise mode-specific content; formal reports and cross-skill handoffs retain full traceability. Configuration details and provenance load only when needed. See the [entrypoint](vistra/SKILL.md), [development Spec](docs/vistra-v0.1-development-spec.md), [current validation](tests/workspace-review-validation.md), [historical 0.1.1 checks](tests/vistra-simplification-validation.md), and [historical 0.1.0 checks](tests/vistra-release-validation.md). This update does not install or publish the skill. Offline checks: `python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`.
 
 ## Install
 

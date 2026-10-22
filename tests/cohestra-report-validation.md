@@ -7,7 +7,7 @@
 - 执行者：独立子智能体 `/root/report_actual_call`，新上下文（`fork_turns: none`），未传入作者历史、期望答案或判定清单。
 - 实际请求：使用本仓库 `cohestra/SKILL.md` 执行 `$cohestra report`，项目为 `/private/tmp/cohestra-report-validation-20261015-01/project`。
 - 原始输入：由 [夹具脚本](cohestra-report-fixture.py) 创建 5 个任务、22 个文件。脚本只建立输入和采集文件系统快照，不生成报告、不实现 finding 合并逻辑。
-- [实际报告](cohestra-report-actual-output.md) 保存子智能体最终回复正文，仅移除两行行尾空格，未改写内容。由父智能体在调用结束、快照核对之后保存；保存证据不是 report 的文件写入行为。
+- [实际报告](cohestra-report-actual-output.md) 保存子智能体最终回复正文，原保存时仅移除两行行尾空格；2026-10-21 将失效链接改指向按当前 `.yuzio/cohestra` 布局重建的[测试输入](fixtures/cohestra-report/project/.yuzio/cohestra/)，结论未重跑。由父智能体在调用结束、快照核对之后保存；保存证据不是 report 的文件写入行为。
 - 调用前快照完成于 16:06:58，调用后快照完成于 16:09:09；报告记录时间为 16:08:02。
 - [文件系统对比](cohestra-report-filesystem-check.json) 保存快照摘要、覆盖范围与逐项比较结果。完整前后快照也保存在上述隔离目录的 `before.json` / `after.json`；仓库中的夹具脚本、实际输出与摘要共同保留复现依据，不依赖临时目录作为唯一证据。
 

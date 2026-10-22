@@ -1,32 +1,29 @@
 # 可选项目配置
 
-仅在项目已有或明确引用 profile，或确需建立可复用配置时读取。配置格式沿用 profile_version 1。
+仅在项目已有或明确引用 profile，或确需建立可复用配置时读取。
 
-
-位置：目标项目的 `.yuzio/vistra/profile.yaml`。只有已有入口不足且需要持久配置时，在任务授权范围内建立；不作为执行门槛。示例：[project-profile.example.yaml](../assets/project-profile.example.yaml)。示例中的项目、路径均为虚构，不自动复制为有效配置。
+位置：目标项目的 `.yuzio/vistra/profile.yaml`。只有已有入口不足且需要复用来源或默认值时建立，不作为执行门槛。示例：[project-profile.example.yaml](../assets/project-profile.example.yaml)；路径和名称均为虚构，不自动复制为有效配置。
 
 | 字段 | 形状与含义 |
 |---|---|
-| `profile_version` | 整数 `1`；不认识的版本报告缺口，不强行按旧版解释 |
+| `profile_version` | 整数 `2`；其他版本报告配置缺口，不按 v2 解释 |
 | `project` | 稳定名称或标识 |
-| `sources` | 角色到引用列表的映射 |
-| `domains` | `mobile` / `desktop` / `brand` 到补充 `sources`、`defaults` 的映射 |
-| `targets` | 对象标识到 `domains`、`purpose`、`surface`、`sources`、`defaults` 的映射 |
-| `imports` | Skill 引用列表；每项有 `source`、`scope`、`role`，可用 `modes`、`domains` 限定适用范围 |
+| `sources` | 资料角色到引用列表的映射，只读取本轮相关来源 |
 | `defaults` | 可覆盖的 `locale`、`appearance`、`output_directory`、`budget` |
 
-`sources` 角色：`canonical`、`design`、`brand`、`tokens`、`components`、`page_overlay`、`adapter`、`policies`、`assets`、`mock_data`。`scope` 为 `user` 或 `project`；`source` 可为文件、链接或宿主暴露的 Skill 标识，必须解析到可读取内容后才能采用。
+`sources` 角色可用 `canonical`、`design`、`brand`、`tokens`、`components`、`page_overlay`、`adapter`、`policies`、`assets`、`mock_data`。文件、链接或宿主暴露的 Skill 标识须解析到可读取内容后才能采用；Skill 入口与其他资料一样作为来源引用，不另建导入、作用域或条件加载配置。
 
-`budget` 使用 `variants`（正整数方向数）、`refinement_rounds`（非负整数上限），可选 `images`（非负整数图片上限）。这些是默认值，不是外发、运行或写入授权。零图片预算保留文字交付，承诺的视觉部分仍未完成。无效类型或矛盾值不能静默当成有效预算；继续不依赖该值的工作。
+v2 删除 v1 的领域、目标和导入继承，不兼容 v1 的解释方式。遇到 v1 或未知版本，保留原文件，不自动迁移或仅改版本号；先从项目规范及明确输入核实本轮相关约束，尚未核实的部分不使用默认值掩盖。仅继续不依赖该配置的工作。
 
-## 合并与路径
+具体对象、领域、用途和范围由本次任务及有效上下文确定。profile 不配置 `domains`、`targets` 或 `imports`，不做多层继承。遇到不支持的字段，保留文件并说明未采用；影响本轮约束时回到项目规范或明确输入核实，不自动迁移，不因非关键配置缺项停止全部工作。
 
-1. 项目、领域、目标的 `sources` 合并去重，不丢弃仍然适用的依据；实际冲突按资料职责处理。
-2. 默认值逐字段按当前要求 → 调用方已确定值 → 目标默认 → 领域默认 → 项目默认 → Vistra 默认解析。未设置字段继续回退，显式零值不视为缺失。跨领域相互冲突的同一参数需要解决，不以最后读取者取胜。
-3. `imports` 的范围限定加载；排除项或不可读来源在报告中说明。未知字段记录为未采用，不解释为权限。
-4. profile 内相对路径，包括 `output_directory`，相对目标项目根目录；包内引用相对实际加载的包文件。链接、绝对路径保留其明确位置。跨仓库引用使用明确入口，不猜固定机器路径。
-5. `null` 为未知或未设置，空列表为未声明来源；都不证明没有约束或已获授权。记录缺失、冲突及实际回退，不为非关键缺项停止全部工作。
+## 默认值与路径
+
+- 默认值逐字段按当前要求 → 调用方已确定值 → profile 默认 → Vistra 默认解析；只处理本轮相关字段。来源冲突按 [项目适配](project-adapter.md) 的资料职责解决，不用默认值覆盖项目约束。
+- `budget` 保留 `variants`（正整数方向数）、`refinement_rounds`（非负整数上限）和可选 `images`（非负整数图片上限）。显式零值有效，不视为缺失；零图片预算保留文字交付，承诺的视觉部分仍未完成。无效预算报告缺口，继续不依赖该值的工作。这些值不产生外发、运行或写入授权。
+- profile 的相对路径（含 `output_directory`）以目标项目根目录为基点；包内引用以实际加载文件为基点。绝对路径和链接保留明确位置，不猜跨仓库机器路径。
+- `null` 为未知或未设置，空列表为未声明来源，都不证明没有约束或已获授权。只记录影响本轮的缺失、冲突和回退。
 
 Vistra 默认值见 [入口](../SKILL.md#共享预算与默认值)。
 
-profile 不保存选择、授权布尔值、当前截图或旧运行状态；即使旧文件存在这些数据，也不能作为本轮依据。建立或修改配置前读取 [存储约定](storage.md)。
+profile 不保存选择、授权布尔值、当前截图或旧运行状态；旧文件即使包含这些数据，也不能作为本轮依据。本机配置引用共享规范，不取代项目真源。建立或修改配置前读取 [存储约定](storage.md)。

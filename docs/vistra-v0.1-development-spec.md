@@ -2,7 +2,7 @@
 
 日期：2026-10-17，Asia/Shanghai。
 
-状态：0.1.1 精简版工作区规格，正式报告与跨 Skill 产物契约 1，profile 格式 1。本轮不安装或发布。当前检查见 [精简验证](../tests/vistra-simplification-validation.md)；[首版记录](../tests/vistra-release-validation.md) 保留历史结果，旧 HTML 路径验证不代表当前静态图片流程通过。
+状态：0.1.2 工作区规格，正式报告与跨 Skill 产物契约 1，profile 格式 2。本轮不安装或发布。当前检查见 [提交前验证](../tests/workspace-review-validation.md)；[0.1.1 精简验证](../tests/vistra-simplification-validation.md) 保留当时边界；[首版记录](../tests/vistra-release-validation.md) 保留历史结果，旧 HTML 路径验证不代表当前静态图片流程通过。
 
 2026-10-21 范围收敛：只生成或编辑静态图片，保留四模式和三领域；移除 Vistra Tools，不制作 HTML、交互原型、审阅网站或运行验证。历史实验与运行记录保留为当时证据，不代表当前执行能力。
 
@@ -49,7 +49,7 @@ Vistra 依据项目规范和可核实的证据，评审视觉设计、探索方�
 | 宿主适配 | 不提供 `agents/openai.yaml` 或其他宿主专属入口文件 |
 | Taste | 作为开发来源，定制内容由 Vistra 维护，不要求运行时安装或加载 Taste |
 | 项目存储 | 默认使用 `.yuzio/vistra` |
-| 其他 Skill | 先完成 Vistra；Cohestra、Cadra、Relatra 的目录迁移与适配后续统一升级 |
+| 其他 Skill | 项目资料统一使用 `.yuzio/<skill>`；各 Skill 管理自身容器 |
 
 ## 2 调用与路由
 
@@ -408,7 +408,7 @@ skills/
 
 ### 9.2 版本约定
 
-当前包版本 `0.1.1`；正式报告和跨 Skill 契约保持 `1`，`profile_version: 1` 不变。普通对话与本机过程记录不要求完整报告结构。既有报告、候选引用与配置继续有效，不迁移或改写历史产物；版本更新不表示已经安装或发布。
+当前包版本 `0.1.2`；正式报告和跨 Skill 契约保持 `1`，profile 格式升级为 `2`。v2 移除 v1 的领域、目标及导入继承，不声称配置兼容；遇到旧版或未知版本保留原文件并报告缺口，不自动迁移或仅修改版本号，先核实本轮相关约束，仅继续不依赖该配置的工作。普通对话与本机过程记录不要求完整报告结构。既有报告及候选引用保持原版本，不迁移或改写历史产物；版本更新不表示已经安装或发布。
 
 `release.json` 沿用仓库的 `version`、`protocol_version`、`repository`、`skill_path` 字段。改变报告必需字段或结果语义时评估契约兼容性；改变 profile 解释方式时评估配置兼容性。旧产物保留生成时的版本，不通过修改版本号伪装为新格式。
 
@@ -427,14 +427,14 @@ skills/
     │           ├── vistra-explore-01.md
     │           ├── concept-B-r01.png
     │           └── runtime-baseline-01.png
-    ├── cohestra/                        后续迁移
-    ├── cadra/                           后续迁移
-    └── relatra/                         后续迁移
+    ├── cohestra/                        工程阶段上下文与交付
+    ├── cadra/                           任务、队列与 Run
+    └── relatra/                         采集快照与报告
 ```
 
-`.yuzio` 保存项目配置、上下文与产物。Skill 包本身的安装位置继续由宿主工具管理。
+`.yuzio` 保存当前工作区的本机执行配置、上下文与过程产物，由项目根 `.gitignore` 的 `/.yuzio/` 整体忽略。正式文档与必要采用素材进入项目已有文档目录，无约定时使用 `docs/`；共享规则不以本机 profile 为唯一真源。Skill 包本身的安装位置继续由宿主工具管理。
 
-Vistra 默认写入 `.yuzio/vistra/artifacts/<任务标识>/`。用户明确指定其他输出位置时采用该位置并记录。任务标识复用调用方的有效标识；独立任务按对象与目标命名，遇到冲突区分范围，不覆盖旧产物。
+Vistra 的探索与执行记录默认写入 `.yuzio/vistra/artifacts/<任务标识>/`，正式设计交接按 [存储约定](../vistra/references/storage.md) 整理至项目文档目录。用户明确指定其他输出位置时采用该位置并记录。任务标识复用调用方的有效标识；独立任务按对象与目标命名，遇到冲突区分范围，不覆盖旧产物。
 
 Vistra 仅在实际需要保存产物时建立所需目录。讨论规则不初始化目录；profile 不作为开始工作的前置条件。明确要求只读或不落盘时按该限制交付；调用方要求持久交接而不能落盘时，持久交付仍为未完成。
 
@@ -443,19 +443,19 @@ Vistra 仅在实际需要保存产物时建立所需目录。讨论规则不初�
 | 目录 | 内容与所有者 |
 |---|---|
 | `.yuzio/vistra` | Vistra 的项目资料索引和视觉专项产物 |
-| `.yuzio/cohestra` | 后续由 Cohestra 管理工程阶段上下文与交付 |
-| `.yuzio/cadra` | 后续由 Cadra 管理任务、队列、Run 与恢复记录 |
-| `.yuzio/relatra` | 后续由 Relatra 管理采集快照、统计与报告 |
+| `.yuzio/cohestra` | 由 Cohestra 管理工程阶段上下文与交付 |
+| `.yuzio/cadra` | 由 Cadra 管理任务、队列、Run 与恢复记录 |
+| `.yuzio/relatra` | 由 Relatra 管理采集快照、统计与报告 |
 
 统一目录不合并状态所有权。不同 Skill 通过准确引用关联，不复制同一套任务索引。已有稳定图片或报告可以直接引用，无需再复制一份。
 
 项目既有设计规范保留原位置。Vistra 的报告与提案不能自动替换规范真源。
 
-### 10.3 过渡安排
+### 10.3 统一目录约定
 
-Vistra 先使用新目录。其他 Skill 升级前保留其当前路径与解析方式，Vistra 可以引用旧目录，不自动搬迁、双写或假装新目录已被支持。
+项目资料统一使用 `.yuzio/vistra`、`.yuzio/cohestra`、`.yuzio/cadra` 和 `.yuzio/relatra`。当前目录约定不提供旧目录迁移、回退读取或双写逻辑；历史发布及验证记录保留各自的版本边界。Skill 安装位置保持宿主约定。
 
-后续统一升级需处理路径解析、模板、跨 Skill 引用、历史记录、恢复入口和 Relatra 采集适配。不得以移动文件夹代替完整迁移验证。跨项目 Relatra 报告仍需明确汇总位置，不复制到所有源项目。
+路径解析、模板、跨 Skill 引用、恢复入口及 Relatra 的 Cadra/Cohestra 采集均采用统一目录。Vistra 只引用其他 Skill 的资料，不初始化或改写其容器。跨项目 Relatra 报告仍需明确汇总位置，不复制到所有源项目；Vistra 自动采集仍按第 14.5 节单独验证。
 
 ## 11 项目适配协议
 
@@ -471,12 +471,9 @@ Vistra 先使用新目录。其他 Skill 升级前保留其当前路径与解析
 
 | 字段 | 含义 |
 |---|---|
-| `profile_version` | 配置格式版本，v0.1 使用 `1` |
+| `profile_version` | 配置格式版本，0.1.2 使用 `2`；其他版本不按 v2 解释 |
 | `project` | 项目稳定名称或标识 |
 | `sources` | 按资料角色组织的引用列表 |
-| `domains` | `mobile`、`desktop`、`brand` 的补充来源与默认值 |
-| `targets` | 已知对象的领域、用途、界面形态、补充来源与默认值 |
-| `imports` | 需要配合的 UI/UX Skill 引用、用户级或项目级来源、职责和适用范围 |
 | `defaults` | 语言、外观、输出目录和预算等可覆盖默认值 |
 
 `sources` 支持 `canonical`、`design`、`brand`、`tokens`、`components`、`page_overlay`、`adapter`、`policies`、`assets`、`mock_data`。角色说明资料用途，不能仅靠把外部文档填入 `canonical` 就赋予项目权威。
@@ -484,7 +481,7 @@ Vistra 先使用新目录。其他 Skill 升级前保留其当前路径与解析
 下面是配置结构示例，路径与名称均为虚构示例，不代表已创建文件或已安装 Skill：
 
 ```yaml
-profile_version: 1
+profile_version: 2
 project: example-product
 
 sources:
@@ -496,30 +493,8 @@ sources:
     - docs/BRAND.md
   policies:
     - docs/DATA_POLICY.md
-
-domains:
-  desktop:
-    sources:
-      tokens:
-        - docs/ui/TOKENS.md
-      components:
-        - docs/ui/COMPONENTS.md
-
-targets:
-  workspace:
-    domains: [desktop]
-    purpose: product
-    surface: workspace
-    sources:
-      page_overlay:
-        - docs/ui/pages/workspace.md
-
-imports:
-  - source: .agents/skills/example-ui/SKILL.md
-    scope: project
-    role: project-design-rules
-    modes: [review, explore, compare, handoff]
-    domains: [mobile, desktop]
+  adapter:
+    - .agents/skills/example-ui/SKILL.md
 
 defaults:
   locale: zh-Hans
@@ -530,7 +505,7 @@ defaults:
     refinement_rounds: 1
 ```
 
-`sources` 的值为引用列表；`domains`、`targets` 为按标识组织的映射；其下的 `sources` 与 `defaults` 采用相同形状。`imports` 的 `source` 可以是明确文件、链接或宿主提供的 Skill 标识，实际使用前必须解析到可读取来源。
+`sources` 的值为引用列表；引用可以是明确文件、链接或宿主提供的 Skill 标识，实际使用前解析到可读取内容。Skill 与其他资料一样按本轮相关性读取，不另建 imports、作用域或条件加载配置。具体对象、领域与用途由本次任务及有效上下文确定，不配置 `domains`、`targets` 或 `imports`，不做多层继承。不支持的字段保留并说明未采用，影响本轮约束时从项目规范或明确输入核实，不自动迁移。
 
 用户级规范从宿主已提供的有效入口或明确引用读取；不预设新的用户级配置目录。未知格式版本应报告无法可靠解释的部分，不按旧版强行解析。
 
@@ -538,15 +513,15 @@ defaults:
 
 1. 固定目标项目根目录，不能因切换目录或技能安装位置而改变目标。
 2. 读取适用项目入口，再读取明确 profile 与本轮相关来源。
-3. 合并项目、领域和目标对象的来源并去重；实际内容按第 7 节判断。
-4. 默认值按当前明确要求 → 调用方已确定值 → 目标对象默认 → 领域默认 → 项目默认 → Vistra 默认解析。同一跨领域参数出现冲突时记录并解决，不依赖读取顺序。
+3. 只读取本轮相关来源并去重；实际内容按第 7 节判断。
+4. 默认值逐字段按当前明确要求 → 调用方已确定值 → profile 默认 → Vistra 默认解析；显式零值不视为缺失，无效预算报告缺口，不用默认值覆盖项目约束。
 5. 记录已读取、缺失、冲突和仍需确认的材料；只阻塞依赖缺口的交付。
 
 profile 中相对路径统一相对于目标项目根目录。技能内部引用相对于实际加载的技能目录。跨仓库来源使用明确入口，不猜测用户机器上的固定路径。
 
 空值代表未知或未设置，空列表代表未声明来源；二者都不证明没有约束、已经授权或已经通过检查。profile 不保存运行授权布尔值、选定候选、当前截图或旧执行状态。
 
-本轮有效上下文至少覆盖：目标与范围、请求模式和领域、来源及版本、基线与候选、显示条件、冻结与探索项、预算、授权依据、选择记录、输出位置和关键缺口。能安全读取或推导的项由 agent 整理，不能把表单负担转给用户。
+本轮有效上下文按实际需要覆盖：目标与范围、请求模式和领域、来源及版本、基线与候选、显示条件、冻结与探索项、预算、授权依据、选择记录、输出位置和关键缺口。能安全读取或推导的项由 agent 整理；未变内容可准确引用上轮，不能把表单负担转给用户。
 
 ## 12 证据模型与结果语义
 
@@ -647,7 +622,7 @@ profile 中相对路径统一相对于目标项目根目录。技能内部引用
 
 交接保留选定主视觉的概念、主体尺度、叠压/纵深、材质、准确文案与素材、裁切及适配关系。组件映射不能静默删除主视觉或改成通用栅格；冲突列出损失与待决部分。图片中的操作仅表达意图，真实行为不因方向已选而变为通过。
 
-### 13.3 固定记录字段
+### 13.3 按需记录语义
 
 | 记录 | 字段 |
 |---|---|
@@ -776,7 +751,7 @@ Relatra 按目标与证据归并，不把每张图片、每份报告或每个候
 | V32 | Cohestra 调用 | 返回专项结果，不写工程任务状态或宣布正式验收 |
 | V33 | Cadra 衔接 | 保持通过 Cohestra 控制契约推进，不消费 Vistra 字段作队列状态 |
 | V34 | Relatra 衔接 | 按独立目标与实际证据归并，不将图片数当成果数 |
-| V35 | 旧目录过渡 | 不迁移、不双写其他 Skill，不声称旧解析器支持新路径 |
+| V35 | 已有 `.yuzio/cohestra`、`.yuzio/cadra`，执行 Vistra | 只引用资料，不初始化或改写其他 Skill 的容器 |
 | V36 | 未安装 Taste | Vistra 定制方法可执行；所缺图像工具单独报告 |
 
 ### 16.1 静态与结构检查
@@ -797,7 +772,7 @@ Relatra 按目标与证据归并，不把每张图片、每份报告或每个候
 - 代表任务的实际行为有可复核证据；要求覆盖的场景未运行时保持待验证。
 - 运行不依赖 Taste 安装，且来源与定制记录可追溯。
 - `.yuzio/vistra` 的写入边界、候选保留和交接引用已验证。
-- 与其他 Skill 的协议边界得到验证；尚未完成的自动化接入或目录迁移明确列出。
+- 与其他 Skill 的协议边界得到验证；尚未完成的自动化接入明确列出。
 - 未完成项不被“包校验通过”或“图片已生成”掩盖。
 
 ## 17 后续开发顺序
@@ -809,10 +784,10 @@ Relatra 按目标与证据归并，不把每张图片、每份报告或每个候
 3. 完成公共报告、模式正文、profile 示例及 `.yuzio/vistra` 产物约定。
 4. 完成静态检查与行为场景，使用授权的代表任务执行真实验证。
 5. 在明确授权的项目中接入已有 UI/UX 规范和专用 Skill，验证规则未被通用方法改写。
-6. 完成 Vistra 后，再统一升级 Cohestra、Cadra、Relatra 的目录与集成适配。
+6. 核对四个 Skill 的 `.yuzio/<skill>` 目录、跨 Skill 引用及采集路径；尚未实现的 Vistra 自动采集单独适配和验证。
 7. 根据真实重复工作添加必要的窄范围脚本，不预先重写上游完整工具链。
 
-实现、验证、迁移与发布分开记录。Spec 完成不代表 Skill 实现完成；Vistra 完成不代表其他 Skill 已迁移。提交、推送、发布、运行受限环境和修改业务项目按当次实际授权执行。
+实现、验证、迁移与发布分开记录。Spec 完成不代表 Skill 实现完成；Vistra 完成不代表其他 Skill 的自动化接入已验证。提交、推送、发布、运行受限环境和修改业务项目按当次实际授权执行。
 
 ## 18 参考入口
 

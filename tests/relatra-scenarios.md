@@ -49,11 +49,7 @@
 - 真实本地日志只读烟测：本项目 1 个来源、4 个 turn、51 个工具结果引用、54 个资源记录；候选保持待确认，交付/验收均为 0。重复 report 的 statistics.json 字节一致，前后源日志哈希未变。仅验证采集与报告链路。
 - Markdown 本地链接与 `git diff --check` 通过。
 
-原生校验复现（将示例路径替换为本机 skill-creator 路径；校验工具自身需 PyYAML，隔离依赖目录可通过 PYTHONPATH 指定）：
-
-```sh
-python3 -B /path/to/skill-creator/scripts/quick_validate.py relatra
-```
+校验复现使用当前宿主 skill-creator 的原生 `scripts/quick_validate.py`，以 `relatra/` 为输入；开发校验环境需有 PyYAML。上文临时安装及原生校验结果仍为历史执行记录，Relatra 运行依赖不变。
 
 ## agent 使用验收与限制
 
