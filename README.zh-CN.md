@@ -102,7 +102,7 @@ $vistra handoff
 采用：<候选与选择来源>
 ```
 
-当前工作区版本 **0.1.2**，正式报告与跨 Skill 产物契约保持 **1**。profile 格式升级为 **2**，只保留来源和默认值，不兼容 v1 的领域、目标和导入继承；旧配置不自动迁移，仅继续不依赖该配置的工作。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。入口见 [vistra/SKILL.md](vistra/SKILL.md)，设计依据见 [开发 Spec](docs/vistra-v0.1-development-spec.md)，当前检查见 [提交前验证](tests/workspace-review-validation.md)；[0.1.1 精简验证](tests/vistra-simplification-validation.md) 保留当时边界，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
+当前工作区版本 **0.1.2**，正式报告与跨 Skill 产物契约保持 **1**。profile 格式升级为 **2**，只保留来源和默认值，不兼容 v1 的领域、目标和导入继承；旧配置不自动迁移，仅继续不依赖该配置的工作。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。执行规则以技能包内文档为准，入口见 [vistra/SKILL.md](vistra/SKILL.md)，项目适配见 [适配规则](vistra/references/project-adapter.md)，当前检查见 [提交前验证](tests/workspace-review-validation.md)；[0.1.1 精简验证](tests/vistra-simplification-validation.md) 保留当时边界，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
 
 ## 安装
 
