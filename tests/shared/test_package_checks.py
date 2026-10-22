@@ -64,7 +64,7 @@ class PackageCheckTests(unittest.TestCase):
                 resource_graph(root)
 
     def test_repository_documentation_links(self):
-        files = [ROOT / "README.md", ROOT / "README.zh-CN.md"]
+        files = list(ROOT.glob("*.md"))
         files.extend((ROOT / "tests").rglob("*.md"))
         self.assertEqual(check_links(files)[1], [])
 

@@ -74,4 +74,4 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 
 测试布局、单技能命令与验收场景见 [测试说明](tests/README.md)。检查覆盖包元数据、文档链接、隔离副本资源完整性及离线回归；实际安装器行为、智能体执行和视觉验收单独验证。
 
-版本与协议在各包 `release.json` 维护，根 README 不重复记录版本值。Cohestra 协议变更须同步检查 Cadra 兼容性。保持中英文 README 同步；流程语义变化另行更新协议。提交、推送和发布标签需明确授权。许可证：[MIT](LICENSE)。
+版本与协议在各包 `release.json` 维护，更新条件、兼容性和提交前检查见 [版本管理规则](VERSIONING.md)。保持中英文 README 同步。提交、推送和发布标签需明确授权。许可证：[MIT](LICENSE)。

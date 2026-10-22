@@ -74,4 +74,4 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 
 See the [test guide](tests/README.md) for test layout, per-skill commands and acceptance scenarios. Checks cover package metadata, document links, resource integrity in isolated copies and offline regressions. Actual installer behavior, agent execution and visual acceptance are validated separately.
 
-Versions and protocols are maintained in each package's `release.json`; this README does not duplicate version values. Cohestra protocol changes require a Cadra compatibility check. Keep both README languages in sync; update protocols separately when flow semantics change. Commits, pushes and release tags require explicit authorization. License: [MIT](LICENSE).
+Versions and protocols are maintained in each package's `release.json`. See the [versioning rules](VERSIONING.md) for bump criteria, compatibility and pre-commit checks. Keep both README languages in sync. Commits, pushes and release tags require explicit authorization. License: [MIT](LICENSE).

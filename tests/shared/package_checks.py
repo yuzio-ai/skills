@@ -7,6 +7,8 @@ import tempfile
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from .release_checks import HistoryUnavailable, release_issues
+
 
 def local_links(path):
     """Yield inline Markdown file targets; fragments are not checked."""
@@ -67,6 +69,13 @@ class SkillPackageChecks:
     """Mixin: inherited tests run once in each skill's own test suite."""
 
     extra_resources = ()
+
+    def test_package_version_history(self):
+        try:
+            issues = release_issues(self.package.parent, self.package.name)
+        except HistoryUnavailable as error:
+            self.skipTest(str(error))
+        self.assertEqual(issues, [], "\n".join(issues))
 
     def test_package_metadata(self):
         release = json.loads((self.package / "release.json").read_text())

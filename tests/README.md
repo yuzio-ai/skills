@@ -44,6 +44,10 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 
 [Cadra 修订夹具](cadra/fixtures/pre-call-blocked-revision.json)保留当前回归所需输入，不包含历史错误输出；期望结果由测试断言维护。
 
+## 版本检查
+
+[版本规则](../VERSIONING.md)由 [release_checks.py](shared/release_checks.py) 和 [回归测试](shared/test_release_versions.py) 支持，并通过各包测试纳入统一入口。检查工作区内容与当前版本首次提交的内容是否一致，覆盖未跟踪资源、已提交的同号修改及版本回退。完整 Git 历史是必要条件；无历史或浅克隆会显示跳过，发布前必须补齐历史并确认没有跳过。版本增量级别和协议语义兼容性仍需人工判断。
+
 ## 行为场景与辅助工具
 
 - [Cohestra](cohestra/scenarios.md)：阶段、契约、索引发布与只读报告。
