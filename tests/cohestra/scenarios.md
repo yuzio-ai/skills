@@ -1,0 +1,139 @@
+# Cohestra 验证场景
+
+这是维护者的验收清单，不是每次阶段执行的必读文件。不创建自动安装器或将模拟结果冒充实际智能体执行。
+
+## 文件与路由
+
+- SKILL.md 前置元数据有效，发行版与协议版本明确，九个入口（init、六阶段、verify 与 report）均能定位说明文件；阶段只加载公共流程、对应说明及必要输入，init 不加载业务阶段，report 只加载报告说明、发行版本、任务索引与必要问题来源，字段含义不明时查公共流程第 7 节。
+- Markdown 相对链接存在，模板占位符可识别，技能包无脚本和测试运行时依赖；无失效的项目 prompts 路由、旧安装器命令或模板管理清单。
+- 普通阶段只读取任务索引及必要输入。need/design/review/validate/verify 的业务只读边界仍允许阶段落盘；code/fix 保留实施授权与停止线。
+- 五节交付、任务索引、结构化状态（任务 README YAML Front Matter）、版本记录、AC、finding ID、候选及证据链可以通过模板和说明完整定位。
+- 根 README 为双语版（`README.md` 英文、`README.zh-CN.md` 中文），顶部语言切换行双向可达；两版的标题层级、表格行列、代码块内容与相对链接目标一致，改一版必须同步另一版。
+
+## 临时安装
+
+在临时用户目录、临时 npm 缓存与临时 Git 仓库运行安装器，不修改真实用户安装或业务项目。记录实际 CLI 版本。
+
+- 从本地源仓库发现并安装 cohestra，分别检查用户级与项目级；指定多个工具时核对实际目录与链接。
+- 对比完整技能包与安装结果，包含嵌套 references、assets 和隐藏的忽略规则；安装本身不创建 `.yuzio/cohestra`。
+- 源仓库不可访问时，安装副本中的路由、相对链接和模板仍完整；移动临时项目后检查内部链接。
+- 若验证技能更新，必须用临时的可控来源，核对命令仅更新指定技能/作用域且保留项目 `.yuzio/cohestra`。没有对应实测时标明未实测，不能用文件复制代替 CLI 更新证据。
+
+## 上下文与阶段桌面推演
+
+| 场景 | 预期结果 |
+|---|---|
+| init 新项目 | 项目根维护 `/.yuzio/`，容器只有项目入口、兜底忽略规则、两个空记录容器；没有 prompts、manifest 或示例任务 |
+| 第二个工具重复 init | 复用原目录，不覆盖入口、交付或复盘，不按工具建立副本 |
+| 旧版上下文 | 保留原文件；不做来源说明补写或格式迁移。不支持的执行状态报告缺口并停止依赖它的推进 |
+| 容器已删除但 Git 仍有记录 | 先报告可恢复与不可恢复清单，再按新项目建立；删除记录是否提交由用户决定，init 不提交、不 checkout |
+| 普通阶段缺少上下文容器 | 先报告目标路径并执行一次最小初始化，再继续本阶段；不误把技能源仓库或其他目录当目标 |
+| need → design → code | 同一任务目录接力；未确认建议不自动变成实现依据 |
+| 上一阶段交付后不带输入直接跑下一阶段 | 自动衔接同任务目录中被调用阶段上游、链条顺序最靠后的已有交付阶段之最近一轮（跳过 verify 与草稿，不按文件编号或修改时间取舍），交付物「输入与上游依据」写明所选文件与来源；handoff 内建议不因此变成已确认 |
+| 重跑链条中较早阶段（如 fix 后再次 code）不带输入 | 取 code 上游（design 或 need）的最近一轮交付，不取下游 fix 交付；下游交付可作补充材料引用，不得冒充上游依据；上游无交付时报告缺口请用户指定 |
+| 无输入调用 verify 或 need | 不适用自动衔接：verify 按其「最近一轮实际交付与其直接上游」规则选对象；need 的输入按公共流程第 1 节既有条（首次为原始需求），不衔接任务目录内交付 |
+| 无参数 init（空项目或已有任务项目） | 不适用自动衔接：直接建立或复用容器与项目入口，不因缺上游交付报告缺口或请用户指定 |
+| 任务目录无法唯一确定时裸跑下一阶段 | 报告缺口并请用户指定，不凭文件编号、修改时间或「最新」猜测，不新建替代任务 |
+| review → fix → review | 固定候选、稳定 findings、新轮次交付、按差异增量复审 |
+| 两个任务并行 | 各写本任务，不争写项目入口；业务文件另明确所有权 |
+| 同任务索引冲突 | 保留独立交付物，报告索引待同步，不覆盖他人内容 |
+| 从 design 起步（无 need 交付） | 以本次需求与参考为上游依据，「流程范围」写明起点，不补造 need 文件 |
+| 从 code 起步（接口或样式小改） | 直接实施并落 code 交付，不要求先有 design；随后可接 review |
+| 用 verify 核对 design 与 need | 输出偏差清单与处置，只写 verify 交付与索引，不改被核对文件 |
+| verify 缺上游依据 | 报告「无法核对」并列出缺口，不用本阶段产出倒推上游 |
+| verify 与 review 分工 | verify 不产缺陷级 findings；需要缺陷审查时推荐 review |
+| verify 编号与索引登记 | 产出 `verify-<轮次>.md`，编号独立于六阶段序列；任务索引按 `verify-<轮次>` 登记，不占阶段轮次 |
+| verify 提议无前置条件 | 不再固定提议；用户请求时执行，发现具体偏差时才说明对象并建议核对 |
+| 未初始化项目直接从中间阶段起步 | 先提醒并完成最小初始化，再执行该阶段；不要求用户先手工补 init |
+| validate 缺运行前提 | 最小候选核对，复用有效证据，简短待验证，不重复审查填充 |
+| 用户级技能更新 | 后续交付记录新技能版本，历史交付、已确认决定和验收状态不变 |
+| need 提问 | 先只读调查再成组提问，问题针对目标、分解、边界、验收；用户确认与假设分开记录，用户不回答时按标注的假设继续并入未决项 |
+| need/design/code/fix 交付后的 verify 提议 | 无具体偏差时不提议，也不生成跳过理由；review、复审和验收要求保持不变 |
+| review/validate 交付后 | 不固定提议 verify；发现具体偏差可建议核对，但不替代正式审查或验收 |
+| 阶段说明的「交付与停止」段 | 只写本阶段文件名、下一阶段推荐与特有前提；落盘、骨架、索引与停止规则指向公共流程 |
+| 缺容器时从任意阶段起步 | 先最小初始化再执行；初始化不读业务任务、不清旧副本、不生成任务、不提交 |
+| 目标路径不明确或有多个候选 | 先澄清，不在错误目录初始化，也不开始阶段 |
+| 只讨论、未知入口、旧 update 调用 | 不开始实施或隐式更新，说明入口或澄清必要信息 |
+| code 正常完成（契约） | Front Matter：stage_result.status=completed，next.stage=review、allowed=true、reason=stage_completed，正文推荐与 next 一致 |
+| review 无阻塞（契约） | findings.blocking=0 → next.stage=validate、reason=stage_completed，不要求 fix |
+| review 有阻塞（契约） | findings.blocking>0 → next.stage=fix、allowed=true、reason=blocking_findings |
+| validate 验收通过（契约） | acceptance.status=passed 且满足既有完成条件 → 任务 status=completed、next.stage=null、allowed=false、reason=task_completed |
+| unattended 缺人工决策（契约） | 不提问空等、不自行选择产品方向 → stage_result.status=blocked、blocked.reason=human_decision_required、next.allowed=false，然后停止 |
+| 环境阻塞（契约） | stage_result.status=blocked、blocked.reason=environment_blocked、next.allowed=false，然后停止 |
+| README 更新失败（契约） | handoff 已落盘并回读；逐字报告 `handoff completed`、`index sync failed` 及错误，失败后回读并区分旧版（或未创建）/ 新版 / 无法确认，消费方停止推进，不固定宣称停留在上一轮 |
+| README 完整发布（契约） | 完整准备 Front Matter 与正文，校验后写同目录唯一临时文件、回读、重读原文件核对未变、原子替换、回读；不分次发布两部分，临时文件不是第二状态源 |
+| 临时写入或原子替换失败 | 正式 README 保持原版或未创建，不消费临时文件；保留 handoff、报告失败，清理本执行者临时文件 |
+| 替换前检测到并发修改 | 保留他人版本与本阶段 handoff，不覆盖；单写入者仍是前提，重读比较不冒充文件锁 |
+| 替换成功但回读失败 | 不宣称回滚；恢复读取后区分完整新版或无法确认，仍报告 index sync failed，恢复核实前不推进 |
+| validate 缺必要复审但可执行 | 无已确认验收失败、输入/授权/执行条件齐备 → acceptance=pending、next={review,true,stage_completed}，正文一致，不重复 validate 代替 review |
+| validate 复审条件不足 | stage_result.status=blocked、任务 status=blocked、blocked.reason 按实际原因、next.allowed=false，不空等或绕过复审 |
+| validate 已失败且仍缺复审 | 保留 acceptance=failed，优先推荐 fix/design/need；整改缺权限等前提时受阻，不降为 pending |
+| validate 仅缺本阶段可补证据 | 有执行条件才 next={validate,true,stage_completed}；缺权限或环境等条件时受阻，不以“将来可恢复”为由空转 |
+| 旧任务无 Front Matter（契约） | 报告契约缺口，不自动迁移或从正文补造控制字段；不重写历史交付 |
+| 旧任务首次 verify 后再正式阶段 | verify 不修复控制状态；缺契约时停止依赖该状态的推进，待明确修复后继续 |
+| 外部编排只读控制流（契约） | 只读 Front Matter 即可判断任务状态、阶段结果、候选、受阻、下一阶段与是否允许继续，不解析正文 |
+| Front Matter 唯一状态源（契约） | 不出现 state.json / status.json / runtime.json；handoff 仍是不可变历史交付 |
+| verify 交付（契约） | 只写 verify 交付与正文索引行；完整发布 README 时保留已有 Front Matter 全部原值，不改 stage_result / next / execution_mode 等控制字段 |
+| 链条外终点（契约） | 用户声明终点（如 review-only 于 review 收尾、small-change 于 code 收尾）→ 任务 status=completed、next={null,false,task_completed}、acceptance 可缺省；不与「仅 passed 才 completed」冲突，必做问题未关闭不按终点收尾；与 Cadra 配合使用时终点由 flow 表达（flow 含 validate 而验收缺省时 Cadra 判 blocked，见 Cadra 终态映射第 7、8 行） |
+| 受阻任务状态（契约） | blocked.value=true 时任务 status 同步写 blocked，受阻解除后回 in_progress；消费方单读 status 也能看到受阻 |
+| 契约版本核对（契约） | Front Matter 含必填 `contract`（取当前协作协议版本）；消费方可核对版本，缺失判「契约未就绪」而非靠字段嗅探 |
+| 必填与可选（契约） | 必填集缺失判协议输出不合法，可选字段缺失合法；新任务首次正式交付写完整必填集 |
+| unattended 下 verify 提议（契约） | 不固定提议、不记录跳过，也不产生对应人工介入项；质量要求不变 |
+| 未指定阶段，要求修改明确文案 | 自动选择 code，核对项目规范与授权后执行；不要求用户提供阶段名，不补 need/design，不自动继续 review |
+| 未指定阶段，要求评审固定候选 | 自动选择 review，保留候选校验与业务只读边界 |
+| 未指定阶段，要求补验收证据 | 自动选择 validate，不误选 verify |
+| 显式 design，但目标中含后续实现愿景 | 执行 design，交付后停止，不用自动路由覆盖显式入口 |
+| 仅讨论流程或目标/候选存在实质歧义 | 仅解释或澄清必要缺口，不因自动选择而获得实施授权 |
+| 本版本索引发布中断 | 以原索引、本轮 handoff、阶段/轮次与候选核实后恢复完整索引，不重跑阶段、不重置轮次 |
+
+## validate 完成状态一致性场景
+
+以下为验收要求，不代表已完成实际智能体调用。采用隔离任务目录，准备固定候选、有效 AC、已关闭必做问题、必要复审和有效证据；除各行声明的差异外保持输入不变。按[公共流程](../../cohestra/references/workflow.md)第 5、7.3 节执行，分别核对 handoff、README 发布前后内容与最终回复。
+
+| 场景 | 预期结果 |
+|---|---|
+| 本轮验收 passed，原 README 为 in_progress，正常发布并回读（attended／unattended 分别核对） | 本轮 validate 的 stage_result.status=completed、任务 status=completed、acceptance.status=passed、next={null,false,task_completed}、blocked={false,null} 同时写入；轮次、候选与 handoff 一致，正文记录任务完成且无后续必做阶段，才报告索引同步成功 |
+| 本轮验收 passed，首次为无 Front Matter 的旧任务发布契约 | 不借验收自动迁移旧任务；若为本版本已核实交付的索引同步中断，按公共流程第 5、7.5 节恢复完整状态 |
+| 待发布内容验收 passed，但任务 status 仍为 in_progress／blocked／failed | 三种值分别核对；发布前拒绝冲突内容，按本轮有效结果补齐完成状态后重新校验，不降低 acceptance；不能将原冲突组合发布为同步成功 |
+| 待发布内容漏写完成字段或与之冲突 | 分别缺失或改错任务 status、stage_result 的阶段／结果／轮次、acceptance、next 的 stage／allowed／reason、blocked 的 value／reason，或保留正文必做下一阶段；任一项均不能通过完成一致性检查；仅漏写字段时补齐再校验 |
+| 写入临时文件或原子替换失败 | 保留已通过的 validate handoff，README 为旧版或未创建；最终回复同时含 handoff completed、index sync failed、「验收通过，完成状态待同步」、实际版本／任务状态、错误和恢复条件；不推进 |
+| 替换前发现 README 并发更新 | 不覆盖他人内容，保留本轮 handoff；报告上述三句和实际可确认状态，不能将保留他人版本视为本轮同步成功 |
+| 替换已成功但首次回读失败，随后读到新版 completed | 仍报告上述三句，并说明新版 completed 已读到但本次同步核对失败，恢复核实前不推进；不宣称回滚或状态必然停留在上一轮 |
+| 发布后回读发现完成字段、候选或正文不符 | 不报告同步成功，不覆盖未知并发变更；报告上述三句及不符项、实际状态和恢复条件，保留验收通过的 handoff |
+| 缺必要复审／验收证据，或确认验收失败 | 分别沿用 pending／blocked／failed 对应出口；stage_result.status=completed 或部分检查通过都不能触发任务 completed，也不能报告「验收通过，完成状态待同步」 |
+| 历史轮次或另一候选有 passed，本轮尚未通过 | 不据历史 passed 强制 completed；先核对本轮候选、轮次与证据适用性，按本轮结果写状态 |
+| 非 validate 终点与 verify | 用户声明的 review-only 终点仍可 completed 且 acceptance 缺省；verify 仍保留 Front Matter 原值，不借本次校验修改历史控制字段 |
+| 发布前校验进程非零退出 | 实际检查退出非零后不调用发布；保留 handoff 和原索引，报告同步失败及「验收通过，完成状态待同步」 |
+| 旧任务的解析依赖不可用 | 缺模块不等于校验通过；没有可用校验通道时停止，不给旧任务发布未校验的新契约 |
+| 校验进程返回 0 但没有解析结果 | 输出为空或不能确认成功时不发布，不从进程码单独推导完整校验通过 |
+| 前置校验失败，后续日志命令成功 | 逐项核对真实子命令结果；最后命令或外层调用退出 0 不抵消前置失败，索引保持原版 |
+| 首次解析失败，但另有可用解析工具 | 用后续独立调用完成同一内容的完整校验，先读取成功结果再发布；不通过事后补验追认已发生的发布 |
+| 校验成功后待发布内容发生变化 | 旧摘要不覆盖新内容，先重新校验变更后的完整内容，收到成功结果再发布；实际发布摘要与最近成功校验一致 |
+
+## report 只读汇总场景
+
+以下为验收要求，不把场景定义视为实测。
+
+| 场景 | 预期结果 |
+|---|---|
+| 裸调用 report，项目有多个任务 | 汇总当前项目全部任务，不走单任务自动衔接，不要求挑选一个 handoff，不扫描其他项目 |
+| 目标缺 .yuzio/cohestra／缺 handoffs／空 handoffs | 分别报告未初始化／记录缺失／暂无任务；均不创建文件，不触发 init |
+| completed 但 non_blocking > 0 | 总览保留已完成状态并标注未关闭项，遗留明细展示延期文档问题与来源；不转 fix、不重开任务 |
+| 正常进行中、受阻、失败与已完成任务 | 每个任务一行，分开显示阶段结果、任务状态、验收状态、三类问题计数与已记录 next；不从阶段完成推导任务完成 |
+| completed 且 acceptance 缺省 | 验收未知，不推导 passed，不把合法可选字段缺失当契约错误 |
+| findings 缺省或只有计数没有明细 | 缺省写未知；有计数保留计数并注明明细缺口，不给伪完整汇总或宣称无遗留 |
+| 多轮 review/fix、不同任务同名 finding ID | 只按任务 + ID 合并有效处置；已明确关闭的旧条目不重复出现，不跨任务合并；已修改未复审按来源分别展示 |
+| 延后、转交、不接受与裁决不明 | 延后／转交不推导关闭；已有不接受裁决不重新打开；不明写待核实，缺负责人写待指派，不新增延期或关闭要求 |
+| 无契约旧任务、缺 README、损坏 YAML 或不支持契约 | 无契约的当前状态写未知，历史正文仅作引用；缺索引任务仍保留目录行，契约异常不以正文补造有效控制状态，不迁移或修复 |
+| 索引与 findings 计数冲突、来源缺失或指向草稿 | 展示各自来源并列状态异常，不以计数零跳过明细、不自行选最大编号交付覆盖索引 |
+| 读取期间记录变化、部分目录不可读 | 重读受影响记录，仍变化时标明；部分结果保留并标覆盖不完整，不宣称原子快照或零问题 |
+| report 的文件副作用与执行边界 | 比较调用前后项目文件内容、目录清单和写入时间，均不变化；无 report 文件、handoff、缓存、索引写入、测试、构建、阶段调用或提醒；unattended 同样只读 |
+| 报告输出 | 含项目、实际时间及时区、扫描覆盖、状态分布、全部任务总览、遗留明细与状态异常；来源可点击，输出后停止、不提议 verify |
+
+交付检查结果时分开标注：文档静态检查、文件/CLI 实测、桌面推演、独立智能体实测。未执行项如实列出。
+
+## 测试工具
+
+[报告输入生成器](report_fixture.py)按需建立多任务、旧格式及问题计数冲突样本，仓库不保存生成的输入副本。在仓库根目录执行 `python3 -B tests/cohestra/report_fixture.py prepare <新建临时项目目录>`；目标目录须不存在。使用 `python3 -B tests/cohestra/report_fixture.py snapshot <项目目录>` 采集调用前后快照，输出保存到被测目录之外，再比较差异。
+
+[validate 输入与故障驱动](validate_fixture.py)和[产物核对器](validate_check.py)用于准备隔离场景、注入文件操作故障并检查实际产物。使用前按上述当前场景核对适用性，尤其是旧任务处理；脚本断言不能替代当前规则或实际技能调用。

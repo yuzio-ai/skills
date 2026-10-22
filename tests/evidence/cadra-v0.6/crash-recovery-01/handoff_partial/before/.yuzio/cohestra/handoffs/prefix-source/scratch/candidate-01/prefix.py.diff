@@ -1,8 +1,0 @@
---- /dev/null
-+++ prefix.py
-@@ -0,0 +1,5 @@
-+"""Shared greeting prefix."""
-+
-+
-+def greeting_prefix() -> str:
-+    return "Hello"

@@ -1,4 +1,9 @@
-.DS_Store
+# Local execution data and maintenance backups (repository root only)
 /.yuzio/
+
+# Python caches and bytecode
 __pycache__/
 *.py[cod]
+
+# macOS file metadata
+.DS_Store

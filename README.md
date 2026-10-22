@@ -25,11 +25,11 @@ The rules and stage prompts live inside the skill package (currently documented 
 |---|---|
 | Routing, execution rules, version and provenance | [cohestra/SKILL.md](cohestra/SKILL.md) |
 | Common flow, terminology, artifact and shared-write rules | [references/workflow.md](cohestra/references/workflow.md) |
-| Per-stage responsibilities, with copy-pasteable invocation snippets | [references/](cohestra/references/) |
+| Per-stage responsibilities, with copy-pasteable invocation snippets | [references/](cohestra/references) |
 | Read-only task overview, outstanding findings and state inconsistencies | [references/report.md](cohestra/references/report.md) |
-| Handoff and task-index skeletons | [assets/](cohestra/assets/) |
+| Handoff and task-index skeletons | [assets/](cohestra/assets) |
 | Install, update and tool boundaries | [references/installation.md](cohestra/references/installation.md) |
-| Maintainer acceptance checklist | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
+| Maintainer acceptance checklist | [tests/cohestra/scenarios.md](tests/cohestra/scenarios.md) |
 
 ## cadra
 
@@ -45,9 +45,9 @@ Execution has three limits: two extra failure retries per stage, three remediati
 |---|---|
 | Routing, execution rules, boundaries, version and provenance | [cadra/SKILL.md](cadra/SKILL.md) |
 | Task/Run state machines, queue order, flow presets, Cohestra contract, unattended rules | [references/workflow.md](cadra/references/workflow.md) |
-| Per-entry responsibilities (add / ready / list / run / resume / report) | [references/](cadra/references/) |
-| Task and run skeletons, `.yuzio/cadra` container template | [assets/](cadra/assets/) |
-| Maintainer acceptance checklist | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
+| Per-entry responsibilities (add / ready / list / run / resume / report) | [references/](cadra/references) |
+| Task and run skeletons, `.yuzio/cadra` container template | [assets/](cadra/assets) |
+| Maintainer acceptance checklist | [tests/cadra/scenarios.md](tests/cadra/scenarios.md) |
 
 ## relatra
 
@@ -67,9 +67,9 @@ $relatra
 Range: 2026-10-01 through 2026-10-12
 ```
 
-See [the skill](relatra/SKILL.md), [data and invocation](relatra/references/data.md), and [metrics](relatra/references/metrics.md). Offline tests: `python3 -B -m unittest discover -s tests -p 'test_relatra.py'`. These fixtures do not establish real agent usability or complete cloud-history coverage.
+See [the skill](relatra/SKILL.md), [data and invocation](relatra/references/data.md), and [metrics](relatra/references/metrics.md). Offline tests: `python3 -B -m unittest discover -s tests/relatra -t tests -p 'test_relatra.py'`. These fixtures do not establish real agent usability or complete cloud-history coverage.
 
-Current 0.2.0/schema v2 checks are recorded in [simplification validation](tests/relatra-simplification-validation.md). Old files remain readable without automatic migration; recomputation requires fresh configuration and collection. Historical plan coverage, review fixes, and native skill validation are recorded in [Relatra acceptance](tests/relatra-scenarios.md). Isolated installation, full invocation and minimum-runtime checks are recorded in [pre-push validation](tests/relatra-prepush.md).
+Current 0.2.0/schema v2 acceptance requirements are listed in [Relatra scenarios](tests/relatra/scenarios.md). Old files remain readable without automatic migration; recomputation requires fresh configuration and collection. See the [test guide](tests/README.md) for maintained checks and their limits.
 
 ## Local execution data and project documents
 
@@ -102,7 +102,7 @@ $vistra handoff
 Selected: <candidate and selection source>
 ```
 
-Current workspace version **0.1.2** keeps formal artifact contract **1**. Profile format **2** retains sources and defaults and is incompatible with v1 domain, target and import inheritance. Old profiles are not migrated automatically; only work independent of that configuration may continue. Everyday responses use concise mode-specific content; formal reports and cross-skill handoffs retain full traceability. Configuration details and provenance load only when needed. The skill package is the source of truth for execution rules. See the [entrypoint](vistra/SKILL.md), [project adaptation](vistra/references/project-adapter.md), [current validation](tests/workspace-review-validation.md), [historical 0.1.1 checks](tests/vistra-simplification-validation.md), and [historical 0.1.0 checks](tests/vistra-release-validation.md). This update does not install or publish the skill. Offline checks: `python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`.
+Current workspace version **0.1.2** keeps formal artifact contract **1**. Profile format **2** retains sources and defaults and is incompatible with v1 domain, target and import inheritance. Old profiles are not migrated automatically; only work independent of that configuration may continue. Everyday responses use concise mode-specific content; formal reports and cross-skill handoffs retain full traceability. Configuration details and provenance load only when needed. The skill package is the source of truth for execution rules. See the [entrypoint](vistra/SKILL.md), [project adaptation](vistra/references/project-adapter.md), and [current acceptance scenarios](tests/vistra/scenarios.md). Offline checks: `python3 -B -m unittest discover -s tests/vistra -t tests -p 'test_vistra*.py'`.
 
 ## Install
 
@@ -115,7 +115,7 @@ npx skills add yuzio-ai/skills --skill relatra
 npx skills add yuzio-ai/skills --skill vistra
 ```
 
-Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra/), [cadra](cadra/), [relatra](relatra/), or [vistra](vistra/) directory where your tool looks for skills.
+Add `-g` for a user-level install, or `-a <tool-a> <tool-b>` to target specific tools. If the source repository has not been pushed yet, use a local absolute path as the source instead. Installing does not initialize the project; if you would rather not use this CLI, you can also place the complete [cohestra](cohestra), [cadra](cadra), [relatra](relatra), or [vistra](vistra) directory where your tool looks for skills.
 
 The full command set, how to update, and how to diagnose a local source that silently no-ops when updated by name are in the [installation guide](cohestra/references/installation.md).
 
@@ -184,4 +184,4 @@ The labels are Chinese for the same reason as above. Task state lives in `.yuzio
 
 Release **0.10.1**, collaboration protocol **v0.8**; cadra is release **0.6.0**, task/run protocol **v0.6**; Relatra is **0.2.0**, report schema **v2**. Versions are maintained in [cohestra/release.json](cohestra/release.json), [cadra/release.json](cadra/release.json), and [relatra/release.json](relatra/release.json). Cohestra protocol changes require a compatible Cadra release. Cohestra/Cadra use Markdown, templates and metadata; Relatra additionally requires Python 3.9+ with no third-party runtime packages. None provides an installer. This README has a Chinese counterpart at [README.zh-CN.md](README.zh-CN.md); keep both in sync.
 
-After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra-scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra-scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).
+After any change, check routing, documentation links, temporary installation and the handoff flow against the [cohestra scenarios](tests/cohestra/scenarios.md), and the task-orchestration rules against the [cadra scenarios](tests/cadra/scenarios.md). File-integrity checks and real agent invocations are reported separately; without an independent agent run, a desktop walkthrough is not written up as a measured result. Flow-semantics changes update the protocol version separately. Commits, pushes and release tags still require explicit authorization. License: [MIT](LICENSE).

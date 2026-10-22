@@ -1,0 +1,62 @@
+{
+  "scenario": "R2 requirement change blocked before first call; R3 only changes execution_policy",
+  "records": [
+    {
+      "protocol": "0.6",
+      "run_id": "r1",
+      "status": "completed",
+      "tasks": [
+        {
+          "slug": "a",
+          "revision": 1,
+          "previous_run": null,
+          "definition": {
+            "requirement": "R1"
+          },
+          "state": "completed",
+          "result": {
+            "state": "completed"
+          }
+        }
+      ]
+    },
+    {
+      "protocol": "0.6",
+      "run_id": "r2",
+      "status": "completed",
+      "tasks": [
+        {
+          "slug": "a",
+          "revision": 2,
+          "previous_run": "r1",
+          "definition": {
+            "requirement": "R2",
+            "changed_fields": [
+              "requirement"
+            ]
+          },
+          "state": "blocked",
+          "result": {
+            "state": "blocked",
+            "reason": "dependency became draft before first call"
+          },
+          "calls": [],
+          "authorization_consumed": false,
+          "start_action": "revision restart at code"
+        }
+      ]
+    }
+  ],
+  "current": {
+    "protocol": "0.6",
+    "slug": "a",
+    "revision": 3,
+    "preparation": "ready",
+    "definition": {
+      "requirement": "R2"
+    },
+    "changed_fields": [
+      "execution_policy"
+    ]
+  }
+}

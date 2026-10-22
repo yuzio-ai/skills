@@ -25,11 +25,11 @@
 |---|---|
 | 路由、执行规则、版本与来源 | [cohestra/SKILL.md](cohestra/SKILL.md) |
 | 公共流程、术语、落盘与共享写入规则 | [references/workflow.md](cohestra/references/workflow.md) |
-| 各阶段职责与可直接粘贴的调用片段 | [references/](cohestra/references/) |
+| 各阶段职责与可直接粘贴的调用片段 | [references/](cohestra/references) |
 | 只读任务总览、遗留问题与状态异常 | [references/report.md](cohestra/references/report.md) |
-| 交付骨架与任务索引骨架 | [assets/](cohestra/assets/) |
+| 交付骨架与任务索引骨架 | [assets/](cohestra/assets) |
 | 安装、更新与工具边界 | [references/installation.md](cohestra/references/installation.md) |
-| 维护者验收清单 | [tests/cohestra-scenarios.md](tests/cohestra-scenarios.md) |
+| 维护者验收清单 | [tests/cohestra/scenarios.md](tests/cohestra/scenarios.md) |
 
 ## cadra
 
@@ -45,9 +45,9 @@ flow 接受 preset 或非空阶段列表：首项是起点，所有项去重后�
 |---|---|
 | 路由、执行规则、边界、版本与来源 | [cadra/SKILL.md](cadra/SKILL.md) |
 | Task/Run 状态机、队列顺序、Flow Preset、Cohestra 调用契约、unattended 规则 | [references/workflow.md](cadra/references/workflow.md) |
-| 各入口职责（add / ready / list / run / resume / report） | [references/](cadra/references/) |
-| 任务与 Run 骨架、`.yuzio/cadra` 容器模板 | [assets/](cadra/assets/) |
-| 维护者验收清单 | [tests/cadra-scenarios.md](tests/cadra-scenarios.md) |
+| 各入口职责（add / ready / list / run / resume / report） | [references/](cadra/references) |
+| 任务与 Run 骨架、`.yuzio/cadra` 容器模板 | [assets/](cadra/assets) |
+| 维护者验收清单 | [tests/cadra/scenarios.md](tests/cadra/scenarios.md) |
 
 ## relatra
 
@@ -67,9 +67,9 @@ $relatra
 起止：2026-10-01 至 2026-10-12
 ```
 
-入口见 [relatra/SKILL.md](relatra/SKILL.md)，调用契约见 [数据与调用](relatra/references/data.md)，统计规则见 [统计口径](relatra/references/metrics.md)。离线测试：`python3 -B -m unittest discover -s tests -p 'test_relatra.py'`，不等于真实 agent 使用或云端历史覆盖验收。
+入口见 [relatra/SKILL.md](relatra/SKILL.md)，调用契约见 [数据与调用](relatra/references/data.md)，统计规则见 [统计口径](relatra/references/metrics.md)。离线测试：`python3 -B -m unittest discover -s tests/relatra -t tests -p 'test_relatra.py'`，不等于真实 agent 使用或云端历史覆盖验收。
 
-0.2.0/schema v2 的当前检查见 [精简验证](tests/relatra-simplification-validation.md)。旧格式保留可读，不自动迁移，复算需重新配置和采集。历史计划覆盖、审查修复及原生技能校验见 [Relatra 验收记录](tests/relatra-scenarios.md)。隔离安装、完整调用及最低运行版本验证见 [推送前验收](tests/relatra-prepush.md)。
+0.2.0/schema v2 的当前验收要求见 [Relatra 场景清单](tests/relatra/scenarios.md)。旧格式保留可读，不自动迁移，复算需重新配置和采集。维护中的检查入口与边界见 [测试说明](tests/README.md)。
 
 ## 本机资料与正式文档
 
@@ -102,7 +102,7 @@ $vistra handoff
 采用：<候选与选择来源>
 ```
 
-当前工作区版本 **0.1.2**，正式报告与跨 Skill 产物契约保持 **1**。profile 格式升级为 **2**，只保留来源和默认值，不兼容 v1 的领域、目标和导入继承；旧配置不自动迁移，仅继续不依赖该配置的工作。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。执行规则以技能包内文档为准，入口见 [vistra/SKILL.md](vistra/SKILL.md)，项目适配见 [适配规则](vistra/references/project-adapter.md)，当前检查见 [提交前验证](tests/workspace-review-validation.md)；[0.1.1 精简验证](tests/vistra-simplification-validation.md) 保留当时边界，[0.1.0 首版记录](tests/vistra-release-validation.md) 保留历史结果。本轮不安装或发布。离线检查：`python3 -B -m unittest discover -s tests -p 'test_vistra*.py'`。
+当前工作区版本 **0.1.2**，正式报告与跨 Skill 产物契约保持 **1**。profile 格式升级为 **2**，只保留来源和默认值，不兼容 v1 的领域、目标和导入继承；旧配置不自动迁移，仅继续不依赖该配置的工作。普通答复按模式简短交付，正式报告保留完整追溯；配置细则和开发来源按需加载。执行规则以技能包内文档为准，入口见 [vistra/SKILL.md](vistra/SKILL.md)，项目适配见 [适配规则](vistra/references/project-adapter.md)，当前验收要求见 [场景清单](tests/vistra/scenarios.md)。离线检查：`python3 -B -m unittest discover -s tests/vistra -t tests -p 'test_vistra*.py'`。
 
 ## 安装
 
@@ -115,7 +115,7 @@ npx skills add yuzio-ai/skills --skill relatra
 npx skills add yuzio-ai/skills --skill vistra
 ```
 
-用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra](cohestra/)、[cadra](cadra/)、[relatra](relatra/) 或 [vistra](vistra/) 目录放入工具支持的技能位置。
+用户级安装加 `-g`；指定工具加 `-a <tool-a> <tool-b>`。源仓库尚未推送时，把来源换成本地绝对路径。安装不自动初始化项目；不想使用该 CLI 时，也可将完整 [cohestra](cohestra)、[cadra](cadra)、[relatra](relatra) 或 [vistra](vistra) 目录放入工具支持的技能位置。
 
 命令全集、更新方式，以及本地来源按名称更新会静默空转的排查，见 [安装说明](cohestra/references/installation.md)。
 
@@ -184,4 +184,4 @@ Run：<run-id>
 
 发行版 **0.10.1**，协作协议 **v0.8**；cadra 发行版 **0.6.0**，任务/Run 协议 **v0.6**；Relatra 版本 **0.2.0**，报告结构 **v2**。版本在 [cohestra/release.json](cohestra/release.json)、[cadra/release.json](cadra/release.json)、[relatra/release.json](relatra/release.json) 维护。Cohestra 协议变更时，Cadra 须发布兼容版本。Cohestra/Cadra 使用 Markdown、模板和元数据；Relatra 另需 Python 3.9+，无第三方运行依赖。均不提供自研安装器。本文件与英文 [README.md](README.md) 同步。
 
-修改后按 [cohestra 验证场景](tests/cohestra-scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra-scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。
+修改后按 [cohestra 验证场景](tests/cohestra/scenarios.md) 检查路由、文档链接、临时安装及交接流程，按 [cadra 验证场景](tests/cadra/scenarios.md) 检查任务编排规则。文件完整性检查和实际智能体调用分别报告；无独立智能体验证时，不把桌面推演写成实测。流程语义变化时另行更新协议版本。提交、推送和发布标签仍需明确授权。许可证：[MIT](LICENSE)。
