@@ -75,10 +75,18 @@ class PackageCheckTests(unittest.TestCase):
         self.assertIn("(README.md)", chinese)
         def structure(text):
             links = re.findall(r"\[[^\]]*\]\(([^)]+)\)", text)
+            blocks = re.findall(r"```([^\n]*)\n(.*?)```", text, re.S)
+            examples = [body for language, body in blocks if language.strip() != "mermaid"]
+            # Localized diagram labels can differ; topology, shapes and styles must match.
+            diagrams = [
+                re.sub(r'"[^"\n]*"', '"<label>"', body)
+                for language, body in blocks if language.strip() == "mermaid"
+            ]
             return (
                 re.findall(r"^(#+) ", text, re.M),
                 [line.count("|") for line in text.splitlines() if line.startswith("|")],
-                re.findall(r"```[^\n]*\n(.*?)```", text, re.S),
+                examples,
+                diagrams,
                 [link for link in links if link not in ("README.md", "README.zh-CN.md")],
             )
         self.assertEqual(structure(english), structure(chinese))
