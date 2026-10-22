@@ -39,4 +39,4 @@
 
 ## 验证入口
 
-静态检查：`python3 -B tests/cadra/static_checks.py`。行为模型：`python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_cadra.py' -v`。模型只验证协议解释；实际多任务执行、中断恢复及故障场景需另行调用技能验证。
+包检查与行为模型统一运行：`python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py' -v`。模型只验证协议解释；实际多任务执行、中断恢复及故障场景需另行调用技能验证。

@@ -6,36 +6,11 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from shared.package_checks import SkillPackageChecks
 
 
 ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = ROOT / "vistra"
-
-
-def resource_graph(package):
-    """Resolve local Markdown links from the entrypoint in a standalone install."""
-    package = package.resolve()
-    pending = [package / "SKILL.md"]
-    visited = set()
-    while pending:
-        current = pending.pop()
-        if current in visited:
-            continue
-        if not current.is_relative_to(package):
-            raise ValueError(f"Resource escapes package: {current}")
-        if not current.is_file():
-            raise ValueError(f"Missing resource: {current}")
-        visited.add(current)
-        if current.suffix != ".md":
-            continue
-        content = current.read_text(encoding="utf-8")
-        for link in re.findall(r"\[[^\]\n]*\]\(([^)\n]+)\)", content):
-            parsed = urlsplit(link)
-            if parsed.scheme or not parsed.path:
-                continue
-            pending.append((current.parent / unquote(parsed.path)).resolve())
-    return visited
 
 
 def validate_provenance(package):
@@ -71,36 +46,8 @@ def validate_provenance(package):
         raise ValueError("Incomplete rule coverage")
 
 
-class VistraPackagingTests(unittest.TestCase):
-    def test_standalone_install_resource_closure(self):
-        # The install must work with only this skill, without sibling skills or Spec.
-        with tempfile.TemporaryDirectory(prefix="vistra-install-") as temp:
-            installed = (Path(temp) / "vistra").resolve()
-            shutil.copytree(PACKAGE, installed)
-            reachable = resource_graph(installed)
-            actual = {p.resolve() for p in installed.rglob("*") if p.is_file()}
-            self.assertEqual(actual, reachable, "Undiscoverable package resource")
-            self.assertEqual(
-                {p.relative_to(installed): p.read_bytes() for p in reachable},
-                {p.relative_to(PACKAGE): p.read_bytes() for p in PACKAGE.rglob("*") if p.is_file()},
-            )
-
-    def test_missing_dependency_is_detected(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            (root / "SKILL.md").write_text("[mode](references/missing.md)\n")
-            with self.assertRaisesRegex(ValueError, "Missing resource"):
-                resource_graph(root)
-
-    def test_repository_dependency_is_detected(self):
-        with tempfile.TemporaryDirectory() as temp:
-            parent = Path(temp)
-            root = parent / "vistra"
-            root.mkdir()
-            (parent / "only-in-repo.md").write_text("not installed")
-            (root / "SKILL.md").write_text("[rules](../only-in-repo.md)\n")
-            with self.assertRaisesRegex(ValueError, "escapes package"):
-                resource_graph(root)
+class VistraPackagingTests(SkillPackageChecks, unittest.TestCase):
+    package = PACKAGE
 
     def test_release_metadata(self):
         release = json.loads((PACKAGE / "release.json").read_text())
