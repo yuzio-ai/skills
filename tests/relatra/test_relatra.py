@@ -575,7 +575,7 @@ class RelatraTests(unittest.TestCase):
         f = self.facts()
         s = r.aggregate(f, self.ledger(f, [self.event(f), self.event(f, "retry")]))
         s["trend"] = r.trend(s, f)
-        text = r.render(s, f)
+        text = r.render_details(s, f)
         self.assertIn("累计 / 占用秒", text)
         self.assertIn("返工 / 重试", text)
         self.assertIn("token 总量 / 覆盖轮", text)
@@ -670,8 +670,8 @@ class RelatraTests(unittest.TestCase):
         self.assertFalse(mixed["process_comparable"])
         self.assertIsNone(mixed["quality_current"])
         self.assertTrue(comparison["process_comparable"])
-        self.assertIn("返工/重试：本期", r.render(dict(s, comparison=comparison), f))
-        self.assertIn("过程指标未比较", r.render(dict(basic, comparison=mixed), basic_facts))
+        self.assertIn("返工/重试：本期", r.render_details(dict(s, comparison=comparison), f))
+        self.assertIn("过程指标未比较", r.render_details(dict(basic, comparison=mixed), basic_facts))
         old["turns"][0]["usage"][0]["tokens"].pop("input_tokens")
         write_baseline()
         self.assertFalse(r.compare(s, f, folder)["comparable"])
@@ -769,13 +769,13 @@ class RelatraTests(unittest.TestCase):
             ledger = self.ledger(f, [self.event(f, kind)])
             ledger["tasks"][0]["next_step"] = "补独立 agent 与 CLI 联调验收"
             s = r.aggregate(f, ledger)
-            tail = r.render(s, f).split("## 遗留与下一步", 1)[1].split("## 改进建议", 1)[0]
+            tail = r.render_details(s, f).split("## 遗留与下一步", 1)[1].split("## 改进建议", 1)[0]
             self.assertIn("补独立 agent 与 CLI 联调验收", tail)
             self.assertNotIn("无已记录的遗留事项", tail)
             self.assertEqual(s["tasks"][0]["status"], kind)
             self.assertEqual(s["counts"]["delivered"], 1)
         ledger["tasks"][0]["next_step"] = ""
-        tail = r.render(r.aggregate(f, ledger), f).split("## 遗留与下一步", 1)[1].split("## 改进建议", 1)[0]
+        tail = r.render_details(r.aggregate(f, ledger), f).split("## 遗留与下一步", 1)[1].split("## 改进建议", 1)[0]
         self.assertIn("无已记录的遗留事项", tail)
 
     def test_daily_report_does_not_render_empty_trend_table(self):
@@ -784,7 +784,7 @@ class RelatraTests(unittest.TestCase):
         f = self.facts()
         s = r.aggregate(f, self.ledger(f))
         s["trend"] = r.trend(s, f)
-        self.assertNotIn("## 周期内趋势", r.render(s, f))
+        self.assertNotIn("## 周期内趋势", r.render_details(s, f))
 
     def test_real_user_input_tool_answer_has_feedback_and_coverage(self):
         values = self.log()
@@ -800,7 +800,7 @@ class RelatraTests(unittest.TestCase):
         s = r.aggregate(f, ledger)
         self.assertEqual(s["coverage"]["user_feedback"]["observed"], 1)
         self.assertEqual(s["coverage"]["user_feedback"]["classified"], 0)
-        self.assertIn("人工介入统计不完整", r.render(s, f))
+        self.assertIn("人工介入统计不完整", r.render_details(s, f))
         ledger["tasks"][0]["events"].append({"id": "choice", "kind": "intervention", "at": feedback["at"], "category": "decision", "evidence": [feedback["id"]], "note": "已核对实际选择，按一次消息而非两个问题计数"})
         s = r.aggregate(f, ledger)
         self.assertEqual(s["interventions"]["decision"], 1)
@@ -881,7 +881,7 @@ class RelatraTests(unittest.TestCase):
         stats = r.aggregate(facts, ledger)
         self.assertEqual(stats["counts"]["delivered"], 0)
         self.assertEqual(stats["tasks"][0]["status"], "delivered")
-        self.assertIn("补运行时验收", r.render(stats, facts))
+        self.assertIn("补运行时验收", r.render_details(stats, facts))
 
     def test_new_turn_in_same_chat_requires_goal_judgment(self):
         original = self.log()
@@ -986,7 +986,7 @@ class RelatraTests(unittest.TestCase):
         stats = r.aggregate(facts, ledger)
         self.assertEqual(stats["counts"]["delivered"], 0)
         self.assertEqual(stats["end_states"]["pending_confirmation"], 1)
-        self.assertIn("前版依据缺失", r.render(stats, facts))
+        self.assertIn("前版依据缺失", r.render_details(stats, facts))
 
     def test_reuse_prefers_latest_cutoff_then_latest_revision(self):
         self.save(self.log())
@@ -1072,13 +1072,19 @@ class RelatraTests(unittest.TestCase):
         facts = dict(self.facts(), analysis="basic")
         ledger = self.ledger(facts)
         ledger["tasks"][0].update(outcome="三个入口可整行点击", limitations=["尚未运行时验收"], next_step="补运行时验收")
+        ledger["summary"] = ("## 本期概况\n\n导航入口已调整，尚未运行时验收。\n\n## 主要成果\n\n"
+                             f"- [三个入口可整行点击](details.md#{r.task_anchor(ledger['tasks'][0])})；尚未运行时验收。\n\n"
+                             "## 下一步\n\n- 补运行时验收，确认触摸范围。")
         stats = r.aggregate(facts, ledger)
         text = r.render(stats, facts)
-        for value in ("三个入口可整行点击", "尚未运行时验收", "补运行时验收", "未统计", "资源覆盖", "关键证据"):
+        for value in ("三个入口可整行点击", "尚未运行时验收", "补运行时验收", "details.md#", "token"):
             self.assertIn(value, text)
-        for value in ("## 前期比较", "## 改进建议", "## 周期内趋势", "cached_input_tokens", "过程事件："):
+        for value in ("## 前期比较", "## 改进建议", "## 周期内趋势", "cached_input_tokens", "过程事件：", "资源覆盖", "关键证据"):
             self.assertNotIn(value, text)
-        self.assertLess(len(text.splitlines()), 55)
+        self.assertLess(len(text.splitlines()), 25)
+        details = r.render_details(stats, facts)
+        for value in ("三个入口可整行点击", "尚未运行时验收", "补运行时验收", "未统计", "时间已知", "关键证据"):
+            self.assertIn(value, details)
         self.assertEqual(stats["execution"]["tokens"]["cached_input_tokens"], 40)
 
     def test_cross_period_reuse_preserves_first_delivery_and_later_acceptance(self):
@@ -1184,6 +1190,8 @@ class RelatraTests(unittest.TestCase):
         r.write_json(snapshot / "tasks.json", self.ledger(facts))
         first_report = run("report", "--snapshot", str(snapshot))
         first_folder = Path(first_report["report"]).parent
+        self.assertTrue((first_folder / "details.md").is_file())
+        self.assertEqual(set(first_report), {"report", "statistics", "counts", "coverage"})
         frozen = {p.name: p.read_bytes() for p in first_folder.iterdir()}
         reused = run(*collect_args)
         self.assertEqual(reused["review_queue"], [])

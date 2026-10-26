@@ -49,13 +49,13 @@ agent 整理 tasks.json，不让用户手工填表。示例中的引用替换为
 
 任务 type：implementation/fix/review/design/documentation/research/operations/consultation/other。id 标识独立目标，revision 仅用于实质范围变化，同一键仅一行。跨项目目标选一个主项目；共享 turn 不按字数分摊资源。
 
-已知 started_at 必须提供 start_evidence 和 start_note，证明真实目标起点；未知为 null，不用首条日志代替。goal/outcome/limitations/next_step 可省；next_step 只保留未闭合行动，即使已交付或验收也不能隐藏，已由其他目标完成时清空。limitations 不自动产生待办。
+已知 started_at 必须提供 start_evidence 和 start_note，证明真实目标起点；未知为 null，不用首条日志代替。goal/outcome/limitations/next_step 可省。outcome 整理截止时的实际变化与当前结论，limitations 保留当前仍适用的限制；已解决的限制不留在当前视图，历史事件和原证据不改写。next_step 只保留未闭合行动，即使已交付或验收也不能隐藏，已由其他目标完成时清空；语义重复行动由 agent 核实并只留一个主要归属目标，仅指向其他目标的说明不作待办。limitations 不自动产生待办。
 
 事件必须有唯一 id、kind、at（带时区 ISO 或 null）、非空 evidence 列表和 note。时间不得超出截止或早于已知起点；未定日期 workflow 不能单独确定事件日期，关联 dated turn 也必须确实定位该事件，不能随便引用旧消息。current_only README 不作历史证明。
 
 交付/验收/验证需 basis：static/build/runtime/user_acceptance/other/artifact/answer。实现交付需 tool_result 或有效 workflow；工具引用需核读 locations 指向的实际源行，在 verified_excerpt 保存去敏摘录。源行不可读或截断时保持待确认。user_acceptance 需明确用户认可；工具中的答复也需核对摘录。answer 仅可证明咨询、审查、设计、文档、研究的实际答案交付，不能证明实现或验收。脚本验证结构、引用与时间，语义及验收条件由 agent 核实。
 
-建议最多三条，形状为 `{"text":"建议", "task_ids":["目标id"], "evidence":["证据id"]}`，须来自相关任务的真实问题；所引任务未出现在本期报告时不展示。summary/recommendations 先写到账本，report 才是最终产物生成入口。
+建议最多三条，形状为 `{"text":"建议", "task_ids":["目标id"], "evidence":["证据id"]}`，须来自相关任务的真实问题；所引任务未出现在本期报告时不展示。summary/recommendations 先写到账本，report 才是最终产物生成入口。summary 按 [报告写作](reporting.md) 整理为带标题和任务明细链接的重点摘要，字段仍为字符串；recommendations 的完整引证列在明细，关键判断可归纳进摘要，不重复堆入正文。
 
 ## 更正
 
@@ -67,13 +67,13 @@ python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.yuzio/re
 
 `--revises` 与非空 `--reason` 必须成对提供；父版本须通过哈希校验，与当前项目/来源/时区/版本及周期一致，当前截止不得更早。同 facts 可直接复用原报告；需新证据时重新 collect 后指定新 snapshot。删除、拆分和归并直接编辑 tasks，不改变其他目标的 id；修正错误不增加范围修订号。明确排除的业务活动需写 excluded_turns，不能仅删除任务后让它下次再次成为候选。
 
-新报告保存 report.md、statistics.json、完整 tasks.json、facts.json 和 manifest.json。manifest 记录输入哈希、前版、比较基线、被更正版本及原因。没有独立 patch 文件或重放链，旧报告及源日志不变。
+新报告保存重点正文 report.md、完整可读明细 details.md、statistics.json、完整 tasks.json、facts.json 和 manifest.json。正文、明细及统计来自同一账本；任务明细锚点按 id/revision 稳定生成。命令参数与返回 JSON 字段不变，明细位于返回的 report 路径同目录。manifest 记录输入哈希、前版、比较基线、被更正版本及原因。没有独立 patch 文件或重放链，旧报告及源日志不变。
 
 ## 比较、格式与来源限制
 
 report 的 `--baseline PATH` 明确指定前期报告，校验其哈希并从基础输入重算。比较规则见 [统计口径](metrics.md#比较与覆盖)。没有基线不输出空比较章节。
 
-0.2.0 使用 schema v2。旧文件保留可读，不自动迁移，不承诺旧格式复算；继续处理需重新 configure/collect。`correct` 和 `--correction` 已移除。不要手工修改 schema 或重签哈希伪造兼容。
+0.3.0 沿用 schema v2；本次仅调整阅读结构，不改变采集、状态、统计及 JSON 字段语义。旧报告保留原样，不补写 details.md。沿用既有同版本范围核对和格式检查，不新增跨包版本复用或自动迁移承诺；不适用的旧输入需重新 configure/collect。`correct` 和 `--correction` 已移除。不要手工修改 schema 或重签哈希伪造兼容。
 
 本地适配器识别 session_meta、turn_context、生命周期、token_count、token_usage_record 及消息/工具结果引用。只保存用户、assistant final 和实际用户输入工具答复引用；不导入思考、系统指令或账户元数据，harness 注入仍需 agent 识别。工具原输出仅存哈希与源行，不复制任意原文。
 

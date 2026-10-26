@@ -39,6 +39,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
+| [test_reports.py](relatra/test_reports.py)、[周期报告样例](relatra/examples/README.md) | 重点正文与完整明细、日周月归纳、锚点、资源覆盖及可复现样例 |
 | [test_vistra.py](vistra/test_vistra.py) | 包内引用、元数据、来源、许可证与可移植性 |
 | [package_checks.py](shared/package_checks.py)、[test_package_checks.py](shared/test_package_checks.py) | 通用链接与资源检查、缺失及越界回归、仓库文档链接、双语 README 导航一致性 |
 | [test_local_storage.py](shared/test_local_storage.py)、[test_project_data_paths.py](shared/test_project_data_paths.py) | 临时 Git 仓库中的存储语义、维护路径 |

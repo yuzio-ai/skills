@@ -358,7 +358,7 @@ $relatra 周报
 
 Defaults are the previous complete calendar period, Chinese and Asia/Shanghai time, with weeks running Monday through Sunday. Request “this week through now” for the current period, or specify another output language. Ask explicitly for rework, human intervention or waiting analysis when needed.
 
-Basic mode covers outcomes, status, outstanding work, observable time and tokens. Efficiency diagnosis uses deep mode. A single project defaults to `<project>/.yuzio/relatra`; multiple projects need an explicit shared report directory. Historical reports can be corrected while preserving earlier versions.
+Reports pair a focused `report.md` with complete readable `details.md`. The main report highlights outcomes, important outstanding work and next steps, puts actions requiring you first, and ends with one line of time and tokens; evidence and detailed statistics stay in the details. Daily reports cover the day's progress, weekly reports group work by goals, and monthly reports cover milestones and gaps. Efficiency diagnosis uses deep mode, with trend tables kept in the details. A single project defaults to `<project>/.yuzio/relatra`; multiple projects need an explicit shared report directory. Historical reports can be corrected while preserving earlier versions.
 
 Requires Python 3.9+ and readable local session logs and supported workflow evidence for the selected projects. Coverage is not guaranteed for cloud records, deleted logs or other machines, and an initial collection is not a complete historical backlog audit. Keep claims pending when evidence is unavailable. Missing time and tokens are not zero, and observations are not converted to fees or human work hours.
 

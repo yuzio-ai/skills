@@ -15,9 +15,10 @@ import statistics
 import sys
 import uuid
 from datetime import date, datetime, time, timedelta, timezone
+from decimal import Decimal, ROUND_HALF_UP
 from zoneinfo import ZoneInfo
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 SCHEMA = 2
 STATES = {"pending_confirmation", "in_progress", "delivered", "accepted", "blocked", "failed", "cancelled"}
 PROCESS = {"reopened", "rework", "retry", "scope_changed", "validation_passed", "validation_failed", "intervention", "wait"}
@@ -1005,55 +1006,176 @@ def md_text(value):
 
 
 def display(value, suffix=""):
-    return "未知" if value is None else f"{value:g}{suffix}" if isinstance(value, (int, float)) else str(value)
+    if value is None:
+        return "未知"
+    if isinstance(value, (int, float, Decimal)):
+        text = format(Decimal(str(value)), ",f")
+        return (text.rstrip("0").rstrip(".") if "." in text else text) + suffix
+    return str(value)
+
+
+def duration(value, brief=False):
+    if value is None:
+        return "未知"
+    seconds = Decimal(str(value))
+    if seconds < 60:
+        return display(seconds, " 秒")
+    if brief:
+        minutes = int((seconds / 60).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        hours, minutes = divmod(minutes, 60)
+        parts = ([f"{hours} 小时"] if hours else []) + ([f"{minutes} 分"] if minutes else [])
+        return ("约" if seconds % 60 else "") + " ".join(parts)
+    hours = int(seconds // 3600)
+    minutes = int(seconds % 3600 // 60)
+    remaining = seconds % 60
+    parts = ([f"{hours} 小时"] if hours else []) + ([f"{minutes} 分"] if minutes else [])
+    if remaining:
+        parts.append(display(remaining, " 秒"))
+    return " ".join(parts) + f"（{display(seconds, ' 秒')}）"
+
+
+def short_tokens(value):
+    if value is None:
+        return "未知"
+    number = Decimal(str(value))
+    scale, unit = (Decimal(100000000), "亿") if number >= 100000000 else (Decimal(10000), "万")
+    if number < scale:
+        return display(number)
+    rounded = (number / scale).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return ("约" if rounded * scale != number else "") + display(rounded) + unit
+
+
+def activity_dates(stats, facts):
+    """Presentation only: observed endpoints do not imply continuous coverage."""
+    window = stats["window"]
+    start, end = stamp(window["start"]), stamp(window["cutoff"])
+    excluded = set(stats["coverage"]["excluded_turns"])
+    times = []
+    for turn in facts["turns"]:
+        if turn["id"] in excluded:
+            continue
+        interval = clipped(turn, start, end)
+        if interval:
+            times.extend([interval[0], min(interval[1], end - timedelta(microseconds=1))])
+        activity = turn.get("activity_at", [turn.get("last_observed_at")])
+        for value in activity + [usage["at"] for usage in turn["usage"]]:
+            at = stamp(value)
+            if at is not None and start <= at < end:
+                times.append(at)
+    tz = ZoneInfo(window["timezone"])
+    return (min(times).astimezone(tz).date(), max(times).astimezone(tz).date()) if times else None
+
+
+def coverage_text(stats):
+    coverage, ex = stats["coverage"], stats["execution"]
+    text = (f"覆盖：任务归属 {coverage['mapped_period_turns']}/{coverage['observed_period_turns']} 轮；"
+            f"时间已知 {ex['timed_turns']}/{ex['turns']} 轮；"
+            f"token 总量已知 {ex['token_field_turn_coverage']['total_tokens']}/{ex['turns']} 轮。")
+    if ex["partial_usage_turns"]:
+        text += f"资源记录不完整 {ex['partial_usage_turns']} 轮。"
+    if coverage["unknown_date_events"]:
+        text += f"未定日期事件 {coverage['unknown_date_events']} 项。"
+    return text
+
+
+def task_anchor(task):
+    """Stable across title, order and period changes; revisions stay distinct."""
+    return "task-" + digest([task["id"], task["revision"]])[:16]
+
+
+def report_header(stats, facts, details=False):
+    window = stats["window"]
+    cutoff = stamp(window["cutoff"]).astimezone(ZoneInfo(window["timezone"])).isoformat()
+    first, last = window["label"].split("_")
+    output = [f"# Relatra {PERIODS[window['kind']]} · {window['label']}" + (" · 明细" if details else ""), "",
+              f"统计周期：{first} 至 {last}；实际截止：{cutoff}；时区：{window['timezone']}。",
+              "范围：指定项目的可读取本地记录。",
+              *(["阶段性报告，周期尚未结束。"] if window["partial"] else [])]
+    dates = activity_dates(stats, facts)
+    if dates:
+        output += [f"已发现活动日期：{dates[0]} 至 {dates[1]}（仅首末日期，不代表连续完整覆盖）。"]
+        if dates[0] > stamp(window["start"]).astimezone(ZoneInfo(window["timezone"])).date():
+            output += [f"{dates[0]} 之前的本期工作情况未知。"]
+    else:
+        output += ["本期未发现可归属记录；活动日期未知。"]
+    return output + [""]
 
 
 def render(stats, facts):
-    window, ex, coverage = stats["window"], stats["execution"], stats["coverage"]
+    """Keep editorial judgments in the agent-authored ledger summary."""
+    output = report_header(stats, facts)
+    if stats["summary"].strip():
+        output += [stats["summary"].strip(), ""]
+    else:
+        counts = stats["counts"]
+        output += ["## 本期概况", "", "尚未整理重点摘要；完整任务、限制与后续行动见明细。",
+                   f"本期交付（含验收） {counts['delivered']}；首次验收 {counts['accepted']}；发生失败的任务 {counts['failed']}。",
+                   "期末状态：" + ("；".join(f"{LABELS[k]} {v}" for k, v in sorted(stats["end_states"].items()) if v) or "未发现可归属任务") + "。", ""]
+    diagnostics = [w for w in stats["warnings"] if not w.startswith("覆盖范围仅为")]
+    ex = stats["execution"]
+    output += [coverage_text(stats) + ("另有采集与历史提示，具体影响见[明细](details.md)。" if diagnostics else ""), ""]
+    timing = duration(ex["execution_seconds_sum"], brief=True)
+    tokens = short_tokens(ex["tokens"]["total_tokens"])
+    cached = short_tokens(ex["tokens"]["cached_input_tokens"])
+    if ex["execution_seconds_sum"] is not None and (diagnostics or ex["timed_turns"] < ex["turns"]):
+        timing += "（部分观测值）"
+    if ex["tokens"]["total_tokens"] is not None and (diagnostics or ex["partial_usage_turns"] or
+            ex["token_field_turn_coverage"]["total_tokens"] < ex["turns"]):
+        tokens += "（部分观测值）"
+    if ex["tokens"]["cached_input_tokens"] is not None and (diagnostics or ex["partial_usage_turns"] or
+            ex["token_field_turn_coverage"]["cached_input_tokens"] < ex["turns"]):
+        cached += "（部分观测值）"
+    output += [f"已观测累计执行时间：{timing}；token：{tokens}，其中缓存输入：{cached}。完整任务、证据与统计见[明细](details.md)。", ""]
+    return "\n".join(output)
+
+
+def render_details(stats, facts):
+    ex, coverage = stats["execution"], stats["coverage"]
     deep = stats["analysis"] == "deep"
-    cutoff = stamp(window["cutoff"]).astimezone(ZoneInfo(window["timezone"])).isoformat()
     counts = stats["counts"]
-    output = [f"# Relatra {PERIODS[window['kind']]} · {window['label']}", "",
-              f"范围：指定项目的可读取本地记录；时区：{window['timezone']}；截止：{cutoff}。",
-              "阶段性报告，周期尚未结束。" if window["partial"] else "完整指定周期；历史来源完整性未知。", "",
+    output = report_header(stats, facts, details=True) + ["[返回重点正文](report.md)；历史来源完整性未知。", "",
               "## 周期概览", "",
               f"本期交付（含验收） {counts['delivered']}；首次验收 {counts['accepted']}；发生失败的任务 {counts['failed']}。",
               "期末状态：" + ("；".join(f"{LABELS[k]} {v}" for k, v in sorted(stats["end_states"].items()) if v) or "未发现可归属任务") + "。", ""]
-    if stats["summary"]:
-        output += [stats["summary"], ""]
     output += ["## 具体任务与成果", ""]
     projects = sorted({t["project"] for t in stats["tasks"]})
     for project in projects:
         output += [f"### {md_text(project)}", ""]
         for task in (t for t in stats["tasks"] if t["project"] == project):
-            output += [f"- **{md_text(task['title'])}**（{LABELS[task['status']]}" + ("，历史修订" if task["superseded"] else "") +
-                       f"）：{md_text(task['outcome'] or '实际变化待核实')}。"]
-            if task["goal"]:
-                output += [f"  目标：{md_text(task['goal'])}。"]
-            judgments = [e for e in task["events"] if e["kind"] in STATES | {"reopened", "validation_passed", "validation_failed"}]
-            if judgments:
-                event = judgments[-1]
-                output += [f"  证据判断：{md_text(event['note'])}；验证层级：{BASIS_LABELS.get(event.get('basis'), '状态记录')}。"]
-                output += [f"  关键证据：{', '.join(event['evidence'])}（详见 statistics.json）。"]
-            else:
-                output += ["  交付证据尚待核实。"]
+            output += [f'<a id="{task_anchor(task)}"></a>', "",
+                       f"#### {md_text(task['title'])}（{LABELS[task['status']]}" + ("，历史修订" if task["superseded"] else "") + "）", "",
+                       f"当前结论：{md_text(task['outcome'] or '当前结论待核实')}。"]
             if task["limitations"]:
-                output += ["  限制：" + md_text("；".join(task["limitations"])) + "。"]
-        output += [""]
+                output += ["", "当前限制：" + md_text("；".join(task["limitations"])) + "。"]
+            if task["next_step"].strip():
+                output += ["", "未闭合行动：" + md_text(task["next_step"]) + "。"]
+            output += ["", f"目标标识：`{md_text(task['id'])}`；修订：{task['revision']}；本期首次交付：{'是' if task['delivered_this_period'] else '否'}；本期首次验收：{'是' if task['accepted_this_period'] else '否'}。"]
+            if task["goal"]:
+                output += ["", f"目标：{md_text(task['goal'])}。"]
+            events = task["events"] + task["unknown_date_events"]
+            if events:
+                output += ["", "历史事件与证据：", ""]
+                for event in events:
+                    kind = LABELS.get(event["kind"], PROCESS_LABELS.get(event["kind"], event["kind"]))
+                    output += [f"- {event['at'] or '日期未知'} · {kind}：{md_text(event['note'])}；验证层级：{BASIS_LABELS.get(event.get('basis'), '状态记录')}。",
+                               f"  关键证据：{', '.join(event['evidence'])}（详见 statistics.json）。"]
+            else:
+                output += ["", "交付证据尚待核实。"]
+            output += [""]
     if not projects:
         output += ["本期未发现范围内可归属的任务。", ""]
     output += ["## 资源与覆盖", "",
-               f"累计执行 {display(ex['execution_seconds_sum'], ' 秒')}；去重占用 {display(ex['occupied_seconds'], ' 秒')}；已观测 token 总量 {display(ex['tokens']['total_tokens'])}。",
-               f"时间区间覆盖 {ex['timed_turns']}/{ex['turns']} 轮；资源覆盖 {ex['token_turn_coverage']['known']}/{ex['turns']} 轮；资源不完整轮 {ex['partial_usage_turns']}。",
-               f"任务归属覆盖 {coverage['mapped_period_turns']}/{coverage['observed_period_turns']} 轮；未定日期事件 {coverage['unknown_date_events']}。",
+               f"累计执行 {duration(ex['execution_seconds_sum'])}；去重占用 {duration(ex['occupied_seconds'])}；已观测 token 总量 {display(ex['tokens']['total_tokens'])}，其中缓存输入 {display(ex['tokens']['cached_input_tokens'])}。",
+               coverage_text(stats),
                "执行时间包含工具及轮内等待，不代表人工投入；未知不补零，不换算费用。", ""]
     if not deep:
         output += ["返工、重试、人工介入与等待未统计；不能解释为零次。", ""]
     diagnostics = [w for w in stats["warnings"] if not w.startswith("覆盖范围仅为")]
     if diagnostics:
-        output += [f"采集与历史覆盖有 {len(diagnostics)} 条提示，成果和资源可能不完整；详情见 statistics.json 的 warnings。"]
+        output += [f"采集与历史覆盖有 {len(diagnostics)} 条提示，成果和资源可能不完整：", ""]
+        output += [f"- {md_text(w)}" for w in diagnostics]
         if any("未全面盘点更早遗留" in w for w in diagnostics):
-            output += ["账本未全面盘点更早遗留目标。"]
+            output += ["", "账本未全面盘点更早遗留目标。"]
         output += [""]
     if deep:
         cycle = stats["completion_cycle"]
@@ -1144,6 +1266,7 @@ def report(args):
                                          "revises": absolute(args.revises) if args.revises else None,
                                          "reason": args.reason.strip() if args.reason else None})
     (target / "report.md").write_text(render(stats, facts), encoding="utf-8")
+    (target / "details.md").write_text(render_details(stats, facts), encoding="utf-8")
     return {"report": str(target / "report.md"), "statistics": str(target / "statistics.json"), "counts": stats["counts"], "coverage": stats["coverage"]}
 
 
