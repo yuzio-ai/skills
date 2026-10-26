@@ -18,7 +18,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from zoneinfo import ZoneInfo
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 SCHEMA = 2
 STATES = {"pending_confirmation", "in_progress", "delivered", "accepted", "blocked", "failed", "cancelled"}
 PROCESS = {"reopened", "rework", "retry", "scope_changed", "validation_passed", "validation_failed", "intervention", "wait"}
@@ -781,14 +781,18 @@ def observed(turn, start, end):
 
 def execution(turns, start, end):
     intervals = [v for t in turns if (v := clipped(t, start, end))]
-    usages = [u for t in turns for u in t["usage"] if start <= stamp(u["at"]) < end]
+    period_usages = [[u for u in t["usage"] if start <= stamp(u["at"]) < end] for t in turns]
+    usages = [u for records in period_usages for u in records]
     token_values, samples = {}, {}
     for key in TOKENS:
         values = [u["tokens"].get(key) for u in usages if type(u["tokens"].get(key)) is int and u["tokens"][key] >= 0]
         token_values[key] = sum(values) if values else None
         samples[key] = len(values)
     with_usage = sum(any(start <= stamp(u["at"]) < end and any(type(u["tokens"].get(k)) is int and u["tokens"][k] >= 0 for k in TOKENS) for u in t["usage"]) for t in turns)
-    field_coverage = {key: sum(any(start <= stamp(u["at"]) < end and type(u["tokens"].get(key)) is int and u["tokens"][key] >= 0 for u in t["usage"]) for t in turns) for key in TOKENS}
+    # A field is complete for a turn only when every observed response in this
+    # window supplies it. Keep partial sums and other fields independently valid.
+    field_coverage = {key: sum(bool(records) and all(type(u["tokens"].get(key)) is int and
+                          u["tokens"][key] >= 0 for u in records) for records in period_usages) for key in TOKENS}
     def user_in_period(turn):
         # Legacy facts without message timestamps cannot establish a period count.
         return any(start <= stamp(at) < end for at in turn.get("user_message_at", []))

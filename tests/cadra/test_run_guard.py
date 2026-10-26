@@ -17,10 +17,11 @@ AT = '2026-10-25T10:00:00+08:00'
 LATER = '2026-10-25T11:00:00+08:00'
 
 
-def example():
+def example(protocol='0.10', flow='code'):
     return {
-        'protocol': '0.8', 'run_id': 'run-20261025-01', 'status': 'running',
-        'created_at': AT, 'execution_mode': 'unattended', 'skill_version': '0.8.0',
+        'protocol': protocol, 'run_id': 'run-20261025-01', 'status': 'running',
+        'created_at': AT, 'execution_mode': 'unattended',
+        'skill_version': '0.10.0',
         'executor': {'instance_id': 'first', 'generation': 1, 'host_id': 'local',
                      'thread_id': 'chat-1', 'turn_id': 'turn-1', 'claimed_at': AT,
                      'progress': {'at': AT, 'event': 'run_created'}},
@@ -28,9 +29,9 @@ def example():
         'preflight': [dict(scope='project', status='passed', at=AT, inputs={}, evidence='project check'),
                       dict(scope='task', slug='camera', status='passed', at=AT, inputs={}, evidence='inputs and commands')],
         'tasks': [{'slug': 'camera', 'revision': 1, 'previous_run': None,
-                   'definition': {'protocol': '0.8', 'slug': 'camera', 'revision': 1,
-                                  'requirement': 'preserve camera dependency', 'flow': 'implementation', 'preparation': 'ready'},
-                   'start_action': {'kind': 'first_start', 'stage': 'code'},
+                   'definition': {'protocol': protocol, 'slug': 'camera', 'revision': 1,
+                                  'requirement': 'preserve camera dependency', 'flow': flow, 'preparation': 'ready'},
+                   'start_action': {'kind': 'first_start', 'stage': guard.normalize_flow(flow, protocol)[0]},
                    'authorization_consumed': False, 'state': 'queued',
                    'budget': {'calls': 0, 'remediation': 0, 'retries': {}},
                    'checkpoint': {'pending_call': None, 'last_delivery': None},
@@ -65,7 +66,7 @@ class RunGuardTests(unittest.TestCase):
         self.runs = self.root / '.yuzio/cadra/runs'
         self.runs.mkdir(parents=True)
         self.path = self.runs / 'run-20261025-01.md'
-        self.data = example()
+        self.data = example(getattr(self, 'protocol', '0.10'), getattr(self, 'configured_flow', 'code'))
         self.sha = guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
 
     def bind_worker(self):
@@ -305,25 +306,6 @@ class RunGuardTests(unittest.TestCase):
         self.assertEqual(report.read_bytes(), saved)
         self.assertFalse(list(self.runs.glob('.run-*')))
 
-    def test_legacy_yaml_is_readonly_and_active_legacy_blocks_new_run(self):
-        self.path.unlink()
-        old = self.runs / 'run-20261024-01.md'
-        raw = b"---\nprotocol: '0.6'\nrun_id: run-20261024-01\nstatus: running\ntasks:\n- slug: old\n  state: running\n---\n# Historical\n"
-        old.write_bytes(raw)
-        self.assertTrue(guard.unfinished(guard.header(raw)))
-        with self.assertRaises(ValueError):
-            guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-        with self.assertRaises(ValueError):
-            guard.current(raw)
-        self.assertEqual(old.read_bytes(), raw)
-        closed = raw.replace(b'status: running', b'status: stopped').replace(b'  state: running', b'  state: failed')
-        old.write_bytes(closed)
-        with self.assertRaises(ValueError):
-            guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-        closed = closed.replace(b'  state: failed\n', b'  state: failed\n  result:\n    state: failed\n')
-        old.write_bytes(closed)
-        guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-        self.assertEqual(old.read_bytes(), closed)
 
     def test_new_run_does_not_overwrite_or_bypass_active_run(self):
         with self.assertRaises(ValueError):
@@ -334,7 +316,8 @@ class RunGuardTests(unittest.TestCase):
             guard.publish(self.runs / (new['run_id'] + '.md'), document(new), None, 'first', 1, 'create')
 
     def test_duplicate_fields_and_legacy_definition_cannot_be_published(self):
-        raw = document(self.data).replace(b'"protocol": "0.8",', b'"protocol": "0.8", "protocol": "0.8",', 1)
+        field = ('"protocol": "' + self.data['protocol'] + '",').encode()
+        raw = document(self.data).replace(field, field + b' ' + field, 1)
         with self.assertRaises(ValueError):
             guard.publish(self.path, raw, self.sha, 'first', 1)
         new = deepcopy(self.data)
@@ -411,6 +394,8 @@ class RunGuardTests(unittest.TestCase):
             task = new['tasks'][0]
             second = deepcopy(task['calls'][0])
             second['id'] = 2
+            second['before'] = {'stage_result': {'stage': 'code', 'status': 'completed', 'round': 1},
+                                'next': {'stage': 'review', 'allowed': True, 'reason': 'stage_completed'}}
             if close_old:
                 task['calls'][0].update(closed=True, result={'handoff': 'code-01.md'})
             else:
@@ -428,50 +413,44 @@ class RunGuardTests(unittest.TestCase):
         guard.publish(self.path, document(new), sha, 'first', 1)
         self.assertEqual(guard.current(self.path.read_bytes())[0]['tasks'][0]['budget']['calls'], 2)
 
-    def test_legacy_closure_checks_results_duplicates_and_nested_snapshot_fields(self):
-        self.path.unlink()
-        old = self.runs / 'run-20261024-01.md'
-        for indent in ('', '  '):
-            valid = ("---\nprotocol: '0.6'\nrun_id: run-20261024-01\nstatus: completed\ntasks:\n"
-                     + indent + '- slug: old\n' + indent + '  state: completed\n'
-                     + indent + '  definition:\n' + indent + '    state: running\n'
-                     + indent + '    full_task_document: |\n' + indent + '      status: running\n'
-                     + indent + '  result:\n' + indent + '    state: completed\nreports: []\n---\n# History\n')
-            field = indent + '  state: completed\n'
-            bad_cases = [valid.replace(field, field + field, 1),
-                         valid.replace('status: completed', 'status: completed\nstatus: running', 1),
-                         valid.replace('status: completed', 'status: completed\n"status": running', 1),
-                         valid.replace(indent + '    state: completed', indent + '    state: failed'),
-                         valid.replace(indent + '    state: completed', indent + '    state: completed\n' + indent + '    "state": running'),
-                         valid.replace(indent + '  result:\n' + indent + '    state: completed\n', ''),
-                         valid.replace('reports: []', indent + '- slug: old\n' + field + indent + '  result:\n' + indent + '    state: completed\nreports: []')]
-            for bad in bad_cases:
-                old.write_text(bad)
-                with self.subTest(indent=indent, bad=bad), self.assertRaises(ValueError):
-                    guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-                self.assertEqual(old.read_text(), bad)
-            old.write_text(valid)
-            guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-            self.assertEqual(old.read_text(), valid)
-            self.path.unlink()
 
-    def test_legacy_json_requires_matching_results_and_inspect_rejects_unknown_protocol(self):
+
+    def test_old_json_and_yaml_are_rejected_without_writes(self):
+        before = self.path.read_bytes()
+        for protocol in ('0.6', '0.7', '0.8', '0.9', '0.99', None):
+            old = deepcopy(self.data)
+            old['protocol'] = protocol
+            raw = document(old)
+            with self.subTest(protocol=protocol):
+                with self.assertRaisesRegex(ValueError, 'archive'):
+                    guard.current(raw)
+                with self.assertRaises(ValueError):
+                    guard.publish(self.path, raw, self.sha, 'first', 1)
+                self.assertEqual(self.path.read_bytes(), before)
+                self.path.write_bytes(raw)
+                proc = subprocess.run([sys.executable, '-B', str(SCRIPT), 'inspect', '--run', str(self.path)],
+                                      capture_output=True, text=True)
+                self.assertEqual(proc.returncode, 1)
+                self.assertIn('archive', proc.stderr)
+                self.assertEqual(self.path.read_bytes(), raw)
+                self.path.write_bytes(before)
+        with self.assertRaisesRegex(ValueError, 'archive'):
+            guard.header(b"---\nprotocol: '0.6'\nstatus: completed\n---\n")
+
+    def test_old_run_in_active_container_blocks_create_until_archived(self):
         self.path.unlink()
         old = self.runs / 'run-20261024-01.md'
-        legacy = dict(protocol='0.6', run_id='run-20261024-01', status='stopped',
-                      legacy_closed=True, tasks=[dict(slug='old', state='failed')])
-        old.write_bytes(document(legacy))
+        raw = b"---\nprotocol: '0.6'\nstatus: completed\n---\n"
+        old.write_bytes(raw)
         with self.assertRaises(ValueError):
             guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-        legacy['tasks'][0]['result'] = {'state': 'failed'}
-        old.write_bytes(document(legacy))
+        self.assertFalse(self.path.exists())
+        self.assertEqual(old.read_bytes(), raw)
+        archive = self.root / '.yuzio/cadra-archive/test/runs'
+        archive.mkdir(parents=True)
+        old.rename(archive / old.name)
         guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
-        unknown = document({**self.data, 'protocol': '0.99'})
-        self.path.write_bytes(unknown)
-        proc = subprocess.run([sys.executable, '-B', str(SCRIPT), 'inspect', '--run', str(self.path)],
-                              capture_output=True, text=True)
-        self.assertEqual(proc.returncode, 1)
-        self.assertEqual(self.path.read_bytes(), unknown)
+        self.assertEqual((archive / old.name).read_bytes(), raw)
 
 
 if __name__ == '__main__':

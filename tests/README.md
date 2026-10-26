@@ -34,9 +34,12 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | 文件 | 检查范围 |
 |---|---|
 | [test_cadra.py](cadra/test_cadra.py)、[model.py](cadra/model.py) | Cadra v0.6 测试模型的流程、修订、预算和恢复约束；不是技能运行时 |
-| [test_flow_v08.py](cadra/test_flow_v08.py)、[model_v08.py](cadra/model_v08.py) | 当前流程的测试模型：新预设、人工阶段受阻与必要复审；不替代真实 agent 验证 |
-| [test_append_agents.py](cadra/test_append_agents.py) | 直接测试写入器的原子追加、进程竞争、角色绑定、派发证据、子 agent 停止与旧协议只读 |
+| [test_flow_current.py](cadra/test_flow_current.py)、[model_current.py](cadra/model_current.py) | 当前流程的测试模型：新预设、人工阶段受阻与必要复审；不替代真实 agent 验证 |
+| [test_append_agents.py](cadra/test_append_agents.py) | 直接测试写入器的原子追加、进程竞争、角色绑定、派发证据、子 agent 停止与旧协议拒绝 |
+| [test_review_current.py](cadra/test_review_current.py) | review 闭环、按需创建 worker、当前协议与 Gate 校验 |
+| [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；离线旧 YAML 读取需 macOS 系统 Ruby |
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
+| [test_guard_safety.py](cadra/test_guard_safety.py) | 停止与 skipped、计费依据及上限、合法恢复、复审旧轮次的真实文件回归；跨 Run 轮次另用当前模型核对 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
 | [test_reports.py](relatra/test_reports.py)、[周期报告样例](relatra/examples/README.md) | 重点正文与完整明细、日周月归纳、锚点、资源覆盖及可复现样例 |

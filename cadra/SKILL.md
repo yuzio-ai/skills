@@ -28,8 +28,8 @@ license: MIT
 - 只执行指定入口；run 内的串行推进，以及 run/resume 按 [report](references/report.md) 生成收尾报告，均属于该入口已授权范围。只讨论规则时不创建资料、不启动执行。list 不写文件、不初始化。
 - 写入口缺容器时先报告路径，再按 [容器模板](assets/project/) 最小建立 README、tasks、runs 与忽略规则；已有缺项仅补齐。接续指定任务或 Run 却找不到记录时报告缺口，不能用空初始化代替恢复。目标不明确、指向技能源仓库或不可安全写入时停止。
 - Task 只保存定义与准入；Run 是执行状态的唯一来源。实际工程阶段通过 Cohestra 调用，Cadra 不写 `.yuzio/cohestra`，不复制 handoff 正文。正式执行总结按存储约定处理。
-- 同一项目至多一个未完成 Run，同一时刻至多一个执行中的 Task。每项使用独立 worker 与 reviewer，角色按需创建、阶段串行；不做跨任务并行、DAG 调度、定时器或 daemon。默认 implementation；need/design 在外部人工参与准备。
-- 协议 0.8；历史 0.6/0.7 按 [版本边界](references/compatibility.md) 只读识别，未完成旧 Run 由旧版继续。只在明确 add 升级授权下迁移指定 Task，不自动迁移或双写，不改旧 Run；缺版本或未知版本停止相关操作。
+- 同一项目至多一个未完成 Run，同一时刻至多一个执行中的 Task。每项使用独立 worker 与 reviewer，角色按需创建、阶段串行；不做跨任务并行、DAG 调度、定时器或 daemon。默认 code；need/design 在外部人工参与准备。
+- 仅接受协议 0.10；旧协议、缺版本与未知版本停止相关操作，不保留运行时兼容或迁移入口。本地切换先闭合原 Run、备份并归档，再重新准备待办，见 [版本边界](references/compatibility.md)。
 - run/resume 的角色隔离与派发遵循 [任务执行者](references/agents.md)；run/resume 写入和 list 后续建议遵循 [执行者识别](references/executor.md)；建 Run 前完成 [执行预检](references/preflight.md)。执行中与活性未知均不得自动接管。
 
 ## 交付

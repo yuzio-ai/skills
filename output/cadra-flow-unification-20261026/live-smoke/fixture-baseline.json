@@ -1,0 +1,17 @@
+{
+  "project": "/private/tmp/cadra-live-fa274994d4",
+  "at": "2026-10-26T12:15:30.916869+00:00",
+  "author": "live smoke controller fixture setup; pre-task baseline",
+  "files": {
+    ".gitignore": "2a58ffc5a5349edfa5a55b93f0fa6bd2848b04dce15af5cb58f8fae5d77c4a8b",
+    "AGENTS.md": "d89b1d325bd4a058637ab13d88120c200b01242ee3fbf4f17a33e0aa016002a5",
+    "cleanup.py": "8285a92c417e243b4b70b96ceaad5069fb8f87425874b64f33a4cce53e1d23ef",
+    "fix_counter.py": "9cc7d08dd0cf5f4c4d4b43ba86459cec6152004b6ebb64f69048fa85032e27e2",
+    "review_total.py": "14af3dc5d2ca90e5adc8f4ddb62535ff85b67bb6dcb247d9470e73ff753b3a36",
+    "readonly_value.py": "e0da6bd3ee37b682cdce47496c9d28fd26f6065bb04ac4bbc6540f3e8de39e80",
+    "test_cleanup.py": "de5f51d7b3bfb402f7802e5a3176ff9ba7f9668c0b5639e5396db693ee146998",
+    "test_fix_counter.py": "602acee89bbb19d8ecfa99a225119912dae80002b799a75f0bdef648db0327dc",
+    "test_review_total.py": "56db46808076b51b400dfa725b00e7f690d02a379e3a65d25c00328a79fad965",
+    "test_readonly_value.py": "60dbca0f4eb8a3f679684d4db3a9a9369c54084fde3c8d6ce7375a7ed84c5272"
+  }
+}

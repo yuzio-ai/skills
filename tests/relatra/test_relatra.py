@@ -113,6 +113,70 @@ class RelatraTests(unittest.TestCase):
         with self.assertRaises(r.DataError):
             self.facts()
 
+    def test_mixed_response_fields_keep_partial_sums_and_independent_coverage(self):
+        for missing in ("total_tokens", "cached_input_tokens"):
+            with self.subTest(missing=missing):
+                records = self.log()
+                second = copy.deepcopy(records[4])
+                second["payload"]["response_id"] = "response-two"
+                second["payload"]["usage"].pop(missing)
+                records.insert(5, second)
+                self.save(records)
+                facts = self.facts()
+                stats = r.aggregate(facts, self.ledger(facts))
+                ex = stats["execution"]
+                expected = {"total_tokens": 120, "cached_input_tokens": 40}
+                for field, value in expected.items():
+                    self.assertEqual(ex["tokens"][field], value if field == missing else value * 2)
+                    self.assertEqual(ex["token_field_turn_coverage"][field], int(field != missing))
+                self.assertEqual(ex["recorded_calls"], 2)
+                self.assertEqual(ex["partial_usage_turns"], 0)
+                text = r.render(stats, facts)
+                if missing == "total_tokens":
+                    self.assertIn("token：120（部分观测值），其中缓存输入：80。", text)
+                    self.assertIn("token 总量已知 0/1 轮", text)
+                else:
+                    self.assertIn("token：240，其中缓存输入：40（部分观测值）", text)
+
+    def test_complete_zero_response_fields_count_as_known(self):
+        records = self.log()
+        records[4]["payload"]["usage"] = dict.fromkeys(r.TOKENS, 0)
+        second = copy.deepcopy(records[4])
+        second["payload"]["response_id"] = "response-two"
+        records.insert(5, second)
+        self.save(records)
+        facts = self.facts()
+        ex = r.aggregate(facts, self.ledger(facts))["execution"]
+        self.assertEqual(ex["tokens"], dict.fromkeys(r.TOKENS, 0))
+        self.assertEqual(ex["token_field_turn_coverage"], dict.fromkeys(r.TOKENS, 1))
+        self.assertEqual(ex["token_field_samples"], dict.fromkeys(r.TOKENS, 2))
+
+    def test_field_coverage_only_checks_responses_inside_window(self):
+        records = self.log(start="2026-10-04T23:55:00+08:00")
+        records[4]["payload"]["usage"].pop("total_tokens")
+        records[4]["payload"]["usage"].pop("cached_input_tokens")
+        second = self.log()[4]
+        second["payload"]["response_id"] = "response-two"
+        records.insert(5, second)
+        self.save(records)
+        facts = self.facts()
+        ex = r.aggregate(facts, r.candidates(facts))["execution"]
+        self.assertEqual(ex["tokens"]["total_tokens"], 120)
+        self.assertEqual(ex["tokens"]["cached_input_tokens"], 40)
+        self.assertEqual(ex["token_field_turn_coverage"], dict.fromkeys(r.TOKENS, 1))
+        self.assertEqual(ex["recorded_calls"], 1)
+        # Complete historical records cannot fill a missing field in this window.
+        records[4]["payload"]["usage"].update(total_tokens=120, cached_input_tokens=40)
+        second["payload"]["usage"].pop("total_tokens")
+        second["payload"]["usage"].pop("cached_input_tokens")
+        self.save(records)
+        facts = self.facts()
+        ex = r.aggregate(facts, r.candidates(facts))["execution"]
+        for field in ("total_tokens", "cached_input_tokens"):
+            self.assertIsNone(ex["tokens"][field])
+            self.assertEqual(ex["token_field_turn_coverage"][field], 0)
+        self.assertEqual(ex["token_field_turn_coverage"]["input_tokens"], 1)
+
     def test_replayed_response_keeps_original_period(self):
         values = self.log(start="2026-10-03T09:00:00+08:00", end="2026-10-03T09:10:00+08:00")
         replay = copy.deepcopy(values[4])

@@ -1,0 +1,19 @@
+{
+  "reviewed_source": {
+    "tests": 4,
+    "failures": 4,
+    "errors": 0
+  },
+  "fixed_source": {
+    "tests": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "baseline_sha256": "fb014710b2853c579b17e748f192a1364baae070f9875fe32b8c5ceb2ef29d4f",
+  "regression_cases": [
+    "test_invalid_skipped_history_blocks_inspect_and_new_run",
+    "test_blocking_findings_fix_cannot_be_undercharged",
+    "test_failed_stage_retry_cannot_be_undercharged_or_exceed_two",
+    "test_cross_stage_old_review_result_rejected_but_next_round_passes"
+  ]
+}

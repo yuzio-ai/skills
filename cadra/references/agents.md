@@ -5,7 +5,7 @@ run/resume 在首次派发或恢复前读取本页。宿主必须能创建干净
 ## 分工与生命周期
 
 - Cadra 主 agent 只做准入、调度、Run 写入、契约核对与恢复。每次只允许一个 Task 执行，一个阶段派发；不跨任务并行。
-- 每个 Task 的 worker 执行 code/fix/validate，reviewer 执行 review。角色按需创建；review-only 不创建闲置 worker，仅核对历史结果的收尾不创建 agent。
+- 每个 Task 的 worker 执行 code/fix/validate，reviewer 执行 review。角色按需创建；review 先创建 reviewer，后续 fix/validate 才创建 worker；`[review]` 不创建闲置 worker，仅核对历史结果的收尾不创建 agent。
 - 同一任务优先复用原 worker 和 reviewer，不同 Task 不复用身份。reviewer 不得兼任本任务任何实现或整改作者；原作者不明时不能凭“新建了 agent”宣称已核实独立性，应核查候选来源。
 - agent 使用干净上下文，不继承主聊天完整历史。只传 Task 定义快照、有效决定和授权、项目规范、实际技能路径、必要上游交付与固定候选证据。共享接口变化通过交付和当前候选传递，不依赖主 agent 摘要代替源码。
 - 子 agent 不自行调用下一个阶段，不再委派其他 agent，不写 Cadra Run。Cohestra 阶段交付和任务索引由当次执行者发布；上一阶段完成、工具停止、发布核对成功后才向另一角色移交。

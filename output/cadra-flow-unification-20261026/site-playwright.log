@@ -1,0 +1,46 @@
+[WebServer] (node:1970) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] $ next start --port 3187
+[WebServer] (node:1989) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 28 tests using 4 workers
+
+(node:1997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1996) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1995) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › tests/e2e/skills-bilingual.spec.ts:28:5 › both Skills domains and discovery use their own language and the frozen public state (370ms)
+  ✓   4 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English home: complete copy, commands, links and responsive screenshots (726ms)
+  ✓   3 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English cohestra: complete copy, commands, links and responsive screenshots (794ms)
+  ✓   5 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English vistra: complete copy, commands, links and responsive screenshots (600ms)
+  ✓   1 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English cadra: complete copy, commands, links and responsive screenshots (922ms)
+  ✓   6 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English relatra: complete copy, commands, links and responsive screenshots (505ms)
+  ✓   7 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English getting-started: complete copy, commands, links and responsive screenshots (462ms)
+  ✓   8 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English installation: complete copy, commands, links and responsive screenshots (568ms)
+  ✓   9 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English workflows: complete copy, commands, links and responsive screenshots (511ms)
+  ✓  10 [chromium] › tests/e2e/skills-bilingual.spec.ts:91:7 › English troubleshooting: complete copy, commands, links and responsive screenshots (385ms)
+  ✓  11 [chromium] › tests/e2e/skills-bilingual.spec.ts:142:5 › English homepage navigation breakpoint and reduced motion (447ms)
+  ✓  14 [chromium] › tests/e2e/skills-bilingual.spec.ts:222:5 › English copy feedback handles real clipboard, denial and unsupported browsers (253ms)
+  ✓  15 [chromium] › tests/e2e/skills.spec.ts:14:5 › Skills actual Host routes, isolation, discovery and redirects use the build state (264ms)
+  ✓  16 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills home: approved copy, links, responsive layout and screenshots (484ms)
+  ✓  17 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills cohestra: approved copy, links, responsive layout and screenshots (519ms)
+  ✓  18 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills cadra: approved copy, links, responsive layout and screenshots (531ms)
+  ✓  19 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills vistra: approved copy, links, responsive layout and screenshots (454ms)
+  ✓  13 [chromium] › tests/e2e/skills-bilingual.spec.ts:197:5 › bilingual native navigation and same-page language links work without JavaScript (1.8s)
+  ✓  20 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills relatra: approved copy, links, responsive layout and screenshots (452ms)
+  ✓  21 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills getting-started: approved copy, links, responsive layout and screenshots (410ms)
+  ✓  24 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills troubleshooting: approved copy, links, responsive layout and screenshots (398ms)
+  ✓  22 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills installation: approved copy, links, responsive layout and screenshots (526ms)
+  ✓  23 [chromium] › tests/e2e/skills.spec.ts:74:7 › Skills workflows: approved copy, links, responsive layout and screenshots (457ms)
+  ✓  26 [chromium] › tests/e2e/skills.spec.ts:161:5 › Skills copy succeeds, fails, and reports unsupported clipboard without executing commands (344ms)
+  ✓  25 [chromium] › tests/e2e/skills.spec.ts:135:5 › Skills narrow homepage, keyboard menu, Escape and reduced motion (344ms)
+  ✓  28 [chromium] › tests/e2e/skills.spec.ts:209:5 › Skills copies the exact installation example through the browser clipboard (273ms)
+  ✓  27 [chromium] › tests/e2e/skills.spec.ts:177:5 › Skills native navigation and FAQ work without JavaScript (680ms)
+  ✓  12 [chromium] › tests/e2e/skills-bilingual.spec.ts:159:5 › language switching maps every page and section, preserves queries and drops unknown fragments (5.8s)
+
+  28 passed (8.5s)

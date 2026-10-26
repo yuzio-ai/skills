@@ -1,0 +1,161 @@
+--- a/cadra/scripts/run_guard.py
++++ b/cadra/scripts/run_guard.py
+@@ -82,6 +82,69 @@
+ 
+ def identity(owner):
+     return {k: v for k, v in owner.items() if k != 'progress'}
++
++
++def validate_charge(task, call):
++    charged, stage = call['charged'], call['stage']
++    require(charged['calls'] == 1 and type(charged['calls']) is int and
++            type(charged['remediation']) is int and charged['remediation'] in (0, 1), 'invalid budget charge')
++    require('retry_stage' in charged and
++            (charged['retry_stage'] is None or charged['retry_stage'] == stage), 'retry charge must match call stage')
++    before = call.get('before')
++    require(before is None or isinstance(before, dict), 'invalid before contract for budget')
++    require(call['id'] == 1 or before is not None, 'follow-up call requires before contract')
++    remediation, retry_stage = 0, None
++    if before is not None:
++        previous, next_ = before.get('stage_result', {}), before.get('next', {})
++        require(isinstance(previous, dict) and isinstance(next_, dict) and
++                previous.get('stage') in ('need', 'design', *STAGES) and
++                previous.get('status') in ('completed', 'blocked', 'failed') and
++                type(next_.get('allowed')) is bool and isinstance(next_.get('reason'), str),
++                'before contract lacks budget evidence')
++        remediation = int(stage == 'fix' and previous['stage'] == 'review' and
++                          next_['reason'] == 'blocking_findings')
++        if previous['status'] == 'failed' or next_['reason'] == 'stage_failed' and next_['allowed']:
++            retry_stage = stage
++    # A newly admitted definition restart may use its own start instead of the
++    # old contract's next. Preserve that existing first-call exception using
++    # frozen revision/authorization evidence, without inventing a kind enum.
++    # The caller still verifies the exact source and admitted start action.
++    definition = task['definition']
++    restart_eligible = (call['id'] == 1 and task.get('authorization_consumed') is True and
++                        bool(set(definition.get('changed_fields', [])) & {'requirement', 'flow'}) and
++                        stage == task['start_action']['stage'] == normalize_flow(definition['flow'])[0])
++    actual = (charged['remediation'], charged['retry_stage'])
++    require(actual == (remediation, retry_stage) or restart_eligible and actual == (0, None),
++            'budget charge disagrees with call basis')
++
++
++def saved_contract(value):
++    if isinstance(value, dict):
++        contract = value.get('contract', value)
++        if isinstance(contract, dict) and 'stage_result' in contract:
++            return contract
++    return None
++
++
++def validate_delivery_round(call, rounds):
++    """Compare known rounds of the same stage, including across review/fix.
++
++    Full handoff, candidate, source-chain and sync verification remains with
++    the caller. This only checks structured evidence already saved in a Run.
++    """
++    before = call.get('before')
++    if before is not None:
++        previous = before.get('stage_result', {})
++        stage, round_ = previous.get('stage'), previous.get('round')
++        require(type(round_) is int and round_ > 0, 'invalid before stage round')
++        rounds[stage] = max(rounds.get(stage, 0), round_)
++    contract = saved_contract(call.get('result'))
++    if call.get('closed') and contract is not None:
++        delivery = contract['stage_result']
++        stage, round_ = delivery.get('stage'), delivery.get('round')
++        require(stage == call['stage'] and type(round_) is int and round_ > rounds.get(stage, 0),
++                'delivery round must advance its own stage')
++        rounds[stage] = round_
+ 
+ 
+ def validate(data):
+@@ -141,11 +204,15 @@
+         require(task['budget']['calls'] == sum(c['charged']['calls'] for c in calls), 'budget mismatch')
+         require(task['budget']['remediation'] == sum(c['charged']['remediation'] for c in calls), 'remediation budget mismatch')
+         retries = {}
++        rounds = {}
++        previous_contract = None
+         for call in calls:
+             charged = call['charged']
+-            require(charged['calls'] == 1 and type(charged['calls']) is int and
+-                    type(charged['remediation']) is int and charged['remediation'] in (0, 1), 'invalid budget charge')
+-            if charged.get('retry_stage'):
++            if previous_contract is not None:
++                require(call.get('before') == previous_contract, 'before contract disagrees with last delivery')
++            validate_charge(task, call)
++            previous_contract = saved_contract(call.get('result')) if call.get('closed') else None
++            if charged['retry_stage'] is not None:
+                 stage = charged['retry_stage']
+                 retries[stage] = retries.get(stage, 0) + 1
+         require(task['budget']['retries'] == retries, 'retry budget mismatch')
+@@ -155,6 +222,11 @@
+         require(not pending or pending[0] is calls[-1], 'unclosed call must be last')
+         require(state != 'queued' or not calls, 'queued task cannot contain calls')
+         require(task['checkpoint']['pending_call'] == (pending[0]['id'] if pending else None), 'checkpoint mismatch')
++        if state == 'skipped':
++            require(not calls and task['authorization_consumed'] is False and
++                    task['budget'] == {'calls': 0, 'remediation': 0, 'retries': {}} and
++                    task['checkpoint'] == {'pending_call': None, 'last_delivery': None} and
++                    task['result'].get('last_delivery') is None, 'skipped task cannot contain execution evidence')
+         for call in calls:
+             require(call.get('stage') in allowed and
+                     call.get('execution_mode') == 'unattended', 'invalid call stage/mode')
+@@ -162,6 +234,7 @@
+             require(type(call.get('closed')) is bool, 'closed must be boolean')
+             require(not call.get('closed') or call.get('result') is not None, 'closed call lacks result')
+             validate_call_agent(task, call)
++            validate_delivery_round(call, rounds)
+         if state == 'completed':
+             require(not pending, 'completed task has unclosed call')
+     if data['status'] == 'completed':
+@@ -327,6 +400,8 @@
+         require(len(after['calls']) >= len(before['calls']), 'cannot delete calls')
+         if before['state'] == 'running':
+             require(after['state'] != 'queued', 'running task cannot return to queued')
++        if after['state'] == 'skipped':
++            require(before['state'] in ('queued', 'skipped'), 'only queued task may become skipped')
+         require(after['agents'][:len(before['agents'])] == before['agents'], 'agent bindings are append-only')
+         require(len(after['agents']) <= len(before['agents']) + 1, 'publish one agent binding at a time')
+         if len(after['agents']) > len(before['agents']):
+--- a/cadra/references/contract.md
++++ b/cadra/references/contract.md
+@@ -57,7 +57,7 @@
+ 
+ 调用前按 [Run 规则](run-rules.md) 保存拟调用阶段、execution_mode 与完整 before 契约。调用后先确认索引发布成功并回读，再核对 task、contract 与字段：
+ 
+-- stage_result.stage 必须等于拟调用阶段，round 为正整数。若 before 为同阶段，round 必须增加；跨阶段轮次不比较大小。
++- stage_result.stage 必须等于拟调用阶段，round 为正整数，且大于调用前该阶段已有的最高正式轮次。调用前从当前 Run、来源链及必要正式 handoff 核对该基线；复审/复验不能只比较紧邻 before（它可能是 fix 等另一阶段）。跨阶段轮次不比较大小。guard 核对本 Run 已保存的 before 与交付中的同阶段轮次；跨 Run、未登记 handoff、候选、实际执行者及派发来源仍由调用者核实，不为比较轮次回写旧记录。
+ - execution_mode 必须等于本次声明 unattended；缺失、非法或 attended 均为 failed，不消费 next。
+ - index sync failed、同步无法确认、阶段不符或旧结果均不构成可用交付，即使文件看似新版也不能忽略失败信号。恢复需核对完整 README 与该轮 handoff 的阶段、轮次、候选和模式。
+ - 字段类型、枚举与 Cohestra 契约一致；next.allowed=true 时 next.stage 必须是六阶段名。协议不合法优先记 failed，不以表面 completed 放行。
+@@ -104,6 +104,8 @@
+ 
+ 预算与调用意图同次持久化，预算总额必须等于 calls 中 charged 的累计值；调用 id 在该 Run/slug 内唯一。resume 核对同一调用不重复计数、不清零、不返还不明派发的预占。来源缺失或计数矛盾时停止，不补造预算。已结束 Run 的显式恢复使用新 Run 的预算，但需重新通过授权与恢复准入。
+ 
++guard 还按保存的 before 核对计费分类：review 的 blocking_findings 引发 fix 时 remediation=1；acceptance_failed 的 fix 和无既有交付的首次 fix 为 0；失败重试的 retry_stage 必须等于本次 stage，否则为 null。后续调用不得省略 before，已有完整交付快照时必须与其一致，不能清空或改写依据来少收费。修订重启首调用可按已准入 start 而非旧 next 计费；零附加计费只在冻结 changed_fields 含 requirement/flow、调用等于新 flow start、同次消费重启授权时可用，仍由调用者核实来源和 start_action，不新增字段或以理由文本豁免后续调用。
++
+ 连续相同结果不另作提前停止判断；是否可继续由契约与上述预算决定。
+ 
+ ## Unattended
+--- a/cadra/references/executor.md
++++ b/cadra/references/executor.md
+@@ -29,6 +29,7 @@
+ - 写操作提供 `--proposal <完整 Markdown 文件>`；除首次 create 外，提供上次 inspect 的 `--expected-sha256`。create/update/takeover 同时提供 `--instance` 和 `--generation`。临时提案放 Run 的 scratch 目录，不参与状态解析。
+ - create 在项目 runs 目录的短时 `.writer.lock` 下检查既有 Run、目标不存在和完整初态；先准备 queued 数组，再创建。锁不保存执行状态，进程退出由内核释放，锁文件不能删除重建。
+ - update 只接受当前身份/代次与预期摘要；冻结定义、闭合调用、终态条目及既有预检不得改写；普通 update 不得增删、重排队列或改 append_history。角色绑定仅按任务执行者规则追加，原 pending 未闭合时不得替换。一次只追加一个 prepared、未闭合且无结果的调用；原 pending 必须先单独核实闭合落盘，再追加下一意图。调用前保存意图后回读归属，再派发；写入保护不是外部调用的 exactly-once 保证。
++- skipped 只允许由未执行的 queued 转入，必须没有调用、预算消费、授权消费和交付 checkpoint；running 即使尚无调用也不能改记 skipped。guard 拒绝这些非法新提案及历史记录，failed 保留未闭合调用的恢复路径不变。计费分类和已保存的同阶段轮次按 [契约核对](contract.md#本次结果核对) 与 [调用预算](contract.md#调用预算) 检查。
+ - append 不要求执行 owner 身份，只接受 running Run；仅追加 tasks 后缀、对应新增任务的 preflight 和一条 append_history，保留其他字段及正文。具体准入见 [append](append.md)。
+ - takeover 仅在原执行、全部绑定子 agent 与工具明确停止、获得本次 resume 授权，并完成只读协议/来源/唯一 Run/快照核验后使用。新 instance、generation+1，claimed_at 不早于父执行者和全部子 agent 的停止观察；仅替换 executor 并追加 `{previous: 原 executor, observation: 本次核实观察}`，保留正文、任务、预算与调用。脚本核对 observation 后发布，再按 resume 核实同一调用，不能先清 pending_call。
+ - report 仅追加 reports 链接，保留其他字段与正文；不接管执行者、不改执行事实。仍需摘要比较和短时锁。
+--- a/cadra/assets/run.md
++++ b/cadra/assets/run.md
+@@ -80,7 +80,7 @@
+ prepared_at: <ISO-8601 时间>
+ ```
+ 
+-调用意图与累计 budget 在同次更新中落盘；checkpoint.pending_call 指向未闭合调用 id，last_delivery 记录最近核实的阶段、结果、轮次与来源。closed=true 时必须已有核实 result；无法核实的 failed 保留 closed=false 和恢复证据。累计 budget 必须与 calls.charged 一致。
++调用意图与累计 budget 在同次更新中落盘；checkpoint.pending_call 指向未闭合调用 id，last_delivery 记录最近核实的阶段、结果、轮次与来源。closed=true 时必须已有核实 result；无法核实的 failed 保留 closed=false 和恢复证据。累计 budget 必须与 calls.charged 一致，分类与 before 及首动作依据一致；后续 before 不可省略或偏离上一完整交付。复审/复验轮次须超过该阶段已有最高正式轮次，不以另一阶段轮次或 call id 代替。
+ 
+ 条目 result 与终态同时写入，包含 state、最后交付、candidate、findings、acceptance、人工介入、下一步、来源文件/阶段/轮次和带时区时间。skipped 写明未调用与原因；核对收尾说明未调用及沿用来源。非终态 result=null；终态不得缺 result。
+ 

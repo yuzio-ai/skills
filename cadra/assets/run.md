@@ -1,10 +1,10 @@
 ---
-protocol: "0.8"
+protocol: "0.10"
 run_id: <run-YYYYMMDD-NN>
 status: running
 execution_mode: unattended
 created_at: <ISO-8601 带时区时间>
-skill_version: "0.8.0"
+skill_version: "<实际加载的 Skill 发行版本>"
 executor:
   instance_id: <本执行实例唯一标识>
   generation: 1
@@ -50,7 +50,7 @@ reports: []
 
 # <run-id>
 
-上方 YAML 只作字段骨架；新 0.8 Run 落盘时头部必须序列化为合法 JSON 映射，保留 Markdown 分隔符和正文，使用 [写入器](../scripts/run_guard.py)。不得把占位符作为真实值。身份、进展与交接语义见 [执行归属](../references/executor.md)。
+上方 YAML 只作字段骨架；protocol 必须与本批全部 Task 一致（0.10），不盲用模板值。0.10 Run 落盘时头部必须序列化为合法 JSON 映射，保留 Markdown 分隔符和正文，使用 [写入器](../scripts/run_guard.py)。不得把占位符作为真实值。身份、进展与交接语义见 [执行归属](../references/executor.md)。
 
 ## 建立依据
 
@@ -80,7 +80,7 @@ charged: {calls: 1, remediation: 0, retry_stage: null}
 prepared_at: <ISO-8601 时间>
 ```
 
-调用意图与累计 budget 在同次更新中落盘；checkpoint.pending_call 指向未闭合调用 id，last_delivery 记录最近核实的阶段、结果、轮次与来源。closed=true 时必须已有核实 result；无法核实的 failed 保留 closed=false 和恢复证据。累计 budget 必须与 calls.charged 一致。
+调用意图与累计 budget 在同次更新中落盘；checkpoint.pending_call 指向未闭合调用 id，last_delivery 记录最近核实的阶段、结果、轮次与来源。closed=true 时必须已有核实 result；无法核实的 failed 保留 closed=false 和恢复证据。累计 budget 必须与 calls.charged 一致，分类与 before 及首动作依据一致；后续 before 不可省略或偏离上一完整交付。复审/复验轮次须超过该阶段已有最高正式轮次，不以另一阶段轮次或 call id 代替。
 
 条目 result 与终态同时写入，包含 state、最后交付、candidate、findings、acceptance、人工介入、下一步、来源文件/阶段/轮次和带时区时间。skipped 写明未调用与原因；核对收尾说明未调用及沿用来源。非终态 result=null；终态不得缺 result。
 

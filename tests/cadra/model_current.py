@@ -2,12 +2,27 @@
 
 These checks exercise state scenarios, not real agent adherence to prose.
 """
-from .model import decision as legacy_decision, result_valid
+from .model import decision as legacy_decision, result_valid as legacy_result_valid
 from .test_run_guard import guard
 
 
-def decision(state, configured_flow='implementation'):
-    start, allowed = guard.normalize_flow(configured_flow)
+def result_valid(state, expected=None, before=None, synced=True, history=()):
+    """history contains verified contracts, including source Runs when supplied."""
+    if not legacy_result_valid(state, expected, before, synced):
+        return False
+    if expected:
+        try:
+            for previous in history:
+                sr = previous['stage_result']
+                if sr['stage'] == expected and state['stage_result']['round'] <= sr['round']:
+                    return False
+        except (KeyError, TypeError):
+            return False
+    return True
+
+
+def decision(state, configured_flow='code', protocol='0.10'):
+    start, allowed = guard.normalize_flow(configured_flow, protocol)
     if not result_valid(state):
         return 'failed'
     if state['status'] == 'failed' or state['next']['reason'] == 'stage_failed' and not state['next']['allowed']:

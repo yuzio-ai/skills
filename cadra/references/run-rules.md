@@ -6,11 +6,11 @@ running → completed / stopped / interrupted。completed 表示本轮所有项�
 
 **未完成 Run**：状态 running/interrupted，或 stopped 但仍有 queued/running 条目。completed 却有未结束条目、终态条目缺结果、同一 Run 多个 running 或来源链矛盾，均为记录异常，不放行新 Run。closed 的 completed 或 stopped 不重开；resume 只报告其结束事实。
 
-Run 0.8 保留 executor、ownership_history、preflight，并增加 append_history、每项 agents 与调用角色引用，按 [执行归属](executor.md) 与 [预检](preflight.md) 解释。新 Run 头部使用 JSON 映射（YAML 子集），通过包内 guard 写入；活性观察不是 Run.status，不因未知观察改写执行事实。
+Run 0.10 均包含 executor、ownership_history、preflight、append_history、每项 agents 与调用角色引用，按 [执行归属](executor.md) 与 [预检](preflight.md) 解释。新 Run 头部使用 JSON 映射（YAML 子集），通过包内 guard 写入；活性观察不是 Run.status，不因未知观察改写执行事实。
 
 ## 建立与执行
 
-通过目标、协议、Gate、来源链与首个动作核对后，按 [Run 模板](../assets/run.md) 保存初始任务数组：每个 slug 唯一，已有顺序固定，仅 [append](append.md) 可追加尾部，definition 快照及 revision、previous_run、首个动作与授权依据齐全，初态 queued。这份文件回读成功即完成入队；不回写 Task。append_history 初始为空，每项 agents 初始为空；具体绑定和派发见 [任务执行者](agents.md)。
+通过目标、协议、Gate、来源链与首个动作核对后，确认全部 Task 使用协议 0.10；Run.protocol 固定为 0.10，definition.protocol 必须一致。混合协议拒绝，不拆批或自动转换。随后按 [Run 模板](../assets/run.md) 保存初始任务数组：每个 slug 唯一，已有顺序固定，仅 [append](append.md) 可追加尾部，definition 快照及 revision、previous_run、首个动作与授权依据齐全，初态 queued。这份文件回读成功即完成入队；不回写 Task。append_history 初始为空，每项 agents 初始为空；具体绑定和派发见 [任务执行者](agents.md)。
 
 每项状态为 queued → running → completed/blocked/failed；尚未调用且无结果的 queued 项可在停止收尾时记 skipped。每项结果与其终态在同一次 Run 文件更新中写入。归属、顺序、执行事实均以 Run 为准；不保留另一张逐任务状态摘要表。
 

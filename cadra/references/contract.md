@@ -57,7 +57,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 调用前按 [Run 规则](run-rules.md) 保存拟调用阶段、execution_mode 与完整 before 契约。调用后先确认索引发布成功并回读，再核对 task、contract 与字段：
 
-- stage_result.stage 必须等于拟调用阶段，round 为正整数。若 before 为同阶段，round 必须增加；跨阶段轮次不比较大小。
+- stage_result.stage 必须等于拟调用阶段，round 为正整数，且大于调用前该阶段已有的最高正式轮次。调用前从当前 Run、来源链及必要正式 handoff 核对该基线；复审/复验不能只比较紧邻 before（它可能是 fix 等另一阶段）。跨阶段轮次不比较大小。guard 核对本 Run 已保存的 before 与交付中的同阶段轮次；跨 Run、未登记 handoff、候选、实际执行者及派发来源仍由调用者核实，不为比较轮次回写旧记录。
 - execution_mode 必须等于本次声明 unattended；缺失、非法或 attended 均为 failed，不消费 next。
 - index sync failed、同步无法确认、阶段不符或旧结果均不构成可用交付，即使文件看似新版也不能忽略失败信号。恢复需核对完整 README 与该轮 handoff 的阶段、轮次、候选和模式。
 - 字段类型、枚举与 Cohestra 契约一致；next.allowed=true 时 next.stage 必须是六阶段名。协议不合法优先记 failed，不以表面 completed 放行。
@@ -103,6 +103,8 @@ Cohestra 的 task_completed 也可能来自对话里的用户终点声明，Cadr
 只有需要继续调用时检查适用上限，任一不足则 failed 并列人工介入。acceptance_failed 引发的 fix 不计入 blocking_findings 整改轮，仍计入总调用；无需调用的核对收尾不计费。
 
 预算与调用意图同次持久化，预算总额必须等于 calls 中 charged 的累计值；调用 id 在该 Run/slug 内唯一。resume 核对同一调用不重复计数、不清零、不返还不明派发的预占。来源缺失或计数矛盾时停止，不补造预算。已结束 Run 的显式恢复使用新 Run 的预算，但需重新通过授权与恢复准入。
+
+guard 还按保存的 before 核对计费分类：review 的 blocking_findings 引发 fix 时 remediation=1；acceptance_failed 的 fix 和无既有交付的首次 fix 为 0；失败重试的 retry_stage 必须等于本次 stage，否则为 null。后续调用不得省略 before，已有完整交付快照时必须与其一致，不能清空或改写依据来少收费。修订重启首调用可按已准入 start 而非旧 next 计费；零附加计费只在冻结 changed_fields 含 requirement/flow、调用等于新 flow start、同次消费重启授权时可用，仍由调用者核实来源和 start_action，不新增字段或以理由文本豁免后续调用。
 
 连续相同结果不另作提前停止判断；是否可继续由契约与上述预算决定。
 

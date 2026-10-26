@@ -1,0 +1,35 @@
+{
+  "skipped_pending": {
+    "invalid_transition_published": true,
+    "call_closed": false,
+    "pending_call": 1,
+    "unfinished": false,
+    "next_run_create_accepted": true
+  },
+  "undercharged_budget": {
+    "stage_sequence": [
+      "review",
+      "fix",
+      "review",
+      "fix",
+      "review",
+      "fix",
+      "review",
+      "fix"
+    ],
+    "blocking_finding_fix_calls": 4,
+    "charged_remediation": 0
+  },
+  "invalid_retry_stage": {
+    "published": true,
+    "call_stage": "code",
+    "charged_retry_stage": "made-up-stage"
+  },
+  "stale_model_round": {
+    "previous_review_round": 1,
+    "before_stage": "fix",
+    "reused_review_round": 1,
+    "accepted_by_result_valid": true,
+    "evidence_scope": "test model only"
+  }
+}

@@ -8,10 +8,10 @@ Run：<run-id；省略时选择唯一 running Run>
 任务：<明确指定的 slug 列表>
 ```
 
-只接受当前协议的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
+只接受协议 0.10 的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
 
 1. 明确目标 Run 和非空任务集合。重复输入或 Run 中已有 slug 整批拒绝；不重开旧终态条目。append 不提供失败恢复列表，需恢复或业务修订先走原有 add/ready/run 准入。
-2. 每项必须是当前可入队的 ready 定义，且通过与 run 相同的协议、Gate、来源链、授权、输入、Cohestra 绑定及首个动作核对。依赖当前定义必须已 completed，不接受仅排在队列前面的未完成依赖。
+2. 每项必须是当前可入队且与目标 Run 同协议的 ready 定义，并通过与 run 相同的协议、Gate、来源链、授权、输入、Cohestra 绑定及首个动作核对。混合协议整批拒绝，不自动迁移。依赖当前定义必须已 completed，不接受仅排在队列前面的未完成依赖。
 3. 对本批次执行任务预检，并核实当前项目前提仍成立；保存可核查证据。任何任务不合格或全局检查失败，整批不写入，逐项报告缺口；不写 Task、不派发阶段。
 4. 按 priority 高到低、同级 slug 字典序排列本批次，准备完整定义快照、revision、previous_run、start_action 和初始 queued 条目；agents/calls 为空、预算为零、checkpoint 与 result 为空。已有队列顺序不变。
 5. 写入前重读 Task、授权与关键输入，有变化则重检。经 guard append 在同一原子写入中追加 tasks 后缀、仅对应新增 slug 的 task 预检记录和一条 append_history；其余字段及正文逐字保留。项目预检复核依据写入本批新增任务证据，不借 append 修改原项目记录。

@@ -1,6 +1,6 @@
 """Current contract scenarios alongside preserved historical regression cases."""
 import unittest
-from .model_v08 import decision
+from .model_current import decision
 from .test_cadra import contract
 
 
@@ -9,7 +9,7 @@ class CurrentFlowTests(unittest.TestCase):
         # Legal standalone endpoints do not establish Cadra's required review.
         # This also covers recovery closeout through the same terminal mapping.
         for stage in ('code', 'fix'):
-            for flow in ([stage, 'review'], [stage], 'review-only', 'implementation', 'bugfix'):
+            for flow in ([stage, 'review'], [stage], ['review'], 'code', 'fix'):
                 for acceptance in (None, 'pending', 'blocked', 'failed', 'passed'):
                     state = contract(stage, None, 'task_completed')
                     state['status'] = 'completed'
@@ -29,9 +29,9 @@ class CurrentFlowTests(unittest.TestCase):
         reviewed = contract('review', None, 'task_completed')
         reviewed['status'] = 'completed'
         reviewed['next']['allowed'] = False
-        self.assertEqual(decision(reviewed, 'review-only'), 'completed')
+        self.assertEqual(decision(reviewed, ['review']), 'completed')
         self.assertEqual(decision(reviewed, ['code', 'review']), 'completed')
-        self.assertEqual(decision(reviewed, 'implementation'), 'blocked')
+        self.assertEqual(decision(reviewed, 'code'), 'blocked')
         validated = contract('validate', None, 'task_completed')
         validated['status'] = 'completed'
         validated['next']['allowed'] = False
@@ -57,7 +57,7 @@ class CurrentFlowTests(unittest.TestCase):
         state['status'] = 'failed'
         self.assertEqual(decision(state, ['code', 'review']), 'failed')
 
-    def test_implementation_review_fix_rereview_validate(self):
+    def test_code_review_fix_rereview_validate(self):
         for state in (contract('code', 'review', 'stage_completed'),
                       contract('review', 'fix', 'blocking_findings'),
                       contract('fix', 'review', 'stage_completed'),
@@ -82,10 +82,10 @@ class CurrentFlowTests(unittest.TestCase):
         self.assertEqual(decision(contract('code', 'review', 'stage_completed'), ['code']), 'blocked')
         self.assertEqual(decision(contract('fix', 'review', 'stage_completed'), ['fix', 'validate']), 'blocked')
 
-    def test_bugfix_and_review_only_do_not_expand_allowed_scope(self):
-        self.assertEqual(decision(contract('fix', 'review', 'stage_completed'), 'bugfix'), 'call')
-        self.assertEqual(decision(contract('review', 'fix', 'blocking_findings'), 'review-only'), 'blocked')
-        self.assertEqual(decision(contract('review', 'validate', 'stage_completed'), 'review-only'), 'completed')
+    def test_fix_and_review_only_do_not_expand_allowed_scope(self):
+        self.assertEqual(decision(contract('fix', 'review', 'stage_completed'), 'fix'), 'call')
+        self.assertEqual(decision(contract('review', 'fix', 'blocking_findings'), ['review']), 'blocked')
+        self.assertEqual(decision(contract('review', 'validate', 'stage_completed'), ['review']), 'completed')
 
     def test_removed_presets_rejected_without_reinterpreting_history(self):
         for name in ('small-change', 'full', 'feature'):

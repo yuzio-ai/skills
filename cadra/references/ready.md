@@ -8,7 +8,7 @@ $cadra ready
 补充：<澄清或输入，可空>
 ```
 
-旧 0.6/0.7 Task 先按 [版本边界](compatibility.md) 由明确 add 升级，本入口不迁移。
+仅接受协议 0.10；旧协议按 [版本边界](compatibility.md) 停止操作并提示先完成归档切换，本入口不迁移。
 
 解析当前展示状态及 Run 归属，仅接受 draft/ready 且不属于未完成 Run 的任务。读取本 Task、依赖当前状态和必要输入，按唯一 Ready Gate 逐项核对；不修改定义。补充改变定义时先指向 add。
 

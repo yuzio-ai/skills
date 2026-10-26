@@ -129,29 +129,33 @@ Prepare tasks, execute them serially and recover interrupted runs. Engineering s
 | `resume` | Continue or finalize an unfinished run; automatically report after finalization |
 | `report` | Generate a summary file for a run and register its report link |
 
-For the current protocol, `report` writes a file and registers its link. For historical 0.6/0.7 Runs, `report` only displays read-only output in chat and adds no files or links.
+For protocol `0.10`, `report` writes a file and registers its link. Old records must be archived before switching; runtime entries do not parse them.
 
 After `run` or `resume` successfully finalizes and rereads a `completed` Run or a `stopped` Run whose entries have all ended, it automatically generates a report for that exact Run. The reply gives Run and report paths, result counts and necessary human actions, using saved results without repeating engineering stages or acceptance. Unfinished Runs do not automatically produce reports. A repeated `resume` on an already closed Run stays read-only; use manual `report` for a missing report, a progress report or a different focus. Report failures preserve execution results; if only link registration fails, retain the file and retry registration using its exact path instead of generating another report. Necessary formal project summaries still follow project conventions.
 
 The recommended engineering combination is **Cadra for tasks and runs, with Cohestra for engineering stages**. `add` only records a task, `ready` checks admission, and `run` invokes Cohestra automatically within the task's flow. If requirements or the approach are unsettled, invoke `$cohestra need` / `$cohestra design` separately first, then set Cadra's flow to specify the implementation starting stage and allowed scope.
 
-`add` uses scoped reads for creation, editing, existing-delivery binding and historical-protocol upgrades. It checks definitions, reachable dependency graphs and Run ownership, then saves and rereads the Task; missing business inputs remain explicit gaps. It loads revision maintenance when editing and identity checks when binding, without preloading execution rules. Dependency completion, candidate suitability, the full execution contract and legal first actions belong to `ready` and subsequent execution checks. Existing context can confirm identity, but cannot waive these admission checks. Independent reads are batched; relevant records are reread before writing. No persistent cache or extra runtime dependency is introduced. See [add](cadra/references/add.md).
+`add` uses scoped reads for creation, editing and existing-delivery binding. Old protocols are rejected without an upgrade entry. It checks definitions, reachable dependency graphs and Run ownership, then saves and rereads the Task; missing business inputs remain explicit gaps. It loads revision maintenance when editing and identity checks when binding, without preloading execution rules. Dependency completion, candidate suitability, the full execution contract and legal first actions belong to `ready` and subsequent execution checks. Existing context can confirm identity, but cannot waive these admission checks. Independent reads are batched; relevant records are reread before writing. No persistent cache or extra runtime dependency is introduced. See [add](cadra/references/add.md).
 
 #### Choose a flow
 
 | Flow | Start | Allowed stages | Use |
 |---|---|---|---|
-| `implementation` (default) | code | code, review, fix, validate | Implement clear goals, scope and authorization; also use for defects needing investigation |
-| `bugfix` | fix | fix, review, validate | Remediate a known defect with established evidence and expected behavior |
-| `review-only` | review | review | Review a fixed candidate without automatic fixes or acceptance |
+| `code` (default) | code | code, review, fix, validate | Execute planned development, refactoring and cleanup; also use for defects needing investigation |
+| `fix` | fix | fix, review, validate | Remediate a known defect with established evidence and expected behavior |
+| `review` | review | review, fix, validate | Review a fixed candidate, fix mandatory findings, independently re-review and validate |
 
-A nonempty list containing only these four stages is also supported. Its first item sets the start; the remaining items define allowed scope, not execution order, and the last item does not declare an endpoint. Initial execution and restarts after requirements/flow revisions use that start; continuation and recovery determine the first action from the legal contract and admission rules. Implementation receives independent review; mandatory fixes require fix and re-review, and complete coverage with no mandatory fixes remaining permits validation within the allowed flow. Optional suggestions are deferred by default. Mandatory findings block review-only tasks rather than expand their scope.
+A nonempty list containing only these four stages is also supported. Its first item sets the start; the remaining items define allowed scope, not execution order, and the last item does not declare an endpoint. Initial execution and restarts after requirements/flow revisions use that start; continuation and recovery determine the first action from the legal contract and admission rules. Implementation receives independent review; mandatory fixes require fix and re-review, and complete coverage with no mandatory fixes remaining permits validation within the allowed flow. Optional suggestions are deferred by default. Mandatory findings block tasks limited to `[review]` rather than expand their scope.
+
+The `review` preset is stored as `flow: review`, equivalent to `[review, fix, validate]`. Mandatory findings follow review → fix → independent re-review → validate; complete coverage without mandatory findings proceeds directly to validate. Create a reviewer first and a worker only when fix/validate is needed. Review alone does not establish acceptance.
+
+Cadra accepts only protocol `0.10`, with no legacy protocol parser or old preset aliases. Finish unfinished Runs in their original environment, back up and archive closed records unchanged, then upgrade pending tasks and repeat `ready`. Archives do not participate in task scanning or admission, and completed tasks are not rerun. Switch installed skills and local records together; `add` does not migrate old protocols. [Version boundaries](cadra/references/compatibility.md).
 
 Prepare need/design outside Cadra with human participation. Existing decisions remain valid; small tasks need no fabricated earlier handoffs. Resolve goals, acceptance, product decisions and necessary design through interactive `$cohestra need` / `$cohestra design` before admission. A return to need/design during execution blocks for human input instead of completing the task.
 
 #### Examples for each flow
 
-These are three independent tasks. Replace paths and candidates; send each call separately.
+These are four independent tasks. Replace paths and candidates; send each call separately.
 
 ```text
 $cadra add
@@ -160,7 +164,7 @@ $cadra add
 需求：按已确认方案增加最多 20 条搜索记录，支持单条删除和清空；不改搜索算法。
 输入：<已确认需求、工程方案和必要视觉交付>
 验收：重启后保留记录，删除与清空有效，超过 20 条移除最旧记录。
-流程：implementation
+流程：code
 
 $cadra add
 项目：<项目绝对路径>
@@ -168,7 +172,15 @@ $cadra add
 需求：按已有定位修复空输入崩溃；提示填写关键词且不发起请求。
 输入：<复现记录、日志和已有定位依据>
 验收：空输入不崩溃且不发请求，正常关键词仍可搜索。
-流程：bugfix
+流程：fix
+
+$cadra add
+项目：<项目绝对路径>
+任务：审查并修复账单导出
+需求：审查固定候选的数据范围、CSV 内容和错误处理；修复范围内的必做问题，经独立复审后验收。
+输入：<候选提交 SHA 或可复核快照>、<需求与验收条件>
+验收：审查覆盖完整，必做问题闭合，当前候选通过约定验证。
+流程：review
 
 $cadra add
 项目：<项目绝对路径>
@@ -176,7 +188,7 @@ $cadra add
 需求：审查固定候选的数据范围、CSV 内容和错误处理；不修改生产代码。
 输入：<候选提交 SHA 或可复核快照>、<需求与验收条件>
 验收：问题带位置、影响和证据；无问题时说明实际覆盖范围。
-流程：review-only
+流程：[review]
 ```
 
 #### Execute multiple tasks automatically
@@ -208,17 +220,17 @@ flowchart TB
 
 The chart shows the default behavior of continuing after a blocked or failed task; the per-task stop policy takes precedence.
 
-Each `add` returns a slug. Run `ready` for each selected task, then start one `run` after they pass. There is no need to invoke Cohestra stages manually. For one implementation and one bugfix, send each call separately and wait for its result before proceeding:
+Each `add` returns a slug. Run `ready` for each selected task, then start one `run` after they pass. There is no need to invoke Cohestra stages manually. For one code task and one fix task, send each call separately and wait for its result before proceeding:
 
 ```text
 $cadra ready
-任务：<implementation 任务的 slug>
+任务：<code 任务的 slug>
 
 $cadra ready
-任务：<bugfix 任务的 slug>
+任务：<fix 任务的 slug>
 
 $cadra run
-范围：<implementation 任务的 slug>、<bugfix 任务的 slug>
+范围：<code 任务的 slug>、<fix 任务的 slug>
 ```
 
 **What to copy from replies** — these values are illustrative, not completed executions. Use the values actually returned for your task. `YYYYMMDD` is a date placeholder; response wording is not a fixed protocol.
@@ -233,7 +245,7 @@ Copy task and Run IDs into selection fields; copy the handoff's full path, inclu
 
 You can also use `范围：全部 ready`. Execution follows priority from high to low, then slug alphabetical order; the scope list does not set execution order. By default, a blocked or failed task does not stop later tasks. To stop the queue when that task fails or is blocked, set `执行策略：stop_queue_on_failure: true` during `add`.
 
-Dependencies must already be completed for admission. If B depends on A, execute A first, check B with `ready`, then append it to a still-running Run or establish a subsequent batch. An unfinished dependency chain cannot enter one run together. A project can have at most one unfinished run. Use `resume` for interruptions; after a finished run, resolve gaps and explicitly select failed tasks for recovery in a new `run`. The controller creates a worker and independent reviewer with clean context as each task needs them; review-only creates no worker, and reconciliation without stage calls creates no agents. Prefer reusing each role within its task, never across tasks. Tasks and stages remain serial; there is no scheduler or background service. Missing child-agent or identity-verification capabilities block execution explicitly.
+Dependencies must already be completed for admission. If B depends on A, execute A first, check B with `ready`, then append it to a still-running Run or establish a subsequent batch. An unfinished dependency chain cannot enter one run together. A project can have at most one unfinished run. Use `resume` for interruptions; after a finished run, resolve gaps and explicitly select failed tasks for recovery in a new `run`. The controller creates a worker and independent reviewer with clean context as each task needs them; tasks limited to `[review]` create no worker, and reconciliation without stage calls creates no agents. Prefer reusing each role within its task, never across tasks. Tasks and stages remain serial; there is no scheduler or background service. Missing child-agent or identity-verification capabilities block execution explicitly.
 
 After preparing additional tasks, append them while the original Run executes:
 
@@ -269,7 +281,7 @@ $cadra list
 | State | Meaning | What to check next |
 |---|---|---|
 | Run completed | Every entry has ended; some may be blocked or failed | Inspect per-task results and human actions |
-| Task completed | The configured scope ended | Check flow and acceptance; review-only does not establish engineering acceptance |
+| Task completed | The configured scope ended | Check flow and acceptance; `[review]` does not establish engineering acceptance |
 | Task skipped | Not executed in this Run | Apply original admission and recovery conditions before a new Run |
 
 #### Human decisions and recovery
@@ -325,7 +337,7 @@ $cadra run
 
 Recovery does not simply skip the blocked stage. Cadra checks handoffs and recovery conditions, then takes a legal next action or retries the blocked stage within the permitted flow. Subsequent execution remains unattended. See [Recovery admission](cadra/references/recovery.md) and [Definition revisions](cadra/references/revision-rules.md).
 
-Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) preserve old Runs and require explicit Task upgrades; an unfinished legacy Run continues with its original installation.
+Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before using the new installation. Old protocols are rejected.
 
 **`resume` handles confirmed execution interruptions**: it checks, continues or finalizes an unfinished Run. It does not rerun entries that already have blocked/failed results or reopen a finished Run:
 
@@ -336,7 +348,7 @@ Run：<未完成的 run-id>
 
 </details>
 
-Complete interactive `$cohestra need` or `$cohestra design` when preparation needs discussion, then use implementation in Cadra. To continue an existing Cohestra task, provide its original directory and explicitly confirm the binding; its legal next stage must be within the new allowed scope.
+Complete interactive `$cohestra need` or `$cohestra design` when preparation needs discussion, then use code in Cadra. To continue an existing Cohestra task, provide its original directory and explicitly confirm the binding; its legal next stage must be within the new allowed scope.
 
 To edit a task, use `add` with its existing slug. Tasks belonging to an unfinished Run cannot be edited, even if their individual entries have ended. Changes to requirements, dependencies, flow or execution policy invalidate admission and require `ready` again; title or priority changes alone do not. The slug and Cohestra binding path stay stable; renaming or copying old records is not a recovery method.
 
@@ -518,7 +530,7 @@ Steps 1–3 prepare requirements and settle visual choices; step 4 records the e
    绑定确认：确认这是同一目标，接续上述任务，沿用已有需求和授权。
    输入：<需求交付文件绝对路径>、<design 交付文件绝对路径>、<Vistra 正式交接文件绝对路径>
    验收：最多 20 条，单条删除与清空有效，重启后保留；按需求交付中的完整验收条件验证。
-   流程：implementation
+   流程：code
    ```
 
 5. Send `ready` and `run` separately. Start `run` only after admission passes. Cadra invokes Cohestra implementation, independent review, fixes and validation as actual results require, then automatically generates a report after finalization. Use `resume` first if the run is interrupted.

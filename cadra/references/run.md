@@ -9,13 +9,13 @@ $cadra run
 补充：<本次输入、解除证据或限定条件，可空>
 ```
 
-先读 [预检](preflight.md)、[执行归属](executor.md)、[任务执行者](agents.md)；含旧记录时读 [版本边界](compatibility.md)。旧未完成 Run 存在则只报告，不接管或迁移。
+先读 [预检](preflight.md)、[执行归属](executor.md)、[任务执行者](agents.md)；含旧记录时读 [版本边界](compatibility.md)。任何未完成 Run 存在都不新建；0.10 按 resume 核对继续，旧协议停止并提示先完成归档切换，不迁移。
 
 ## 建立 Run
 
 1. 固定目标，确认 Git 工作区、可安全写入、非技能源仓库，实际 Cohestra 支持契约及 unattended，项目协议可用且无未完成 Run。Cadra 不 git init、不代建 Cohestra 容器；缺容器由首次 Cohestra 阶段最小初始化。
 2. 校验范围与恢复参数，按状态解析选择候选。只恢复 ready 的 skipped 恢复来源时，要求显式 slug 选择；普通 blocked/failed 必须出现在恢复列表。
-3. 对候选复核 Gate、定义快照及首个动作，分别按首次/接续、恢复或修订准入。普通 Gate 或个别恢复条件未满足时保留原状并说明；全局前提或任一候选契约损坏时停止本次 run。所有前置检查在写 Run 前完成；无合格动作不空建 Run。
+3. 对候选先核对协议均为 0.10，旧协议或混合协议整批停止；再复核 Gate、定义快照及首个动作，分别按首次/接续、恢复或修订准入。普通 Gate 或个别恢复条件未满足时保留原状并说明；全局前提或任一候选契约损坏时停止本次 run。所有前置检查在写 Run 前完成；无合格动作不空建 Run。
 4. 对合格项完成项目及任务只读预检；项目级失败不建 Run，任务级失败明确排除。重读定义、授权和关键输入，变化则重检。保存 preflight 证据，不要求未来阶段产物已存在。
 5. 按 priority 与 slug 排序；新 Run 内为每项引用该 slug 的来源链尾，并保存当前 revision、完整定义、首个动作与依据。按 Run 规则构造 [骨架](../assets/run.md)，初始化 executor/ownership_history/append_history 和每项 agents，经 guard create 发布并回读后开始执行。
 

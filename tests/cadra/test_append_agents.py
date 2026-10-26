@@ -1,4 +1,4 @@
-"""Exercise 0.8 queue and agent invariants through the shipped publication guard."""
+"""Exercise 0.10 queue and agent invariants through the shipped publication guard."""
 from copy import deepcopy
 import json
 import subprocess
@@ -13,7 +13,7 @@ def appended(data, slugs=('second',)):
     new = deepcopy(data)
     batch = []
     for slug in slugs:
-        task = deepcopy(example()['tasks'][0])
+        task = deepcopy(example(data['protocol'])['tasks'][0])
         task['slug'] = task['definition']['slug'] = slug
         new['tasks'].append(task)
         new['preflight'].append(dict(scope='task', slug=slug, status='passed', at=LATER,
@@ -275,29 +275,16 @@ class AppendAgentTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             guard.publish(self.path, document(self.takeover(obs)), self.sha, 'second', 2, 'takeover', obs)
 
-    def test_07_json_remains_readonly_and_blocks_new_run_until_closed(self):
-        old = deepcopy(example())
-        old['protocol'] = old['tasks'][0]['definition']['protocol'] = '0.7'
-        old['tasks'][0]['definition']['flow'] = 'full'
-        old.pop('append_history')
-        old['tasks'][0].pop('agents')
-        self.path.write_bytes(document(old))
-        guard.validate(guard.header(self.path.read_bytes()))
-        with self.assertRaises(ValueError): guard.current(self.path.read_bytes())
-        new = example()
-        new['run_id'] = 'run-20261025-02'
-        target = self.runs / (new['run_id'] + '.md')
-        with self.assertRaises(ValueError): guard.publish(target, document(new), None, 'first', 1, 'create')
-        old['status'] = 'completed'
-        old['tasks'][0].update(state='completed', result={'state': 'completed'})
-        self.path.write_bytes(document(old))
-        guard.publish(target, document(new), None, 'first', 1, 'create')
-        self.assertEqual(self.path.read_bytes(), document(old))
+    def test_append_rejects_old_definition_without_modifying_run(self):
+        for protocol in ('0.6', '0.7', '0.8', '0.9'):
+            new = appended(self.data)
+            new['tasks'][-1]['definition']['protocol'] = protocol
+            self.assert_rejected(new, 'append')
 
     def test_current_flow_acceptance_and_removed_names(self):
-        self.assertEqual(guard.normalize_flow('implementation'), guard.normalize_flow(['code', 'validate', 'fix', 'review']))
-        self.assertEqual(guard.normalize_flow('bugfix')[0], 'fix')
-        for value in ('full', 'feature', 'small-change', ['need', 'code'], ['code', 'design'], [], None):
+        self.assertEqual(guard.normalize_flow('code'), guard.normalize_flow(['code', 'validate', 'fix', 'review']))
+        self.assertEqual(guard.normalize_flow('fix')[0], 'fix')
+        for value in ('implementation', 'bugfix', 'review-only', 'full', 'feature', 'small-change', ['need', 'code'], ['code', 'design'], [], None):
             with self.subTest(value=value), self.assertRaises(ValueError): guard.normalize_flow(value)
 
 

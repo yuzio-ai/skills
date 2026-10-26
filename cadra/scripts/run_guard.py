@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Cadra 0.8 Run publication guard. Stdlib only; never dispatches work.
+"""Cadra 0.10 Run publication guard. Stdlib only; never dispatches work.
 
-New Runs use JSON inside YAML Front Matter. Legacy YAML headers are inspected
-read-only; full provenance and Cohestra contract checks remain the caller's job.
+Runs use JSON inside YAML Front Matter. Only protocol 0.10 is accepted;
+full provenance and Cohestra contract checks remain the caller's job.
 """
 import argparse
 from contextlib import contextmanager
@@ -15,17 +15,20 @@ import re
 import tempfile
 
 STAGES = ('code', 'review', 'fix', 'validate')
+PROTOCOL = '0.10'
+PROTOCOL_ERROR = 'unsupported Cadra protocol; finish old Runs and archive the old container before cutover'
 PRESETS = {
-    'implementation': ('code', 'review', 'fix', 'validate'),
-    'bugfix': ('fix', 'review', 'validate'),
-    'review-only': ('review',),
+    'code': ('code', 'review', 'fix', 'validate'),
+    'fix': ('fix', 'review', 'validate'),
+    'review': ('review', 'fix', 'validate'),
 }
 
 
-def normalize_flow(value):
+def normalize_flow(value='code', protocol=PROTOCOL):
+    require(protocol == PROTOCOL, PROTOCOL_ERROR)
     stages = PRESETS.get(value) if isinstance(value, str) else value
     require(isinstance(stages, (list, tuple)) and stages and
-            all(isinstance(s, str) and s in STAGES for s in stages), 'invalid 0.8 flow')
+            all(isinstance(s, str) and s in STAGES for s in stages), 'invalid ' + protocol + ' flow')
     return stages[0], frozenset(stages)
 
 
@@ -65,122 +68,90 @@ def split_document(raw):
 
 def header(raw):
     block, _ = split_document(raw)
-    if block.lstrip().startswith('{'):
-        result = read_json(block)
-        require(isinstance(result, dict) and result.get('protocol') in ('0.6', '0.7', '0.8'),
-                'unsupported or malformed Run header')
-        if result['protocol'] == '0.6':
-            result['legacy_closed'] = legacy_tasks_closed(result.get('tasks'))
-        return result
-    # Bounded historical block form only, not a general YAML parser. Never
-    # derive control fields from nested definitions or quoted block content.
-    result = {}
-    lines = block.splitlines()
-    require(all(not line or line[0].isspace() or line.startswith(('#', '- ')) or
-                re.fullmatch(r'[A-Za-z_][\w-]*:[ ]*.*', line) for line in lines),
-            'unsupported legacy root syntax')
-    roots = [(i, m[1], m[2]) for i, line in enumerate(lines)
-             if (m := re.fullmatch(r'([A-Za-z_][\w-]*):[ ]*(.*)', line))]
-    require(len({key for _, key, _ in roots}) == len(roots), 'duplicate legacy root key')
-    for key in ('protocol', 'run_id', 'status'):
-        values = [value for _, name, value in roots if name == key]
-        require(len(values) == 1, 'missing legacy control field')
-        result[key] = legacy_scalar(values[0])
-    require(result.get('protocol') == '0.6', 'unsupported or malformed Run header')
-    result['legacy_closed'] = False
-    sections = [i for i, key, value in roots if key == 'tasks' and not value]
-    if not sections:
-        return result
-    start = sections[0] + 1
-    end = next((i for i, _, _ in roots if i >= start), len(lines))
-    items = lines[start:end]
-    significant = [line for line in items if line.strip() and not line.lstrip().startswith('#')]
-    if not significant:
-        return result
-    first = re.fullmatch(r'( {0,2})- slug:[ ]*(.*)', significant[0])
-    if not first or len(first[1]) not in (0, 2):
-        return result
-    indent = len(first[1])
-    tasks, task, in_result = [], None, False
-    try:
-        seen = set()
-        for line in significant:
-            depth = len(line) - len(line.lstrip(' '))
-            if depth == indent:
-                match = re.fullmatch(r' *- slug:[ ]*(.*)', line)
-                require(match is not None, 'unsupported legacy task item')
-                task = {'slug': legacy_scalar(match[1])}
-                tasks.append(task)
-                seen, in_result = {'slug'}, False
-            elif depth == indent + 2:
-                # Nested call lists may use indentless YAML sequences here.
-                match = re.fullmatch(r' *([A-Za-z_][\w-]*):[ ]*(.*)', line)
-                if not match:
-                    require(line.lstrip().startswith('- '), 'unsupported legacy task field')
-                    in_result = False
-                    continue
-                key, value = match.groups()
-                require(key not in seen, 'duplicate legacy task key')
-                seen.add(key)
-                in_result = key == 'result'
-                if key == 'state':
-                    task['state'] = legacy_scalar(value)
-                elif in_result:
-                    require(not value, 'unsupported legacy result')
-                    task['result'] = {}
-                    result_keys = set()
-            elif depth == indent + 4 and in_result:
-                match = re.fullmatch(r' *([A-Za-z_][\w-]*):[ ]*(.*)', line)
-                if not match:
-                    require(line.lstrip().startswith('- '), 'unsupported legacy result field')
-                    continue
-                key, value = match.groups()
-                require(key not in result_keys, 'duplicate legacy result key')
-                result_keys.add(key)
-                if key == 'state':
-                    task['result']['state'] = legacy_scalar(value)
-            else:
-                require(depth > indent + 2, 'unsupported legacy indentation')
-        result['legacy_closed'] = legacy_tasks_closed(tasks)
-    except ValueError:
-        # Unsupported/ambiguous structures remain read-only, never admission proof.
-        pass
+    require(block.lstrip().startswith('{'), PROTOCOL_ERROR)
+    result = read_json(block)
+    require(isinstance(result, dict) and result.get('protocol') == PROTOCOL, PROTOCOL_ERROR)
     return result
 
 
-def legacy_scalar(value):
-    match = re.fullmatch(r'''(?:([A-Za-z0-9_.-]+)|"([A-Za-z0-9_.-]+)"|'([A-Za-z0-9_.-]+)')''', value.strip())
-    require(match is not None, 'unsupported legacy scalar')
-    return next(part for part in match.groups() if part is not None)
-
-
-def legacy_tasks_closed(tasks):
-    if not isinstance(tasks, list) or not tasks or not all(isinstance(t, dict) for t in tasks):
-        return False
-    slugs = [t.get('slug') for t in tasks]
-    return (all(isinstance(slug, str) and slug for slug in slugs) and len(set(slugs)) == len(slugs)
-            and all(t.get('state') in ('completed', 'blocked', 'failed', 'skipped')
-                    and isinstance(t.get('result'), dict) and t['result'].get('state') == t['state']
-                    for t in tasks))
-
-
 def current(raw):
-    block, body = split_document(raw)
-    require(block.lstrip().startswith('{'), '0.8 Run requires JSON Front Matter; legacy is read-only')
-    data = read_json(block)
-    require(isinstance(data, dict) and data.get('protocol') == '0.8', 'only 0.8 Runs may be written')
+    data = header(raw)
     validate(data)
-    return data, body
+    return data, split_document(raw)[1]
 
 
 def identity(owner):
     return {k: v for k, v in owner.items() if k != 'progress'}
 
 
+def validate_charge(task, call):
+    charged, stage = call['charged'], call['stage']
+    require(charged['calls'] == 1 and type(charged['calls']) is int and
+            type(charged['remediation']) is int and charged['remediation'] in (0, 1), 'invalid budget charge')
+    require('retry_stage' in charged and
+            (charged['retry_stage'] is None or charged['retry_stage'] == stage), 'retry charge must match call stage')
+    before = call.get('before')
+    require(before is None or isinstance(before, dict), 'invalid before contract for budget')
+    require(call['id'] == 1 or before is not None, 'follow-up call requires before contract')
+    remediation, retry_stage = 0, None
+    if before is not None:
+        previous, next_ = before.get('stage_result', {}), before.get('next', {})
+        require(isinstance(previous, dict) and isinstance(next_, dict) and
+                previous.get('stage') in ('need', 'design', *STAGES) and
+                previous.get('status') in ('completed', 'blocked', 'failed') and
+                type(next_.get('allowed')) is bool and isinstance(next_.get('reason'), str),
+                'before contract lacks budget evidence')
+        remediation = int(stage == 'fix' and previous['stage'] == 'review' and
+                          next_['reason'] == 'blocking_findings')
+        if previous['status'] == 'failed' or next_['reason'] == 'stage_failed' and next_['allowed']:
+            retry_stage = stage
+    # A newly admitted definition restart may use its own start instead of the
+    # old contract's next. Preserve that existing first-call exception using
+    # frozen revision/authorization evidence, without inventing a kind enum.
+    # The caller still verifies the exact source and admitted start action.
+    definition = task['definition']
+    restart_eligible = (call['id'] == 1 and task.get('authorization_consumed') is True and
+                        bool(set(definition.get('changed_fields', [])) & {'requirement', 'flow'}) and
+                        stage == task['start_action']['stage'] == normalize_flow(definition['flow'])[0])
+    actual = (charged['remediation'], charged['retry_stage'])
+    require(actual == (remediation, retry_stage) or restart_eligible and actual == (0, None),
+            'budget charge disagrees with call basis')
+
+
+def saved_contract(value):
+    if isinstance(value, dict):
+        # A direct Cohestra contract has a scalar `contract` version; only
+        # delivery wrappers use that key for the nested contract object.
+        contract = value if 'stage_result' in value else value.get('contract')
+        if isinstance(contract, dict) and 'stage_result' in contract:
+            return contract
+    return None
+
+
+def validate_delivery_round(call, rounds):
+    """Compare known rounds of the same stage, including across review/fix.
+
+    Full handoff, candidate, source-chain and sync verification remains with
+    the caller. This only checks structured evidence already saved in a Run.
+    """
+    before = call.get('before')
+    if before is not None:
+        previous = before.get('stage_result', {})
+        stage, round_ = previous.get('stage'), previous.get('round')
+        require(type(round_) is int and round_ > 0, 'invalid before stage round')
+        rounds[stage] = max(rounds.get(stage, 0), round_)
+    contract = saved_contract(call.get('result'))
+    if call.get('closed') and contract is not None:
+        delivery = contract['stage_result']
+        stage, round_ = delivery.get('stage'), delivery.get('round')
+        require(stage == call['stage'] and type(round_) is int and round_ > rounds.get(stage, 0),
+                'delivery round must advance its own stage')
+        rounds[stage] = round_
+
+
 def validate(data):
     require(isinstance(data, dict), 'Run must be an object')
-    require(data.get('protocol') in ('0.7', '0.8'), 'unsupported Run protocol')
-    modern = data['protocol'] == '0.8'
+    require(data.get('protocol') == PROTOCOL, PROTOCOL_ERROR)
     require(re.fullmatch(r'run-\d{8}-\d{2,}', data.get('run_id', '')), 'invalid run id')
     require(data.get('status') in ('running', 'interrupted', 'completed', 'stopped'), 'invalid Run state')
     require(data.get('execution_mode') == 'unattended', 'invalid execution mode')
@@ -217,12 +188,11 @@ def validate(data):
         definition = task.get('definition', {})
         require(definition.get('protocol') == data['protocol'] and definition.get('slug') == task['slug'] and
                 definition.get('revision') == task['revision'], 'definition protocol/identity mismatch')
-        if modern:
-            _, allowed = normalize_flow(definition.get('flow'))
-            require(definition.get('preparation') == 'ready', 'definition must have passed Ready Gate')
-            require(isinstance(task.get('start_action'), dict) and 'stage' in task['start_action'], 'start action required')
-            require(task.get('start_action', {}).get('stage') in (*allowed, None), 'start action outside flow')
-            validate_agents(task, agent_identities)
+        _, allowed = normalize_flow(definition.get('flow'), definition['protocol'])
+        require(definition.get('preparation') == 'ready', 'definition must have passed Ready Gate')
+        require(isinstance(task.get('start_action'), dict) and 'stage' in task['start_action'], 'start action required')
+        require(task.get('start_action', {}).get('stage') in (*allowed, None), 'start action outside flow')
+        validate_agents(task, agent_identities)
         require(any(c.get('scope') == 'task' and c.get('slug') == task['slug'] and c.get('status') == 'passed'
                     for c in data['preflight']), 'task preflight required')
         state = task.get('state')
@@ -236,11 +206,15 @@ def validate(data):
         require(task['budget']['calls'] == sum(c['charged']['calls'] for c in calls), 'budget mismatch')
         require(task['budget']['remediation'] == sum(c['charged']['remediation'] for c in calls), 'remediation budget mismatch')
         retries = {}
+        rounds = {}
+        previous_contract = None
         for call in calls:
             charged = call['charged']
-            require(charged['calls'] == 1 and type(charged['calls']) is int and
-                    type(charged['remediation']) is int and charged['remediation'] in (0, 1), 'invalid budget charge')
-            if charged.get('retry_stage'):
+            if previous_contract is not None:
+                require(call.get('before') == previous_contract, 'before contract disagrees with last delivery')
+            validate_charge(task, call)
+            previous_contract = saved_contract(call.get('result')) if call.get('closed') else None
+            if charged['retry_stage'] is not None:
                 stage = charged['retry_stage']
                 retries[stage] = retries.get(stage, 0) + 1
         require(task['budget']['retries'] == retries, 'retry budget mismatch')
@@ -250,20 +224,24 @@ def validate(data):
         require(not pending or pending[0] is calls[-1], 'unclosed call must be last')
         require(state != 'queued' or not calls, 'queued task cannot contain calls')
         require(task['checkpoint']['pending_call'] == (pending[0]['id'] if pending else None), 'checkpoint mismatch')
+        if state == 'skipped':
+            require(not calls and task['authorization_consumed'] is False and
+                    task['budget'] == {'calls': 0, 'remediation': 0, 'retries': {}} and
+                    task['checkpoint'] == {'pending_call': None, 'last_delivery': None} and
+                    task['result'].get('last_delivery') is None, 'skipped task cannot contain execution evidence')
         for call in calls:
-            require(call.get('stage') in (allowed if modern else ('need','design','code','review','fix','validate')) and
+            require(call.get('stage') in allowed and
                     call.get('execution_mode') == 'unattended', 'invalid call stage/mode')
             require(call.get('dispatch') in ('prepared', 'dispatched'), 'invalid dispatch state')
             require(type(call.get('closed')) is bool, 'closed must be boolean')
             require(not call.get('closed') or call.get('result') is not None, 'closed call lacks result')
-            if modern:
-                validate_call_agent(task, call)
+            validate_call_agent(task, call)
+            validate_delivery_round(call, rounds)
         if state == 'completed':
             require(not pending, 'completed task has unclosed call')
     if data['status'] == 'completed':
         require(all(t['state'] not in ('queued', 'running') for t in tasks), 'completed Run has unfinished task')
-    if modern:
-        validate_append_history(data)
+    validate_append_history(data)
 
 
 def agent_stopped(binding, observation, since=None):
@@ -406,8 +384,6 @@ def unfinished(data):
         return True
     if data.get('status') != 'stopped':
         return False
-    if data.get('protocol') == '0.6':
-        return not (data.get('legacy_closed') or legacy_tasks_closed(data.get('tasks')))
     return any(t['state'] in ('queued', 'running') for t in data['tasks'])
 
 
@@ -426,6 +402,8 @@ def validate_update(old, new):
         require(len(after['calls']) >= len(before['calls']), 'cannot delete calls')
         if before['state'] == 'running':
             require(after['state'] != 'queued', 'running task cannot return to queued')
+        if after['state'] == 'skipped':
+            require(before['state'] in ('queued', 'skipped'), 'only queued task may become skipped')
         require(after['agents'][:len(before['agents'])] == before['agents'], 'agent bindings are append-only')
         require(len(after['agents']) <= len(before['agents']) + 1, 'publish one agent binding at a time')
         if len(after['agents']) > len(before['agents']):
@@ -518,14 +496,8 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
                 if '-report-' in other.name:
                     continue
                 require(not other.is_symlink(), 'linked historical Run')
-                data = header(other.read_bytes())
-                require(data.get('protocol') in ('0.6', '0.7', '0.8') and data.get('status') in ('running','interrupted','completed','stopped'), 'unknown historical Run')
-                if data['protocol'] in ('0.7', '0.8'):
-                    validate(data)
-                elif data['status'] == 'completed':
-                    require(data.get('legacy_closed') or legacy_tasks_closed(data.get('tasks')),
-                        'legacy closure cannot be verified from this header form')
-                require(not unfinished(data), 'unfinished or unverified legacy stopped Run; do not create another')
+                data, _ = current(other.read_bytes())
+                require(not unfinished(data), 'unfinished Run; do not create another')
         else:
             require(raw is not None, 'missing Run')
             old, old_body = current(raw)
@@ -590,15 +562,11 @@ def main():
         observation = read_json(args.observation.read_text()) if args.observation else None
         if args.mode == 'inspect':
             raw = args.run.read_bytes()
-            data = header(raw)
-            require(data.get('status') in ('running', 'interrupted', 'completed', 'stopped'), 'unknown Run state')
-            result = {'sha256': digest(raw), 'protocol': data['protocol'], 'status': data.get('status'), 'activity': 'unknown'}
-            if data['protocol'] in ('0.7', '0.8'):
-                validate(data)
-                result['executor'] = data['executor']
-                result['activity'] = activity(data['executor'], observation)
-                if data['protocol'] == '0.8' and result['activity'] == 'stopped' and not descendants_stopped(data, observation):
-                    result['activity'] = 'unknown'
+            data, _ = current(raw)
+            result = {'sha256': digest(raw), 'protocol': data['protocol'], 'status': data['status'],
+                      'executor': data['executor'], 'activity': activity(data['executor'], observation)}
+            if result['activity'] == 'stopped' and not descendants_stopped(data, observation):
+                result['activity'] = 'unknown'
             print(json.dumps(result, ensure_ascii=False))
         else:
             require(args.proposal is not None, 'proposal required')

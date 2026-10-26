@@ -1,0 +1,14 @@
+{
+  "archive": "/Users/zhubowen/Documents/yuzio-ai/mewoo-ios/.yuzio/cadra-archive/20261026T123127459548Z",
+  "completed_tasks": 37,
+  "pending_tasks": 0,
+  "rewritten_reference_files": 190,
+  "checks": {
+    "archive_original_byte_hashes": true,
+    "current_container_readback": true,
+    "no_requeued_completed_tasks": true,
+    "no_old_runs_in_active_container": true,
+    "installed_source_equal": true,
+    "reference_readbacks": true
+  }
+}

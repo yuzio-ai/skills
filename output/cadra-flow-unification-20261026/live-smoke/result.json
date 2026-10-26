@@ -1,0 +1,313 @@
+{
+  "at": "2026-10-26T12:51:22.648271+00:00",
+  "project": "/private/tmp/cadra-live-fa274994d4",
+  "run": "/private/tmp/cadra-live-fa274994d4/.yuzio/cadra/runs/run-20261026-01.md",
+  "report": "/private/tmp/cadra-live-fa274994d4/.yuzio/cadra/runs/run-20261026-01-report-01.md",
+  "counts": {
+    "completed": 3,
+    "blocked": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "source_skills": {
+    "cadra": {
+      "path": "/Users/zhubowen/Documents/yuzio-ai/skills/cadra",
+      "version": "0.10.0",
+      "protocol": "0.10"
+    },
+    "cohestra": {
+      "path": "/Users/zhubowen/Documents/yuzio-ai/skills/cohestra",
+      "version": "0.13.1",
+      "protocol": "0.8"
+    }
+  },
+  "all_calls_closed": true,
+  "total_calls": 11,
+  "business_files_changed": [
+    "cleanup.py",
+    "fix_counter.py",
+    "review_total.py"
+  ],
+  "readonly_has_no_worker": true,
+  "readonly_source_sha256_unchanged": true,
+  "tests_unchanged": true,
+  "tasks": [
+    {
+      "slug": "01-cleanup",
+      "state": "completed",
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "agents": [
+        {
+          "id": "worker-1",
+          "role": "worker",
+          "agent_id": "/root/live_smoke/cleanup_worker",
+          "host_id": null,
+          "created_at": "2026-10-26T12:16:15.550381+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/cleanup_worker actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        },
+        {
+          "id": "reviewer-1",
+          "role": "reviewer",
+          "agent_id": "/root/live_smoke/cleanup_reviewer",
+          "host_id": null,
+          "created_at": "2026-10-26T12:19:33.631517+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/cleanup_reviewer actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        }
+      ],
+      "result": {
+        "state": "completed",
+        "last_delivery": {
+          "stage": "validate",
+          "round": 1,
+          "status": "completed",
+          "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/01-cleanup/validate-01.md"
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/01-cleanup/code-01.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "passed"
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/01-cleanup/validate-01.md",
+        "at": "2026-10-26T12:24:59.717862+00:00"
+      },
+      "stages": [
+        "code",
+        "review",
+        "validate"
+      ],
+      "call_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "slug": "02-fix-counter",
+      "state": "completed",
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "agents": [
+        {
+          "id": "worker-1",
+          "role": "worker",
+          "agent_id": "/root/live_smoke/counter_worker",
+          "host_id": null,
+          "created_at": "2026-10-26T12:25:43.709438+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/counter_worker actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        },
+        {
+          "id": "reviewer-1",
+          "role": "reviewer",
+          "agent_id": "/root/live_smoke/counter_reviewer",
+          "host_id": null,
+          "created_at": "2026-10-26T12:29:24.239875+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/counter_reviewer actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        }
+      ],
+      "result": {
+        "state": "completed",
+        "last_delivery": {
+          "stage": "validate",
+          "round": 1,
+          "status": "completed",
+          "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/02-fix-counter/validate-01.md"
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/02-fix-counter/fix-01.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "passed"
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/02-fix-counter/validate-01.md",
+        "at": "2026-10-26T12:35:40.562215+00:00"
+      },
+      "stages": [
+        "fix",
+        "review",
+        "validate"
+      ],
+      "call_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "slug": "03-review-total",
+      "state": "completed",
+      "budget": {
+        "calls": 4,
+        "remediation": 1,
+        "retries": {}
+      },
+      "agents": [
+        {
+          "id": "reviewer-1",
+          "role": "reviewer",
+          "agent_id": "/root/live_smoke/total_reviewer",
+          "host_id": null,
+          "created_at": "2026-10-26T12:36:06.719334+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/total_reviewer actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        },
+        {
+          "id": "worker-1",
+          "role": "worker",
+          "agent_id": "/root/live_smoke/total_worker",
+          "host_id": null,
+          "created_at": "2026-10-26T12:39:42.750166+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/total_worker actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        }
+      ],
+      "result": {
+        "state": "completed",
+        "last_delivery": {
+          "stage": "validate",
+          "round": 1,
+          "status": "completed",
+          "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/03-review-total/validate-01.md"
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/03-review-total/fix-01.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "passed"
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "human_intervention": [],
+        "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/03-review-total/validate-01.md",
+        "at": "2026-10-26T12:47:05.746403+00:00"
+      },
+      "stages": [
+        "review",
+        "fix",
+        "review",
+        "validate"
+      ],
+      "call_ids": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "slug": "04-review-only",
+      "state": "blocked",
+      "budget": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "agents": [
+        {
+          "id": "reviewer-1",
+          "role": "reviewer",
+          "agent_id": "/root/live_smoke/readonly_reviewer",
+          "host_id": null,
+          "created_at": "2026-10-26T12:47:32.185787+00:00",
+          "source": "collaboration.spawn_agent /root/live_smoke/readonly_reviewer actual returned canonical identity; child initialization confirmed available before dispatch",
+          "supersedes": null,
+          "stop_observation": null
+        }
+      ],
+      "result": {
+        "state": "blocked",
+        "last_delivery": {
+          "stage": "review",
+          "round": 1,
+          "status": "completed",
+          "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/04-review-only/review-01.md"
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/04-review-only/review-01.md"
+        },
+        "findings": {
+          "blocking": 1,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "unknown"
+        },
+        "next": {
+          "stage": "fix",
+          "allowed": true,
+          "reason": "blocking_findings"
+        },
+        "human_intervention": [
+          "Expected [review] boundary: RO-001 is blocking; necessary fix is outside allowed review-only scope. No worker or implementation authorized; any follow-up needs explicit flow/revision decision."
+        ],
+        "source": "/private/tmp/cadra-live-fa274994d4/.yuzio/cohestra/handoffs/04-review-only/review-01.md",
+        "at": "2026-10-26T12:51:22.465880+00:00"
+      },
+      "stages": [
+        "review"
+      ],
+      "call_ids": [
+        1
+      ]
+    }
+  ],
+  "limits": [
+    "One tiny local Python stdlib fixture; no production environment or broader workflows acceptance.",
+    "No host session release API; completed roles/tools observed, no release fabricated.",
+    "No PyYAML installed; JSON mappings used as valid YAML subset.",
+    "Controller-only local harness corrected initial int(None) before any task02 call was persisted; this was not a skill failure.",
+    "Current task READMEs/handoffs are authoritative; copies in this evidence folder are frozen audit snapshots."
+  ]
+}

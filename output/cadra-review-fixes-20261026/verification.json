@@ -1,0 +1,17 @@
+{
+  "package_version": {
+    "version": "0.10.0",
+    "protocol_version": "0.10",
+    "repository": "https://github.com/yuzio-ai/skills",
+    "skill_path": "cadra"
+  },
+  "frozen_smoke_tasks": 4,
+  "frozen_smoke_calls": 11,
+  "frozen_smoke_validates": true,
+  "changed_package_files": {
+    "cadra/scripts/run_guard.py": "d74bff527767172022946b764502e4764d17f130a4701e35c3d1310e642de08a",
+    "cadra/references/contract.md": "2ad8fb46632dfc67552b1bafa6c8db2871dea027605e1b9f7a15c52af6ef603f",
+    "cadra/references/executor.md": "8a606c3487ef54983109f0422d1c5b33e5c0151e6dba6ba9d180488dd6eab69a",
+    "cadra/assets/run.md": "8278e41086bc00284996751fdfcee0545ad4a1988566a81ffe93dfff4aae1148"
+  }
+}

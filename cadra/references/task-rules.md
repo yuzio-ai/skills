@@ -4,7 +4,7 @@
 
 定义、字段校验、Gate 失效和修订分代仅由 [任务定义](task-definition.md) 规定，准入复核定义时读取该参考；flow 配置见 [配置规则](flow-config.md)。add 不读取下方准入表。
 
-入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。只读旧 Task 不意味着允许新版 ready/run/append 写入，历史协议见 [版本边界](compatibility.md)。
+入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。仅接受协议 0.10；旧记录停止准入并提示先归档切换，详见 [版本边界](compatibility.md)。
 
 ## Ready Gate
 
