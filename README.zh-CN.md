@@ -109,6 +109,8 @@ $cohestra verify
 
 接续任务时明确原任务目录，不能把“自动衔接”理解为自动执行后续阶段。阶段只读业务代码也可能写交付文件，只有 `report` 是不落盘的查询入口。检查和验收绑定固定候选，构建通过不等于运行验收通过；同一作者换阶段也不构成独立审查。
 
+review 按适用风险核查真实调用方、装配与生命周期路径，证据覆盖固定候选及必要未修改依赖；零 findings 不代表覆盖完整。review 先在已有授权内补查，必要路径仍无法核实时受阻；validate 核对最终候选的覆盖及复审证据。详见[风险覆盖](cohestra/references/review-coverage.md)。单独调用默认单智能体；Cadra 明确安排的 worker/reviewer 按[编排派发](cohestra/references/workflow.md#编排派发)执行。
+
 </details>
 
 详细规则：[Cohestra](cohestra/SKILL.md)。
@@ -123,135 +125,55 @@ $cohestra verify
 | `ready` | 检查目标、范围、验收、输入、依赖等是否满足执行条件 |
 | `list` | 只读查看任务、队列和执行批次 |
 | `run` | 创建执行批次，串行执行指定任务；默认选择全部 ready 任务 |
+| `append` | 向 running Run 尾部原子追加已通过准入的指定任务 |
 | `resume` | 恢复或收尾尚未完成的执行批次 |
 | `report` | 为指定执行批次生成摘要文件，并登记报告链接 |
 
-推荐用 **Cadra 管理任务和执行批次，Cohestra 执行工程阶段**。`add` 只登记任务，`ready` 检查能否执行，`run` 才按任务流程自动调用 Cohestra。`$cadra add cohestra need` 不是约定格式，应通过 `流程` 指定起点和允许范围。
+当前协议的 `report` 生成文件并登记链接；历史 0.6/0.7 Run 的 `report` 仅在对话中只读输出，不新增文件或链接。
+
+推荐用 **Cadra 管理任务和执行批次，Cohestra 执行工程阶段**。`add` 只登记任务，`ready` 检查能否执行，`run` 才按任务流程自动调用 Cohestra。需求或方案尚未明确时，先单独调用 `$cohestra need` / `$cohestra design`，再通过 Cadra 的 `流程` 指定实施起点和允许范围。
 
 #### 选择流程
 
-```mermaid
----
-config:
-  flowchart:
-    rankSpacing: 24
-    nodeSpacing: 24
-    padding: 8
----
-flowchart LR
-    P{"根据输入和本轮目标选择"}
-    P -->|"从正式需求整理开始"| F["full<br/>need → design → code<br/>→ review → fix → validate"]
-    P -->|"需求已确认，还需工程设计"| D["feature<br/>design → code → review<br/>→ fix → validate"]
-    P -->|"改法已确认，可直接开发"| C["small-change<br/>code → review → fix → validate"]
-    P -->|"缺陷与预期明确，直接修复"| X["bugfix<br/>fix → review → validate"]
-    P -->|"已有固定候选，只要审查"| R["review-only<br/>review"]
-    class F,D,C,X,R automatic
-    classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
-    classDef automatic fill:#e8f1ff,stroke:#547fb8,color:#193d6a
-    classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
-```
-
-图中按常见推进方向展开各流程的完整阶段范围。`fix` 按需执行，修复后可回到 `review`；验收缺口可触发整改或补证，实际按结果推进，不是每次固定走完所有阶段。
-
-| 流程 | 首次调用 Cohestra | 允许阶段 | 适用条件 |
+| 流程 | 起点 | 允许阶段 | 适用条件 |
 |---|---|---|---|
-| `full`（默认） | `need` | need、design、code、review、fix、validate | 目标、边界和验收已能判定，希望从正式需求整理开始完成工程流程 |
-| `feature` | `design` | design、code、review、fix、validate | 需求及产品决定已明确，需要工程设计和后续实现；已选视觉方案可作为输入 |
-| `small-change` | `code` | code、review、fix、validate | 改法和范围已明确，可直接实施，不需要单独的设计阶段 |
-| `bugfix` | `fix` | fix、review、validate | 缺陷、预期行为、范围及必要复现或定位依据已明确，可直接修复 |
-| `review-only` | `review` | review | 已有固定候选，只要审查问题，不自动修改或完成工程验收 |
+| `implementation`（默认） | code | code、review、fix、validate | 目标、范围及授权明确，直接实施；尚需定位的缺陷也用此流程 |
+| `bugfix` | fix | fix、review、validate | 已有明确缺陷、预期和整改依据 |
+| `review-only` | review | review | 仅审查固定候选，不自动修复或验收 |
 
-也可提供非空阶段列表，例如 `[code, review, fix, validate]` 与 `small-change` 等价。首项决定起点，其余项定义允许范围，不按列表顺序机械执行；不能靠省略必做阶段绕过门禁。
+也可用仅含这四个阶段的非空列表。首项决定起点，其余项是允许范围，不是执行顺序，末项不声明终点。首次启动或需求/流程修订重启使用该起点；接续与恢复按合法契约及准入确定首个动作。实施后独立 review，必做整改经 fix 后复审，覆盖齐备、无必做整改且 flow 允许时才进入 validate；可选建议默认延后。`review-only` 遇必做整改会受阻，不扩大范围。
 
-表中的首个阶段适用于首次启动或按规则修订后重启；接续已有任务时还需核对其交付和允许的下一步。允许阶段不是必须逐项执行的固定清单，复审、整改和补证按实际结果推进。`review-only` 发现必须修复的问题时可受阻结束，不会自动扩大范围去修复；仅审查完成也不代表实现已验收。
-
-**`full` 不会绕过准入。** 所有流程在 `ready` 时都要求目标、范围、验收、输入、依赖及必要人工决定齐备。若只有模糊想法或仍需产品取舍，先交互调用 Cohestra，解决问题后再登记或补全 Cadra 任务：
-
-```text
-$cohestra need
-项目：<项目绝对路径>
-需求：<功能想法、已有约束和待确认问题>
-要求：先明确范围、产品决定和验收条件，供后续 Cadra 任务使用。
-```
+need/design 在 Cadra 外由人工参与准备；已有确认继续有效，小任务不必补造阶段文档。目标、验收、产品取舍或设计未明确时，先交互调用 `$cohestra need` / `$cohestra design`，再准备 Cadra 任务。执行中返回 need/design 会受阻交回人工，不判完成。
 
 #### 各流程调用示例
 
-下面是 5 个独立任务示例。为每个需求选择合适流程，分别调用 `add`；输入路径和候选必须替换为真实资料。
-
-<details>
-<summary>full：验收目标已明确，但希望先形成正式需求交付，再设计和实现。</summary>
-
-```text
-$cadra add
-项目：<项目绝对路径>
-任务：导出账单
-需求：导出当前筛选结果为 CSV，列为日期、分类、金额；不增加其他格式。
-验收：只包含筛选范围内的数据，列顺序和金额精度正确，中文可读；无数据时给出提示。
-流程：full
-```
-
-</details>
-
-<details>
-<summary>feature：直接复用已确认需求和必要视觉交接，从工程设计开始。</summary>
+下面是三个独立任务示例；替换输入路径和候选，每次调用分别发送。
 
 ```text
 $cadra add
 项目：<项目绝对路径>
 任务：搜索历史
-需求：按已确认需求增加最近 20 条搜索记录，支持单条删除和清空；不改搜索算法。
-输入：<已确认的需求交付文件绝对路径>；涉及视觉变更时附 <已选方案的 Vistra handoff 绝对路径>。
-验收：重启后保留记录，删除与清空有效，超过 20 条时移除最旧记录；符合输入中的完整验收条件。
-流程：feature
-```
+需求：按已确认方案增加最多 20 条搜索记录，支持单条删除和清空；不改搜索算法。
+输入：<已确认需求、工程方案和必要视觉交付>
+验收：重启后保留记录，删除与清空有效，超过 20 条移除最旧记录。
+流程：implementation
 
-</details>
-
-<details>
-<summary>small-change：修改方案已经确定，直接进入开发；“改动小”本身不代表可以省略设计。</summary>
-
-```text
-$cadra add
-项目：<项目绝对路径>
-任务：调整列表分页数量
-需求：将订单列表每页数量从 20 改为 50，沿用现有分页实现；不改排序、筛选或接口结构。
-输入：<相关代码路径和已确认的修改方案>
-验收：每页最多 50 条，翻页无重复或遗漏，排序与筛选行为保持一致。
-流程：small-change
-```
-
-</details>
-
-<details>
-<summary>bugfix：依据已知缺陷直接修复；问题仍不明确时先补调查和复现信息。</summary>
-
-```text
 $cadra add
 项目：<项目绝对路径>
 任务：修复空搜索崩溃
-需求：修复输入为空时点击搜索导致的崩溃；空输入应提示填写关键词，不发起搜索请求。
+需求：按已有定位修复空输入崩溃；提示填写关键词且不发起请求。
 输入：<复现记录、日志和已有定位依据>
-验收：空输入不崩溃且不发请求，正常关键词仍可搜索；相关回归检查通过。
+验收：空输入不崩溃且不发请求，正常关键词仍可搜索。
 流程：bugfix
-优先级：high
-```
 
-</details>
-
-<details>
-<summary>review-only：只审查已有候选；后续是否修复及如何调整流程另行决定。</summary>
-
-```text
 $cadra add
 项目：<项目绝对路径>
 任务：审查账单导出实现
-需求：审查指定候选的数据范围、CSV 内容和错误处理，输出问题及证据；不修改生产代码。
-输入：<候选提交 SHA 或可复核快照>、<对应需求和验收条件>
-验收：问题定位到候选及具体位置，说明影响和依据；没有发现问题时明确说明实际检查范围。
+需求：审查固定候选的数据范围、CSV 内容和错误处理；不修改生产代码。
+输入：<候选提交 SHA 或可复核快照>、<需求与验收条件>
+验收：问题带位置、影响和证据；无问题时说明实际覆盖范围。
 流程：review-only
 ```
-
-</details>
 
 #### 多任务自动执行
 
@@ -282,17 +204,17 @@ flowchart TB
 
 上图展示受阻或失败后继续下一项的默认行为；该任务的停止策略优先。
 
-每次 `add` 返回一个 slug。对要执行的任务逐项 `ready`，全部通过后启动一个 `run`；不需要手工逐阶段调用 Cohestra。下面以一个 feature 和一个 bugfix 为例，每条调用分别发送，等待上一步完成后继续：
+每次 `add` 返回一个 slug。对要执行的任务逐项 `ready`，全部通过后启动一个 `run`；不需要手工逐阶段调用 Cohestra。下面以一个 implementation 和一个 bugfix 为例，每条调用分别发送，等待上一步完成后继续：
 
 ```text
 $cadra ready
-任务：<feature 任务的 slug>
+任务：<implementation 任务的 slug>
 
 $cadra ready
 任务：<bugfix 任务的 slug>
 
 $cadra run
-范围：<feature 任务的 slug>、<bugfix 任务的 slug>
+范围：<implementation 任务的 slug>、<bugfix 任务的 slug>
 
 $cadra report
 Run：<run 返回的 run-id>
@@ -310,11 +232,21 @@ Run：<run 返回的 run-id>
 
 也可用 `范围：全部 ready`。任务按优先级从高到低执行，同级按 slug 字典序排列，范围列表顺序不控制执行顺序。默认某项受阻或失败后继续下一项；需要该项失败时停止队列，可在 `add` 中设置 `执行策略：stop_queue_on_failure: true`。
 
-依赖必须已完成才能通过准入：B 依赖 A 时，先执行 A，再检查 B 的 `ready` 并建立下一批，不能把尚未完成的依赖链一次全部入队。同一项目最多有一个未完成 Run；中断用 `resume`，已结束批次的失败任务则在解决缺口后显式选择恢复范围，用新 `run` 执行。Cadra 在当前智能体执行中串行推进，不自带定时器或独立后台服务。
+依赖必须已完成才能通过准入：B 依赖 A 时，先执行 A，再检查 B 的 `ready`，可追加到仍在 running 的 Run 或建立后续批次；不能把尚未完成的依赖链一次全部入队。同一项目最多有一个未完成 Run；中断用 `resume`，已结束批次的失败任务则在解决缺口后显式选择恢复范围，用新 `run` 执行。Cadra 主 agent 编排，按阶段需要为每项任务创建干净上下文的 worker 与独立 reviewer；`review-only` 不创建 worker，仅核对收尾不创建 agent。同任务优先复用各自角色，跨任务不复用，任务与阶段串行推进；无定时器或独立后台服务。缺少子 agent 或身份核验能力时明确受阻。
+
+准备好新增任务后，可在原 Run 执行期间发送：
+
+```text
+$cadra append
+Run：<running Run 的 run-id>
+任务：<已 ready 的 slug 列表>
+```
+
+追加整批成功或整批拒绝。新增任务按优先级和 slug 排序后加入尾部，依赖须已完成；不会接管或唤醒执行者。interrupted 先恢复，已结束 Run 不重开。
 
 | 执行中遇到什么情况 | 怎么处理 |
 |---|---|
-| 又有新需求 | 登记为后续任务；原 Run 结束后检查 `ready` 并启动下一批，当前队列不追加任务、不改顺序 |
+| 又有新需求 | 先 add、ready，再用 append 加到 running Run 尾部；不重排原队列 |
 | 想主动停止 | 向正在执行的智能体发送下面的自然语言请求；没有 `$cadra stop` 入口 |
 
 ```text
@@ -350,7 +282,7 @@ config:
     padding: 8
 ---
 flowchart TB
-    B["need / design → blocked<br/>保存方案与待决问题"] -->|"继续其他任务或按策略停止"| H["用户补充决定"]
+    B["执行中需要新的需求或设计决定<br/>blocked：保存证据与待决问题"] -->|"继续其他任务或按策略停止"| H["人工参与 need / design<br/>补充决定"]
     H --> D{"定义改变？"}
     D -->|"未改变"| R["原 Run 结束后<br/>新 run：指定范围 + 恢复"]
     D -->|"已改变"| A["原 Run 结束后<br/>add 修订 → ready → 新 run"]
@@ -364,12 +296,12 @@ flowchart TB
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-Cadra 以 `unattended` 模式调用 Cohestra。`need` 和 `design` 在现有信息与授权足够时可以自动完成；若执行中新发现必须由用户作出的决定，则保存已有调查、方案及待决问题，将该任务标为 `blocked`，禁止继续后续阶段，不切换为交互模式等待回答。
+Cadra 以 `unattended` 模式派发 code/review/fix/validate，不派发 need/design。若执行中新发现必须由用户作出的需求或设计决定，或下一步指向 need/design，则保存已有调查、方案及待决问题，将该任务标为 `blocked` 并交回人工准备；不在 Run 内切换为交互模式等待回答，也不按流程越界判为完成。
 
-| 阶段 | 需要人工参与的例子 | 当前任务的处理 |
+| 准备缺口 | 需要人工参与的例子 | 当前任务的处理 |
 |---|---|---|
-| `need` | 无法确定本次是否包含跨设备同步，现有需求不能给出答案 | 记录范围选择及其影响，以需要人工决定为由受阻 |
-| `design` | 出现超出现有授权的重大架构取舍，需要用户选择或确认 | 保存候选、推荐依据与待决项，以需要人工决定为由受阻 |
+| 需求决定 | 无法确定本次是否包含跨设备同步，现有需求不能给出答案 | 记录范围选择及其影响，受阻后交回人工参与的 `need` |
+| 设计决定 | 出现超出现有授权的重大架构取舍，需要用户选择或确认 | 保存候选、推荐依据与待决项，受阻后交回人工参与的 `design` |
 
 Cadra 将人工待办记入 Run。默认继续执行队列的下一项；该项设置 `stop_queue_on_failure: true` 时停止队列，并将尚未执行的项记为 skipped。先查看该 Run 的 `report`，按其中的实际问题补充决定。
 
@@ -392,7 +324,9 @@ $cadra run
 
 恢复不是直接跳过受阻阶段。Cadra 核对交付与恢复条件后，选择合法下一步，或在允许范围内重试原受阻阶段；后续继续使用无人值守模式。详情见 [恢复准入](cadra/references/recovery.md) 和 [定义修订](cadra/references/revision-rules.md)。
 
-**`resume` 处理执行中断**，用于未完成 Run 的核对、续跑或收尾；不会重新执行其中已有 blocked/failed 结果的条目，也不会重开已结束的 Run：
+冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 保留旧 Run，Task 需显式升级；旧未完成 Run 使用原安装副本继续。
+
+**`resume` 处理已确认的执行中断**，用于未完成 Run 的核对、续跑或收尾；不会重新执行其中已有 blocked/failed 结果的条目，也不会重开已结束的 Run：
 
 ```text
 $cadra resume
@@ -401,7 +335,7 @@ Run：<未完成的 run-id>
 
 </details>
 
-如果事先知道需求或设计需要多轮讨论，先交互完成 `$cohestra need` 或 `$cohestra design`，再交给 Cadra。需求已确认但还需工程设计时选 `feature`；实施方案及授权齐备、可直接开发时可选 `small-change`。接续已有 Cohestra 任务时提供原任务目录并明确确认绑定。
+需求或设计需要讨论时，先交互完成 `$cohestra need` 或 `$cohestra design`，再用 implementation 交给 Cadra。接续已有 Cohestra 任务时提供原任务目录并明确确认绑定，其合法下一阶段必须在新版允许范围内。
 
 编辑任务时用 `add` 指定已有 slug。属于未完成 Run 的任务不能编辑，即使该条目已经结束。改变需求、依赖、流程或执行策略会使准入失效，需要重新 `ready`；只改标题或优先级不使准入失效。slug 和 Cohestra 绑定路径保持稳定，不靠重命名或复制旧记录恢复。
 
@@ -509,10 +443,11 @@ flowchart TB
     V --> H["人工选定方案<br/>或明确授权代选"]
     H --> F["Vistra handoff<br/>已选设计与必要素材"]
     A["Cadra<br/>add → ready → run"] --> C["Cohestra<br/>工程阶段推进与验收"]
-    F --> A
+    F --> D["Cohestra design<br/>确认工程方案"]
+    D --> A
     N -->|"无需视觉探索，已有输入齐备"| A
     C -.-> R["Relatra<br/>按需复盘已有执行证据"]
-    class N,V,H,F human
+    class N,V,H,F,D human
     class A,C automatic
     class R result
     classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
@@ -522,7 +457,7 @@ flowchart TB
 
 单个工程任务可直接使用 Cohestra；多个需求推荐用 Cadra 准备任务，再串行调度 Cohestra。Cadra 的流程只包含 Cohestra 的工程阶段，Vistra 不是可填写的 flow 阶段；工程阶段可按需使用视觉专项能力，但不能据此跳过必要决定。
 
-涉及新视觉方向时，推荐先完成 **Vistra explore/compare → 人工选定准确候选 → Vistra handoff → Cadra add → ready → run**。Vistra handoff 是工程输入，`feature` 中的 `design` 仍负责工程方案。可以提前 `add` 为草稿，但视觉方向或关键素材未定时不能通过 `ready`；无需视觉探索的任务可直接准备 Cadra。
+涉及新视觉方向时，推荐先完成 **Vistra explore/compare → 人工选定准确候选 → Vistra handoff → Cohestra design → Cadra add → ready → run**。Vistra handoff 是工程输入；必要的工程设计先在 Cadra 外与用户确认。可以提前 `add` 为草稿，但视觉方向或关键素材未定时不能通过 `ready`；无需视觉探索的任务可直接准备 Cadra。
 
 视觉探索通常需要人在环中选择或反馈。Vistra 也支持明确授权后的代选，因此并非每次都必须人工选案；未授权代选时，不能让 Cadra 自行裁决。无人值守阶段遇到缺失决定或权限，应记录受阻。Relatra 在执行后汇总实际成果和遗留。
 
@@ -566,21 +501,26 @@ flowchart TB
    要求：保存正式交接，明确采用范围、组件映射和未决项，供后续工程设计使用。
    ```
 
-4. 为第 1 步的同一任务登记 Cadra 定义，沿用原 Cohestra slug，提供原目录并确认绑定。`feature` 允许从工程设计开始，实际接续时核对原 need 交付及合法下一步，不重复创建同目标任务。
+4. 先针对同一任务完成工程设计与必要决定，再登记 Cadra 定义；沿用原 Cohestra slug，提供原目录并确认绑定，核对合法下一步为 code。两次调用分别发送。
 
    ```text
+   $cohestra design
+   任务目录：<第 1 步的 Cohestra 任务目录绝对路径>
+   输入：<need 交付>、<Vistra 正式交接>
+   要求：确认工程方案、验收方法和实施授权，交付后停止。
+
    $cadra add
    项目：<同一项目绝对路径>
    任务：<第 1 步返回的 Cohestra 任务 slug>
    需求：沿用第 1 步已确认的搜索历史需求，按已选视觉方案实施；不改搜索算法和其他页面。
    原任务目录：<第 1 步的 Cohestra 任务目录绝对路径>
    绑定确认：确认这是同一目标，接续上述任务，沿用已有需求和授权。
-   输入：<需求交付文件绝对路径>、<Vistra 正式交接文件绝对路径>
+   输入：<需求交付文件绝对路径>、<design 交付文件绝对路径>、<Vistra 正式交接文件绝对路径>
    验收：最多 20 条，单条删除与清空有效，重启后保留；按需求交付中的完整验收条件验证。
-   流程：feature
+   流程：implementation
    ```
 
-5. 分别发送 `ready`、`run`、`report`。仅在准入通过后执行 `run`；Cadra 按实际结果调用 Cohestra 的设计、开发、审查、修复和验收阶段。运行中断时先用 `resume` 恢复。
+5. 分别发送 `ready`、`run`、`report`。仅在准入通过后执行 `run`；Cadra 按实际结果调用 Cohestra 的开发、独立审查、修复和验收阶段。运行中断时先用 `resume` 恢复。
 
    ```text
    $cadra ready

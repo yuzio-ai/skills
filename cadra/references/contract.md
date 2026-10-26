@@ -35,13 +35,23 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 ## 前置检查与首个动作
 
-建 Run 前确认目标为可安全写入的 Git 工作区、不是技能源仓库，实际 Cohestra 支持 0.8、unattended 与单阶段交付。缺 Cohestra 容器可由首次阶段最小初始化，Cadra 不代建。目标或协议前提不满足时不建 Run，不逐项制造失败结果。
+建 Run 或 append 前确认目标为可安全写入的 Git 工作区、不是技能源仓库，实际 Cohestra 支持 0.8、unattended 与单阶段交付。缺 Cohestra 容器可由首次阶段最小初始化，Cadra 不代建。目标或协议前提不满足时不建 Run，不逐项制造失败结果。
 
 - 首次启动：没有 README、没有六阶段正式 handoff，且 Run 来源链没有任何调用意图或核对收尾；仅有未执行 skipped 可以成立。核对后调用 flow start 一次，before=null；首次输出仍须通过完整契约与模式核对。
 - 已有交付：检查 contract、task/slug、字段取值及绑定。绑定尚未确认时对照 README 目标与 requirement，用户明确确认对应关系后才能接续；明显不对应时请用户选择，不静默收养。此为身份检查，不用正文驱动阶段。
-- 普通接续：合法旧契约按下表确定 next 或核对收尾；缺合法动作时说明缺口，不空建 Run。
+- 普通接续：合法旧契约按下表确定 next 或核对收尾；旧 `completed` 不豁免本 Task 的必要独立评审，先执行下述完成前置核对。缺合法动作时说明缺口，不空建 Run，也不通过 append 加入无合法动作的条目。
 - 显式恢复按 [恢复准入](recovery.md)，定义变更按 [修订准入](revision-rules.md)，不能将旧 blocked/failed 直接当作新的完成结论，也不能重新当首次启动。
 - 已有正式交付或调用但缺 README、契约缺失/不支持/损坏时，停止整个 run 并报告路径；不允许忽略。索引修复归 Cohestra 或人工。
+
+编排传入适用项目评审要求、预检引用、执行来源及 [独立角色安排](agents.md)；Cohestra handoff 记录这些审计信息，不增加契约 0.8 的字段。审查充分性归 Cohestra，Cadra 不解析覆盖表驱动控制状态；报告可引用作者/独立方式与覆盖及验收边界。
+
+### 完成前置核对
+
+普通接续、恢复核对收尾和仅策略/依赖修订的沿用收尾，都必须核对当前候选、正式阶段与必要独立评审来源，不能只凭旧 `status: completed` 收尾。最近正式阶段仍是 code/fix 时，该终点没有完成本次要求的后续 review/复审，按终态表受阻；即使 flow 不含 validate，或保留了历史 `acceptance: passed`，也不放行。
+
+没有后续独立 review 时，报告需要用户明确调用 `$cohestra review` 并传递当前固定候选、有效决定及独立评审安排；已有 review 交付但索引未同步时，由 Cohestra 按发布恢复规则修复。Cadra 不代写索引、不制造 `next`、不把旧交付当首次启动重跑。取得新的合法契约后重新准入；已发布的 review/validate 仍须核对独立身份、候选适用性和既有验收要求，证据缺失时不沿用完成结论。
+
+上述核对只约束本次接续/收尾，不回写历史 Run 结果。入队前缺合法动作时只报告准入受阻；已在执行中的条目按现有 blocked 规则记录。核对本身不派发阶段、不消费调用预算。
 
 ## 本次结果核对
 
@@ -58,7 +68,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 行序即优先级。先确定已完成、失败、受阻或正常范围边界；只有仍需调用时才检查预算，不能把第 16 次调用刚成立的完成结果改判失败。首次/恢复/修订的首个动作先按各自准入，不拿旧受阻结果提前结束新执行。
 
-**必做后续**：next.reason 为 blocking_findings / acceptance_failed / stage_failed；或刚交付 fix/validate 且 next.stage=review；或刚交付 validate 且 acceptance.status=pending。正常后续超出 allowed 可收尾，必做后续超出则 blocked。下表“flow 内/含”均指规范化 allowed 集合。
+**必做后续**：next.reason 为 blocking_findings / acceptance_failed / stage_failed；或刚交付 code/fix/validate 且 next.stage=review；或刚交付 validate 且 acceptance.status=pending。正常后续超出 allowed 可收尾，必做后续超出则 blocked。下表“flow 内/含”均指规范化 allowed 集合。
 
 | # | 结构化状态 | 判定 |
 |---|---|---|
@@ -66,6 +76,8 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 | 2 | Agent 执行异常、工具调用失败、无法恢复执行状态 | `failed`（记录错误与恢复条件） |
 | 3 | `status = failed`，或 `next.reason = stage_failed` 且 `next.allowed = false` | `failed`（记录错误与恢复条件） |
 | 4 | `status = blocked`，或 `blocked.value = true` | `blocked`（记录 `next.reason` / `blocked.reason`） |
+| 4a | `next.allowed = true` 且 `next.stage` 为 need/design | `blocked`，交回人工准备，不按普通 flow 越界完成；记录实际下一阶段和决定缺口 |
+| 4b | `status = completed` 且最近 `stage_result.stage` 为 code/fix | `blocked`，该终点尚不能证明完成必要的后续独立 review/复审；优先于所有 completed 收尾分支，不能用不含 validate 的 flow 或历史 acceptance 放行 |
 | 5 | `status = completed` 且 `acceptance.status = passed` | `completed` |
 | 6 | `status = completed` 且 `acceptance.status = failed` | `blocked`（验收未通过，缺人工决定后续处置） |
 | 7 | `status = completed` 且验收非 passed／failed（缺失、`pending`、`blocked`），本 Task flow 序列含 validate | `blocked`（验收无结论，缺人工决定） |
@@ -76,7 +88,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 | 12 | `next.allowed = true` 且 `next.stage` 是六阶段名但不在 flow 内，且不属于上述必做后续 | `completed`，以正常 flow 边界为终点；Run 与报告必须标注被截断及未执行阶段，保留已知验收结论、无结论才写 `unknown`，列入需人工介入 |
 
 
-Cohestra 的 task_completed 也可能来自对话里的用户终点声明，Cadra 无法机器核对该声明；因此仍按 allowed 是否含 validate 要求验收。保留已知 acceptance 原值，缺失或 null 才记 unknown。正常边界与未验收的完成仍说明范围及人工介入，不冒称验收通过。
+Cohestra 的 task_completed 也可能来自对话里的用户终点声明，Cadra 无法机器核对该声明；先通过完成前置核对，再按 allowed 是否含 validate 要求验收。保留已知 acceptance 原值，缺失或 null 才记 unknown。正常边界与未验收的完成仍说明范围及人工介入，不冒称验收通过。
 
 ## 调用预算
 

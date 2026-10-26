@@ -8,6 +8,8 @@ $cadra ready
 补充：<澄清或输入，可空>
 ```
 
+旧 0.6/0.7 Task 先按 [版本边界](compatibility.md) 由明确 add 升级，本入口不迁移。
+
 解析当前展示状态及 Run 归属，仅接受 draft/ready 且不属于未完成 Run 的任务。读取本 Task、依赖当前状态和必要输入，按唯一 Ready Gate 逐项核对；不修改定义。补充改变定义时先指向 add。
 
-通过写 preparation=ready；失败写 draft 并列缺口。Gate 记录绑定 revision，保留旧历史，不重复追加同一修订的等价通过记录。回读后推荐 `$cadra run` 加范围，或继续准备其他任务。不建立 Run、不调用阶段。
+通过写 preparation=ready；失败写 draft 并列缺口。Gate 记录绑定 revision，保留旧历史，不重复追加同一修订的等价通过记录。回读后，无未完成 Run 时推荐 `$cadra run` 加范围；已有 running Run 时推荐 `$cadra append` 加明确 slug；其他情况按恢复边界说明，或继续准备任务。不建立 Run、不调用阶段。

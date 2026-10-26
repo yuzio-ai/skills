@@ -1,10 +1,32 @@
 ---
-protocol: "0.6"
+protocol: "0.8"
 run_id: <run-YYYYMMDD-NN>
 status: running
 execution_mode: unattended
 created_at: <ISO-8601 带时区时间>
-skill_version: "0.6.0"
+skill_version: "0.8.0"
+executor:
+  instance_id: <本执行实例唯一标识>
+  generation: 1
+  host_id: null
+  thread_id: null
+  turn_id: null
+  claimed_at: <ISO-8601 带时区时间>
+  progress: {at: <ISO-8601>, event: run_created}
+ownership_history: []
+append_history: []
+preflight:
+  - scope: project
+    status: passed
+    at: <ISO-8601>
+    inputs: {}
+    evidence: <实际项目级预检结果与引用>
+  - scope: task
+    slug: <task-slug>
+    status: passed
+    at: <ISO-8601>
+    inputs: {}
+    evidence: <实际任务级预检结果与引用>
 tasks:
   - slug: <task-slug>
     revision: 1
@@ -20,12 +42,15 @@ tasks:
     checkpoint:
       pending_call: null
       last_delivery: null
+    agents: []
     calls: []
     result: null
 reports: []
 ---
 
 # <run-id>
+
+上方 YAML 只作字段骨架；新 0.8 Run 落盘时头部必须序列化为合法 JSON 映射，保留 Markdown 分隔符和正文，使用 [写入器](../scripts/run_guard.py)。不得把占位符作为真实值。身份、进展与交接语义见 [执行归属](../references/executor.md)。
 
 ## 建立依据
 
@@ -36,7 +61,7 @@ reports: []
 
 ## 记录约定
 
-tasks 数组顺序是执行顺序，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。
+tasks 数组顺序是执行顺序，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。已有条目不可重排；append_history 记录每次尾部追加的 at、source、tasks=[{slug,revision}]，仅 append 可追加。agents 的绑定形状及恢复规则见 [任务执行者](../references/agents.md)，按需创建后单独落盘，不与首次调用意图合并。
 
 每次调用向 calls 追加：
 
@@ -45,6 +70,8 @@ id: 1                       # 该 Run/slug 内递增，不因 resume 重建
 reason: <调用原因与授权来源>
 stage: <拟调用阶段>
 execution_mode: unattended
+agent_ref: <本 Task 已保存的实际角色绑定 id>
+dispatch_evidence: null     # 实际派发后记录 {agent_id, source, at}
 before: <调用前完整契约或 null>
 dispatch: prepared          # prepared / dispatched；都不是交付证明
 closed: false

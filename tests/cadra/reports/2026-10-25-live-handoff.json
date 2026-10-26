@@ -1,0 +1,199 @@
+{
+  "date": "2026-10-25",
+  "tested_at": "2026-10-25T02:01:00.766575+00:00",
+  "cli_version": "0.154.0",
+  "cadra_version": "0.7.0",
+  "cadra_protocol": "0.7",
+  "cohestra_version": "0.12.0",
+  "cohestra_protocol": "0.8",
+  "temporary_root": "/private/tmp/cadra-live-handoff-vaYJY1",
+  "method": "real ephemeral Codex app-server threads; workspace-write sandbox; actual turn/interrupt and host terminal status; no mock observations",
+  "results": [
+    {
+      "scenario": "after_delivery",
+      "status": "passed",
+      "threads": [
+        "01a170b8-b547-7bc3-916b-695aa718d533",
+        "01a170bd-6875-71c2-832c-071b4828ba4d",
+        "01a170c0-ff6d-71c2-b55e-6e0a8f4efaf5"
+      ],
+      "turns": [
+        "01a170b8-b5cf-7bc1-a958-56f32259734b",
+        "01a170bd-68d6-7283-a31f-a0939d271503",
+        "01a170c0-ffbc-77d3-9931-2c4630aebc58"
+      ],
+      "pending_call_preserved": 1,
+      "budget_calls": 1,
+      "generation": 2,
+      "duplicate_resume_readonly": true,
+      "cohestra_code_rounds": 1
+    },
+    {
+      "scenario": "before_dispatch",
+      "status": "passed",
+      "threads": [
+        "01a170c2-c35b-7e50-97f0-8ffda46169c7",
+        "01a170c4-ba6f-7a51-8cee-64093ffc36d2",
+        "01a170c7-e4f8-7fd1-a2f3-0326f151e0b8"
+      ],
+      "turns": [
+        "01a170c2-c3ab-7673-a8e3-75dbfd679ed9",
+        "01a170c4-bac6-7562-8323-a36d085a0a76",
+        "01a170c7-e54d-7282-ae25-07b4a16a890b"
+      ],
+      "pending_call_preserved": 1,
+      "budget_calls": 1,
+      "generation": 2,
+      "duplicate_resume_readonly": true,
+      "cohestra_code_rounds": 1
+    },
+    {
+      "scenario": "legacy",
+      "status": "passed",
+      "thread": "01a170c8-c7d1-7f30-b43f-78804ede4b29",
+      "turn": "01a170c8-c825-7631-98bc-f781f5721582",
+      "unchanged": true,
+      "guard_exit_code": 1
+    }
+  ],
+  "mewoo_history": {
+    "before_count": 4227,
+    "after_count": 4227,
+    "changed": [],
+    "added": []
+  },
+  "skill_sources_unchanged": true,
+  "evidence": {
+    "after_delivery": {
+      "original_identity": {
+        "instance_id": "4145597f-e0d4-469a-829e-15acdab4a40b",
+        "host_id": "local",
+        "thread_id": "01a170b8-b547-7bc3-916b-695aa718d533",
+        "turn_id": "01a170b8-b5cf-7bc1-a958-56f32259734b"
+      },
+      "recovery_identity": {
+        "instance_id": "7cab493a-1c9a-411d-a65b-53e071636196",
+        "host_id": "local",
+        "thread_id": "01a170bd-6875-71c2-832c-071b4828ba4d",
+        "turn_id": "01a170bd-68d6-7283-a31f-a0939d271503"
+      },
+      "repeat_identity": {
+        "instance_id": "2e1a65f0-69a8-4e09-b7d8-a108ce9e2c4d",
+        "host_id": "local",
+        "thread_id": "01a170c0-ff6d-71c2-b55e-6e0a8f4efaf5",
+        "turn_id": "01a170c0-ffbc-77d3-9931-2c4630aebc58"
+      },
+      "original_turn_status": "interrupted",
+      "remaining_background_terminals": [],
+      "generation_before": 1,
+      "generation_after": 2,
+      "budget_before": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "budget_after": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "call_ids": [
+        1
+      ],
+      "closed_calls": [
+        1
+      ],
+      "run_status": "completed",
+      "run_sha256": "00d4e9534f40686f46caff55041746165636a622eeb0417ff9f06d70fb7ddf41",
+      "repeat_compared_file_count": 28,
+      "host_stop_evidence_sha256": "11b4c5cea5bc76c203b1d79a528cdad93f2ae1e4c7a17b6f287c8c1565a882ed",
+      "cohestra_code_handoff_sha256": "e262f1cc30c368c3883331fa084670c78b10b28cd86a0cfdd7e5205236f025b4",
+      "actual_stage_executor": {
+        "thread_id": "01a170b8-b547-7bc3-916b-695aa718d533",
+        "turn_id": "01a170b8-b5cf-7bc1-a958-56f32259734b",
+        "instance_id": "4145597f-e0d4-469a-829e-15acdab4a40b"
+      },
+      "stage_executor_matches_actual_dispatch": true
+    },
+    "before_dispatch": {
+      "original_identity": {
+        "instance_id": "ce689a0a-9e9c-4307-98ce-3664765534c9",
+        "host_id": "local",
+        "thread_id": "01a170c2-c35b-7e50-97f0-8ffda46169c7",
+        "turn_id": "01a170c2-c3ab-7673-a8e3-75dbfd679ed9"
+      },
+      "recovery_identity": {
+        "instance_id": "084505b7-b2a2-4096-9d36-31199bc7e2de",
+        "host_id": "local",
+        "thread_id": "01a170c4-ba6f-7a51-8cee-64093ffc36d2",
+        "turn_id": "01a170c4-bac6-7562-8323-a36d085a0a76"
+      },
+      "repeat_identity": {
+        "instance_id": "8b19b0d1-db64-405f-8d39-2300e3932d2e",
+        "host_id": "local",
+        "thread_id": "01a170c7-e4f8-7fd1-a2f3-0326f151e0b8",
+        "turn_id": "01a170c7-e54d-7282-ae25-07b4a16a890b"
+      },
+      "original_turn_status": "interrupted",
+      "remaining_background_terminals": [],
+      "generation_before": 1,
+      "generation_after": 2,
+      "budget_before": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "budget_after": {
+        "calls": 1,
+        "remediation": 0,
+        "retries": {}
+      },
+      "call_ids": [
+        1
+      ],
+      "closed_calls": [
+        1
+      ],
+      "run_status": "completed",
+      "run_sha256": "924b93bbf24f2ad14e2fdbbacbd8716fdaf9555db475b1001857108f94c1523f",
+      "repeat_compared_file_count": 25,
+      "host_stop_evidence_sha256": "8d93f620d6698a68c84741479b19226f4a9dcc35285b2b96335f11b739b4dd55",
+      "cohestra_code_handoff_sha256": "3626fcff1a8dd09b1083b8e98e9d951475cfb0cca2d6300b6df4b2b37f117a80",
+      "actual_stage_executor": {
+        "thread_id": "01a170c4-ba6f-7a51-8cee-64093ffc36d2",
+        "turn_id": "01a170c4-bac6-7562-8323-a36d085a0a76",
+        "instance_id": "084505b7-b2a2-4096-9d36-31199bc7e2de"
+      },
+      "stage_executor_matches_actual_dispatch": true
+    },
+    "legacy": {
+      "exit_code": 1,
+      "stderr": "0.7 Run requires JSON Front Matter; legacy is read-only\n",
+      "unchanged": true
+    }
+  },
+  "limitations": [
+    "Sequential duplicate resume after completion; concurrent takeover remains covered by the process-level guard test, not by this live run.",
+    "Controlled turn interruption at two explicit fault boundaries, not an OS/power/network crash during file replacement.",
+    "Legacy Run is an isolated minimal 0.6 rejection fixture with missing Task/budget prerequisites; session and guard reject at the protocol boundary. No full old-version stage execution or migration is exercised.",
+    "No Simulator, commit, push or installation update."
+  ],
+  "raw_artifacts": {
+    "run_live.py": "0c901113c02c08d8a3b906517ac358b7a3a3b3398dc69b71874773c6fe507e80",
+    "setup.py": "adc770b31c8b15a6af9c71cb3346bc28cf06c8e45d6a5ceae28633e240ebdae2",
+    "rpc.jsonl": "6f379f047462be2c61612bfcfeccf41ff3f33e6ddbc8dfed81b5834ce0802760",
+    "source-before.json": "60e1053c1faa2a2204b8870c4621c71af5e39869143f00c98394ac3c4a8eff43",
+    "mewoo-history-before.json": "a1af9c8e7d3c4ec3849d4a288da96c755f4e619b7dcb6cdccce3cc0b4eebb3ac",
+    "mewoo-history-comparison.json": "7a0b41ee510ab798de37199db5ff3b0e030a23d8a3f06fe1c935233cb97844c9"
+  },
+  "transport_retry_notifications": 28,
+  "temporary_git_commit_counts": {
+    "after_delivery": 0,
+    "before_dispatch": 0,
+    "legacy": 0
+  },
+  "repository_regression_tests": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "passed": 219
+  }
+}

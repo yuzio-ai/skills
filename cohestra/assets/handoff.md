@@ -4,7 +4,8 @@
 
 - 协议：cohestra v0.8
 - Skill 发行版本：<实际 release.json.version>
-- 执行者：<工具/会话；未知不编造>
+- 执行者：<实际工具/agent/会话；未知不编造，不用主编排者身份代替>
+- 编排来源：<仅调用方提供时记录 Run 路径、slug、call id、主执行实例与归属代次、agent_ref 及实际角色 worker/reviewer；核对实际 agent 身份和本次派发证据来源；独立使用时省略>
 - 时间：<实际时间及时区>
 - 执行模式：<attended / unattended；verify 仅记在本交付物>
 - 阶段状态：<进行中 / 已结束 / 受阻 / 跳过；说明实际结果>

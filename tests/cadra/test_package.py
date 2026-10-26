@@ -19,7 +19,7 @@ def check_package():
     run = frontmatter(ROOT / 'cadra/assets/run.md')
     for label, block, required in [
         ('task', task, {'protocol', 'slug', 'revision', 'preparation', 'flow', 'cohestra_task', 'revision_base', 'changed_fields'}),
-        ('run', run, {'protocol', 'run_id', 'status', 'execution_mode', 'tasks', 'reports'}),
+        ('run', run, {'protocol', 'run_id', 'status', 'execution_mode', 'tasks', 'reports', 'executor', 'preflight', 'append_history'}),
     ]:
         if not required <= keys(block):
             failures.append(f'{label} template missing fields: {required - keys(block)}')
@@ -30,7 +30,7 @@ def check_package():
         failures.append('Task template stores execution state')
     if (ROOT / 'cadra/assets/project/queue').exists():
         failures.append('Obsolete queue template remains')
-    for entry in ('add', 'ready', 'list', 'run', 'resume', 'report'):
+    for entry in ('add', 'ready', 'list', 'run', 'append', 'resume', 'report'):
         path = ROOT / f'cadra/references/{entry}.md'
         if not path.is_file():
             failures.append(f'Missing entry {entry}')

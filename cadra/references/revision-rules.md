@@ -17,7 +17,7 @@ Task 的 revision 初始为 1。影响 Gate 的编辑发生时：当前 revision
 | requirement / 规范化 flow | completed | 新 flow start 一次 |
 | requirement / 规范化 flow | blocked / failed | 先按 [恢复准入](recovery.md) 核实原因解除与交付，再从新 start 一次 |
 | 仅 dependencies / execution_policy | blocked / failed | 按恢复准入选择原待调用、合法 next 或核对收尾 |
-| 仅 dependencies / execution_policy | completed | 核实旧契约与来源后修订收尾，不调用阶段；明确候选与验收为沿用 |
+| 仅 dependencies / execution_policy | completed | 核实旧契约与来源，并通过 [完成前置核对与终态映射](contract.md#完成前置核对) 后才可修订收尾；否则报告受阻。收尾不调用阶段，明确候选与验收为沿用 |
 
 仅已有 Cohestra 交付、尚无 Cadra 执行依据时：绑定确认与合法契约必需；requirement/flow 已变化时按该契约的实际完成/受阻情况套用上述准入，缺少恢复所需调用证据时停止，不补造历史。
 

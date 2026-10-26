@@ -32,4 +32,4 @@ $cohestra fix
 
 新增 `fix-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
-按既定要求转 review 复审，否则转 validate。传递本轮 fix、原 findings、剩余证据与前提；未确定角色标待指派。
+按既定要求转 review 复审，否则转 validate。Cadra 派发的 fix 必须转独立 review，包括从已定位问题直接起步的首次 fix；复审输入或角色条件缺失时按既有受阻路径交付，不跳到 validate。传递本轮 fix、原 findings、剩余证据与前提；未确定角色标待指派。

@@ -34,6 +34,9 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | 文件 | 检查范围 |
 |---|---|
 | [test_cadra.py](cadra/test_cadra.py)、[model.py](cadra/model.py) | Cadra v0.6 测试模型的流程、修订、预算和恢复约束；不是技能运行时 |
+| [test_flow_v08.py](cadra/test_flow_v08.py)、[model_v08.py](cadra/model_v08.py) | 当前流程的测试模型：新预设、人工阶段受阻与必要复审；不替代真实 agent 验证 |
+| [test_append_agents.py](cadra/test_append_agents.py) | 直接测试写入器的原子追加、进程竞争、角色绑定、派发证据、子 agent 停止与旧协议只读 |
+| [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
 | [test_vistra.py](vistra/test_vistra.py) | 包内引用、元数据、来源、许可证与可移植性 |
@@ -57,3 +60,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 - [本机资料与正式文档](shared/scenarios.md)：存储与跨技能交付边界。
 
 Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见对应场景清单；它们辅助隔离验证，不代替实际阶段执行。场景清单定义验收要求，不记录一次性通过数量。结构检查、模型测试、实际调用和视觉验收分别报告。
+
+真实宿主验证单独保存：[2026-10-25 Cadra 跨会话接管](cadra/reports/2026-10-25-live-handoff.md)及其机器可读证据覆盖两个实际中断点、完成后的重复 resume 与旧协议拒绝。普通 unittest 不启动这些会话，也不将历史实测当作当前环境已经复测。
+
+[2026-10-25 两个真实会话竞争接管](cadra/reports/2026-10-25-live-race.md)补充同时 resume 的实际竞争、唯一所有者、失败方工具调用审计与预算保护；保留首轮测试驱动中止及修正后重跑的边界。

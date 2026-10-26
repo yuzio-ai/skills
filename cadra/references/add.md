@@ -8,9 +8,11 @@ $cadra add
 需求：<目标、范围、排除项、验收条件>
 优先级：<high / medium / low；缺省 medium>
 依赖：<已存在 slug 列表；可空>
-流程：<preset 或阶段列表；缺省 full>
+流程：<preset 或阶段列表；缺省 implementation>
 执行策略：<stop_queue_on_failure: true/false；缺省 false>
 ```
+
+旧 Task 的明确协议升级按 [版本边界](compatibility.md) 操作；未明确升级时只读说明，不自动重写版本。
 
 1. 固定目标与 slug，解析 Run 归属；未完成 Run 涉及的任务拒绝编辑。
 2. 校验定义、依赖与 flow，只修改用户明确指定的字段。缺少业务信息记录为缺口，不编造。

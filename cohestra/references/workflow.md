@@ -41,11 +41,27 @@
 
 - 事实、假设、建议和已确认决定分开。明确的局部用户修订记录确认来源、覆盖的旧条款、影响范围和验收变化，并让索引指向该记录；不追加设计追认。重要取舍、需求歧义或显著范围变化才返回 need/design，共享语义仍走项目治理。
 - 改动范围、实现复杂度、风险与未知项决定设计/验证深度；文件数、行数和耗时不作机械门槛。事实不清先调查，一行高风险变化也可能需要升级。
-- 执行者数量单独决定。默认单智能体，只有输入稳定、写入可分离、能独立验收且有并行收益时才建议分工；流程不自动授权启动其他智能体。
+- 执行者数量单独决定。独立调用默认单智能体，只有输入稳定、写入可分离、能独立验收且有并行收益时才建议分工；流程不自动授权启动其他智能体。Cadra 的固定角色派发按下文执行，不由阶段 agent 再次委派。
 - design 确定审查方式、依据、复查责任与触发条件，以及 AC 对应的证据类型和执行前提。后续提高门槛需说明新事实与适用范围；同一作者切换阶段不构成独立审查。
 - 视觉设计先说明方案数量、图片角色与用户待决定事项。默认一套方向的代表图，补充状态图只解决具体问题，生成图不能证明动态布局。修改同类组件要列影响实例、状态和明确保留项，覆盖截图外实例。
 - review 区分确定缺陷、待核实问题、可选建议及是否阻塞。fix 区分认可判断与本次实施；可选项默认延后，纳入本次需说明必要性、范围及授权。
 - 原作者优先整改，原 reviewer 优先复查；按既定条件增量复审：先核对候选关系和差异，再核查原 findings 与受影响断言。连续两次修复同一问题失败时重查根因、证据和测试假设。
+
+进入阶段前核对调用方提供的预检范围、输入指纹与授权来源。预检只证明前提，不证明候选通过；关键输入或验证配置变化时仅重核受影响部分，阶段计划产物不作为此前输入缺失。编排来源只写 handoff 身份信息，不新增 Front Matter 控制字段，不据此接管或修改 Cadra Run。
+
+编排来源中的实例/代次表示本次调用者，不替代实际阶段执行者；恢复者代次变化不使原实例已完成的同一 call 交付失效。是否可闭合同一调用由 Cadra 核对阶段、轮次、同步与派发证据决定，Cohestra 不为匹配新 owner 重写旧交付。旧 0.8 交付缺少可选编排来源时保留未知，不补造；仅凭缺字段也不能确认它就是待恢复调用。
+
+### 编排派发
+
+Cadra 新版为每个任务分别绑定 worker 与 reviewer，并逐阶段派发。worker 执行 code/fix/validate，reviewer 执行 review；同任务可复用各自角色，跨任务不复用。子 agent 的初始上下文只含任务定义、有效决定、项目规范、实际技能路径和必要上游交付，不继承整个队列聊天。上下文隔离不隔离共享工作区，仍须核对实际候选和文件所有权。
+
+- 接到角色初始化消息时只确认身份与可用性，不执行工程阶段。只有收到明确阶段派发后，才核对 Run/slug/call id、agent_ref、角色和实际 agent 身份；来源缺失、身份不符或角色不适用时报告缺口，不代替另一角色执行。
+- 每次派发仅执行指定阶段。本阶段执行者按发布规则独占写入对应 handoff 和任务索引；发布完成并报告后停止。主编排者只核对交付与维护 Run，不代写 Cohestra 索引；阶段之间由 Cadra 串行移交写入权。阶段 agent 不修改 Run，也不自行创建其他 agent 或推进阶段。
+- Cadra 的 code/fix 交付必须交独立 reviewer 审查；fix 后的复审包括从已定位问题直接起步的首次 fix。reviewer 不得是本任务实现或整改作者，不能以切换角色、会话名称或重述作者检查代替独立审查。review-only 直接使用独立 reviewer，不要求虚构 worker。
+- review 期间候选保持固定；复审核对新旧候选关系、原 findings 和受影响路径。validate 必须核对适用于最终候选的独立 review 及整改复审；缺口按既有 pending → review 或 blocked 路径交付，不由 worker 自行补作独立审查。
+- 确认来源和角色审计只写 handoff，不新增 Front Matter 控制字段。新编排交付需如实记录；旧交付缺字段不等于协议损坏，不能据此补造独立审查事实。无法核实所需审查身份或候选时仍是验收缺口。
+
+以上是调用方明确安排的执行要求；单独调用的默认行为及协议 0.8 状态语义不变。need/design 仍可独立调用，既有用户确认有效；Cadra 不派发这两个阶段，执行中需要新的产品决定时按既有受阻路径交回人工。
 
 ## 4. 候选、证据与完成
 
@@ -146,14 +162,14 @@ blocked:
 | validate | acceptance = failed | fix（建议回 design／need 时写对应阶段） | true | acceptance_failed |
 | validate | acceptance = pending，缺必要复审且复审输入、授权与执行条件齐备 | review | true | stage_completed |
 | validate | acceptance = pending，仅缺本阶段能够补足且已有执行条件的验收证据 | validate | true | stage_completed |
-| 任意 | 用户声明的终点已到达（如 small-change 于 code／review 收尾、review-only 于 review 收尾） | null | false | task_completed（任务 status → completed，acceptance 可缺省） |
+| 任意 | 用户声明的终点已到达（如独立调用明确于 code／review 收尾、review-only 于 review 收尾） | null | false | task_completed（任务 status → completed，acceptance 可缺省） |
 | 任意 | 受阻（环境／输入／权限／依赖／候选缺失／需人工决定） | null | false | blocked 或 human_decision_required（任务 status → blocked） |
 | 任意 | 阶段失败、可重试 | 本阶段 | true | stage_failed（正文写恢复条件） |
 | 任意 | 阶段失败、不可继续 | null | false | stage_failed（任务 status → failed） |
 
 - `task_completed` 有两种来源：validate 验收通过，或用户声明的终点已到达。两者都写任务 `status: completed`；后者 `acceptance` 可缺省，消费方按其口径标注 `acceptance = unknown`。
 - **validate 完成一致性**：本轮 validate 只有在范围完成、必做问题关闭、所需复审完成且必要证据齐全时才写 `acceptance.status: passed`。一旦本轮判为 passed，待发布 README 必须同时满足：`stage_result: {stage: validate, status: completed, round: 本轮轮次}`、任务 `status: completed`、`acceptance.status: passed`、`next: {stage: null, allowed: false, reason: task_completed}`、`blocked: {value: false, reason: null}`；正文如有状态说明须与之相符，不得留下后续必做阶段；无需重复抄写完成字段。发布前与发布后回读均逐项核对，并与本轮 handoff、候选及完成条件一致；缺项或任一冲突都不能报告索引同步成功。不将仅有 `stage_result.status: completed` 或部分检查通过当作验收 passed；也不把历史 passed 套用到另一轮次或候选。此约束不改变用户声明的非 validate 终点及 verify 不改控制字段的规则。
-- 「用户声明的终点」只存在于对话与交付记录，不进契约；外部编排系统无法读取该声明，只能按任务 flow 推断终点合法性（如 Cadra 终态映射：flow 允许范围含 validate 而验收缺省时判 blocked）。与外部编排配合使用时，阶段范围用任务 flow 表达——仅允许 review 时选 `review-only` 或 `[review]`，不靠 `small-change` 等允许 validate 的配置提前声明。
+- 「用户声明的终点」只存在于对话与交付记录，不进契约；外部编排系统无法读取该声明，只能按任务 flow 推断终点合法性（如 Cadra 终态映射：flow 允许范围含 validate 而验收缺省时判 blocked）。与外部编排配合使用时，阶段范围用任务 flow 表达——仅允许 review 时选 `review-only` 或 `[review]`，不靠 `implementation` 等允许 validate 的配置提前声明。
 - validate 已确认验收失败时优先推荐 fix/design/need，不因还缺复审改为 pending；缺必要复审且可执行时推荐 review，不能用重复 validate 代替。复审或补证据缺输入、权限、执行条件，或需要人工决定时走受阻路径；不能仅因缺口将来可恢复就允许重复本阶段。
 - 终点到达以该阶段自身交付完成为前提（如 review 必做问题未关闭时不能按终点收尾，仍走 `blocking_findings`）；受阻与失败路径优先于终点表达。
 - `blocked` 优先于 `next` 表达「禁止继续」：`blocked.value: true` 时 `next.allowed` 必为 `false`，任务 `status` 写 `blocked`。

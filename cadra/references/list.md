@@ -9,6 +9,6 @@ $cadra list
 
 容器不存在时报告“未初始化”与目标路径，不写文件。按状态解析读取 Task 定义与关联 Run，展示：slug/title、当前 revision 与展示状态、priority、依赖状态、flow、当前 Run 与 checkpoint 摘要。
 
-队列视图直接取所选 Run 的 tasks 顺序、每项状态及结果；Run 一览列 running/completed/stopped/interrupted、总项数、结束项数和当前执行项。Task 按 slug 排序，Run 展示可按 run-id 倒序，但不能据此决定执行来源。旧 Run 的条目始终展示旧结果。
+队列视图直接取所选 Run 的 tasks 顺序、每项状态及结果；Run 一览列 running/completed/stopped/interrupted、总项数、结束项数和当前执行项，另列追加批次及实际 worker/reviewer 身份摘要。Task 按 slug 排序，Run 展示可按 run-id 倒序，但不能据此决定执行来源。旧 Run 的条目始终展示旧结果。
 
-协议不支持、缺来源或结果矛盾时标 unknown 与具体缺口，不补写、不创建队列文件。根据实际缺口推荐 ready/run/resume/report 的准确调用。
+协议不支持、缺来源或结果矛盾时标 unknown 与具体缺口，不补写、不创建队列文件。按 [执行归属](executor.md) 展示活跃/已停止待核对/活性未知；不从 pending_call、prepared 或时间过久推断中断。仅明确已停止且可核对恢复时推荐 resume；活跃或未知保持只读。其余按实际缺口推荐 ready/run/report；已有 running Run 且新任务 ready 时可推荐 append，不将其描述为接管或唤醒。

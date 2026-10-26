@@ -26,6 +26,12 @@
 | init 新项目 | 项目根维护 `/.yuzio/`，容器只有项目入口、兜底忽略规则、两个空记录容器；没有 prompts、manifest 或示例任务 |
 | 第二个工具重复 init | 复用原目录，不覆盖入口、交付或复盘，不按工具建立副本 |
 | 旧版上下文 | 保留原文件；不做来源说明补写或格式迁移。不支持的执行状态报告缺口并停止依赖它的推进 |
+| 旧 0.8 交付缺新增覆盖表或可选编排来源 | 契约继续按原必填字段读取；本次风险按证据检查，必要补查写新轮次，不回填旧交付或编造执行身份 |
+| Cadra 交接后回收原 call 的完整交付 | 原实例/代次保留为调用来源；新恢复者核对同一 call，不要求 Cohestra 改写旧身份来匹配新 owner |
+| Cadra 角色初始化与阶段派发 | 初始化只确认实际身份与可用性；明确派发后核对 Run/slug/call id、agent_ref、角色和实际身份。worker 仅执行 code/fix/validate，reviewer 仅执行 review；身份或来源无法核实则受阻，不代替另一角色 |
+| Cadra 阶段发布与写入权移交 | 本阶段执行者发布 Cohestra handoff 与任务索引并停止，不写 Cadra Run，不自行推进或再次委派；主编排者核对后才派发下一阶段 |
+| Cadra 从已定位问题首次 fix | fix 后仍需独立 review；作者身份或固定候选无法核实时受阻，不以首次修复、零 findings 或角色名称代替独立评审证据 |
+| 固定候选遗漏必要调用方 | 由原固定版本补取并引用；只有可变工作区副本时重新固定候选并核对差异，不扩写旧不可变清单或冒称原快照 |
 | 容器已删除但 Git 仍有记录 | 先报告可恢复与不可恢复清单，再按新项目建立；删除记录是否提交由用户决定，init 不提交、不 checkout |
 | 普通阶段缺少上下文容器 | 先报告目标路径并执行一次最小初始化，再继续本阶段；不误把技能源仓库或其他目录当目标 |
 | need → design → code | 同一任务目录接力；未确认建议不自动变成实现依据 |
@@ -74,7 +80,7 @@
 | 外部编排只读控制流（契约） | 只读 Front Matter 即可判断任务状态、阶段结果、候选、受阻、下一阶段与是否允许继续，不解析正文 |
 | Front Matter 唯一状态源（契约） | 不出现 state.json / status.json / runtime.json；handoff 仍是不可变历史交付 |
 | verify 交付（契约） | 只写 verify 交付与正文索引行；完整发布 README 时保留已有 Front Matter 全部原值，不改 stage_result / next / execution_mode 等控制字段 |
-| 链条外终点（契约） | 用户声明终点（如 review-only 于 review 收尾、small-change 于 code 收尾）→ 任务 status=completed、next={null,false,task_completed}、acceptance 可缺省；不与「仅 passed 才 completed」冲突，必做问题未关闭不按终点收尾；与 Cadra 配合使用时终点由 flow 表达（flow 含 validate 而验收缺省时 Cadra 判 blocked，见 Cadra 终态映射第 7、8 行） |
+| 链条外终点（契约） | 独立调用明确于 code/review 收尾，或 review-only 于 review 收尾 → 任务 status=completed、next={null,false,task_completed}、acceptance 可缺省；不与「仅 passed 才 completed」冲突，必做问题未关闭不按终点收尾。Cadra 另按 flow 和完成前置核对判定：code/fix 终点不能绕过必要独立 review/复审（终态映射第 4b 行）；其余合法终点按 flow 是否含 validate 处理验收缺省（第 7、8 行），不将独立调用的终点声明当作 Cadra 提前完成授权 |
 | 受阻任务状态（契约） | blocked.value=true 时任务 status 同步写 blocked，受阻解除后回 in_progress；消费方单读 status 也能看到受阻 |
 | 契约版本核对（契约） | Front Matter 含必填 `contract`（取当前协作协议版本）；消费方可核对版本，缺失判「契约未就绪」而非靠字段嗅探 |
 | 必填与可选（契约） | 必填集缺失判协议输出不合法，可选字段缺失合法；新任务首次正式交付写完整必填集 |
@@ -137,3 +143,17 @@
 [报告输入生成器](report_fixture.py)按需建立多任务、旧格式及问题计数冲突样本，仓库不保存生成的输入副本。在仓库根目录执行 `python3 -B tests/cohestra/report_fixture.py prepare <新建临时项目目录>`；目标目录须不存在。使用 `python3 -B tests/cohestra/report_fixture.py snapshot <项目目录>` 采集调用前后快照，输出保存到被测目录之外，再比较差异。
 
 [validate 输入与故障驱动](validate_fixture.py)和[产物核对器](validate_check.py)用于准备隔离场景、注入文件操作故障并检查实际产物。使用前按上述当前场景核对适用性，尤其是旧任务处理；脚本断言不能替代当前规则或实际技能调用。
+
+## 风险覆盖回放
+
+这些场景用于实际 review/validate 验收，不以措辞匹配测试替代源码判断。仅在隔离候选中注入缺陷，不改真实项目历史。
+
+| 输入 | 期望 |
+|---|---|
+| 相机服务组件测试通过，但账号恢复装配漏传依赖 | 追踪恢复调用方并提出缺陷，不能因默认 Unavailable 可编译而通过 |
+| 设置返回后退出位置页丢失手动选择意图 | 覆盖退出、重建、激活路径，识别意外自动定位 |
+| 权限重读抛错后仍使用缓存 allowed | 核查本次成功条件、取消与迟到回调，识别错误业务放行 |
+| 固定候选缺少必要调用方，仅可变工作区可读 | 补齐固定输入或 blocked，不伪造覆盖完整 |
+| 已有 review 无 findings，但漏掉必要路径，validate 可返回复审 | pending → review；不自行重复 review 或直接 passed |
+| 独立调用的纯局部样式修改无上述风险 | 只记相关覆盖，不强制全项目权限审计或自动委派独立 Agent；已有独立审查要求仍有效，Cadra 派发继续遵守其固定角色与复审安排 |
+| 只授权源码/主机验收 | 明示运行未执行；不扩展授权，也不把运行证据必需项擅改为不适用 |

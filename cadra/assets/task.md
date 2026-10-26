@@ -1,12 +1,12 @@
 ---
-protocol: "0.6"
+protocol: "0.8"
 slug: <stable-slug>
 title: <任务名>
 revision: 1
 preparation: draft
 priority: medium
 dependencies: []
-flow: full
+flow: implementation
 execution_policy:
   stop_queue_on_failure: false
 cohestra_task: .yuzio/cohestra/handoffs/<stable-slug>/

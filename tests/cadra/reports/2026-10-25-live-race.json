@@ -1,0 +1,525 @@
+{
+  "status": "passed",
+  "original": {
+    "instance_id": "2c9164d3-0fcc-4769-a671-c421ac647d8c",
+    "host_id": "local",
+    "thread_id": "01a170db-0035-7693-aac6-f0ff6c73bc25",
+    "turn_id": "01a170db-0114-7771-ba0a-aa4f611c3d7f"
+  },
+  "contenders": [
+    {
+      "instance_id": "b99c934e-9432-4751-9cec-04688617875c",
+      "host_id": "local",
+      "thread_id": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+      "turn_id": "01a170de-c89b-7860-8bd8-a8ddc060c419"
+    },
+    {
+      "instance_id": "eb5fc954-15bf-49d6-9107-6796ad9e1746",
+      "host_id": "local",
+      "thread_id": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+      "turn_id": "01a170de-c94b-7d41-9d17-ea4ecbeb2258"
+    }
+  ],
+  "baseline_sha256": "b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57",
+  "winner": "resume-b",
+  "loser": "resume-c",
+  "outcomes": [
+    {
+      "label": "resume-b",
+      "identity": {
+        "instance_id": "b99c934e-9432-4751-9cec-04688617875c",
+        "host_id": "local",
+        "thread_id": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+        "turn_id": "01a170de-c89b-7860-8bd8-a8ddc060c419"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "/private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py",
+        "takeover",
+        "--run",
+        "/private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/run-20261025-01.md",
+        "--proposal",
+        "/private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-b/takeover.md",
+        "--expected-sha256",
+        "b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57",
+        "--instance",
+        "b99c934e-9432-4751-9cec-04688617875c",
+        "--generation",
+        "2",
+        "--observation",
+        "/private/tmp/cadra-live-race-WgRTsA/race/control/stop-observation.json"
+      ],
+      "started_at": "2026-10-25T02:26:32.072579+00:00",
+      "started_ns": 1394142246434250,
+      "finished_ns": 1394142296683541,
+      "exit_code": 0,
+      "stdout": "99a503f1a706bcb011714cfd38598caafc8343131e3baa2b8d68629b80257426\n",
+      "stderr": "",
+      "after_sha256": "99a503f1a706bcb011714cfd38598caafc8343131e3baa2b8d68629b80257426"
+    },
+    {
+      "label": "resume-c",
+      "identity": {
+        "instance_id": "eb5fc954-15bf-49d6-9107-6796ad9e1746",
+        "host_id": "local",
+        "thread_id": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+        "turn_id": "01a170de-c94b-7d41-9d17-ea4ecbeb2258"
+      },
+      "command": [
+        "python3",
+        "-B",
+        "/private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py",
+        "takeover",
+        "--run",
+        "/private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/run-20261025-01.md",
+        "--proposal",
+        "/private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-c/takeover-proposal.md",
+        "--expected-sha256",
+        "b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57",
+        "--instance",
+        "eb5fc954-15bf-49d6-9107-6796ad9e1746",
+        "--generation",
+        "2",
+        "--observation",
+        "/private/tmp/cadra-live-race-WgRTsA/race/control/stop-observation.json"
+      ],
+      "started_at": "2026-10-25T02:26:32.072578+00:00",
+      "started_ns": 1394142246434250,
+      "finished_ns": 1394142295311583,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "another Run writer is active\n",
+      "after_sha256": "99a503f1a706bcb011714cfd38598caafc8343131e3baa2b8d68629b80257426"
+    }
+  ],
+  "overlap_ms": 48.877333,
+  "final_generation": 2,
+  "ownership_history_entries": 1,
+  "calls": 1,
+  "budget": {
+    "calls": 1,
+    "remediation": 0,
+    "retries": {}
+  },
+  "dispatches": [
+    {
+      "label": "resume-b",
+      "identity": {
+        "instance_id": "b99c934e-9432-4751-9cec-04688617875c",
+        "host_id": "local",
+        "thread_id": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+        "turn_id": "01a170de-c89b-7860-8bd8-a8ddc060c419"
+      },
+      "at": "2026-10-25T02:26:50.843041+00:00",
+      "stage": "code",
+      "call_id": 1
+    }
+  ],
+  "code_handoffs": 1,
+  "run_sha256": "4aa4d2a78fd29dc2bac4f4970050b538a9f02a500dd561ca601b3cb5beca072d",
+  "cohestra_handoff_sha256": "2826c1daaf1130c4aa527755f63cafdefc22452b7bdbbf5708c3884bedf5eda5",
+  "proposal_checks": [
+    {
+      "label": "resume-b",
+      "sha256": "99a503f1a706bcb011714cfd38598caafc8343131e3baa2b8d68629b80257426",
+      "valid_original_revision_takeover": true
+    },
+    {
+      "label": "resume-c",
+      "sha256": "9594425edf4dc1c7506683477987f40abd12c8d6695bee4c4f2271a1f5302d50",
+      "valid_original_revision_takeover": true
+    }
+  ],
+  "actual_stage_executor_verified": true,
+  "mewoo_original_history": {
+    "original_cadra_history_files": 39,
+    "changed": [],
+    "baseline_manifest_sha256": "321564dc3ae923595330b49ca3d0187eded6297b3fd23961dd3b2d4b163be290"
+  },
+  "mewoo_isolation": {
+    "test_actor_tools_targeting_mewoo": 0,
+    "external_run": ".yuzio/cadra/runs/run-20261025-02.md",
+    "external_thread": "01a170cf-31ce-7343-9b52-a944e11474bf",
+    "external_run_protocol": "0.6",
+    "external_evidence": ".yuzio/cohestra/handoffs/assistant-settings-local-preferences/code-01.md",
+    "action": "Read-only hashing and source identity inspection; preserved concurrent changes; no rollback."
+  },
+  "date": "2026-10-25",
+  "cli_version": "0.154.0",
+  "cadra_version": "0.7.0",
+  "cadra_protocol": "0.7",
+  "cohestra_version": "0.12.0",
+  "cohestra_protocol": "0.8",
+  "temporary_root": "/private/tmp/cadra-live-race-WgRTsA",
+  "real_threads": 3,
+  "mewoo_history": {
+    "before_count": 4245,
+    "after_count": 4303,
+    "changed": [
+      "cadra/runs/run-20261025-02.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/README.md",
+      "mewoo-ui-explorer/artifacts/care-grouping-capsule-20261024/README.md"
+    ],
+    "added": [
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Documents/05-我/06-首页.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Documents/05-我/19-AI 设置与数据说明.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppDestinationView.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppEnvironment+HouseholdUpgrade.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppEnvironment+Live.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppEnvironment.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppRootView.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/AppRoute.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/App/Destinations/AppProfileDestinations.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Data/Repositories/AssistantPreferencesStore.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Data/Services/AccountScopedRepositories.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Domain/Values/AssistantPreferences.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Features/Profile/ProfileModels.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Features/Settings/AssistantPreferencesController.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Features/Settings/AssistantSettingsView.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Mewoo/Resources/Localizable.xcstrings",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/MewooTests/AssistantPreferencesTests.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/MewooTests/HomeDashboardTests.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/MewooUITests/MewooReleaseUITests.swift",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Scripts/check_navigation_chrome.py",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/Scripts/test_account_profile_host.py",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/docs/assets/assistant-settings/README.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/docs/assets/assistant-settings/assistant-settings-v1.png",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/files/docs/assets/assistant-settings/prompt-v1.txt",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/manifest.json",
+      "cohestra/handoffs/assistant-settings-local-preferences/candidate-code-01/task.diff",
+      "cohestra/handoffs/assistant-settings-local-preferences/code-01.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/review-01.md",
+      "cohestra/handoffs/assistant-settings-local-preferences/validate-01.md",
+      "cohestra/handoffs/card-surface-unification/README.md",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/files/Documents/01-朝夕/01-首页.md",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/files/Documents/02-健康/01-首页.md",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/files/Packages/MewooDesignSystem/Sources/MewooDesignSystem/Foundations/MewooColor.swift",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/files/Packages/MewooDesignSystem/Sources/MewooDesignSystem/Foundations/MewooComponentToken.swift",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/files/docs/DESIGN_TOKENS.md",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/manifest.json",
+      "cohestra/handoffs/card-surface-unification/candidate-code-01/task.diff",
+      "cohestra/handoffs/card-surface-unification/code-01.md",
+      "cohestra/handoffs/card-surface-unification/design-01.md",
+      "cohestra/handoffs/card-surface-unification/need-01.md",
+      "cohestra/handoffs/card-surface-unification/review-01.md",
+      "cohestra/handoffs/card-surface-unification/validate-01.md",
+      "cohestra/handoffs/care-grouping-capsule/README.md",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/files/Documents/03-照护/01-首页.md",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/files/Mewoo/Features/Care/CareDailyTaskBoard.swift",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/files/docs/assets/care-grouping-capsule/README.md",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/files/docs/assets/care-grouping-capsule/preview-r02.png",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/files/docs/assets/care-grouping-capsule/prompt-r02.txt",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/manifest.json",
+      "cohestra/handoffs/care-grouping-capsule/candidate-code-01/task.diff",
+      "cohestra/handoffs/care-grouping-capsule/code-01.md",
+      "cohestra/handoffs/care-grouping-capsule/design-01.md",
+      "cohestra/handoffs/care-grouping-capsule/need-01.md",
+      "cohestra/handoffs/care-grouping-capsule/review-01.md",
+      "cohestra/handoffs/care-grouping-capsule/validate-01.md",
+      "cohestra/handoffs/health-attention-types-footer/README.md",
+      "cohestra/handoffs/health-attention-types-footer/need-01.md",
+      "mewoo-ui-explorer/artifacts/health-attention-types-20261024/prompt-r02.txt"
+    ]
+  },
+  "package_sources_unchanged": true,
+  "temporary_git_commits": 0,
+  "both_active_evidence": [
+    {
+      "thread_id": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+      "turn_id": "01a170de-c89b-7860-8bd8-a8ddc060c419",
+      "identity": {
+        "instance_id": "b99c934e-9432-4751-9cec-04688617875c",
+        "host_id": "local",
+        "thread_id": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+        "turn_id": "01a170de-c89b-7860-8bd8-a8ddc060c419"
+      },
+      "background_terminals": {
+        "data": [
+          {
+            "itemId": "exec-06ef79de-a47d-4e43-ac6c-f6a5e0766150",
+            "processId": "66212",
+            "command": "python3 -B race_takeover.py --label resume-b --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-b/takeover.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57",
+            "cwd": "/private/tmp/cadra-live-race-WgRTsA/race",
+            "osPid": null,
+            "cpuPercent": null,
+            "rssKb": null
+          }
+        ],
+        "nextCursor": null
+      },
+      "host_status_event": {
+        "method": "thread/status/changed",
+        "params": {
+          "threadId": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+          "status": {
+            "type": "active",
+            "activeFlags": []
+          }
+        },
+        "emittedAtMs": 1792895010988
+      },
+      "active_command_events": [
+        {
+          "method": "item/started",
+          "params": {
+            "item": {
+              "type": "commandExecution",
+              "id": "exec-06ef79de-a47d-4e43-ac6c-f6a5e0766150",
+              "pluginId": null,
+              "scriptPath": null,
+              "command": "/bin/zsh -lc 'python3 -B race_takeover.py --label resume-b --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-b/takeover.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57'",
+              "cwd": "/private/tmp/cadra-live-race-WgRTsA/race",
+              "processId": "66212",
+              "source": "unifiedExecStartup",
+              "status": "inProgress",
+              "commandActions": [
+                {
+                  "type": "unknown",
+                  "command": "python3 -B race_takeover.py --label resume-b --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-b/takeover.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57"
+                }
+              ],
+              "aggregatedOutput": null,
+              "exitCode": null,
+              "durationMs": null
+            },
+            "threadId": "01a170de-c800-78e1-8ebd-dab5fde972d8",
+            "turnId": "01a170de-c89b-7860-8bd8-a8ddc060c419",
+            "startedAtMs": 1792895178488
+          },
+          "emittedAtMs": 1792895178488
+        }
+      ],
+      "observed_at": "2026-10-25T02:26:31.957709+00:00"
+    },
+    {
+      "thread_id": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+      "turn_id": "01a170de-c94b-7d41-9d17-ea4ecbeb2258",
+      "identity": {
+        "instance_id": "eb5fc954-15bf-49d6-9107-6796ad9e1746",
+        "host_id": "local",
+        "thread_id": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+        "turn_id": "01a170de-c94b-7d41-9d17-ea4ecbeb2258"
+      },
+      "background_terminals": {
+        "data": [],
+        "nextCursor": null
+      },
+      "host_status_event": {
+        "method": "thread/status/changed",
+        "params": {
+          "threadId": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+          "status": {
+            "type": "active",
+            "activeFlags": []
+          }
+        },
+        "emittedAtMs": 1792895011206
+      },
+      "active_command_events": [
+        {
+          "method": "item/started",
+          "params": {
+            "item": {
+              "type": "commandExecution",
+              "id": "exec-8957ed8c-40a8-47a4-b47d-8e2a89d46272",
+              "pluginId": null,
+              "scriptPath": null,
+              "command": "/bin/zsh -lc 'python3 -B race_takeover.py --label resume-c --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-c/takeover-proposal.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57'",
+              "cwd": "/private/tmp/cadra-live-race-WgRTsA/race",
+              "processId": "9929",
+              "source": "unifiedExecStartup",
+              "status": "inProgress",
+              "commandActions": [
+                {
+                  "type": "unknown",
+                  "command": "python3 -B race_takeover.py --label resume-c --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-c/takeover-proposal.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57"
+                }
+              ],
+              "aggregatedOutput": null,
+              "exitCode": null,
+              "durationMs": null
+            },
+            "threadId": "01a170de-c8b5-7af0-a0f0-b2806e314f62",
+            "turnId": "01a170de-c94b-7d41-9d17-ea4ecbeb2258",
+            "startedAtMs": 1792895191986
+          },
+          "emittedAtMs": 1792895191986
+        }
+      ],
+      "observed_at": "2026-10-25T02:26:32.063791+00:00"
+    }
+  ],
+  "loser_tool_audit": {
+    "commands": [
+      {
+        "id": "exec-d07a97e6-370c-4514-bc31-52a745bdb07f",
+        "command": "/bin/zsh -lc \"pwd && rg --files -g AGENTS.md -g '\"'!control/identity*'\"' -g '\"'!**/scratch/**'\"' . /private/tmp/cadra-live-race-WgRTsA/skills/cadra /private/tmp/cadra-live-race-WgRTsA/skills/cohestra\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-d8271185-720a-42f7-bf88-aaed5b7eb03f",
+        "command": "/bin/zsh -lc 'cat AGENTS.md /private/tmp/cadra-live-race-WgRTsA/skills/cadra/SKILL.md /private/tmp/cadra-live-race-WgRTsA/skills/cohestra/SKILL.md'",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-4f1179e9-6cdb-49f7-b806-1249394d5f1c",
+        "command": "/bin/zsh -lc 'cat /private/tmp/cadra-live-race-WgRTsA/skills/cadra/references/{workflow,resume,storage,executor,contract,compatibility}.md /private/tmp/cadra-live-race-WgRTsA/skills/cadra/release.json'",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-b4733e84-3926-4a5b-85f0-2b6ba4b9b30b",
+        "command": "/bin/zsh -lc \"rg --files --hidden .yuzio control | rg -v 'identity|scratch' && cat control/identity-resume-c.json control/stop-observation.json && cat race_takeover.py record_dispatch.py\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-f261ef1b-4841-49e4-9a8b-eea559ad919b",
+        "command": "/bin/zsh -lc 'cat /private/tmp/cadra-live-race-WgRTsA/skills/cadra/references/{run-rules,run,preflight,flow}.md'",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-ffee5547-78ec-4516-b0b9-fd68a03e50b9",
+        "command": "/bin/zsh -lc \"rg --files --hidden --no-ignore .yuzio evidence | rg -v '/scratch/|/contenders/' && cat .yuzio/cadra/runs/run-20261025-01.md .yuzio/cadra/tasks/*.md evidence/host-stop-evidence.json && git status --short && git check-ignore .yuzio/cadra/runs/run-20261025-01.md\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-18505923-2117-4b71-bcf8-2c828cb72c0b",
+        "command": "/bin/zsh -lc \"python3 -B - <<'PY'\nfrom pathlib import Path\nimport json,hashlib\np=Path.cwd();r=p/'.yuzio/cadra/runs/run-20261025-01.md'\ndef parse(path):return json.loads(path.read_text().split('---',2)[1])\nd=parse(r);t=parse(p/'.yuzio/cadra/tasks/hello-test.md');print('original_sha256',hashlib.sha256(r.read_bytes()).hexdigest())\nfor f in (p/'.yuzio/cadra/runs').glob('*.md'):\n a=parse(f);print('run',f.name,a['protocol'],a['status'],[(x['slug'],x['state'],x['previous_run']) for x in a['tasks']])\nprint('snapshot fields equal',all(d['tasks'][0]['definition'][k]==v for k,v in t.items()))\nprint('source bytes equal',d['tasks'][0]['definition']['source_document']==(p/'.yuzio/cadra/tasks/hello-test.md').read_text())\nfor check in d['preflight']:\n for f,h in check['inputs'].items():\n  actual=hashlib.sha256(Path(f).read_bytes()).hexdigest();print('hash',actual==h,f,'expected='+h,'actual='+actual)\nprint('call',json.dumps(d['tasks'][0]['calls'],ensure_ascii=False,indent=2))\nprint('cohestra_exists',(p/'.yuzio/cohestra').exists())\nprint('products',[(f,(p/f).exists()) for f in ['greeting.py','test_greeting.py']])\nPY\ncat evidence/fault-boundary.json evidence/terminals-before-cleanup.json evidence/identity-resume-c.json\npython3 -B /private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py inspect --run /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/run-20261025-01.md --observation /private/tmp/cadra-live-race-WgRTsA/race/control/stop-observation.json\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-523eaad9-a533-48f4-b707-1df5cbd86e6c",
+        "command": "/bin/zsh -lc \"cat /private/tmp/cadra-live-race-WgRTsA/skills/cohestra/release.json /private/tmp/cadra-live-race-WgRTsA/skills/cohestra/references/code.md && rg -n 'takeover|progress|ownership_history|observation' /private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-1c5c7043-65eb-4099-864c-973f16387310",
+        "command": "/bin/zsh -lc \"python3 -B - <<'PY'\nfrom pathlib import Path\nimport json,hashlib\np=Path.cwd();r=p/'.yuzio/cadra/runs/run-20261025-01.md'\ndef parse(path):return json.loads(path.read_text().split('\\\\n---\\\\n',1)[0][4:])\nd=parse(r);t=parse(p/'.yuzio/cadra/tasks/hello-test.md');print('original_sha256',hashlib.sha256(r.read_bytes()).hexdigest())\nfor f in (p/'.yuzio/cadra/runs').glob('*.md'):\n a=parse(f);print('run',f.name,a['protocol'],a['status'],[(x['slug'],x['state'],x['previous_run']) for x in a['tasks']])\nprint('snapshot fields equal',all(d['tasks'][0]['definition'][k]==v for k,v in t.items()))\nprint('source bytes equal',d['tasks'][0]['definition']['source_document']==(p/'.yuzio/cadra/tasks/hello-test.md').read_text())\nfor check in d['preflight']:\n for f,h in check['inputs'].items():\n  actual=hashlib.sha256(Path(f).read_bytes()).hexdigest();print('hash',actual==h,f,'expected='+h,'actual='+actual)\nprint('call',json.dumps(d['tasks'][0]['calls'],ensure_ascii=False,indent=2))\nprint('cohestra_exists',(p/'.yuzio/cohestra').exists())\nprint('products',[(f,(p/f).exists()) for f in ['greeting.py','test_greeting.py']])\nprint('body',r.read_text().split('\\\\n---\\\\n',1)[1])\nPY\nsed -n '1,95p' /private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py\nsed -n '160,242p' /private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-d028cfc2-6db2-4905-9d9b-4fa53a345f59",
+        "command": "/bin/zsh -lc \"python3 -B - <<'PY'\nfrom pathlib import Path\nimport json\nfor name in ['thread-original.json','thread-resume-c.json','run-before-interrupt.json']:\n p=Path('evidence')/name;d=json.loads(p.read_text());print(name,'type',type(d).__name__,'keys',list(d) if isinstance(d,dict) else len(d))\n if name=='thread-original.json':\n  print(json.dumps(d,ensure_ascii=False)[-18000:])\n elif name=='thread-resume-c.json':\n  print(json.dumps(d,ensure_ascii=False)[:3000])\nPY\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-b868e9a1-1cf1-44ec-84c9-d81b84b0e883",
+        "command": "/bin/zsh -lc \"python3 -B - <<'PY'\nfrom pathlib import Path\nimport json,hashlib,datetime,importlib.util,copy,os,unittest,fcntl\np=Path.cwd();r=p/'.yuzio/cadra/runs/run-20261025-01.md';raw=r.read_bytes();sha=hashlib.sha256(raw).hexdigest();assert sha=='b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57'\nspec=importlib.util.spec_from_file_location('guard','/private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py');g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g)\nd=g.header(raw);g.validate(d);_,body=g.split_document(raw)\ni=json.loads((p/'control/identity-resume-c.json').read_text());o=json.loads((p/'control/stop-observation.json').read_text());h=json.loads(Path(o['source']).read_text());task=g.read_json(g.split_document((p/'.yuzio/cadra/tasks/hello-test.md').read_bytes())[0]);entry=d['tasks'][0]\nassert g.activity(d['executor'],o)=='stopped'\nfor k in ['host_id','thread_id','turn_id']:assert o[k]==h[k]==d['executor'][k]\nassert h['completion']['threadId']==o['thread_id'] and h['completion']['turn']['id']==o['turn_id'] and h['completion']['turn']['status']=='interrupted'\nassert h['background_terminals']['data']==[] and h['pause_process_exit']['ps_exit_code']==1 and h['pause_process_exit']['pid']==h['fault_boundary']['pid']\nassert h['fault_boundary']['boundary']=='before_dispatch'\nassert raw==(p/'evidence/run-before-interrupt.md').read_bytes()\nassert d==json.loads((p/'evidence/run-before-interrupt.json').read_text())\nassert i==json.loads((p/'evidence/identity-resume-c.json').read_text())\nassert i['thread_id']==json.loads((p/'evidence/thread-resume-c.json').read_text())['thread']['id']\nassert len(list((p/'.yuzio/cadra/runs').glob('run-*.md')))==1 and entry['previous_run'] is None\nassert all(entry['definition'][k]==v for k,v in task.items()) and entry['definition']['source_document']==(p/'.yuzio/cadra/tasks/hello-test.md').read_text()\nassert all(hashlib.sha256(Path(f).read_bytes()).hexdigest()==v for c in d['preflight'] for f,v in c['inputs'].items())\nassert entry['budget']=={'calls':1,'remediation':0,'retries':{}} and len(entry['calls'])==1 and entry['calls'][0]['dispatch']=='prepared' and not entry['calls'][0]['closed']\nassert entry['checkpoint']=={'pending_call':1,'last_delivery':None} and not (p/'.yuzio/cohestra').exists()\nassert task['flow']==['code'] and task['dependencies']==[] and task['ready_gate']['status']=='passed'\nassert os.access(p,os.W_OK) and os.access(r,os.W_OK)\nproposal=copy.deepcopy(d);now=datetime.datetime.now(datetime.timezone.utc).isoformat();proposal['executor']={**i,'generation':2,'claimed_at':now,'progress':{'at':now,'event':'resume_takeover_claim'}};proposal['ownership_history'].append({'previous':d['executor'],'observation':o});g.validate(proposal)\nscratch=p/'.yuzio/cadra/runs/scratch/run-20261025-01/resume-c';scratch.mkdir(parents=True,exist_ok=True)\n(scratch/'original-run.md').write_bytes(raw)\nproposal_path=scratch/'takeover-proposal.md';proposal_path.write_text('---\\\\n'+json.dumps(proposal,ensure_ascii=False,indent=2)+'\\\\n---\\\\n'+body)\n(scratch/'verification.json').write_text(json.dumps({'original_sha256':sha,'verified_at':now,'source_chain':'unique run, previous_run=null','task_snapshot':'exact fields and source bytes match','prerequisite_hashes':'all 9 match','stop_evidence':o['source'],'identity':i,'call_count':1,'budget':entry['budget'],'dispatch':'prepared; before_dispatch confirmed; no delivery'},ensure_ascii=False,indent=2)+'\\\\n')\nassert r.read_bytes()==raw\nprint(json.dumps({'proposal':str(proposal_path),'original_sha256':sha,'checks':'passed'},ensure_ascii=False))\nPY\"",
+        "exitCode": 0,
+        "status": "completed"
+      },
+      {
+        "id": "exec-8957ed8c-40a8-47a4-b47d-8e2a89d46272",
+        "command": "/bin/zsh -lc 'python3 -B race_takeover.py --label resume-c --proposal /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/scratch/run-20261025-01/resume-c/takeover-proposal.md --expected-sha256 b747bafece7df0b04fc17ecba44bac03761f4e6fcf66c209d6350dfada25db57'",
+        "exitCode": 1,
+        "status": "failed"
+      },
+      {
+        "id": "exec-cb0a7333-9a66-410f-a2cf-47f3ae038384",
+        "command": "/bin/zsh -lc \"python3 -B /private/tmp/cadra-live-race-WgRTsA/skills/cadra/scripts/run_guard.py inspect --run /private/tmp/cadra-live-race-WgRTsA/race/.yuzio/cadra/runs/run-20261025-01.md\npython3 -B - <<'PY'\nfrom pathlib import Path\nimport json,hashlib\np=Path.cwd();raw=(p/'.yuzio/cadra/runs/run-20261025-01.md').read_bytes();d=json.loads(raw.decode().split('\\\\n---\\\\n',1)[0][4:]);i=json.loads((p/'control/identity-resume-c.json').read_text());t=d['tasks'][0];result=json.loads((p/'evidence/contenders/resume-c/result.json').read_text())\nsummary={'personally_owned':d['executor']['instance_id']==i['instance_id'],'executor':d['executor'],'run_status':d['status'],'call_count':len(t['calls']),'budget':t['budget'],'pending_call':t['checkpoint']['pending_call'],'calls':[{'id':c['id'],'dispatch':c['dispatch'],'closed':c['closed']} for c in t['calls']],'takeover_exit_code':result['exit_code'],'takeover_stderr':result['stderr'],'sha256':hashlib.sha256(raw).hexdigest(),'personally_dispatched':False}\nassert result['exit_code']\"'!=0\nprint(json.dumps(summary,ensure_ascii=False,indent=2))\n(p/'\"'.yuzio/cadra/runs/scratch/run-20261025-01/resume-c/conflict-readback.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\\\\n')\nPY\"",
+        "exitCode": 0,
+        "status": "completed"
+      }
+    ],
+    "file_changes": [],
+    "messages": [
+      "我将使用指定的临时 Cadra 与 Cohestra 技能，核验原始 Run 和停止证据，再以 resume-c 身份执行唯一一次接管尝试。\n",
+      "原始 Run 记录为 call 1 已准备、预算已计 1 次。宿主证据显示原执行已中断，暂停进程已结束；我正在复核快照与前提文件哈希。\n",
+      "- resume-c 未取得所有权。唯一接管尝试退出码为 1：`another Run writer is active`。\n- 回读确认 generation 2 已属于其他实例；未重试接管。\n- 回读时调用数为 1、预算消费为 1，call 1 仍为 prepared、未闭合。\n- 我未派发任何阶段，未新增调用或预算消费。"
+    ],
+    "post_conflict_review": {
+      "command_calls": 1,
+      "effects": [
+        "guard inspect",
+        "read current Run and own guard result",
+        "write own scratch/conflict-readback.json"
+      ],
+      "stage_dispatches": 0,
+      "run_updates": 0,
+      "takeover_retries": 0,
+      "review_basis": "Actual post-conflict command body in captured RPC events, not only the final response."
+    }
+  },
+  "raw_artifacts": {
+    "run_race.py": "28bd8efb87e82fdbe217038b5c3589335f5ec08ac092608bc9a9678ee7038394",
+    "live_support.py": "e939b8bda2fca42193def2f98116107e78c174185bc1d97d0e562ae97ed37a11",
+    "setup.py": "300f1be0bada0faf113ae23d7eb3d089211662c61435b8067282a3abdf20b4d0",
+    "rpc.jsonl": "6e396c382be7978e3aa395c89a1d929e32955e12daddbcd698f46b0a85bc0f58",
+    "source-before.json": "60e1053c1faa2a2204b8870c4621c71af5e39869143f00c98394ac3c4a8eff43",
+    "mewoo-history-before.json": "bf2813ee27efb768927ca41737afd1399d6b9e76c97a8e0525e8a538d719faed",
+    "mewoo-history-comparison.json": "89b9866dc1528db37aa9dee609d9d625c0b927b64c84ba8970e8e6186e975ad5"
+  },
+  "harness_artifacts": {
+    "race_takeover.py": "bb9f58c6b40d670790cfdae9d6963217868a2b4564ee8ac8ac5bdc83cca64de2",
+    "record_dispatch.py": "40b2dc049f55852f8069e2d2e0ea2a6f44a6678df88d39e983ed33408a9ae2bd",
+    "evidence/dispatch-events.jsonl": "8e9688b1007721f0256fb5e54a0f4e2a6d028dbe3e5b129b06287fb6154a3416",
+    "evidence/host-stop-evidence.json": "cbd5b95900a3f832df1b895a455a7aa5719133a25b53c826d4bb7512771bb240"
+  },
+  "limitations": [
+    "One observed two-session contention, not a proof covering every interleaving or every host.",
+    "Host-controlled synchronization only schedules unchanged guard invocations; no forced winner, fake host observation, lock replacement, or injected guard result.",
+    "Actual business flow is code only. No Simulator, installation update, commit or push."
+  ],
+  "prior_attempt": {
+    "status": "aborted_before_competition",
+    "cause": "Test driver incorrectly required foreground takeover calls to appear in backgroundTerminals/list. Fixed the driver to require actual active turn and unfinished command events instead.",
+    "temporary_root": "/private/tmp/cadra-live-race-etnARW",
+    "run_unchanged": true,
+    "competition_released": false,
+    "guard_invocations": 0,
+    "cleanup": [
+      {
+        "label": "resume-b",
+        "pid": 35241,
+        "already_stopped": true
+      },
+      {
+        "label": "resume-c",
+        "pid": 35195,
+        "already_stopped": true
+      }
+    ],
+    "mewoo_history": {
+      "before_count": 4227,
+      "after_count": 4245,
+      "changed": [
+        "mewoo-ui-explorer/artifacts/about-footer-20261024/README.md"
+      ],
+      "added": [
+        "cadra/runs/run-20261025-02.md",
+        "cohestra/handoffs/about-footer/README.md",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/Documents/05-我/22-帮助、反馈与关于.md",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/Mewoo/Features/Settings/AboutMewooView.swift",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/Mewoo/Resources/Localizable.xcstrings",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/docs/assets/about-introduction/README.md",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/docs/assets/about-introduction/footer-candidate-v1.png",
+        "cohestra/handoffs/about-footer/candidate-code-01/files/docs/assets/about-introduction/footer-prompt-v1.txt",
+        "cohestra/handoffs/about-footer/candidate-code-01/manifest.json",
+        "cohestra/handoffs/about-footer/candidate-code-01/task.diff",
+        "cohestra/handoffs/about-footer/code-01.md",
+        "cohestra/handoffs/about-footer/design-01.md",
+        "cohestra/handoffs/about-footer/need-01.md",
+        "cohestra/handoffs/about-footer/review-01.md",
+        "cohestra/handoffs/about-footer/validate-01.md",
+        "cohestra/handoffs/assistant-settings-local-preferences/README.md",
+        "cohestra/handoffs/assistant-settings-local-preferences/design-01.md",
+        "cohestra/handoffs/assistant-settings-local-preferences/need-01.md"
+      ]
+    },
+    "rpc_sha256": "2c2cb394dc647c1258a3f384d09287beb0f74c8b6e05a680a2670727884e7851"
+  },
+  "repository_regression_tests": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "passed": 219
+  }
+}
