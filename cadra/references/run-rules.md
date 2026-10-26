@@ -20,6 +20,8 @@ Run 0.8 保留 executor、ownership_history、preflight，并增加 append_histo
 - 预算在调用意图落盘时预占。中断后仍未能确认是否发起时保留消费，不返还；确认未发起、原绑定 agent 可恢复且可安全继续时沿用同一 call id 与预算；不能把未闭合调用改派替代者。不能以新 id 绕过未闭合调用。
 - 每项结束保存固定结果快照：状态、最后交付、候选、findings、acceptance、下一步、人工介入、来源与时间。重读队列确认所有项结束后更新 Run 状态；中间中断由 resume 补 Run 收尾，不重复阶段。
 
+本次 run/resume 完成 Run 收尾并回读后，进入 [report 的收尾自动报告](report.md#收尾自动报告)。报告生成与链接登记在执行收尾之后进行，不是任务终态或 Run 闭合的前置条件。
+
 ## 停止与恢复
 
 默认 blocked/failed 后继续下一项；但当前子 agent 或工具仍在执行、活性未知或副作用尚无法核实时，停止整个 Run 的后续派发，先保留现场并核对，不能借失败状态启动下一项。当前项 `stop_queue_on_failure=true` 时停止，未执行 queued 项记 skipped，展示为 ready，且下次重新核对原首个动作的准入。

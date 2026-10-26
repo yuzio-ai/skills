@@ -124,14 +124,18 @@ review 按适用风险核查真实调用方、装配与生命周期路径，证�
 | `add` | 新建或编辑任务定义，指定需求、优先级、依赖和流程 |
 | `ready` | 检查目标、范围、验收、输入、依赖等是否满足执行条件 |
 | `list` | 只读查看任务、队列和执行批次 |
-| `run` | 创建执行批次，串行执行指定任务；默认选择全部 ready 任务 |
+| `run` | 创建执行批次，串行执行指定任务；默认选择全部 ready 任务，收尾后自动生成报告 |
 | `append` | 向 running Run 尾部原子追加已通过准入的指定任务 |
-| `resume` | 恢复或收尾尚未完成的执行批次 |
+| `resume` | 恢复或收尾尚未完成的执行批次，收尾后自动生成报告 |
 | `report` | 为指定执行批次生成摘要文件，并登记报告链接 |
 
 当前协议的 `report` 生成文件并登记链接；历史 0.6/0.7 Run 的 `report` 仅在对话中只读输出，不新增文件或链接。
 
+`run` / `resume` 本次将 Run 收尾为 `completed`，或所有条目均已结束的 `stopped`，并成功回读后，自动为当前 Run 生成报告。最终回复直接给出 Run 与报告路径、结果数量及必要人工事项，使用已保存结果，不重跑工程阶段或验收。未完成 Run 不自动生成报告；对已结束 Run 重复 `resume` 保持只读，缺报告、需要阶段报告或不同关注点时手动调用 `report`。报告失败不改变执行结果；仅链接登记失败时保留文件，按准确路径补登记，不重新生成。必要的正式项目总结仍按项目规范处理。
+
 推荐用 **Cadra 管理任务和执行批次，Cohestra 执行工程阶段**。`add` 只登记任务，`ready` 检查能否执行，`run` 才按任务流程自动调用 Cohestra。需求或方案尚未明确时，先单独调用 `$cohestra need` / `$cohestra design`，再通过 Cadra 的 `流程` 指定实施起点和允许范围。
+
+`add` 按新建、编辑、绑定已有交付、旧协议升级四条路径限定读取范围。只校验定义、可达依赖图和 Run 归属，再保存并回读 Task；业务信息不足明确记缺口。编辑时维护修订，绑定时核对身份，不提前加载执行规则。依赖是否完成、候选适用性、完整执行契约和合法首动作由 `ready` 及后续执行检查；已有上下文可确认身份，不能豁免准入。独立读取合并，写前重读相关记录，不引入跨调用缓存或额外运行依赖。详见 [add](cadra/references/add.md)。
 
 #### 选择流程
 
@@ -193,7 +197,7 @@ flowchart TB
     R --> E["Cohestra<br/>自动推进当前任务"]
     E -->|"本项结束"| M{"还有任务？"}
     M -->|"有：执行下一项"| E
-    M -->|"无：结束本批次"| O["report<br/>查看结果与人工待办"]
+    M -->|"无：结束本批次"| O["自动生成报告<br/>结果与人工待办"]
     class H human
     class R,E automatic
     class O result
@@ -215,9 +219,6 @@ $cadra ready
 
 $cadra run
 范围：<implementation 任务的 slug>、<bugfix 任务的 slug>
-
-$cadra report
-Run：<run 返回的 run-id>
 ```
 
 **从回复里复制什么**：以下值仅示意，不代表已执行的任务。请使用本轮实际返回值；`YYYYMMDD` 是日期占位符，回复措辞不要求固定格式。
@@ -225,7 +226,7 @@ Run：<run 返回的 run-id>
 | 哪一步的回复 | 返回值示意 | 下一步填在哪里 |
 |---|---|---|
 | `add` | slug：`search-history` | `ready` 的任务、`run` 的范围 |
-| `run` | run-id：`run-YYYYMMDD-01` | `report` 或 `resume` 的 Run |
+| `run` | run-id：`run-YYYYMMDD-01` | 中断时填 `resume` 的 Run；可选手动 `report` 的 Run |
 | Cohestra 阶段 | 返回的 handoff 绝对路径 | 下游阶段输入，或 `add` 的参考输入 |
 
 选任务和批次时复制标识；传交付材料时复制完整文件路径，包含文件名。
@@ -254,11 +255,11 @@ Run：<running Run 的 run-id>
 保留当前任务的实际执行结果，将后续未执行任务记为 skipped。
 ```
 
-收尾保留实际结果，Run 记为 `stopped`，后续未执行项记为 `skipped`；收尾中断时先用 `resume` 核对，完成后再建新 Run。
+收尾保留实际结果，Run 记为 `stopped`，后续未执行项记为 `skipped`，随后自动生成报告；收尾中断时先用 `resume` 核对，完成后再建新 Run。
 
 `run` 建立批次时仍会复核准入。任务执行有预算：每阶段失败重试最多 2 次、针对 review 阻塞问题的 fix 最多 3 轮、每任务每 Run 总调用最多 16 次；仍需调用而预算不足时记为 failed 并列出人工待办。`resume` 不清零预算。详见 [调用契约与预算](cadra/references/contract.md)。
 
-用 `list` 查看实际 slug、当前状态和 Run；`report` 不指定 run-id 且存在多个已结束批次时，不会默认猜测“最新”一批：
+用 `list` 查看实际 slug、当前状态和 Run；手动 `report` 不指定 run-id 且存在多个已结束批次时，不会默认猜测“最新”一批：
 
 ```text
 $cadra list
@@ -520,7 +521,7 @@ flowchart TB
    流程：implementation
    ```
 
-5. 分别发送 `ready`、`run`、`report`。仅在准入通过后执行 `run`；Cadra 按实际结果调用 Cohestra 的开发、独立审查、修复和验收阶段。运行中断时先用 `resume` 恢复。
+5. 分别发送 `ready`、`run`。仅在准入通过后执行 `run`；Cadra 按实际结果调用 Cohestra 的开发、独立审查、修复和验收阶段，收尾后自动生成报告。运行中断时先用 `resume` 恢复。
 
    ```text
    $cadra ready
@@ -528,9 +529,6 @@ flowchart TB
 
    $cadra run
    范围：<同一 slug>
-
-   $cadra report
-   Run：<run 返回的 run-id>
    ```
 
 6. 最后复盘本周截至当前的实际成果。Vistra 目录不由 Relatra 自动采集，显式提供交接引用供核对，并以可读取的会话或工具证据确认实际交付；单给路径不保证能纳入统计。证据缺失时保留待确认，未完成和未验收事项仍列为遗留。

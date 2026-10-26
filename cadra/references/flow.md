@@ -1,16 +1,6 @@
-# Flow：起点与允许范围
+# Flow 执行：起点与允许范围
 
-flow 接受 preset 名或非空阶段列表。列表首项为 `start`，所有项去重后构成 `allowed`；后续项没有执行顺序语义。新版仅接受 code、review、fix、validate，不接受空列表或未知阶段。存储保留 preset 或规范化后的列表，不另外保存可漂移的展开结果。
-
-| preset | start | allowed |
-|---|---|---|
-| implementation（缺省） | code | code, review, fix, validate |
-| bugfix | fix | fix, review, validate |
-| review-only | review | review |
-
-例如 `[review, fix, review]` 规范化为 `[review, fix]`；`[code, validate, review, fix]` 与 implementation 的起点和允许范围相同。preset 与等价列表必须得到相同判定。只有 start 与 allowed 均不变的排列或重复写法变化不使 Gate 失效；首项改变时按规范化 flow 变更重新 Gate，已入 Run 的任务建立修订并按新起点重启。
-
-need/design 在 Cadra 外由人工参与准备。已有确认继续有效，不重复索要确认，也不为小任务补造阶段文档。尚需定位的问题用 implementation；已有明确缺陷与整改依据时用 bugfix。历史配置仅按 [版本边界](compatibility.md) 读取，不作为新版入口别名。
+先读 [Flow 配置](flow-config.md)；本页只规定阶段推进，add 不读取。ready 在核对首动作时读取，run/append 及需要阶段判定的 resume 读取。
 
 首次启动及改变 requirement/flow 的修订重启从 start 调用一次；其他入口的起点见 [恢复](recovery.md) 与 [修订](revision-rules.md)。后续仅按合法 `next.allowed`、`next.stage` 与 allowed 决定动作，不机械遍历列表。允许重复进入同一阶段，包括复审与补证，次数由 [预算](contract.md#调用预算) 约束。
 

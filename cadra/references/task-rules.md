@@ -1,16 +1,10 @@
-# Task 定义与 Ready Gate
+# Task 准入与 Ready Gate
 
 ## 定义与编辑
 
-[Task 模板](../assets/task.md) 保存协议、slug、title、revision、preparation、requirement、priority、dependencies、flow、execution_policy、cohestra_task、修订依据与 Gate 历史。`revision` 为正整数，初始为 1；不要在 Task 保存执行状态、候选、调用记录或所属 Run 指针。
+定义、字段校验、Gate 失效和修订分代仅由 [任务定义](task-definition.md) 规定，准入复核定义时读取该参考；flow 配置见 [配置规则](flow-config.md)。add 不读取下方准入表。
 
-- priority 为 high / medium / low，缺省 medium；execution_policy 只含 `stop_queue_on_failure`，缺省 false；flow 缺省 implementation。
-- dependencies 只能引用已存在 slug；悬空、自依赖或成环时拒绝该次修改。入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。
-- 读取和写入的协议边界按 [兼容规则](compatibility.md)；只读旧 Task 不意味着允许新版 ready/run/append 写入。
-- 定义编辑前按 [状态解析](workflow.md#状态解析) 核对 Run 归属；属于未完成 Run 或归属矛盾时拒绝修改。
-- requirement、dependencies、规范化 flow 或 execution_policy 改变使 preparation 回 draft，并使当前 Gate 失效，追加来源、时间与变更字段。已入过 Run 的定义修订按 [修订规则](revision-rules.md) 分代，不覆盖旧快照。
-- 只改 title/priority 不使 Gate 失效、不改变修订或执行结论。slug 与 cohestra_task 不可编辑。仅做语义等价的 flow 规范化不算定义变更。
-- 同名 Cohestra 目录已有正式交付时记录主题与绑定确认；主题明显不对应或绑定未确认时不接续，请用户明确选择接续或更换 slug。后续检查见 [前置检查](contract.md#前置检查与首个动作)。
+入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。只读旧 Task 不意味着允许新版 ready/run/append 写入，历史协议见 [版本边界](compatibility.md)。
 
 ## Ready Gate
 
@@ -28,3 +22,5 @@
 | 范围配置 | flow 按起点与允许集合解释，配置有效 |
 
 ready 只适用于展示状态 draft/ready：通过时 preparation=ready；未通过时 preparation=draft。旧 Gate 记录保留；同一定义重复通过不重复追加等价放行记录。其他状态先按恢复或修订入口处理，不靠 ready 重开终态。只有该修订已通过 Gate 且此次复核通过，才可进入 Run。
+
+已有交付或 Run 执行依据时，起点项按 [完整契约与前置检查](contract.md#前置检查与首个动作) 核对候选适用性、控制字段及合法首动作；定义变更时按 [重启准入](revision-rules.md) 核对。add 的身份绑定不替代上述检查，缺口未解除不得放行。

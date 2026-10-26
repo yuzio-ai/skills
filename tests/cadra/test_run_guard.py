@@ -72,6 +72,28 @@ class RunGuardTests(unittest.TestCase):
         self.data['tasks'][0]['agents'] = [binding()]
         self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
 
+    def close_run(self, status='completed', task_state='completed'):
+        self.bind_worker()
+        pending(self.data)
+        self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        task = self.data['tasks'][0]
+        task['calls'][0].update(dispatch='dispatched', dispatch_evidence={
+            'agent_id': 'agent-worker', 'source': 'fixture dispatch', 'at': AT})
+        self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        delivery = {'handoff': 'code-01.md'}
+        task['calls'][0].update(closed=True, result=delivery)
+        task['checkpoint'].update(pending_call=None, last_delivery=delivery)
+        task.update(state=task_state, result={
+            'state': task_state, 'last_delivery': delivery,
+            'candidate': {'commit': None, 'snapshot': 'candidate-01'},
+            'findings': ['fixture finding'], 'acceptance': {'status': 'pending'},
+            'human_action': 'verify runtime', 'next': 'manual acceptance'})
+        self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        self.data['status'] = status
+        self.data['executor']['progress'] = {'at': LATER, 'event': 'run_closed'}
+        self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        self.assertFalse(guard.unfinished(guard.current(self.path.read_bytes())[0]))
+
     def observation(self, state='stopped', tools=True):
         return {'instance_id': 'first', 'generation': 1, 'observed_at': LATER,
                 'host_id': 'local', 'thread_id': 'chat-1', 'turn_id': 'turn-1', 'source_kind': 'host',
@@ -194,6 +216,94 @@ class RunGuardTests(unittest.TestCase):
         new = deepcopy(self.data)
         new['reports'].append({'path': 'run-20261025-01-report-01.md'})
         guard.publish(self.path, document(new), self.sha, None, None, 'report')
+
+    def assert_closed_report_preserves_execution(self, status, task_state):
+        self.close_run(status, task_state)
+        before, body = guard.current(self.path.read_bytes())
+        report = self.runs / 'run-20261025-01-report-01.md'
+        report.write_text('# Saved report\n', encoding='utf-8')
+        proposed = deepcopy(before)
+        proposed['reports'].append({'path': report.name})
+        guard.publish(self.path, document(proposed), self.sha, None, None, 'report')
+        after, after_body = guard.current(self.path.read_bytes())
+        self.assertEqual(after['reports'], [{'path': report.name}])
+        self.assertEqual({k: v for k, v in after.items() if k != 'reports'},
+                         {k: v for k, v in before.items() if k != 'reports'})
+        self.assertEqual(after_body, body)
+        self.assertEqual(report.read_text(encoding='utf-8'), '# Saved report\n')
+        self.assertFalse(guard.unfinished(after))
+
+    def test_completed_run_report_preserves_execution(self):
+        self.assert_closed_report_preserves_execution('completed', 'completed')
+
+    def test_completed_run_with_failed_task_accepts_report(self):
+        self.assert_closed_report_preserves_execution('completed', 'failed')
+
+    def test_closed_stopped_run_report_preserves_execution(self):
+        self.assert_closed_report_preserves_execution('stopped', 'blocked')
+
+    def test_closed_run_report_cannot_change_execution_or_body(self):
+        self.close_run()
+        original = self.path.read_bytes()
+        variants = []
+        for key, value in [('status', 'stopped'), ('executor', {
+                **self.data['executor'], 'progress': {'at': LATER, 'event': 'report'}})]:
+            changed = deepcopy(self.data)
+            changed[key] = value
+            variants.append(document(changed))
+        for key, value in [('result', {'state': 'completed', 'acceptance': {'status': 'passed'}}),
+                           ('budget', {'calls': 0, 'remediation': 0, 'retries': {}})]:
+            changed = deepcopy(self.data)
+            changed['tasks'][0][key] = value
+            variants.append(document(changed))
+        changed = deepcopy(self.data)
+        changed['tasks'][0]['calls'][0]['result'] = {'handoff': 'replacement.md'}
+        variants.extend([document(changed), original.replace(b'# Run', b'# Rewritten')])
+        for proposed in variants:
+            with self.subTest(proposed=proposed), self.assertRaises(ValueError):
+                guard.publish(self.path, proposed, self.sha, None, None, 'report')
+            self.assertEqual(self.path.read_bytes(), original)
+
+    def test_stale_report_registration_rebases_without_losing_existing_link(self):
+        self.close_run()
+        closed, body = guard.current(self.path.read_bytes())
+        reports = [self.runs / f'run-20261025-01-report-{n:02d}.md' for n in (1, 2)]
+        for report in reports:
+            report.write_text(f'# {report.stem}\n', encoding='utf-8')
+        saved_reports = {report: report.read_bytes() for report in reports}
+        first, stale = deepcopy(closed), deepcopy(closed)
+        first['reports'].append({'path': reports[0].name})
+        stale['reports'].append({'path': reports[1].name})
+        guard.publish(self.path, document(first), self.sha, None, None, 'report')
+        registered = self.path.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'Run changed; reread before writing'):
+            guard.publish(self.path, document(stale), self.sha, None, None, 'report')
+        self.assertEqual(self.path.read_bytes(), registered)
+        latest, _ = guard.current(registered)
+        latest['reports'].append({'path': reports[1].name})
+        guard.publish(self.path, document(latest), guard.digest(registered), None, None, 'report')
+        final, final_body = guard.current(self.path.read_bytes())
+        self.assertEqual(final['reports'], [{'path': report.name} for report in reports])
+        self.assertEqual({k: v for k, v in final.items() if k != 'reports'},
+                         {k: v for k, v in closed.items() if k != 'reports'})
+        self.assertEqual(final_body, body)
+        self.assertEqual({report: report.read_bytes() for report in reports}, saved_reports)
+
+    def test_report_registration_write_failure_preserves_closed_run_and_report(self):
+        from unittest.mock import patch
+        self.close_run()
+        original = self.path.read_bytes()
+        report = self.runs / 'run-20261025-01-report-01.md'
+        report.write_text('# Saved report\n', encoding='utf-8')
+        saved = report.read_bytes()
+        proposed = deepcopy(self.data)
+        proposed['reports'].append({'path': report.name})
+        with patch.object(guard.os, 'replace', side_effect=OSError('injected report failure')):
+            with self.assertRaises(OSError):
+                guard.publish(self.path, document(proposed), self.sha, None, None, 'report')
+        self.assertEqual(self.path.read_bytes(), original)
+        self.assertEqual(report.read_bytes(), saved)
+        self.assertFalse(list(self.runs.glob('.run-*')))
 
     def test_legacy_yaml_is_readonly_and_active_legacy_blocks_new_run(self):
         self.path.unlink()

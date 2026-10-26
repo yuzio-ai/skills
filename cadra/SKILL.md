@@ -10,22 +10,22 @@ license: MIT
 
 ## 入口与读取
 
-`$cadra <入口>` 是技能调用意图，不是终端命令。先读 [公共流程](references/workflow.md)、本次入口和 release.json，再按入口条件加载规则；不要预读其他入口、全部任务或全部 Run 正文。
+`$cadra <入口>` 是技能调用意图，不是终端命令。先读本次入口和 release.json，再按入口指定范围加载 [公共流程](references/workflow.md) 及条件规则；指定章节时只读该节，不递归展开其中的其他入口链接。同次调用复用已读规则，不重复整文件加载；不要预读其他入口、全部任务或全部 Run 正文。
 
 | 入口 | 职责 |
 |---|---|
 | [add](references/add.md) | 创建或编辑任务定义 |
 | [ready](references/ready.md) | 检查 Ready Gate |
 | [list](references/list.md) | 只读展示任务、队列和 Run |
-| [run](references/run.md) | 建立并串行执行新 Run |
+| [run](references/run.md) | 建立并串行执行新 Run，收尾后自动生成报告 |
 | [append](references/append.md) | 向 running Run 尾部原子追加已准入任务 |
-| [resume](references/resume.md) | 续跑或收尾未完成 Run |
+| [resume](references/resume.md) | 续跑或收尾未完成 Run，收尾后自动生成报告 |
 | [report](references/report.md) | 生成指定 Run 的执行摘要 |
 
 ## 共同边界
 
-- 固定目标项目绝对路径，读取适用项目规则及 [存储约定](references/storage.md)。未指定时使用当前任务项目；候选无法区分时澄清。技能来源使用本次选定的实际安装目录，不用源仓库规则代替旧安装副本。
-- 只执行指定入口；run 内的串行推进属于该入口。只讨论规则时不创建资料、不启动执行。list 不写文件、不初始化。
+- 固定目标项目绝对路径，读取适用项目规则及 [存储约定](references/storage.md) 中本入口适用部分。未指定时使用当前任务项目；候选无法区分时澄清。技能来源使用本次选定的实际安装目录，不用源仓库规则代替旧安装副本。
+- 只执行指定入口；run 内的串行推进，以及 run/resume 按 [report](references/report.md) 生成收尾报告，均属于该入口已授权范围。只讨论规则时不创建资料、不启动执行。list 不写文件、不初始化。
 - 写入口缺容器时先报告路径，再按 [容器模板](assets/project/) 最小建立 README、tasks、runs 与忽略规则；已有缺项仅补齐。接续指定任务或 Run 却找不到记录时报告缺口，不能用空初始化代替恢复。目标不明确、指向技能源仓库或不可安全写入时停止。
 - Task 只保存定义与准入；Run 是执行状态的唯一来源。实际工程阶段通过 Cohestra 调用，Cadra 不写 `.yuzio/cohestra`，不复制 handoff 正文。正式执行总结按存储约定处理。
 - 同一项目至多一个未完成 Run，同一时刻至多一个执行中的 Task。每项使用独立 worker 与 reviewer，角色按需创建、阶段串行；不做跨任务并行、DAG 调度、定时器或 daemon。默认 implementation；need/design 在外部人工参与准备。

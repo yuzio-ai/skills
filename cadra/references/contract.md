@@ -38,7 +38,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 建 Run 或 append 前确认目标为可安全写入的 Git 工作区、不是技能源仓库，实际 Cohestra 支持 0.8、unattended 与单阶段交付。缺 Cohestra 容器可由首次阶段最小初始化，Cadra 不代建。目标或协议前提不满足时不建 Run，不逐项制造失败结果。
 
 - 首次启动：没有 README、没有六阶段正式 handoff，且 Run 来源链没有任何调用意图或核对收尾；仅有未执行 skipped 可以成立。核对后调用 flow start 一次，before=null；首次输出仍须通过完整契约与模式核对。
-- 已有交付：检查 contract、task/slug、字段取值及绑定。绑定尚未确认时对照 README 目标与 requirement，用户明确确认对应关系后才能接续；明显不对应时请用户选择，不静默收养。此为身份检查，不用正文驱动阶段。
+- 已有交付：先按 [身份绑定](binding.md) 核对主题、来源与确认，再完整检查本页契约字段、候选适用性及首个动作。add 只登记身份不证明准入通过；ready 的起点项和 run/append 均不能跳过完整核对，不用正文驱动阶段。
 - 普通接续：合法旧契约按下表确定 next 或核对收尾；旧 `completed` 不豁免本 Task 的必要独立评审，先执行下述完成前置核对。缺合法动作时说明缺口，不空建 Run，也不通过 append 加入无合法动作的条目。
 - 显式恢复按 [恢复准入](recovery.md)，定义变更按 [修订准入](revision-rules.md)，不能将旧 blocked/failed 直接当作新的完成结论，也不能重新当首次启动。
 - 已有正式交付或调用但缺 README、契约缺失/不支持/损坏时，停止整个 run 并报告路径；不允许忽略。索引修复归 Cohestra 或人工。

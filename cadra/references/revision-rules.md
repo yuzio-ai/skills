@@ -2,9 +2,7 @@
 
 ## 修订分代
 
-Task 的 revision 初始为 1。影响 Gate 的编辑发生时：当前 revision 尚未进入任何 Run，则继续编辑该修订；已经进入过 Run，则 revision 加一，记录 revision_base（链尾 Run、旧 revision、旧定义来源）并保留旧事实。每次编辑使 preparation 回 draft；title/priority 编辑不触发分代。
-
-同一尚未入 Run 的修订继续编辑时，保留最初 revision_base，累计 changed_fields、编辑原因与时间；requirement/flow 曾改变，即使后来改回，也按新 flow 起点重启。当前快照以 Task 为准，旧定义只引用原 Run，不复制一份可编辑历史。恢复/修订授权的消费只记在 Run，Task 不保存消费标记。
+定义编辑及累计变更仅由 [任务定义的修订分代](task-definition.md#修订分代) 规定。add 读该节，本页只在 ready 核对修订首动作或 run/append/resume/recovery 核对重启准入时读取。
 
 入队前按 [公共流程](workflow.md) 定位执行依据，累计其后各修订及当前修订的 changed_fields；首调用前 blocked/failed 与 skipped 均不能截断累计。链上尚未解除的受阻/失败原因仍须通过恢复准入，不能因跳过无调用条目而绕过。没有执行依据时按公共流程核对首次启动或既有交付。
 

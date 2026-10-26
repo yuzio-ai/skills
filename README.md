@@ -124,14 +124,18 @@ Prepare tasks, execute them serially and recover interrupted runs. Engineering s
 | `add` | Create or edit a task's requirements, priority, dependencies and flow |
 | `ready` | Check whether goals, scope, acceptance criteria, inputs and dependencies permit execution |
 | `list` | Read-only view of tasks, queues and runs |
-| `run` | Create a run and execute tasks serially; defaults to all ready tasks |
+| `run` | Create a run and execute tasks serially; defaults to all ready tasks; automatically report after finalization |
 | `append` | Atomically append admitted tasks to a running Run |
-| `resume` | Continue or finalize an unfinished run |
+| `resume` | Continue or finalize an unfinished run; automatically report after finalization |
 | `report` | Generate a summary file for a run and register its report link |
 
 For the current protocol, `report` writes a file and registers its link. For historical 0.6/0.7 Runs, `report` only displays read-only output in chat and adds no files or links.
 
+After `run` or `resume` successfully finalizes and rereads a `completed` Run or a `stopped` Run whose entries have all ended, it automatically generates a report for that exact Run. The reply gives Run and report paths, result counts and necessary human actions, using saved results without repeating engineering stages or acceptance. Unfinished Runs do not automatically produce reports. A repeated `resume` on an already closed Run stays read-only; use manual `report` for a missing report, a progress report or a different focus. Report failures preserve execution results; if only link registration fails, retain the file and retry registration using its exact path instead of generating another report. Necessary formal project summaries still follow project conventions.
+
 The recommended engineering combination is **Cadra for tasks and runs, with Cohestra for engineering stages**. `add` only records a task, `ready` checks admission, and `run` invokes Cohestra automatically within the task's flow. If requirements or the approach are unsettled, invoke `$cohestra need` / `$cohestra design` separately first, then set Cadra's flow to specify the implementation starting stage and allowed scope.
+
+`add` uses scoped reads for creation, editing, existing-delivery binding and historical-protocol upgrades. It checks definitions, reachable dependency graphs and Run ownership, then saves and rereads the Task; missing business inputs remain explicit gaps. It loads revision maintenance when editing and identity checks when binding, without preloading execution rules. Dependency completion, candidate suitability, the full execution contract and legal first actions belong to `ready` and subsequent execution checks. Existing context can confirm identity, but cannot waive these admission checks. Independent reads are batched; relevant records are reread before writing. No persistent cache or extra runtime dependency is introduced. See [add](cadra/references/add.md).
 
 #### Choose a flow
 
@@ -193,7 +197,7 @@ flowchart TB
     R --> E["Cohestra<br/>Advance the current task"]
     E -->|"Task ended"| M{"More tasks?"}
     M -->|"Yes: next task"| E
-    M -->|"No: end the Run"| O["report<br/>Inspect results and human actions"]
+    M -->|"No: end the Run"| O["Automatic report<br/>Results and human actions"]
     class H human
     class R,E automatic
     class O result
@@ -215,9 +219,6 @@ $cadra ready
 
 $cadra run
 范围：<implementation 任务的 slug>、<bugfix 任务的 slug>
-
-$cadra report
-Run：<run 返回的 run-id>
 ```
 
 **What to copy from replies** — these values are illustrative, not completed executions. Use the values actually returned for your task. `YYYYMMDD` is a date placeholder; response wording is not a fixed protocol.
@@ -225,7 +226,7 @@ Run：<run 返回的 run-id>
 | Reply source | Illustrative returned value | Use it in |
 |---|---|---|
 | `add` | slug: `search-history` | `ready` task or `run` scope |
-| `run` | run-id: `run-YYYYMMDD-01` | `report` or `resume` Run |
+| `run` | run-id: `run-YYYYMMDD-01` | `resume` Run if interrupted; optional manual `report` Run |
 | Cohestra stage | Absolute path of the returned handoff | Downstream stage input or `add` reference inputs |
 
 Copy task and Run IDs into selection fields; copy the handoff's full path, including its filename, into reference inputs.
@@ -254,11 +255,11 @@ A batch is accepted or rejected as a whole. New tasks are sorted by priority and
 保留当前任务的实际执行结果，将后续未执行任务记为 skipped。
 ```
 
-Finalization preserves actual results, marks the Run `stopped` and records unexecuted tasks as `skipped`. If finalization is interrupted, use `resume` to reconcile it before creating another Run.
+Finalization preserves actual results, marks the Run `stopped` and records unexecuted tasks as `skipped`, then automatically generates its report. If finalization is interrupted, use `resume` to reconcile it before creating another Run.
 
 `run` rechecks admission when establishing a batch. Execution budgets are at most 2 failure retries per stage, 3 fix rounds for review blocking findings, and 16 stage calls per task per Run. If another call is needed but its budget is exhausted, the task is failed and listed for human action. `resume` does not reset budgets. See [Call contract and budgets](cadra/references/contract.md).
 
-Use `list` to find actual slugs, current states and Runs. If several finished Runs exist and no run ID is supplied, `report` does not assume the latest one:
+Use `list` to find actual slugs, current states and Runs. If several finished Runs exist and no run ID is supplied, manual `report` does not assume the latest one:
 
 ```text
 $cadra list
@@ -520,7 +521,7 @@ Steps 1–3 prepare requirements and settle visual choices; step 4 records the e
    流程：implementation
    ```
 
-5. Send `ready`, `run` and `report` separately. Start `run` only after admission passes. Cadra invokes Cohestra implementation, independent review, fixes and validation as actual results require. Use `resume` first if the run is interrupted.
+5. Send `ready` and `run` separately. Start `run` only after admission passes. Cadra invokes Cohestra implementation, independent review, fixes and validation as actual results require, then automatically generates a report after finalization. Use `resume` first if the run is interrupted.
 
    ```text
    $cadra ready
@@ -528,9 +529,6 @@ Steps 1–3 prepare requirements and settle visual choices; step 4 records the e
 
    $cadra run
    范围：<同一 slug>
-
-   $cadra report
-   Run：<run 返回的 run-id>
    ```
 
 6. Review actual outcomes for the current week through now. Relatra does not automatically collect the Vistra directory. Supply its handoff reference for inspection and verify delivery through readable session or tool evidence; a path alone does not guarantee inclusion in statistics. Keep unsupported claims pending and incomplete work or outstanding acceptance visible.
