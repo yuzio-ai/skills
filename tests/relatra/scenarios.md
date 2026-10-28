@@ -1,6 +1,6 @@
 # Relatra 当前验收场景
 
-适用版本：0.3.0，schema v2。以下为当前验收要求，不是通过声明。规则依据为 [技能入口](../../relatra/SKILL.md)、[数据与调用](../../relatra/references/data.md)、[报告写作](../../relatra/references/reporting.md)及[统计口径](../../relatra/references/metrics.md)。
+适用包版本见 [release.json](../../relatra/release.json)，schema v2。以下为当前验收要求，不是通过声明。规则依据为 [技能入口](../../relatra/SKILL.md)、[数据与调用](../../relatra/references/data.md)、[报告写作](../../relatra/references/reporting.md)及[统计口径](../../relatra/references/metrics.md)。
 
 ## 基础场景
 
@@ -16,7 +16,7 @@
 | 资源去重、已观测值与缺失覆盖 | response_id 优先；旧累计基线、跨未知归属、回退与零增量处理；缓存/推理不重复加总，字段覆盖单列 |
 | 长周期基础重算、前期同类比较、最多三条引证建议 | 趋势重算交付/中位数/区间/质量/token；前期核对项目、来源、版本、窗口及覆盖；建议需 task/evidence 引用 |
 | 只读来源、独立报告容器、Cadra/Cohestra 边界 | JSONL、Run/handoff 仅只读；README 不作旧状态证据；声明的未来 workflow 不导入；不调用 Cadra report |
-| 可追溯 JSON 与 Markdown、历史更正和版本快照 | 快照 seal、输入哈希、报告自带 facts/ledger/corrections；更正只追加新版本，改写快照拒绝；重复生成统计一致 |
+| 可追溯 JSON 与 Markdown、历史更正和版本快照 | 快照 seal、输入哈希、报告自带 facts 与完整账本；更正记录父版本与原因且只追加新版本，不生成独立 corrections 文件；改写快照拒绝，重复生成统计一致 |
 | 原生技能格式、包自包含、维护入口 | 原生 quick_validate.py、UI YAML、独立临时包校验、内部链接和 CLI 检查；双语 README 同步 |
 
 ## 复用、模式与回归边界

@@ -76,7 +76,7 @@ def prepare(suite):
     add(11, "review-only", stage="review")
     add(11, "verify", stage="verify", historic=True)
     add(12, "validation-exit-nonzero", preflight_fault="exit")
-    add(12, "parser-unavailable-legacy", preflight_fault="missing", legacy=True)
+    add(12, "parser-unavailable", preflight_fault="missing")
     add(12, "validation-empty-output", preflight_fault="empty")
     add(12, "last-command-success", preflight_fault="masked")
     add(12, "available-parser-retry", preflight_fault="retry")

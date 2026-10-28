@@ -1,6 +1,6 @@
 # 测试与场景清单
 
-本目录保留当前自动化测试、行为场景与可复用测试输入。历史模型、一次性验证报告、执行快照和日志从 Git 历史查阅，不作为当前通过依据。
+本目录保留当前自动化测试、行为场景与可复用测试输入，也保留被当前测试复用的旧模型及部分冻结验证报告。其他历史资料可从 Git 历史查阅。历史报告、快照和日志只证明记录时的结果，不代表当前环境已经复测；旧模型的复用范围见下表，不表示技能运行时支持旧协议。
 
 ## 目录
 
@@ -40,6 +40,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；离线旧 YAML 读取需 macOS 系统 Ruby |
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [test_guard_safety.py](cadra/test_guard_safety.py) | 停止与 skipped、计费依据及上限、合法恢复、复审旧轮次的真实文件回归；跨 Run 轮次另用当前模型核对 |
+| [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
 | [test_reports.py](relatra/test_reports.py)、[周期报告样例](relatra/examples/README.md) | 重点正文与完整明细、日周月归纳、锚点、资源覆盖及可复现样例 |
