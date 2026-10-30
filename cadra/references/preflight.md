@@ -11,3 +11,5 @@ ready 的输入/环境项检查已知前提；run/append 在冻结快照前执�
 Run.preflight 为有序数组，每项：scope=project/task、slug（task 时必填）、at（带时区）、status=passed/deferred、inputs（现有输入路径→SHA-256，可为空并说明）、evidence（来源与结果的短说明）。deferred 另含 produced_by（阶段）、尚待产生的对象和检查条件。新 Run 至少一条 project/passed；每个入队任务至少一条 task/passed，未来产物另记 deferred。不复制大日志或保存第二份执行状态。输入与任务级记录只针对本轮队列。
 
 Mewoo 的入口与固定参数由 Mewoo 自己维护；Cadra 不内置项目绝对路径、平台命令或诊断规则。预检不免除真实执行时的参数校验，不证明运行或发布可用。
+
+并行执行前复核当前 revision 的 ready_scope、路径别名和输入变化，核实 Cohestra 实际安装副本支持阶段内资源请求、原角色续接及契约0.8；不能只由版本数字推断支持。缺容器的首次初始化由主调度器串行安排一次。角色总数与同时执行阶段数分开核验，不要求四个角色同时运行；宿主不能可靠保存并续接等待回合时执行受阻，不偷偷绕开资源申请。

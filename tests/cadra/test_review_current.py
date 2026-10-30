@@ -21,7 +21,7 @@ class ReviewFlowTests(unittest.TestCase):
                              ('review', ['review', 'fix', 'validate'])):
             self.assertEqual(guard.normalize_flow(name), guard.normalize_flow(stages))
         self.assertEqual(guard.normalize_flow(), guard.normalize_flow('code'))
-        for protocol in ('0.6', '0.7', '0.8', '0.9', '0.99', None):
+        for protocol in ('0.6', '0.7', '0.8', '0.9', '0.10', '0.99', None):
             with self.subTest(protocol=protocol), self.assertRaises(ValueError):
                 guard.normalize_flow('code', protocol)
 
@@ -29,11 +29,11 @@ class ReviewFlowTests(unittest.TestCase):
         for state in (contract('review', 'fix', 'blocking_findings'),
                       contract('fix', 'review', 'stage_completed'),
                       contract('review', 'validate', 'stage_completed')):
-            self.assertEqual(decision(state, 'review', '0.10'), 'call')
-            self.assertEqual(decision(state, 'review', '0.10'),
-                             decision(state, ['review', 'fix', 'validate'], '0.10'))
-        self.assertEqual(decision(contract(), ['review'], '0.10'), 'blocked')
-        self.assertEqual(decision(contract('review', 'validate', 'stage_completed'), ['review'], '0.10'), 'completed')
+            self.assertEqual(decision(state, 'review', '0.11'), 'call')
+            self.assertEqual(decision(state, 'review', '0.11'),
+                             decision(state, ['review', 'fix', 'validate'], '0.11'))
+        self.assertEqual(decision(contract(), ['review'], '0.11'), 'blocked')
+        self.assertEqual(decision(contract('review', 'validate', 'stage_completed'), ['review'], '0.11'), 'completed')
 
     def test_review_requires_validation_acceptance(self):
         for stage in ('review', 'validate'):
@@ -43,9 +43,9 @@ class ReviewFlowTests(unittest.TestCase):
                 if acceptance:
                     state['acceptance'] = {'status': acceptance}
                 with self.subTest(stage=stage, acceptance=acceptance):
-                    self.assertEqual(decision(state, 'review', '0.10'), 'blocked')
+                    self.assertEqual(decision(state, 'review', '0.11'), 'blocked')
         state['acceptance'] = {'status': 'passed'}
-        self.assertEqual(decision(state, 'review', '0.10'), 'completed')
+        self.assertEqual(decision(state, 'review', '0.11'), 'completed')
 
     def test_missing_input_permission_or_candidate_blocks_without_advancing(self):
         for reason in ('missing_input', 'missing_permission', 'candidate_unavailable', 'environment_blocked'):
@@ -53,11 +53,11 @@ class ReviewFlowTests(unittest.TestCase):
             state.update(status='blocked', blocked={'value': True, 'reason': reason},
                          next={'stage': None, 'allowed': False, 'reason': 'blocked'})
             state['stage_result']['status'] = 'blocked'
-            self.assertEqual(decision(state, 'review', '0.10'), 'blocked')
+            self.assertEqual(decision(state, 'review', '0.11'), 'blocked')
 
     def test_existing_remediation_budget_applies_to_review_preset(self):
         # The legacy budget oracle consumes a normalized list; no new budget rule.
-        start, allowed = guard.normalize_flow('review', '0.10')
+        start, allowed = guard.normalize_flow('review', '0.11')
         configured = [start, *sorted(allowed - {start})]
         item = new_item()
         for _ in range(3):
@@ -71,7 +71,7 @@ class ReviewFlowTests(unittest.TestCase):
 
 
 class ReviewRunTests(unittest.TestCase):
-    protocol = '0.10'
+    protocol = '0.11'
     configured_flow = 'review'
     setUp = fixtures.RunGuardTests.setUp
     observation = fixtures.RunGuardTests.observation

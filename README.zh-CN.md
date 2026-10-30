@@ -31,7 +31,7 @@ flowchart TB
 | Skill | 用途 | 入口 | 版本与协议 |
 |---|---|---|---|
 | cohestra | 初始化项目上下文，按需执行工程阶段、偏差核对和只读报告 | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
-| cadra | 准备任务、串行调用 Cohestra，并管理执行状态与恢复 | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
+| cadra | 准备任务、按固定两任务小组调用 Cohestra，并管理执行状态与恢复 | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
 | relatra | 汇总指定项目的 agent 成果、遗留与已观测资源 | [SKILL.md](relatra/SKILL.md) | [release.json](relatra/release.json) |
 | vistra | 评审、探索、比较和交接移动端、桌面端及品牌静态视觉 | [SKILL.md](vistra/SKILL.md) | [release.json](vistra/release.json) |
 
@@ -117,21 +117,21 @@ review 按适用风险核查真实调用方、装配与生命周期路径，证�
 
 ### Cadra
 
-用于任务准备、串行执行和中断恢复。实际工程阶段由 Cohestra 完成。执行前确认目标是可安全写入的业务 Git 工作区，且实际加载的 Cohestra 支持 Cadra 所需契约和无人值守模式；Cadra 不代建 Git 仓库，也不在本技能源仓库执行业务任务。缺少项目容器时由对应写入口最小初始化，无需把安装和项目初始化混为一步。
+用于任务准备、固定两任务小组执行和中断恢复。实际工程阶段由 Cohestra 完成。执行前确认目标是可安全写入的业务 Git 工作区，且实际加载的 Cohestra 支持 Cadra 所需契约和无人值守模式；Cadra 不代建 Git 仓库，也不在本技能源仓库执行业务任务。缺少项目容器时由对应写入口最小初始化，无需把安装和项目初始化混为一步。
 
 | 入口 | 用法 |
 |---|---|
 | `add` | 新建或编辑任务定义，指定需求、优先级、依赖和流程 |
 | `ready` | 检查目标、范围、验收、输入、依赖等是否满足执行条件 |
 | `list` | 只读查看任务、队列和执行批次 |
-| `run` | 创建执行批次，串行执行指定任务；默认选择全部 ready 任务，收尾后自动生成报告 |
+| `run` | 创建执行批次，按固定一至两任务小组执行指定任务；默认选择全部 ready 任务，收尾后自动生成报告 |
 | `append` | 向 running Run 尾部原子追加已通过准入的指定任务 |
 | `resume` | 恢复或收尾尚未完成的执行批次，收尾后自动生成报告 |
 | `report` | 为指定执行批次生成摘要文件，并登记报告链接 |
 
-协议 `0.10` 的 `report` 生成文件并登记链接；旧记录先归档，新版入口不解析旧协议。
+协议 `0.11` 的 `report` 生成文件并登记链接；仅 `list` 还能只读查询 `0.10` 原记录。写入、准入与执行仍要求 `0.11`，切换执行环境前须完成旧记录归档。
 
-`run` / `resume` 本次将 Run 收尾为 `completed`，或所有条目均已结束的 `stopped`，并成功回读后，自动为当前 Run 生成报告。最终回复直接给出 Run 与报告路径、结果数量及必要人工事项，使用已保存结果，不重跑工程阶段或验收。未完成 Run 不自动生成报告；对已结束 Run 重复 `resume` 保持只读，缺报告、需要阶段报告或不同关注点时手动调用 `report`。报告失败不改变执行结果；仅链接登记失败时保留文件，按准确路径补登记，不重新生成。必要的正式项目总结仍按项目规范处理。
+`run` / `resume` 本次将 Run 收尾为 `completed`，或所有条目均已结束且小组均已 close 的 `stopped`，并成功回读后，自动为当前 Run 生成报告。最终回复直接给出 Run 与报告路径、结果数量及必要人工事项，使用已保存结果，不重跑工程阶段或验收。未完成 Run 不自动生成报告；对已结束 Run 重复 `resume` 保持只读，缺报告、需要阶段报告或不同关注点时手动调用 `report`。报告失败不改变执行结果；仅链接登记失败时保留文件，按准确路径补登记，不重新生成。必要的正式项目总结仍按项目规范处理。
 
 推荐用 **Cadra 管理任务和执行批次，Cohestra 执行工程阶段**。`add` 只登记任务，`ready` 检查能否执行，`run` 才按任务流程自动调用 Cohestra。需求或方案尚未明确时，先单独调用 `$cohestra need` / `$cohestra design`，再通过 Cadra 的 `流程` 指定实施起点和允许范围。
 
@@ -149,7 +149,7 @@ review 按适用风险核查真实调用方、装配与生命周期路径，证�
 
 `review` 原样保存为 `flow: review`，等价于 `[review, fix, validate]`。有必做问题时走 review → fix → 独立复审 → validate；无必做问题且覆盖齐备时直接 review → validate。先创建 reviewer，需要 fix/validate 时再创建 worker；审查通过本身不代表验收完成。
 
-Cadra 仅接受协议 `0.10`，不提供旧协议兼容或旧预设别名。先由原环境闭合未完成 Run，备份并原样归档已结束记录，再升级待办、重新 ready 并同步安装副本。已完成任务不重跑。见 [版本边界](cadra/references/compatibility.md)。
+Cadra 写入、准入与执行仅接受协议 `0.11`。`list` 可按 `0.10` 原有串行规则只读查询，不迁移或改写记录；跨协议来源链、未知版本与缺版本仍为异常，查询成功不授权执行。先由原环境闭合未完成 Run，备份并原样归档已结束记录，再准备待办、重新 ready。归档不参与扫描或准入，已完成任务不重跑。见 [版本边界](cadra/references/compatibility.md)。
 
 need/design 在 Cadra 外由人工参与准备；已有确认继续有效，小任务不必补造阶段文档。目标、验收、产品取舍或设计未明确时，先交互调用 `$cohestra need` / `$cohestra design`，再准备 Cadra 任务。执行中返回 need/design 会受阻交回人工，不判完成。
 
@@ -206,19 +206,22 @@ flowchart TB
     G -->|"否"| H["补齐输入与必要人工决定"]
     H --> G
     G -->|"是"| R["run<br/>建立一个有序批次"]
-    R --> E["Cohestra<br/>自动推进当前任务"]
-    E -->|"本项结束"| M{"还有任务？"}
-    M -->|"有：执行下一项"| E
+    R --> S["扫描冻结队列<br/>固定一至两项范围不相交任务"]
+    S --> E["Cohestra<br/>组内最多两阶段并行<br/>阶段内等待与串行验证"]
+    E --> F["finalization<br/>核对最终输入并关闭小组"]
+    F -->|"证据失效：在授权内复审或复验"| E
+    F -->|"小组已 close"| M{"还有排队任务？"}
+    M -->|"有：下一组"| S
     M -->|"无：结束本批次"| O["自动生成报告<br/>结果与人工待办"]
     class H human
-    class R,E automatic
+    class R,S,E,F automatic
     class O result
     classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
     classDef automatic fill:#e8f1ff,stroke:#547fb8,color:#193d6a
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-上图展示受阻或失败后继续下一项的默认行为；该任务的停止策略优先。
+上图展示正常分组推进。后续阶段仍受原 flow 与预算约束，任务的停止策略优先；工具活性未知或残留改动不安全时保留未完成组。
 
 每次 `add` 返回一个 slug。对要执行的任务逐项 `ready`，全部通过后启动一个 `run`；不需要手工逐阶段调用 Cohestra。下面以一个 code 和一个 fix 为例，每条调用分别发送，等待上一步完成后继续：
 
@@ -243,9 +246,11 @@ $cadra run
 
 选任务和批次时复制标识；传交付材料时复制完整文件路径，包含文件名。
 
-也可用 `范围：全部 ready`。任务按优先级从高到低执行，同级按 slug 字典序排列，范围列表顺序不控制执行顺序。默认某项受阻或失败后继续下一项；需要该项失败时停止队列，可在 `add` 中设置 `执行策略：stop_queue_on_failure: true`。
+也可用 `范围：全部 ready`。入队按优先级从高到低、同级按 slug 字典序排列，范围列表顺序不控制队列顺序。分组按冻结队列扫描不相交的修改范围，后方任务可能先于中间冲突项与首项同组执行。默认某项受阻或失败后继续下一项；需要该项失败时停止队列，可在 `add` 中设置 `执行策略：stop_queue_on_failure: true`。
 
-依赖必须已完成才能通过准入：B 依赖 A 时，先执行 A，再检查 B 的 `ready`，可追加到仍在 running 的 Run 或建立后续批次；不能把尚未完成的依赖链一次全部入队。同一项目最多有一个未完成 Run；中断用 `resume`，已结束批次的失败任务则在解决缺口后显式选择恢复范围，用新 `run` 执行。Cadra 主 agent 编排，按阶段需要为每项任务创建干净上下文的 worker 与独立 reviewer；`[review]` 不创建 worker，仅核对收尾不创建 agent。同任务优先复用各自角色，跨任务不复用，任务与阶段串行推进；无定时器或独立后台服务。缺少子 agent 或身份核验能力时明确受阻。
+依赖必须已完成才能通过准入：B 依赖 A 时，先执行 A，再检查 B 的 `ready`，可追加到仍在 running 的 Run 或建立后续批次；不能把尚未完成的依赖链一次全部入队。同一项目最多有一个未完成 Run；中断用 `resume`，已结束批次的失败任务则在解决缺口后显式选择恢复范围，用新 `run` 执行。Cadra 主 agent 编排，按阶段需要为每项任务创建干净上下文的 worker 与独立 reviewer；`[review]` 不创建 worker，仅核对收尾不创建 agent。同任务优先复用各自角色，跨任务不复用，每项一次一个阶段、全组最多两阶段并行；等待释放全部文件且不补位，写入稳定后FIFO串行验证；无定时器或独立后台服务。详见[小组调度](cadra/references/scheduling.md)。缺少子 agent 或身份核验能力时明确受阻。
+
+所有成功项，包括无需新阶段调用的核对收尾，都须等待最终候选核验及小组 close，之后才将 Run 条目标为 completed。输入指纹统一比较路径别名，不存在须明确记录。停止策略禁止后续工程工作，但允许已完成阶段在不重新取得写入权限的情况下收尾；具体条件见 [小组调度](cadra/references/scheduling.md)。
 
 准备好新增任务后，可在原 Run 执行期间发送：
 
@@ -337,7 +342,7 @@ $cadra run
 
 恢复不是直接跳过受阻阶段。Cadra 核对交付与恢复条件后，选择合法下一步，或在允许范围内重试原受阻阶段；后续继续使用无人值守模式。详情见 [恢复准入](cadra/references/recovery.md) 和 [定义修订](cadra/references/revision-rules.md)。
 
-冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 要求先完成归档切换再使用新版安装；旧协议直接拒绝。
+冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 要求先完成归档切换再执行新版；执行入口仍拒绝旧协议，仅 `list` 可只读查询 `0.10`。
 
 **`resume` 处理已确认的执行中断**，用于未完成 Run 的核对、续跑或收尾；不会重新执行其中已有 blocked/failed 结果的条目，也不会重开已结束的 Run：
 
@@ -468,7 +473,7 @@ flowchart TB
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-单个工程任务可直接使用 Cohestra；多个需求推荐用 Cadra 准备任务，再串行调度 Cohestra。Cadra 的流程只包含 Cohestra 的工程阶段，Vistra 不是可填写的 flow 阶段；工程阶段可按需使用视觉专项能力，但不能据此跳过必要决定。
+单个工程任务可直接使用 Cohestra；多个需求推荐用 Cadra 准备任务，再按固定两任务小组调度 Cohestra。Cadra 的流程只包含 Cohestra 的工程阶段，Vistra 不是可填写的 flow 阶段；工程阶段可按需使用视觉专项能力，但不能据此跳过必要决定。
 
 涉及新视觉方向时，推荐先完成 **Vistra explore/compare → 人工选定准确候选 → Vistra handoff → Cohestra design → Cadra add → ready → run**。Vistra handoff 是工程输入；必要的工程设计先在 Cadra 外与用户确认。可以提前 `add` 为草稿，但视觉方向或关键素材未定时不能通过 `ready`；无需视觉探索的任务可直接准备 Cadra。
 
@@ -579,3 +584,7 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 测试布局、单技能命令与验收场景见 [测试说明](tests/README.md)。检查覆盖包元数据、文档链接、隔离副本资源完整性及离线回归；实际安装器行为、智能体执行和视觉验收单独验证。
 
 版本与协议在各包 `release.json` 维护，更新条件、兼容性和提交前检查见 [维护与版本规则](AGENTS.md#版本管理)。保持中英文 README 同步。提交、推送和发布标签需明确授权。许可证：[MIT](LICENSE)。
+
+### Cadra 固定两任务小组
+
+协议0.11仍为单队列、单未完成Run。ready记录预计修改范围；run按冻结顺序扫描不重叠任务，固定一至两项且不补位。等待释放全部文件，可执行资源申请FIFO；全组停止写入后串行验证，阶段内等待保留原call和预算。完整约定见[小组调度](cadra/references/scheduling.md)。Cohestra正式契约仍为0.8；安装副本须支持阶段内等待。旧0.10记录不自动迁移，先由原环境闭合再归档。

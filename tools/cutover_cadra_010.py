@@ -2,7 +2,9 @@
 """One-time local Cadra 0.10 cutover. Not an installed skill dependency.
 
 Dry-run by default. Requires macOS system Ruby/Psych only for offline old YAML.
-Runtime Cadra never imports this tool or accepts old protocols.
+Runtime Cadra never imports this tool. Current execution entries reject old
+protocols; list alone can read 0.10 without migration. This historical tool
+requires matching 0.10 source packages and does not migrate to 0.11.
 """
 import argparse
 from contextlib import contextmanager

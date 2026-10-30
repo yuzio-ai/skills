@@ -4,7 +4,7 @@ run/resume 写入前、append 受限写入前及 list 推荐后续动作时读�
 
 ## 记录与观察
 
-0.10 Run.executor 必填：instance_id（本次执行实例唯一标识，不是 PID）、generation（从 1 开始）、host_id/thread_id/turn_id（实际可取得身份，否则 null）、claimed_at、progress={at,event}。仅真实派发、交付、收尾事件更新 progress；不用定时心跳伪造进展。ownership_history 保存交接前 executor 和核实的 observation；不另设活性控制状态。
+0.11 Run.executor 必填：instance_id（本次执行实例唯一标识，不是 PID）、generation（从 1 开始）、host_id/thread_id/turn_id（实际可取得身份，否则 null）、claimed_at、progress={at,event}。仅真实派发、交付、收尾及资源调度决策更新 progress；不用定时心跳伪造进展。ownership_history 保存交接前 executor 和核实的 observation；不另设活性控制状态。
 
 用宿主当前可用的正式工具查询记录指向的执行聊天及调用状态；不猜工具接口、不编辑内部数据库、不把别的聊天当同一执行者。观察输入为 {instance_id,generation,host_id,thread_id,turn_id,observed_at,source_kind,source,state,tools_stopped,children}。身份字段必须逐项匹配原 executor，不得用本次恢复者的身份替代。
 
@@ -28,7 +28,7 @@ list 不落盘、不加锁、不发送消息。明确 resume 授权后也必须�
 - inspect 可加 `--observation <JSON 文件>`；只读返回摘要、协议、executor 与 active/stopped/unknown，不写入观察。
 - 写操作提供 `--proposal <完整 Markdown 文件>`；除首次 create 外，提供上次 inspect 的 `--expected-sha256`。create/update/takeover 同时提供 `--instance` 和 `--generation`。临时提案放 Run 的 scratch 目录，不参与状态解析。
 - create 在项目 runs 目录的短时 `.writer.lock` 下检查既有 Run、目标不存在和完整初态；先准备 queued 数组，再创建。锁不保存执行状态，进程退出由内核释放，锁文件不能删除重建。
-- update 只接受当前身份/代次与预期摘要；冻结定义、闭合调用、终态条目及既有预检不得改写；普通 update 不得增删、重排队列或改 append_history。角色绑定仅按任务执行者规则追加，原 pending 未闭合时不得替换。一次只追加一个 prepared、未闭合且无结果的调用；原 pending 必须先单独核实闭合落盘，再追加下一意图。调用前保存意图后回读归属，再派发；写入保护不是外部调用的 exactly-once 保证。
+- update 只接受当前身份/代次与预期摘要；冻结定义、闭合调用、终态条目及既有预检不得改写；普通 update 不得增删、重排队列或改 append_history。角色绑定仅按任务执行者规则追加，原 pending 未闭合时不得替换。调度日志按 [小组调度](scheduling.md) 由同一 owner 追加，禁止删除或改写历史事件。一次只追加一个 prepared、未闭合且无结果的调用；原 pending 必须先单独核实闭合落盘，再追加下一意图。调用前保存意图后回读归属，再派发；写入保护不是外部调用的 exactly-once 保证。
 - skipped 只允许由未执行的 queued 转入，必须没有调用、预算消费、授权消费和交付 checkpoint；running 即使尚无调用也不能改记 skipped。guard 拒绝这些非法新提案及历史记录，failed 保留未闭合调用的恢复路径不变。计费分类和已保存的同阶段轮次按 [契约核对](contract.md#本次结果核对) 与 [调用预算](contract.md#调用预算) 检查。
 - append 不要求执行 owner 身份，只接受 running Run；仅追加 tasks 后缀、对应新增任务的 preflight 和一条 append_history，保留其他字段及正文。具体准入见 [append](append.md)。
 - takeover 仅在原执行、全部绑定子 agent 与工具明确停止、获得本次 resume 授权，并完成只读协议/来源/唯一 Run/快照核验后使用。新 instance、generation+1，claimed_at 不早于父执行者和全部子 agent 的停止观察；仅替换 executor 并追加 `{previous: 原 executor, observation: 本次核实观察}`，保留正文、任务、预算与调用。脚本核对 observation 后发布，再按 resume 核实同一调用，不能先清 pending_call。

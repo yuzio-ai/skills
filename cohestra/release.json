@@ -1,5 +1,5 @@
 {
-  "version": "0.13.1",
+  "version": "0.14.0",
   "protocol_version": "0.8",
   "repository": "https://github.com/yuzio-ai/skills",
   "skill_path": "cohestra"

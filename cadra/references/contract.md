@@ -66,6 +66,8 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 ## 终态映射
 
+协议0.11中，下表 completed 是本任务的临时工程终点：先进入 waiting/finalization 并释放范围，不立即将 Run 条目标为 completed；组最终候选和证据核对通过、close 落盘后才保存成功终态。无需新调用的核对收尾同样遵循 [小组调度](scheduling.md)，Task 始终只保存定义与准入。failed/blocked 保存实际结果前先核查工具；已停止者用 abort 取消资源请求，未知者保留未完成组。
+
 行序即优先级。先确定已完成、失败、受阻或正常范围边界；只有仍需调用时才检查预算，不能把第 16 次调用刚成立的完成结果改判失败。首次/恢复/修订的首个动作先按各自准入，不拿旧受阻结果提前结束新执行。
 
 **必做后续**：next.reason 为 blocking_findings / acceptance_failed / stage_failed；或刚交付 code/fix/validate 且 next.stage=review；或刚交付 validate 且 acceptance.status=pending。正常后续超出 allowed 可收尾，必做后续超出则 blocked。下表“flow 内/含”均指规范化 allowed 集合。
@@ -113,3 +115,7 @@ guard 还按保存的 before 核对计费分类：review 的 blocking_findings �
 每次调用声明 execution_mode: unattended；Cohestra 应把需人类决定、权限/输入缺口等表达为 blocked 或 next.allowed=false，而不是等待交互。Cadra 不替用户做产品决策、不扩大范围、不获取新的隐含授权。默认记录 blocked/failed 后继续其他任务，策略停止按 Run 规则。
 
 Cadra 不调用 verify，也不为其未执行生成跳过记录；review、复审与验收要求保留。resume 沿用原模式与策略，不切换执行模式。
+
+## 资源等待与候选刷新
+
+[小组调度](scheduling.md) 的 wait/grant/finish、原阶段续接、交付回读和收尾核对不新增调用、不消耗重试／整改预算。资源等待不是 Cohestra blocked/failed，不改其 Front Matter。候选失配仅能按已保存 invalidate 事件，在原 flow／授权内创建明确的 review/validate 调用，保存原 before 与 refresh 来源；不得伪造旧 next，超出 flow 则 blocked。真实新阶段计入 16 次上限，真实 findings 整改／失败重试仍按既有分类计费。

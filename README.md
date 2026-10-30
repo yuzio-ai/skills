@@ -31,7 +31,7 @@ flowchart TB
 | Skill | Purpose | Entry | Version and protocol |
 |---|---|---|---|
 | cohestra | Initializes project context and runs engineering stages, drift checks and read-only reports as needed | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
-| cadra | Prepares tasks, calls Cohestra serially, and manages execution state and recovery | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
+| cadra | Prepares tasks, calls Cohestra in fixed groups of up to two tasks, and manages execution state and recovery | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
 | relatra | Reports agent outcomes, outstanding work and observed usage across selected projects | [SKILL.md](relatra/SKILL.md) | [release.json](relatra/release.json) |
 | vistra | Reviews, explores, compares and hands off static mobile, desktop and brand visuals | [SKILL.md](vistra/SKILL.md) | [release.json](vistra/release.json) |
 
@@ -117,21 +117,21 @@ Full rules: [Cohestra](cohestra/SKILL.md).
 
 ### Cadra
 
-Prepare tasks, execute them serially and recover interrupted runs. Engineering stages use Cohestra. Before execution, confirm a writable business-project Git working tree and a loaded Cohestra version supporting Cadra's required contract and unattended mode. Cadra does not create a Git repository or run business tasks in this skill source repository. Relevant write entries minimally initialize missing project containers; installing skills and initializing a project are separate actions.
+Prepare tasks, execute them in fixed groups of up to two tasks and recover interrupted runs. Engineering stages use Cohestra. Before execution, confirm a writable business-project Git working tree and a loaded Cohestra version supporting Cadra's required contract and unattended mode. Cadra does not create a Git repository or run business tasks in this skill source repository. Relevant write entries minimally initialize missing project containers; installing skills and initializing a project are separate actions.
 
 | Entry | Purpose |
 |---|---|
 | `add` | Create or edit a task's requirements, priority, dependencies and flow |
 | `ready` | Check whether goals, scope, acceptance criteria, inputs and dependencies permit execution |
 | `list` | Read-only view of tasks, queues and runs |
-| `run` | Create a run and execute tasks serially; defaults to all ready tasks; automatically report after finalization |
+| `run` | Create a run and execute fixed groups of up to two tasks; defaults to all ready tasks; automatically report after finalization |
 | `append` | Atomically append admitted tasks to a running Run |
 | `resume` | Continue or finalize an unfinished run; automatically report after finalization |
 | `report` | Generate a summary file for a run and register its report link |
 
-For protocol `0.10`, `report` writes a file and registers its link. Old records must be archived before switching; runtime entries do not parse them.
+For protocol `0.11`, `report` writes a file and registers its link. Only `list` can also query original `0.10` records read-only. Writing, admission and execution still require `0.11`; old records must be archived before switching execution environments.
 
-After `run` or `resume` successfully finalizes and rereads a `completed` Run or a `stopped` Run whose entries have all ended, it automatically generates a report for that exact Run. The reply gives Run and report paths, result counts and necessary human actions, using saved results without repeating engineering stages or acceptance. Unfinished Runs do not automatically produce reports. A repeated `resume` on an already closed Run stays read-only; use manual `report` for a missing report, a progress report or a different focus. Report failures preserve execution results; if only link registration fails, retain the file and retry registration using its exact path instead of generating another report. Necessary formal project summaries still follow project conventions.
+After `run` or `resume` successfully finalizes and rereads a `completed` Run or a `stopped` Run whose entries have all ended and groups have all closed, it automatically generates a report for that exact Run. The reply gives Run and report paths, result counts and necessary human actions, using saved results without repeating engineering stages or acceptance. Unfinished Runs do not automatically produce reports. A repeated `resume` on an already closed Run stays read-only; use manual `report` for a missing report, a progress report or a different focus. Report failures preserve execution results; if only link registration fails, retain the file and retry registration using its exact path instead of generating another report. Necessary formal project summaries still follow project conventions.
 
 The recommended engineering combination is **Cadra for tasks and runs, with Cohestra for engineering stages**. `add` only records a task, `ready` checks admission, and `run` invokes Cohestra automatically within the task's flow. If requirements or the approach are unsettled, invoke `$cohestra need` / `$cohestra design` separately first, then set Cadra's flow to specify the implementation starting stage and allowed scope.
 
@@ -149,7 +149,7 @@ A nonempty list containing only these four stages is also supported. Its first i
 
 The `review` preset is stored as `flow: review`, equivalent to `[review, fix, validate]`. Mandatory findings follow review → fix → independent re-review → validate; complete coverage without mandatory findings proceeds directly to validate. Create a reviewer first and a worker only when fix/validate is needed. Review alone does not establish acceptance.
 
-Cadra accepts only protocol `0.10`, with no legacy protocol parser or old preset aliases. Finish unfinished Runs in their original environment, back up and archive closed records unchanged, then upgrade pending tasks and repeat `ready`. Archives do not participate in task scanning or admission, and completed tasks are not rerun. Switch installed skills and local records together; `add` does not migrate old protocols. [Version boundaries](cadra/references/compatibility.md).
+Cadra writing, admission and execution accept only protocol `0.11`. `list` can also read `0.10` with its original serial rules, without migrating or rewriting records. Cross-protocol source chains, unsupported versions and missing versions remain errors; a successful query does not authorize execution. Finish unfinished Runs in their original environment, back up and archive closed records unchanged, then prepare pending tasks and repeat `ready`. Archives do not participate in scanning or admission, and completed tasks are not rerun. [Version boundaries](cadra/references/compatibility.md).
 
 Prepare need/design outside Cadra with human participation. Existing decisions remain valid; small tasks need no fabricated earlier handoffs. Resolve goals, acceptance, product decisions and necessary design through interactive `$cohestra need` / `$cohestra design` before admission. A return to need/design during execution blocks for human input instead of completing the task.
 
@@ -206,19 +206,22 @@ flowchart TB
     G -->|"No"| H["Complete inputs and decisions"]
     H --> G
     G -->|"Yes"| R["run<br/>Create one ordered batch"]
-    R --> E["Cohestra<br/>Advance the current task"]
-    E -->|"Task ended"| M{"More tasks?"}
-    M -->|"Yes: next task"| E
+    R --> S["Scan the frozen queue<br/>Freeze one or two disjoint tasks"]
+    S --> E["Cohestra<br/>Up to two concurrent stages<br/>Stage-local waits and serial verification"]
+    E --> F["Finalization<br/>Check final inputs and close the group"]
+    F -->|"Evidence invalidated: authorized re-review or revalidation"| E
+    F -->|"Group closed"| M{"More queued tasks?"}
+    M -->|"Yes: next group"| S
     M -->|"No: end the Run"| O["Automatic report<br/>Results and human actions"]
     class H human
-    class R,E automatic
+    class R,S,E,F automatic
     class O result
     classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
     classDef automatic fill:#e8f1ff,stroke:#547fb8,color:#193d6a
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-The chart shows the default behavior of continuing after a blocked or failed task; the per-task stop policy takes precedence.
+The chart shows normal group progression. Further stages remain subject to the task's flow and budget; the per-task stop policy takes precedence. Unknown tool activity or unsafe residual changes leave the group unfinished.
 
 Each `add` returns a slug. Run `ready` for each selected task, then start one `run` after they pass. There is no need to invoke Cohestra stages manually. For one code task and one fix task, send each call separately and wait for its result before proceeding:
 
@@ -243,9 +246,11 @@ $cadra run
 
 Copy task and Run IDs into selection fields; copy the handoff's full path, including its filename, into reference inputs.
 
-You can also use `范围：全部 ready`. Execution follows priority from high to low, then slug alphabetical order; the scope list does not set execution order. By default, a blocked or failed task does not stop later tasks. To stop the queue when that task fails or is blocked, set `执行策略：stop_queue_on_failure: true` during `add`.
+You can also use `范围：全部 ready`. Queue admission follows priority from high to low, then slug alphabetical order; the scope list does not set queue order. Group selection scans that frozen queue for disjoint write scopes, so a later task may run alongside the first task before an intervening conflicting task. By default, a blocked or failed task does not stop later tasks. To stop the queue when that task fails or is blocked, set `执行策略：stop_queue_on_failure: true` during `add`.
 
-Dependencies must already be completed for admission. If B depends on A, execute A first, check B with `ready`, then append it to a still-running Run or establish a subsequent batch. An unfinished dependency chain cannot enter one run together. A project can have at most one unfinished run. Use `resume` for interruptions; after a finished run, resolve gaps and explicitly select failed tasks for recovery in a new `run`. The controller creates a worker and independent reviewer with clean context as each task needs them; tasks limited to `[review]` create no worker, and reconciliation without stage calls creates no agents. Prefer reusing each role within its task, never across tasks. Tasks and stages remain serial; there is no scheduler or background service. Missing child-agent or identity-verification capabilities block execution explicitly.
+Dependencies must already be completed for admission. If B depends on A, execute A first, check B with `ready`, then append it to a still-running Run or establish a subsequent batch. An unfinished dependency chain cannot enter one run together. A project can have at most one unfinished run. Use `resume` for interruptions; after a finished run, resolve gaps and explicitly select failed tasks for recovery in a new `run`. The controller creates a worker and independent reviewer with clean context as each task needs them; tasks limited to `[review]` create no worker, and reconciliation without stage calls creates no agents. Prefer reusing each role within its task, never across tasks. Each task executes one stage at a time; up to two stages run concurrently in a fixed group. Waiting releases all file leases without refilling the group. Verification is FIFO after writes stop. A deterministic in-package reducer checks scheduling; there is no daemon. See [Group scheduling](cadra/references/scheduling.md). Missing child-agent or identity-verification capabilities block execution explicitly.
+
+Every successful task, including reconciliation without a new stage call, waits for final candidate checks and group closure before its Run entry becomes `completed`. Input fingerprints compare normalized path names and require explicit absence records. A stop policy blocks further engineering work while allowing an already finished stage to finalize without reacquiring write access. See [Group scheduling](cadra/references/scheduling.md) for the exact conditions.
 
 After preparing additional tasks, append them while the original Run executes:
 
@@ -337,7 +342,7 @@ $cadra run
 
 Recovery does not simply skip the blocked stage. Cadra checks handoffs and recovery conditions, then takes a legal next action or retries the blocked stage within the permitted flow. Subsequent execution remains unattended. See [Recovery admission](cadra/references/recovery.md) and [Definition revisions](cadra/references/revision-rules.md).
 
-Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before using the new installation. Old protocols are rejected.
+Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before new execution. Old protocols are rejected by execution entries; `list` alone may query `0.10` read-only.
 
 **`resume` handles confirmed execution interruptions**: it checks, continues or finalizes an unfinished Run. It does not rerun entries that already have blocked/failed results or reopen a finished Run:
 
@@ -579,3 +584,7 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 See the [test guide](tests/README.md) for test layout, per-skill commands and acceptance scenarios. Checks cover package metadata, document links, resource integrity in isolated copies and offline regressions. Actual installer behavior, agent execution and visual acceptance are validated separately.
 
 Versions and protocols are maintained in each package's `release.json`. See the [maintenance and versioning rules](AGENTS.md#版本管理) for bump criteria, compatibility and pre-commit checks. Keep both README languages in sync. Commits, pushes and release tags require explicit authorization. License: [MIT](LICENSE).
+
+### Cadra fixed groups of up to two tasks
+
+Protocol 0.11 retains one queue and one unfinished Run. Ready records expected write scopes; run scans the frozen queue for disjoint tasks and freezes one or two members without refilling. Waiting releases every file lease; executable resource requests follow FIFO and verification is serial after writes stop. Stage-local waits retain the original call and budget. See [Group scheduling](cadra/references/scheduling.md). Cohestra contract remains 0.8; installed copies must support resource waiting. Old 0.10 records are not automatically migrated: finish them in their original environment and archive unchanged.

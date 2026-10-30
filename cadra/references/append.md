@@ -8,7 +8,7 @@ Run：<run-id；省略时选择唯一 running Run>
 任务：<明确指定的 slug 列表>
 ```
 
-只接受协议 0.10 的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
+只接受协议 0.11 的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
 
 1. 明确目标 Run 和非空任务集合。重复输入或 Run 中已有 slug 整批拒绝；不重开旧终态条目。append 不提供失败恢复列表，需恢复或业务修订先走原有 add/ready/run 准入。
 2. 每项必须是当前可入队且与目标 Run 同协议的 ready 定义，并通过与 run 相同的协议、Gate、来源链、授权、输入、Cohestra 绑定及首个动作核对。混合协议整批拒绝，不自动迁移。依赖当前定义必须已 completed，不接受仅排在队列前面的未完成依赖。

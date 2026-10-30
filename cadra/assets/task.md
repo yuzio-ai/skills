@@ -1,9 +1,10 @@
 ---
-protocol: "0.10"
+protocol: "0.11"
 slug: <stable-slug>
 title: <任务名>
 revision: 1
 preparation: draft
+ready_scope: null
 priority: medium
 dependencies: []
 flow: code
@@ -35,3 +36,5 @@ revision_base 有值时为 `{run: <run-id>, revision: <整数>}`，指向分代�
 - 历史：<保留旧放行及失效记录，不覆盖>
 
 本文件不保存 queued/running/终态、所属 Run、调用结果或预算；查询通过 Run 来源链解析。
+
+ready 通过时填写 `ready_scope: {revision: <当前修订>, scope: {mode: parallel, files: [], dirs: []}, inputs: {<相关输入路径>: <SHA-256 或 null>}}`。这是准入结果，不是资源占用；Gate 失效或 revision、范围、输入语义变化时清空，由 ready 重新计算；不确定范围用 mode=exclusive。路径与失效规则见 [小组调度](../references/scheduling.md)。

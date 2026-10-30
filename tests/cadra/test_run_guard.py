@@ -17,20 +17,21 @@ AT = '2026-10-25T10:00:00+08:00'
 LATER = '2026-10-25T11:00:00+08:00'
 
 
-def example(protocol='0.10', flow='code'):
-    return {
+def example(protocol='0.11', flow='code'):
+    data = {
         'protocol': protocol, 'run_id': 'run-20261025-01', 'status': 'running',
         'created_at': AT, 'execution_mode': 'unattended',
-        'skill_version': '0.10.0',
+        'skill_version': '0.11.0',
         'executor': {'instance_id': 'first', 'generation': 1, 'host_id': 'local',
                      'thread_id': 'chat-1', 'turn_id': 'turn-1', 'claimed_at': AT,
                      'progress': {'at': AT, 'event': 'run_created'}},
-        'ownership_history': [], 'reports': [], 'append_history': [],
+        'ownership_history': [], 'reports': [], 'append_history': [], 'scheduler': guard.scheduler.initial(),
         'preflight': [dict(scope='project', status='passed', at=AT, inputs={}, evidence='project check'),
                       dict(scope='task', slug='camera', status='passed', at=AT, inputs={}, evidence='inputs and commands')],
         'tasks': [{'slug': 'camera', 'revision': 1, 'previous_run': None,
                    'definition': {'protocol': protocol, 'slug': 'camera', 'revision': 1,
-                                  'requirement': 'preserve camera dependency', 'flow': flow, 'preparation': 'ready'},
+                                  'requirement': 'preserve camera dependency', 'flow': flow, 'preparation': 'ready',
+                                  'ready_scope': {'revision': 1, 'scope': {'mode': 'exclusive', 'files': [], 'dirs': []}, 'inputs': {}}},
                    'start_action': {'kind': 'first_start', 'stage': guard.normalize_flow(flow, protocol)[0]},
                    'authorization_consumed': False, 'state': 'queued',
                    'budget': {'calls': 0, 'remediation': 0, 'retries': {}},
@@ -38,8 +39,37 @@ def example(protocol='0.10', flow='code'):
                    'calls': [], 'agents': [], 'result': None}],
     }
 
+    return guard.scheduler.append_event(data, 'group', AT, members=['camera'], before={'camera': {}}, before_refs={'camera': 'fixture-before'})
+
 
 def document(data):
+    # Serial regression adapter: explicitly provide synthetic stop/candidate
+    # evidence for the new singleton close barrier using the shipped reducer.
+    # Scheduler behavior tests use raw_document and never this adapter.
+    events = data.get('scheduler', {}).get('events', [])
+    if events and events[-1]['kind'] != 'close':
+        view = guard.scheduler.replay(data)
+        group = view['group']
+        tasks = [t for t in data['tasks'] if t['slug'] in group['members']]
+        if len(tasks) == 1 and tasks[0]['state'] in guard.scheduler.TERMINAL and all(c['closed'] for c in tasks[0]['calls']):
+            task = tasks[0]; state = task['state']
+            call = task['calls'][-1] if task['calls'] else None
+            bind = next((b for b in task['agents'] if call and b['id'] == call['agent_ref']), None)
+            when = max([e['at'] for e in events] + [LATER])
+            proof = dict(agent_id=bind['agent_id'] if bind else None, host_id=bind['host_id'] if bind else None,
+                         tools_stopped=True, observed_at=when, source='synthetic stopped serial regression role')
+            fixed = dict(snapshot='fixture-candidate', sha256='a'*64, inputs={})
+            updated = guard.scheduler.append_event(data, 'wait', when, slug=task['slug'],
+                call_id=call['id'] if call else None, resource='finalization',
+                scope=view['scope'][task['slug']], stop=proof, candidate=fixed)
+            updated['tasks'][0]['state'] = state
+            updated = guard.scheduler.append_event(updated, 'close', when, candidate=fixed,
+                                                  residuals={task['slug']: 'synthetic safe residual evidence'})
+            data['scheduler'] = updated['scheduler']
+    return raw_document(data)
+
+
+def raw_document(data):
     return ('---\n' + json.dumps(data, ensure_ascii=False, indent=2) + '\n---\n\n# Run\n').encode()
 
 
@@ -66,7 +96,7 @@ class RunGuardTests(unittest.TestCase):
         self.runs = self.root / '.yuzio/cadra/runs'
         self.runs.mkdir(parents=True)
         self.path = self.runs / 'run-20261025-01.md'
-        self.data = example(getattr(self, 'protocol', '0.10'), getattr(self, 'configured_flow', 'code'))
+        self.data = example(getattr(self, 'protocol', '0.11'), getattr(self, 'configured_flow', 'code'))
         self.sha = guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
 
     def bind_worker(self):

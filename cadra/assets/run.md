@@ -1,5 +1,5 @@
 ---
-protocol: "0.10"
+protocol: "0.11"
 run_id: <run-YYYYMMDD-NN>
 status: running
 execution_mode: unattended
@@ -15,6 +15,8 @@ executor:
   progress: {at: <ISO-8601>, event: run_created}
 ownership_history: []
 append_history: []
+scheduler:
+  events: []
 preflight:
   - scope: project
     status: passed
@@ -50,7 +52,7 @@ reports: []
 
 # <run-id>
 
-上方 YAML 只作字段骨架；protocol 必须与本批全部 Task 一致（0.10），不盲用模板值。0.10 Run 落盘时头部必须序列化为合法 JSON 映射，保留 Markdown 分隔符和正文，使用 [写入器](../scripts/run_guard.py)。不得把占位符作为真实值。身份、进展与交接语义见 [执行归属](../references/executor.md)。
+上方 YAML 只作字段骨架；protocol 必须与本批全部 Task 一致（0.11），不盲用模板值。0.11 Run 落盘时头部必须序列化为合法 JSON 映射，保留 Markdown 分隔符和正文，使用 [写入器](../scripts/run_guard.py)。不得把占位符作为真实值。身份、进展与交接语义见 [执行归属](../references/executor.md)。
 
 ## 建立依据
 
@@ -61,7 +63,7 @@ reports: []
 
 ## 记录约定
 
-tasks 数组顺序是执行顺序，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。已有条目不可重排；append_history 记录每次尾部追加的 at、source、tasks=[{slug,revision}]，仅 append 可追加。agents 的绑定形状及恢复规则见 [任务执行者](../references/agents.md)，按需创建后单独落盘，不与首次调用意图合并。
+tasks 数组顺序是入队与扫描顺序，实际小组和资源顺序由 scheduler.events 记录，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。已有条目不可重排；append_history 记录每次尾部追加的 at、source、tasks=[{slug,revision}]，仅 append 可追加。agents 的绑定形状及恢复规则见 [任务执行者](../references/agents.md)，按需创建后单独落盘，不与首次调用意图合并。
 
 每次调用向 calls 追加：
 
@@ -93,3 +95,7 @@ prepared_at: <ISO-8601 时间>
 - 停止原因：<如适用>
 - 正式总结：<如需共享交付，登记路径>
 - 最近更新：<执行者、带时区时间>
+
+## 小组与等待
+
+`scheduler.events` 是调度决策的唯一日志，视图按需派生，不另存 leases/groups 摘要。每项冻结 definition 包含通过当前 revision 的 ready_scope。具体事件、等待 checkpoint、请求文件与预算见 [小组调度](../references/scheduling.md)。waiting 的 result=null；暂停不闭合原 call。组最终 close 后才发布成功项终态；无需新调用的核对收尾也须经过 finalization 和 close。

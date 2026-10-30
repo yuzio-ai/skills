@@ -18,8 +18,8 @@ def check_package():
     task = frontmatter(ROOT / 'cadra/assets/task.md')
     run = frontmatter(ROOT / 'cadra/assets/run.md')
     for label, block, required in [
-        ('task', task, {'protocol', 'slug', 'revision', 'preparation', 'flow', 'cohestra_task', 'revision_base', 'changed_fields'}),
-        ('run', run, {'protocol', 'run_id', 'status', 'execution_mode', 'tasks', 'reports', 'executor', 'preflight', 'append_history'}),
+        ('task', task, {'protocol', 'slug', 'revision', 'preparation', 'flow', 'cohestra_task', 'revision_base', 'changed_fields', 'ready_scope'}),
+        ('run', run, {'protocol', 'run_id', 'status', 'execution_mode', 'tasks', 'reports', 'executor', 'preflight', 'append_history', 'scheduler'}),
     ]:
         if not required <= keys(block):
             failures.append(f'{label} template missing fields: {required - keys(block)}')

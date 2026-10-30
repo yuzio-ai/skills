@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Cadra 0.10 Run publication guard. Stdlib only; never dispatches work.
+"""Cadra 0.11 Run publication guard. Stdlib only; never dispatches work.
 
-Runs use JSON inside YAML Front Matter. Only protocol 0.10 is accepted;
+Runs use JSON inside YAML Front Matter. Only protocol 0.11 is accepted;
 full provenance and Cohestra contract checks remain the caller's job.
 """
 import argparse
 from contextlib import contextmanager
 from datetime import datetime
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import re
 import tempfile
 
+_spec = importlib.util.spec_from_file_location('cadra_scheduler', Path(__file__).with_name('scheduler.py'))
+scheduler = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(scheduler)
+
 STAGES = ('code', 'review', 'fix', 'validate')
-PROTOCOL = '0.10'
+PROTOCOL = '0.11'
 PROTOCOL_ERROR = 'unsupported Cadra protocol; finish old Runs and archive the old container before cutover'
 PRESETS = {
     'code': ('code', 'review', 'fix', 'validate'),
@@ -149,7 +154,14 @@ def validate_delivery_round(call, rounds):
         rounds[stage] = round_
 
 
-def validate(data):
+def validate(data, display_issues=None, *, return_view=False):
+    # list may collect presentation-only gaps while preserving every state,
+    # closure, budget, identity and scheduler check. Writers remain strict.
+    def presentation(ok, message, task):
+        if display_issues is None:
+            require(ok, message)
+        elif not ok:
+            display_issues.append({'slug': task['slug'], 'reason': message})
     require(isinstance(data, dict), 'Run must be an object')
     require(data.get('protocol') == PROTOCOL, PROTOCOL_ERROR)
     require(re.fullmatch(r'run-\d{8}-\d{2,}', data.get('run_id', '')), 'invalid run id')
@@ -178,10 +190,12 @@ def validate(data):
                     for path, sha in check['inputs'].items()), 'preflight inputs must carry SHA-256')
         if check['status'] == 'deferred':
             require(check['scope'] == 'task' and bool(check.get('produced_by')), 'only future stage outputs may be deferred')
+    task_preflights = {c['slug'] for c in data['preflight'] if c['scope'] == 'task' and c['status'] == 'passed'
+                       and isinstance(c.get('slug'), str)}
     tasks = data.get('tasks')
     require(isinstance(tasks, list) and tasks, 'empty Run')
     require(len({t['slug'] for t in tasks}) == len(tasks), 'duplicate slug')
-    require(sum(t.get('state') == 'running' for t in tasks) <= 1, 'multiple running tasks')
+    require(sum(t.get('state') == 'running' for t in tasks) <= 2, 'at most two active stages')
     agent_identities = set()
     for task in tasks:
         require(type(task.get('revision')) is int and task['revision'] >= 1, 'invalid task revision')
@@ -193,10 +207,9 @@ def validate(data):
         require(isinstance(task.get('start_action'), dict) and 'stage' in task['start_action'], 'start action required')
         require(task.get('start_action', {}).get('stage') in (*allowed, None), 'start action outside flow')
         validate_agents(task, agent_identities)
-        require(any(c.get('scope') == 'task' and c.get('slug') == task['slug'] and c.get('status') == 'passed'
-                    for c in data['preflight']), 'task preflight required')
+        require(task['slug'] in task_preflights, 'task preflight required')
         state = task.get('state')
-        require(state in ('queued', 'running', 'completed', 'blocked', 'failed', 'skipped'), 'invalid task state')
+        require(state in ('queued', 'running', 'waiting', 'completed', 'blocked', 'failed', 'skipped'), 'invalid task state')
         terminal = state in ('completed', 'blocked', 'failed', 'skipped')
         require((task.get('result') is not None) == terminal, 'result/state mismatch')
         if terminal:
@@ -220,28 +233,35 @@ def validate(data):
         require(task['budget']['retries'] == retries, 'retry budget mismatch')
         require(len(calls) <= 16 and task['budget']['remediation'] <= 3 and all(n <= 2 for n in retries.values()), 'budget limit exceeded')
         pending = [c for c in calls if not c.get('closed')]
-        require(len(pending) <= 1, 'multiple unclosed calls')
-        require(not pending or pending[0] is calls[-1], 'unclosed call must be last')
+        presentation(len(pending) <= 1, 'multiple unclosed calls', task)
+        presentation(not pending or pending[0] is calls[-1], 'unclosed call must be last', task)
         require(state != 'queued' or not calls, 'queued task cannot contain calls')
-        require(task['checkpoint']['pending_call'] == (pending[0]['id'] if pending else None), 'checkpoint mismatch')
+        presentation(isinstance(task.get('checkpoint'), dict) and 'pending_call' in task['checkpoint'] and
+                     task['checkpoint']['pending_call'] == (pending[0]['id'] if pending else None), 'checkpoint mismatch', task)
         if state == 'skipped':
             require(not calls and task['authorization_consumed'] is False and
                     task['budget'] == {'calls': 0, 'remediation': 0, 'retries': {}} and
                     task['checkpoint'] == {'pending_call': None, 'last_delivery': None} and
                     task['result'].get('last_delivery') is None, 'skipped task cannot contain execution evidence')
         for call in calls:
-            require(call.get('stage') in allowed and
-                    call.get('execution_mode') == 'unattended', 'invalid call stage/mode')
-            require(call.get('dispatch') in ('prepared', 'dispatched'), 'invalid dispatch state')
-            require(type(call.get('closed')) is bool, 'closed must be boolean')
-            require(not call.get('closed') or call.get('result') is not None, 'closed call lacks result')
-            validate_call_agent(task, call)
+            presentation(call.get('stage') in allowed and
+                         call.get('execution_mode') == 'unattended', 'invalid call stage/mode', task)
+            presentation(call.get('dispatch') in ('prepared', 'dispatched'), 'invalid dispatch state', task)
+            presentation(type(call.get('closed')) is bool, 'closed must be boolean', task)
+            presentation(not call.get('closed') or call.get('result') is not None, 'closed call lacks result', task)
+            try:
+                validate_call_agent(task, call)
+            except ValueError as exc:
+                presentation(False, str(exc), task)
             validate_delivery_round(call, rounds)
         if state == 'completed':
             require(not pending, 'completed task has unclosed call')
     if data['status'] == 'completed':
-        require(all(t['state'] not in ('queued', 'running') for t in tasks), 'completed Run has unfinished task')
+        require(all(t['state'] not in ('queued', 'running', 'waiting') for t in tasks), 'completed Run has unfinished task')
     validate_append_history(data)
+    view = scheduler.validate(data)
+    if return_view:
+        return view
 
 
 def agent_stopped(binding, observation, since=None):
@@ -332,6 +352,11 @@ def descendants_stopped(data, observation):
                     times.append(call['prepared_at'])
                     if call.get('dispatch_evidence'):
                         times.append(call['dispatch_evidence']['at'])
+            for request in scheduler.replay(data)['requests']:
+                if request['slug'] == task['slug'] and request.get('call_id') is not None:
+                    call = next(c for c in task['calls'] if c['id'] == request['call_id'])
+                    if call['agent_ref'] == binding['id']:
+                        times.extend(request[k] for k in ('granted_at', 'finished_at') if request.get(k))
             if sum(agent_stopped(binding, child, max(times, key=timestamp)) for child in children) != 1:
                 return False
     return True
@@ -379,12 +404,13 @@ def writer_lock(directory):
         os.close(fd)
 
 
-def unfinished(data):
+def unfinished(data, *, scheduler_view=None):
     if data.get('status') in ('running', 'interrupted'):
         return True
     if data.get('status') != 'stopped':
         return False
-    return any(t['state'] in ('queued', 'running') for t in data['tasks'])
+    group = (scheduler_view if scheduler_view is not None else scheduler.replay(data))['group']
+    return bool(group and group['phase'] != 'closed') or any(t['state'] in ('queued', 'running', 'waiting') for t in data['tasks'])
 
 
 def validate_update(old, new):
@@ -400,7 +426,7 @@ def validate_update(old, new):
         if before['state'] in ('completed', 'blocked', 'failed', 'skipped'):
             require(before == after, 'terminal task history is immutable')
         require(len(after['calls']) >= len(before['calls']), 'cannot delete calls')
-        if before['state'] == 'running':
+        if before['state'] in ('running', 'waiting'):
             require(after['state'] != 'queued', 'running task cannot return to queued')
         if after['state'] == 'skipped':
             require(before['state'] in ('queued', 'skipped'), 'only queued task may become skipped')
@@ -441,6 +467,7 @@ def validate_update(old, new):
                         'dispatch evidence is immutable once recorded')
                 require(not (a['dispatch'] == 'dispatched' and b['dispatch'] == 'prepared'), 'dispatch cannot regress')
     require(new['preflight'][:len(old['preflight'])] == old['preflight'], 'preflight evidence is append-only')
+    scheduler.validate_update(old, new)
 
 
 def fresh_task(task):
@@ -483,6 +510,12 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             path.parent.parent.parent.name == '.yuzio', 'expected project .yuzio/cadra/runs path')
     require(not any(p.is_symlink() for p in (path, *path.parents)), 'linked Run path')
     new, new_body = current(proposed)
+    project = path.parent.parent.parent.parent
+    for task in new['tasks']:
+        scheduler.validate_paths(project, scheduler.admission(task))
+    view = scheduler.replay(new)
+    for value in view['scope'].values():
+        scheduler.validate_paths(project, value)
     require(path.name == new['run_id'] + '.md', 'Run filename mismatch')
     with writer_lock(path.parent):
         raw = path.read_bytes() if path.exists() else None
@@ -492,6 +525,9 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             require(new['executor']['generation'] == 1 and not new['ownership_history'], 'new Run cannot invent ownership history')
             require(new['status'] == 'running' and all(fresh_task(t) for t in new['tasks']), 'new Run must start queued')
             require(new['append_history'] == [], 'new Run cannot invent append history')
+            events = new['scheduler']['events']
+            require(not events or len(events) == 1 and events[0]['kind'] == 'group' and
+                    events[0]['members'] == scheduler.select_group(new), 'new Run cannot invent scheduling history')
             for other in path.parent.glob('run-*.md'):
                 if '-report-' in other.name:
                     continue
@@ -506,6 +542,13 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
                 validate_append(old, new)
             else:
                 validate_update(old, new)
+                for event in new['scheduler']['events'][len(old['scheduler']['events']):]:
+                    if event['kind'] == 'wait' and 'request' in event:
+                        request = event['request']; file = project / request['path']
+                        require(not any(p.is_symlink() for p in (file, *file.parents)), 'linked resource request')
+                        require(file.stat().st_nlink == 1, 'linked resource request')
+                        require(file.read_bytes() == json.dumps(request['body'], ensure_ascii=False,
+                            sort_keys=True, separators=(',', ':')).encode(), 'resource request file changed')
             if mode == 'append':
                 pass
             elif mode == 'takeover':
@@ -564,7 +607,8 @@ def main():
             raw = args.run.read_bytes()
             data, _ = current(raw)
             result = {'sha256': digest(raw), 'protocol': data['protocol'], 'status': data['status'],
-                      'executor': data['executor'], 'activity': activity(data['executor'], observation)}
+                      'executor': data['executor'], 'activity': activity(data['executor'], observation),
+                      'scheduling': scheduler.summary(data)}
             if result['activity'] == 'stopped' and not descendants_stopped(data, observation):
                 result['activity'] = 'unknown'
             print(json.dumps(result, ensure_ascii=False))

@@ -1,4 +1,4 @@
-"""Exercise 0.10 queue and agent invariants through the shipped publication guard."""
+"""Exercise 0.11 queue and agent invariants through the shipped publication guard."""
 from copy import deepcopy
 import json
 import subprocess
@@ -276,7 +276,7 @@ class AppendAgentTests(unittest.TestCase):
             guard.publish(self.path, document(self.takeover(obs)), self.sha, 'second', 2, 'takeover', obs)
 
     def test_append_rejects_old_definition_without_modifying_run(self):
-        for protocol in ('0.6', '0.7', '0.8', '0.9'):
+        for protocol in ('0.6', '0.7', '0.8', '0.9', '0.10'):
             new = appended(self.data)
             new['tasks'][-1]['definition']['protocol'] = protocol
             self.assert_rejected(new, 'append')

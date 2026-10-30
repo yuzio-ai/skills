@@ -1,4 +1,4 @@
-# 公共流程 · cadra v0.10
+# 公共流程 · cadra v0.11
 
 本文件定义存储、状态来源与共同写入规则；详细判定按需读取。
 
@@ -14,8 +14,8 @@
 ```
 
 - **Task**：任务定义、定义修订与 Ready Gate；`preparation` 仅为 draft / ready。
-- **Run**：一次串行执行，`tasks` 数组的次序就是执行顺序；已有条目不重排，仅 append 可增加后缀。每项保存定义快照、执行状态、checkpoint、调用记录与结果。没有独立队列文件。
-- **展示状态**：由 Task 准备状态与关联 Run 推导出的 draft / ready / queued / running / completed / blocked / failed，解析规则见下文。
+- **Run**：一次分组执行，`tasks` 数组为冻结的入队扫描顺序，实际分组与资源顺序由 scheduler.events 保存；已有条目不重排，仅 append 可增加后缀。每项保存定义快照、执行状态、checkpoint、调用记录与结果。没有独立队列文件。
+- **展示状态**：由 Task 准备状态与关联 Run 推导出的 draft / ready / queued / running / waiting / completed / blocked / failed；无法核实或记录矛盾时展示 unknown，不能把它当作已结束或可执行状态。解析规则见下文。
 - **checkpoint**：Run 中待调用动作、授权消费、预算与未闭合调用的恢复依据。阶段交付 completed 不等于整个任务验收通过。
 - **flow**：起始阶段与允许阶段范围；preset 或显式列表的含义见 [Flow 配置](flow-config.md)。
 - **结构化状态**：Cohestra 任务 README Front Matter 的契约；Cadra 只读其控制字段，不凭自然语言决定推进。
@@ -24,8 +24,8 @@ Task 的 slug 与 `cohestra_task: .yuzio/cohestra/handoffs/<slug>/` 稳定绑定
 
 ## 身份与归属
 
-1. 先核对 Task/Run 协议：仅支持 0.10；Run 与 Task 快照须同协议。旧协议停止相关操作，不读取其来源链或执行状态，按 [版本边界](compatibility.md) 提示先完成归档切换，缺版本或未知版本同样停止。仅批量读取当前容器根 tasks/runs 下的 0.10 记录，归档目录不递归扫描。批量读取 Run 头部的身份、状态、任务标识及判断闭合所需的条目状态与结果一致性，再读取目标 slug 的条目及来源链；list 全量查询可汇总全部条目。报告文件不是 Run，不参与来源链，不通读无关调用正文。无法确认闭合或发现异常时查 [Run 规则](run-rules.md)，不能把未知当已结束。
-2. 每个 Run 内 slug 唯一。该 slug 的首次 Run 条目 `previous_run: null`；后续条目引用该 slug 上一次 Run，不限于同一修订。所有条目必须形成唯一无环链，引用必须存在且包含该 slug；缺失、分叉、重复、版本不明或相互矛盾时停止相关推进，list/report 标明未知与缺口。不能用文件时间或 run-id 大小替代来源关系。
+1. 先核对 Task/Run 协议：写入、准入与执行仅支持 0.11；Run 与 Task 快照须同协议。仅 list 按 [只读查询](list.md) 同时读取原协议 0.10，保留其串行状态且不进入写入或执行。其余入口遇旧协议停止，不读取其来源链或执行状态，按 [版本边界](compatibility.md) 提示先完成归档切换；缺版本、其他旧版或未知版本同样停止。只批量读取当前容器根 tasks/runs 下本入口支持的记录，归档目录不递归扫描，跨协议链不拼接。批量读取 Run 头部的身份、状态、任务标识及判断闭合所需的条目状态与结果一致性，再读取目标 slug 的条目及来源链；list 全量查询可汇总全部条目。报告文件不是 Run，不参与来源链，不通读无关调用正文。无法确认闭合或发现异常时查 [Run 规则](run-rules.md)，不能把未知当已结束。
+2. 每个 Run 内 slug 唯一。该 slug 的首次 Run 条目 `previous_run: null`；后续条目引用该 slug 上一次 Run，不限于同一修订。所有条目必须形成唯一无环链，引用必须存在且包含该 slug；未闭合 Run 不能成为后继 Run 的前驱，即使它的该条目已结束。缺失、分叉、重复、版本不明或相互矛盾时停止相关推进，list/report 标明未知与缺口，不自动收尾前驱或改写后继。不能用文件时间或 run-id 大小替代来源关系。
 3. 未完成 Run 归属优先核对：同一项目有多个未完成 Run，或未完成 Run 中该 slug 的修订/定义与 Task 不符，停止并报告。任何归属未完成 Run 的 Task 都不能编辑，包括其条目已经结束的情况。
 4. Run 修订不得大于 Task 修订，也不得沿链倒退。新建前仍须核对同 slug 记录；Task 文件不存在不能证明没有历史，有 Run 而 Task 缺失时报告缺口，不初始化替代记录；仅有 Cohestra 交付时按 [身份绑定](binding.md) 准备 Task。
 
@@ -33,7 +33,7 @@ Task 的 slug 与 `cohestra_task: .yuzio/cohestra/handoffs/<slug>/` 稳定绑定
 
 先核对上述 [身份与归属](#身份与归属)，再推导展示状态；add 不为无关任务或依赖求执行状态。
 
-1. 来源链尾条目若属于当前 revision：queued/running 或 completed/blocked/failed 直接作为展示状态；skipped 表示本轮未执行，展示 Task 的准备状态（正常为 ready）。若链尾属于旧修订或尚无 Run，展示 Task 的 preparation。
+1. 来源链尾条目若属于当前 revision：queued/running/waiting 或 completed/blocked/failed 直接作为展示状态；skipped 表示本轮未执行，展示 Task 的准备状态（正常为 ready）。若链尾属于旧修订或尚无 Run，展示 Task 的 preparation。
 2. ready 复核失败可使 preparation 回 draft；对尚未执行的 skipped 条目，显示 draft，不继续沿用旧 Gate。终态不能被准备状态覆盖，必须由 add 建立新定义修订。
 3. 依赖只认可上述当前定义的展示状态为 completed。旧修订的成功不放行新定义；开始或续跑每项前重核依赖。
 
@@ -61,7 +61,7 @@ Task 的 slug 与 `cohestra_task: .yuzio/cohestra/handoffs/<slug>/` 稳定绑定
 ## 共同写入
 
 - 存储和正式总结遵循 [存储约定](storage.md)。新建文件记录实际发行版、协议和带时区时间；run-id 使用 `run-YYYYMMDD-NN`，报告轮次两位起、不截断，编号只保证唯一，不推断进度。
-- 0.10 Run 的创建、更新、追加与报告链接登记必须使用 [执行归属写入器](executor.md)，不直接覆盖；下列临时文件/回读规则由该工具落实。Task 与报告正文仍按本节原子更新。
+- 0.11 Run 的创建、更新、追加与报告链接登记必须使用 [执行归属写入器](executor.md)，不直接覆盖；下列临时文件/回读规则由该工具落实。Task 与报告正文仍按本节原子更新。
 - Run 执行字段只有当前主 agent 可写；append/report 通过各自受限操作修改允许字段，不获得执行权。其他每份文件单写入者。更新前重读并核对未被其他写入改变；未知更新或所有权冲突时保留现场并报告，不覆盖。
 - Task、Run 更新：在同目录写临时文件，检查文档完整及必填字段、定义/状态约束后替换目标文件，回读成功后才继续。创建 Run 时不得覆盖已有同名文件。临时文件不参与状态解析。
 - 写入失败如实报告待完成内容，不声称事务回滚，不调用下一阶段。替换后回读失败时先恢复并核实原文件；临时文件不证明某次调用已经发生。
