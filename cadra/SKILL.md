@@ -14,7 +14,7 @@ license: MIT
 
 | 入口 | 职责 |
 |---|---|
-| [add](references/add.md) | 创建或编辑任务定义 |
+| [add](references/add.md) | 创建或编辑任务定义，保存相关设计稿与已确认设计结论 |
 | [ready](references/ready.md) | 检查 Ready Gate |
 | [list](references/list.md) | 用包内脚本只读核对并汇总任务、队列和 Run |
 | [run](references/run.md) | 建立并按固定一至两任务小组执行新 Run，收尾后自动生成报告 |

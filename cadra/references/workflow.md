@@ -8,6 +8,7 @@
 .yuzio/cadra/
 ├── README.md
 ├── tasks/<slug>.md
+├── tasks/<slug>/inputs/<唯一批次>/  # 有设计资料时保存的不可变附件
 └── runs/
     ├── <run-id>.md
     └── <run-id>-report-<轮次>.md

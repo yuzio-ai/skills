@@ -11,6 +11,7 @@ add 读取本页；其他入口核对定义时按需读取。准入见 [Ready Ga
 - 编辑前按 [身份与归属](workflow.md#身份与归属) 核对 Run 来源；属于未完成 Run 或归属矛盾时拒绝修改。只改用户指定字段；cohestra_task 固定为 `.yuzio/cohestra/handoffs/<slug>/`，slug 与该绑定路径不可编辑或改绑。
 - requirement、dependencies、规范化 flow 或 execution_policy 改变使 preparation 回 draft，同时清空 ready_scope，使当前 Gate 失效并追加时间、来源与变更字段。revision、范围或输入语义变化也不能沿用旧 ready_scope；该字段是 ready 计算的准入元数据，不是 add 的人工配置。只改 title/priority 不使 Gate 失效、不改变修订或执行结论；语义等价的 flow 规范化不算变更。
 - 同名目录已有 Cohestra 交付时，按 [身份绑定](binding.md) 处理；遇旧协议时加载 [版本边界](compatibility.md)，未知或缺协议停止相关操作。
+- 相关设计稿和已确认结论按 [设计输入留存](design-inputs.md) 保存，属于 requirement；附件更新也按 requirement 变更处理，不以正文外文件修改绕过修订和 Gate。
 
 ## 修订分代
 
