@@ -37,7 +37,7 @@ tasks:
     definition: <完整 Task 定义、requirement、修订依据与 Gate 快照；使用 YAML 映射>
     start_action:
       kind: <首次启动|正常接续|恢复重试|恢复核对收尾|修订重启|修订收尾>
-      stage: <六阶段名或 null>
+      stage: <flow 允许阶段或 null>
       source: <准入依据与来源>
     authorization_consumed: false
     budget:
