@@ -4,7 +4,7 @@ run/resume 写入前、append 受限写入前及 list 推荐后续动作时读�
 
 ## 记录与观察
 
-0.11 Run.executor 必填：instance_id（本次执行实例唯一标识，不是 PID）、generation（从 1 开始）、host_id/thread_id/turn_id（实际可取得身份，否则 null）、claimed_at、progress={at,event}。仅真实派发、交付、收尾及资源调度决策更新 progress；不用定时心跳伪造进展。ownership_history 保存交接前 executor 和核实的 observation；不另设活性控制状态。
+0.12 Run.executor 必填：instance_id（本次执行实例唯一标识，不是 PID）、generation（从 1 开始）、host_id/thread_id/turn_id（实际可取得身份，否则 null）、claimed_at、progress={at,event}。仅真实派发、交付、收尾及资源调度决策更新 progress；不用定时心跳伪造进展。ownership_history 保存交接前 executor 和核实的 observation；不另设活性控制状态。
 
 用宿主当前可用的正式工具查询记录指向的执行聊天及调用状态；不猜工具接口、不编辑内部数据库、不把别的聊天当同一执行者。观察输入为 {instance_id,generation,host_id,thread_id,turn_id,observed_at,source_kind,source,state,tools_stopped,children}。身份字段必须逐项匹配原 executor，不得用本次恢复者的身份替代。
 
@@ -12,7 +12,7 @@ source_kind=host 时，宿主三个身份字段必须完整且经正式工具核
 
 | 观察 | 展示和动作 |
 |---|---|
-| 对应执行者或子 agent 明确 active | 正在执行；不推荐 resume、不接管或中断；仅允许 append/report 的受限写入 |
+| 对应执行者或子 agent 明确 active | 正在执行；不推荐 resume、不接管或中断；外部调用者仅允许 append/report 的受限写入 |
 | 原执行、全部绑定子 agent 及其工具调用均明确结束 | 待核对恢复；仍需检查未闭合调用和交付 |
 | unavailable/notLoaded/idle 但工具状态不明、身份缺失、仅时间过久 | 活性未知；不自动接管、重跑或改判失败 |
 
@@ -24,9 +24,9 @@ list 不落盘、不加锁、不发送消息。明确 resume 授权后也必须�
 
 新 Run 使用 JSON 映射作为 YAML Front Matter，便于无外部 YAML 依赖的完整读写；正文仍为 Markdown。[Run 骨架](../assets/run.md) 展示字段，落盘时将头部转换为合法 JSON，不写占位符。Task 仍可使用 YAML。
 
-脚本接口：`python3 -B <安装目录>/scripts/run_guard.py <inspect|create|update|append|takeover|report> --run <绝对路径>`。
+脚本接口：`python3 -B <安装目录>/scripts/run_guard.py <inspect|create|update|append|closeout|takeover|report> --run <绝对路径>`。
 - inspect 可加 `--observation <JSON 文件>`；只读返回摘要、协议、executor 与 active/stopped/unknown，不写入观察。
-- 写操作提供 `--proposal <完整 Markdown 文件>`；除首次 create 外，提供上次 inspect 的 `--expected-sha256`。create/update/takeover 同时提供 `--instance` 和 `--generation`。临时提案放 Run 的 scratch 目录，不参与状态解析。
+- 写操作提供 `--proposal <完整 Markdown 文件>`；除首次 create 外，提供上次 inspect 的 `--expected-sha256`。create/update/closeout/takeover 同时提供 `--instance` 和 `--generation`。临时提案放 Run 的 scratch 目录，不参与状态解析。
 - create 在项目 runs 目录的短时 `.writer.lock` 下检查既有 Run、目标不存在和完整初态；先准备 queued 数组，再创建。锁不保存执行状态，进程退出由内核释放，锁文件不能删除重建。
 - update 只接受当前身份/代次与预期摘要；冻结定义、闭合调用、终态条目及既有预检不得改写；普通 update 不得增删、重排队列或改 append_history。角色绑定仅按任务执行者规则追加，原 pending 未闭合时不得替换。调度日志按 [小组调度](scheduling.md) 由同一 owner 追加，禁止删除或改写历史事件。一次只追加一个 prepared、未闭合且无结果的调用；原 pending 必须先单独核实闭合落盘，再追加下一意图。调用前保存意图后回读归属，再派发；写入保护不是外部调用的 exactly-once 保证。
 - skipped 只允许由未执行的 queued 转入，必须没有调用、预算消费、授权消费和交付 checkpoint；running 即使尚无调用也不能改记 skipped。guard 拒绝这些非法新提案及历史记录，failed 保留未闭合调用的恢复路径不变。计费分类和已保存的同阶段轮次按 [契约核对](contract.md#本次结果核对) 与 [调用预算](contract.md#调用预算) 检查。
@@ -41,3 +41,7 @@ list 不落盘、不加锁、不发送消息。明确 resume 授权后也必须�
 每次派发、结果落盘和 Run 收尾前都重读最新头部。普通 update 的摘要失效时，先比较变化：仅当是合法任务后缀追加及对应审计/预检，或报告链接追加时，才基于最新 Run 重建本次尚未发布的更新，保留所有新增内容。不得直接重交旧提案或任意合并其他修改。最多重试三次；持续冲突或不明变化时停止写入并报告现场。已派发阶段不能因写入冲突重新派发；先按原 call 核对并保存交付。
 
 追加与收尾使用同一锁：追加先成功则原收尾摘要失效，执行器处理新增条目；收尾先成功则 append 拒绝已结束 Run。追加不改变 executor progress，不构成接管授权。
+
+## 收尾登记
+
+`run_guard.py closeout` 使用相同的 --run、--proposal、--expected-sha256、--instance、--generation 参数。只有原 owner／代次可以原子追加一项生成 Task、对应预检、append_history 和 closeout 引用；不变更正文、既有执行字段或归属。普通 append 无此权限。提案构造、记录形状和关闭门槛见 [收尾审查](closeout.md)；inspect 同时返回派生 closeout 摘要。

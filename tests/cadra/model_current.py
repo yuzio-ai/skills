@@ -21,7 +21,7 @@ def result_valid(state, expected=None, before=None, synced=True, history=()):
     return True
 
 
-def decision(state, configured_flow='code', protocol='0.11'):
+def decision(state, configured_flow='code', protocol='0.12'):
     start, allowed = guard.normalize_flow(configured_flow, protocol)
     if not result_valid(state):
         return 'failed'

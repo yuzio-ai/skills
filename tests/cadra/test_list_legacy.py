@@ -50,7 +50,7 @@ class LegacyListTests(unittest.TestCase):
         result = self.summary()
         self.assertEqual(result['counts'], {'queued': 1})
         self.assertEqual(result['protocol'], '0.10')
-        self.assertEqual(result['execution_protocol'], '0.11')
+        self.assertEqual(result['execution_protocol'], '0.12')
         self.assertEqual(result['protocols'], {'0.10': 2})
         self.assertTrue(result['legacy_read_only'])
         queue = result['queues'][0]

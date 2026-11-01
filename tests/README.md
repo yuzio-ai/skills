@@ -37,11 +37,12 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_flow_current.py](cadra/test_flow_current.py)、[model_current.py](cadra/model_current.py) | 当前流程的测试模型：新预设、人工阶段受阻与必要复审；不替代真实 agent 验证 |
 | [test_append_agents.py](cadra/test_append_agents.py) | 直接测试写入器的原子追加、进程竞争、角色绑定、派发证据、子 agent 停止与旧协议拒绝 |
 | [test_review_current.py](cadra/test_review_current.py) | review 闭环、按需创建 worker、当前协议与 Gate 校验 |
-| [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 历史 0.10 环境的本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；工具要求匹配的 0.10 来源包，不用于当前 0.11 迁移；离线旧 YAML 读取需 macOS 系统 Ruby |
+| [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 历史 0.10 环境的本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；工具要求匹配的 0.10 来源包，不用于当前 0.12 迁移；离线旧 YAML 读取需 macOS 系统 Ruby |
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [test_guard_safety.py](cadra/test_guard_safety.py) | 停止与 skipped、计费依据及上限、合法恢复、复审旧轮次的真实文件回归；跨 Run 轮次另用当前模型核对 |
 | [test_scheduler.py](cadra/test_scheduler.py) | 直接调用包内 reducer 与真实 CAS 发布：小组范围、FIFO、阶段内等待、验证窗口、失败取消、候选刷新及跨代恢复；工具观察为合成输入 |
-| [test_list_summary.py](cadra/test_list_summary.py) | 列表摘要的状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
+| [test_closeout.py](cadra/test_closeout.py) | 0.12 收尾门槛、整改闭环、继承权限、候选与实际字节、追加、恢复、历史与隔离查询；工具观察和交付为合成输入 |
+| [test_list_summary.py](cadra/test_list_summary.py) | 保留原 0.11 语义的列表摘要状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
 | [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
 | [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |

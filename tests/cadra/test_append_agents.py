@@ -1,4 +1,4 @@
-"""Exercise 0.11 queue and agent invariants through the shipped publication guard."""
+"""Exercise 0.12 queue and agent invariants through the shipped publication guard."""
 from copy import deepcopy
 import json
 import subprocess
@@ -118,8 +118,8 @@ class AppendAgentTests(unittest.TestCase):
         return new
 
     def test_closeout_wins_then_append_is_rejected(self):
-        close = self.completed()
-        self.sha = self.publish(close)
+        fixtures.RunGuardTests.close_run(self)
+        close = self.data
         self.assert_rejected(appended(self.data), 'append')
         self.assert_rejected(appended(close), 'append')
 

@@ -1,0 +1,93 @@
+{
+  "verified_at": "2026-11-01T14:03:43.748665+08:00",
+  "packages": {
+    "cadra": {
+      "version": "0.16.0",
+      "protocol_version": "0.12",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cadra"
+    },
+    "cohestra": {
+      "version": "0.15.0",
+      "protocol_version": "0.8",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cohestra"
+    }
+  },
+  "tests": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "count": 493,
+    "seconds": 28.07,
+    "result": "passed",
+    "skipped": 0,
+    "log": "unittest.log"
+  },
+  "package_format_validation": {
+    "cadra": "Skill is valid!",
+    "cohestra": "Skill is valid!"
+  },
+  "full_git_history": true,
+  "git_diff_check": "passed",
+  "independent_review": {
+    "result": "no remaining confirmed findings",
+    "scope": "source and isolated control scenarios",
+    "cadra_test_count_at_review": 328
+  },
+  "boundaries": [
+    "Agent observations and Cohestra deliveries in tests are synthetic; no live project end-to-end execution.",
+    "Repository changes only; no installation cutover, commit, push or publication."
+  ],
+  "source_sha256": {
+    "README.md": "9fe8100dcbaa19edffb49c9d5226d81f16487c34302cec53c634f5ad970c56b5",
+    "README.zh-CN.md": "881cebb3d8dae6ec397fa304f0fc6336cc9b890eb2abeeca33be866a9e44b790",
+    "cadra/SKILL.md": "b43c67257ba4a5d7f081b4988635cbf191743f42475c4ca1ddaccade1f181f5f",
+    "cadra/assets/project/README.md": "f8c9aba116584a83013446f8130d4019852409b5d0a1cea1353dd2e5f7c1906c",
+    "cadra/assets/run.md": "835a78e3913e6ed2219a0cbac0a9f67ca2bcd1011c63150dc46b6e62eeeac849",
+    "cadra/assets/task.md": "fe8096bcdf77ea02301bb37dcf55ffa0b6f83cffe72a9e41b5fe96d36b47b7f9",
+    "cadra/references/add.md": "057829bcc139c596545fa16b38c84610f8cc6743658a4a4ab232d6d8a757a0b5",
+    "cadra/references/append.md": "bb0bf43f49dd4a47faebe6b84ee0fdbd858273d4ad741ce77b2f5a58565846d7",
+    "cadra/references/closeout.md": "ebe9fe67a613c32cac274360e29c0fa62ed704ac7de7ad8f8b67fb46240d7e59",
+    "cadra/references/compatibility.md": "5f9778ed9381d096a546d43b8180d4a9ed471cc99b42174f27c6287fbed1bc8f",
+    "cadra/references/contract.md": "4b5848ef75ff3e7216607e0d61b4db4646e901f6cebb1521c4777131b8aef5b0",
+    "cadra/references/dispatch.md": "b4f2204d269fcc38f9e9b2da96aa39b5d8cd4bd2d2f7b0bb5fbf60640d07e857",
+    "cadra/references/executor.md": "cf57754e4b8e119eba2d741008b0044ee5a1bef129557b525e31eefb77af6829",
+    "cadra/references/flow-config.md": "66148683a5f91db8950372d1ba99e970fec0b0987d7df4a66001e99784a0d86c",
+    "cadra/references/list-details.md": "01e14e833828097d73c0da362e286645674a087510932482e48f5a8ad31fd7bd",
+    "cadra/references/list.md": "92c6a7851fc54c1d16128a7e9ef3e7fdae06af22cc2137c46dc841dcbb5fc5db",
+    "cadra/references/preflight.md": "9307fdf69ffe8e0fc59a6a1c154524fe5a1be37eeeb0973afd167e78bc32f986",
+    "cadra/references/ready.md": "9b9ff5016958c88fb2523cd458e8fe6ff648194b3be6457afbb199fda6dcec28",
+    "cadra/references/report.md": "3514dc478f1320a415237be3d0f1c125f472b917bbd0a2d196f7ccead437e3af",
+    "cadra/references/resume.md": "395bde76c5ded08504645e2fcdd7d4de42924bb6464b403096170071b7006586",
+    "cadra/references/run-rules.md": "ad0b3420d5727b8947a6895665ad0062a5f640cfbb9f1c1a883883cd83e1a9fc",
+    "cadra/references/run.md": "9fb18fa0d726b8727500d3d8692bae71700e198ebe5004c29d898c6cd1f0265c",
+    "cadra/references/scheduling.md": "2dc4223df531098afbb1538aa19d85904a3d36c6aa509dcda490d65018ad54b9",
+    "cadra/references/task-definition.md": "3a682dddc013996a5fbaaa590d6374e5d1ed9c45ad03d1c3a5f81ef9b7e1ae46",
+    "cadra/references/task-rules.md": "241aaa1e9bc3ab378ba8ddfa3a3b10d553006082b70c23176a79aca66767c674",
+    "cadra/references/workflow.md": "de083530facc8b8330f1763ccef53b3d563de27e6519c8904895d0e84ddfe82e",
+    "cadra/release.json": "e106ac58cf9dcfc914bb218286f3c267475bff62888ebec2dee6e3dd516bbd00",
+    "cadra/scripts/closeout.py": "64f3ccd38df17bb8292158cbef8d59c3ddcb6c8796d3e5a889d384cac3186edd",
+    "cadra/scripts/list_legacy_011.py": "2673d66147d88243900e5bb5e64b18f1783a839c74c29574fbdbb761fae31bb7",
+    "cadra/scripts/list_summary.py": "553b9aea7fc419ca0664a11ea5995a2c84f3794eba599b843c2441e570f855f9",
+    "cadra/scripts/run_guard.py": "35ce06345540f47d2fc000e7cee01f13f846f8e0821d7ceee848c68a10d71cd3",
+    "cadra/scripts/scheduler.py": "0acc2bf105b3adf2137f8cc24b03a0b81b1ed2057de2f9631fdd8a4068702f94",
+    "cohestra/references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+    "cohestra/references/fix.md": "e480a705f475c97075af89ac84e960b0d0b4c6325803f6b252be74999257858b",
+    "cohestra/references/review-coverage.md": "5738737846768ae8809be78f00712ce706f6549794dbd2ca97087d83f0e37a13",
+    "cohestra/references/review.md": "a98e5ed6ae2e828f36a0721e0882db3bc5ed277b86d7f771e21d87ed9ca2eaf9",
+    "cohestra/references/validate.md": "c2165431444d66b29ec40b87249e6874f9cf930ad80bac4a70bfbd4db9ac0ca4",
+    "cohestra/references/workflow.md": "6a092f5e41a6eff1b70580fc8a6ee112363398f806bec37cc0047990bd7d2227",
+    "cohestra/release.json": "604820924eb40b00c4641f0daccc242bea8183c0c74f49dab3099380601e1b8a",
+    "tests/README.md": "5156bbd586d7d227b55f7058f38a41d4d140729d6af13259f151eac5335fa458",
+    "tests/cadra/closeout_fixture.py": "770aa586f2f0573a0782982ee829a44a3263ad9bb7cbf3ab31c1ee4f41d86b4d",
+    "tests/cadra/model_current.py": "20a483b4579d5c5ab6a8fca546c508b6049463db7c418f10858b8316db502d13",
+    "tests/cadra/scenarios.md": "fc79ea4b9ec5639da8503ed6e1d401f7190495e413f8e73324dc6ea54dca604d",
+    "tests/cadra/test_append_agents.py": "3fb829651f2c20064b4b7f3e93f99161b5d447ff24417f487f90ce8a7b793fff",
+    "tests/cadra/test_closeout.py": "ee8963503915eea58b5106efce22b107262562760ada2ad03d4c928cec3edde8",
+    "tests/cadra/test_list_legacy.py": "b0a9dde95ccf859dc8edca405b4ca5de439e8e83743fc6e6c13df8a90a315a1d",
+    "tests/cadra/test_list_optimization.py": "45b31a42895ac4bef404889defedbb3a0c619e19eec2828904aa5e4df289239c",
+    "tests/cadra/test_list_summary.py": "556883e8b7b9bfc32c16b2324a580426ee93aac087644feb7550ae99dccace61",
+    "tests/cadra/test_package.py": "66cd4d2ff318d81d3cd2e892be190ba20ad9d9e3bdcd21009495eafaf277f710",
+    "tests/cadra/test_review_current.py": "5c327db304c20d6816df8171341d00af991d21fc294f598bcabb23b9935eb88c",
+    "tests/cadra/test_run_guard.py": "a5c059fd4f2c3b8b7e2916d057181db1cb86956c4875f8187bdbf39f5c3f1d83"
+  }
+}

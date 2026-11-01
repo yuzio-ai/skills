@@ -2,15 +2,15 @@
 
 ## Run 状态
 
-running → completed / stopped / interrupted。completed 表示本轮所有项已结束，不表示所有任务成功；stopped 表示用户停止或执行策略停止；interrupted 表示中断、待恢复。
+running → completed / stopped / interrupted。completed 表示本轮所有项已结束且当前收尾一致性审查通过，不表示所有业务任务成功；stopped 表示用户停止或执行策略停止；interrupted 表示中断、待恢复。
 
 **未完成 Run**：状态 running/interrupted，或 stopped 但仍有 queued/running/waiting 条目或未闭合小组。Run 标记 completed 却有未结束条目或未闭合小组、completed 条目未属于已 close 的小组、终态条目缺结果、同一 Run 超过两个 running、活动项不属于当前组或来源链矛盾，均为记录异常，不放行新 Run。closed 的 completed 或 stopped 不重开；resume 只报告其结束事实。
 
-Run 0.11 均包含 executor、ownership_history、preflight、append_history、每项 agents 与调用角色引用，按 [执行归属](executor.md) 与 [预检](preflight.md) 解释。新 Run 头部使用 JSON 映射（YAML 子集），通过包内 guard 写入；活性观察不是 Run.status，不因未知观察改写执行事实。
+Run 0.12 均包含 closeout、executor、ownership_history、preflight、append_history、每项 agents 与调用角色引用，按 [执行归属](executor.md) 与 [预检](preflight.md) 解释。新 Run 头部使用 JSON 映射（YAML 子集），通过包内 guard 写入；活性观察不是 Run.status，不因未知观察改写执行事实。
 
 ## 建立与执行
 
-通过目标、协议、Gate、来源链与首个动作核对后，确认全部 Task 使用协议 0.11；Run.protocol 固定为 0.11，definition.protocol 必须一致。混合协议拒绝，不拆批或自动转换。随后按 [Run 模板](../assets/run.md) 保存初始任务数组：每个 slug 唯一，已有顺序固定，仅 [append](append.md) 可追加尾部，definition 快照及 revision、previous_run、首个动作与授权依据齐全，初态 queued。每项 `start_action` 按模板记录为 `{kind, stage, source}` 映射：`kind` 记录首动作类型，`stage` 为拟调用阶段（无需调用时为 null），`source` 记录准入依据与来源。guard 对 `start_action` 仅检查映射类型、`stage` 键存在且值属于 flow 允许阶段或 null；不校验 `kind`、`source` 的存在或内容。调用者仍须按模板完整记录并核实首动作类型与准入来源，不能仅凭 guard 通过认定依据齐全。这份文件回读成功即完成入队；不回写 Task。append_history 初始为空，每项 agents 初始为空；具体绑定和派发见 [任务执行者](dispatch.md)。
+通过目标、协议、Gate、来源链与首个动作核对后，确认全部 Task 使用协议 0.12；Run.protocol 固定为 0.12，definition.protocol 必须一致。混合协议拒绝，不拆批或自动转换。随后按 [Run 模板](../assets/run.md) 保存初始任务数组：每个 slug 唯一，已有顺序固定，普通任务由 [append](append.md) 追加尾部，内部收尾任务由 owner 按 [收尾登记](closeout.md) 追加，definition 快照及 revision、previous_run、首个动作与授权依据齐全，初态 queued。每项 `start_action` 按模板记录为 `{kind, stage, source}` 映射：`kind` 记录首动作类型，`stage` 为拟调用阶段（无需调用时为 null），`source` 记录准入依据与来源。guard 对 `start_action` 仅检查映射类型、`stage` 键存在且值属于 flow 允许阶段或 null；不校验 `kind`、`source` 的存在或内容。调用者仍须按模板完整记录并核实首动作类型与准入来源，不能仅凭 guard 通过认定依据齐全。这份文件回读成功即完成入队；不回写 Task。append_history 初始为空，每项 agents 初始为空；具体绑定和派发见 [任务执行者](dispatch.md)。
 
 每项状态为 queued → running ↔ waiting → completed/blocked/failed；waiting 是未完成状态，细分 files/verification/agent/finalization，不等于受阻或失败；尚未调用且无结果的 queued 项可在停止收尾时记 skipped。所有成功项先经 [小组调度](scheduling.md) 的 finalization 与 close，无需新调用的核对收尾也不例外，不能从 queued 直接写 completed。每项结果与其终态在同一次 Run 文件更新中写入。归属、顺序、执行事实均以 Run 为准；不保留另一张逐任务状态摘要表。
 
@@ -18,7 +18,7 @@ Run 0.11 均包含 executor、ownership_history、preflight、append_history、�
 - 回读后发起该次 Cohestra 调用；实际派发后将 dispatch 记 dispatched，并记录实际 agent_id、工具来源与时间的 dispatch_evidence。prepared/dispatched 均不是已交付证明；工具调用与文件更新不具备跨系统原子性。
 - 调用后：核对索引同步、阶段/轮次和模式，再把实际契约与来源写进同一调用记录并闭合，更新 checkpoint。交付不能确认时按 [resume](resume.md) 处理，不盲目再调一次。
 - 预算在调用意图落盘时预占。中断后仍未能确认是否发起时保留消费，不返还；确认未发起、原绑定 agent 可恢复且可安全继续时沿用同一 call id 与预算；不能把未闭合调用改派替代者。不能以新 id 绕过未闭合调用。
-- 每项结束保存固定结果快照：状态、最后交付、候选、findings、acceptance、下一步、人工介入、来源与时间。重读队列确认所有项结束后更新 Run 状态；中间中断由 resume 补 Run 收尾，不重复阶段。
+- 每项结束保存固定结果快照：状态、最后交付、候选、findings、acceptance、下一步、人工介入、来源与时间。重读队列确认所有项结束后，按 [收尾审查](closeout.md) 核对当前覆盖和最终候选；仅有效收尾通过才更新 completed，停止情形保留未完成审查的事实；中间中断由 resume 补 Run 收尾，不重复阶段。
 
 本次 run/resume 完成 Run 收尾并回读后，进入 [report 的收尾自动报告](report.md#收尾自动报告)。报告生成与链接登记在执行收尾之后进行，不是任务终态或 Run 闭合的前置条件。
 

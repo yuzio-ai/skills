@@ -8,10 +8,12 @@ $cadra ready
 补充：<澄清或输入，可空>
 ```
 
-仅接受协议 0.11；旧协议按 [版本边界](compatibility.md) 停止操作并提示先完成归档切换，本入口不迁移。
+仅接受协议 0.12；旧协议按 [版本边界](compatibility.md) 停止操作并提示先完成归档切换，本入口不迁移。
 
 解析当前展示状态及 Run 归属，仅接受 draft/ready 且不属于未完成 Run 的任务。读取本 Task、依赖当前状态和必要输入，按唯一 Ready Gate 逐项核对；不修改需求定义；在既有范围／输入项计算 ready_scope，见 [小组调度](scheduling.md)。补充改变定义时先指向 add。
 
 起点项遇到已有交付、Run 执行依据或定义修订时，按 Task 规则加载完整契约/重启准入；add 已记录的身份确认可沿用，执行材料缺口不能据此豁免。
 
 通过写 preparation=ready 和当前 revision 的 ready_scope；失败写 draft、清空 ready_scope 并列缺口。Gate 记录绑定 revision，保留旧历史，不重复追加同一修订的等价通过记录。回读后，无未完成 Run 时推荐 `$cadra run` 加范围；已有 running Run 时推荐 `$cadra append` 加明确 slug；其他情况按恢复边界说明，或继续准备任务。不建立 Run、不调用阶段。
+
+普通 ready 不为 origin 非 null 的生成任务单独授权执行；其 Gate 由来源 Run 的内部 [收尾准备](closeout.md) 复用本页检查，执行前仍须全部满足。

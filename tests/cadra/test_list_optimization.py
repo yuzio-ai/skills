@@ -32,7 +32,7 @@ class ListOptimizationTests(unittest.TestCase):
         return case
 
     def test_unfinished_predecessor_cannot_be_followed_by_a_terminal_run(self):
-        for protocol in reader.READ_PROTOCOLS:
+        for protocol in ('0.10', '0.11'):
             for status in ('running', 'interrupted', 'stopped'):
                 with self.subTest(protocol=protocol, status=status):
                     c = self.fixture(protocol)
@@ -50,7 +50,7 @@ class ListOptimizationTests(unittest.TestCase):
                     self.assertTrue(old['issues'])
 
     def test_completed_predecessor_and_closed_stopped_predecessor_remain_legal(self):
-        for protocol in reader.READ_PROTOCOLS:
+        for protocol in ('0.10', '0.11'):
             for status in ('completed', 'stopped'):
                 c = self.fixture(protocol)
                 task = c.task()
@@ -69,7 +69,7 @@ class ListOptimizationTests(unittest.TestCase):
         self.assertIn('Run lifecycle contradiction', json.dumps(result['issues']))
 
     def test_role_identity_is_stored_once_per_run_without_losing_agent_ids(self):
-        for protocol in reader.READ_PROTOCOLS:
+        for protocol in ('0.10', '0.11'):
             c = self.fixture(protocol)
             data = c.make_run(state='completed', status='completed')
             base = data['tasks'][0]
@@ -130,7 +130,7 @@ class ListOptimizationTests(unittest.TestCase):
         self.assertEqual(result['runs'][0]['queue'][0]['details']['roles_ref'], first['run_id'])
 
     def test_preflight_scans_are_constant_and_missing_task_evidence_still_fails(self):
-        for protocol in reader.READ_PROTOCOLS:
+        for protocol in ('0.10', '0.11'):
             c = self.fixture(protocol)
             data = c.make_run()
             data['preflight'] = CountingList(data['preflight'])
@@ -149,20 +149,20 @@ class ListOptimizationTests(unittest.TestCase):
     def test_query_reuses_validated_scheduler_view_and_writer_default_stays_strict(self):
         c = self.fixture()
         data = c.make_run()
-        with patch.object(reader.guard.scheduler, 'replay', wraps=reader.guard.scheduler.replay) as replay:
+        with patch.object(reader.legacy011.scheduler, 'replay', wraps=reader.legacy011.scheduler.replay) as replay:
             c.summary()
             self.assertEqual(replay.call_count, 1)
-        self.assertIsNone(reader.guard.validate(data))
+        self.assertIsNone(reader.legacy011.validate(data))
         data['tasks'][0]['checkpoint']['pending_call'] = 99
         with self.assertRaisesRegex(ValueError, 'checkpoint mismatch'):
-            reader.guard.validate(data)
+            reader.legacy011.validate(data)
 
     def test_stopped_run_with_open_group_remains_unfinished_without_replaying_twice(self):
         c = self.fixture()
         data = c.make_run(state='failed', status='stopped')
         data['scheduler'] = fixtures.example()['scheduler']
         c.write(c.runs / (data['run_id'] + '.md'), data)
-        with patch.object(reader.guard.scheduler, 'replay', wraps=reader.guard.scheduler.replay) as replay:
+        with patch.object(reader.legacy011.scheduler, 'replay', wraps=reader.legacy011.scheduler.replay) as replay:
             result = c.summary()
             self.assertEqual(replay.call_count, 1)
             self.assertEqual(result['runs'][0]['status'], 'stopped')

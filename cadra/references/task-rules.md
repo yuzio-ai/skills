@@ -4,7 +4,7 @@
 
 定义、字段校验、Gate 失效和修订分代仅由 [任务定义](task-definition.md) 规定，准入复核定义时读取该参考；flow 配置见 [配置规则](flow-config.md)。add 不读取下方准入表。
 
-入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。仅接受协议 0.11；旧记录停止准入并提示先归档切换，详见 [版本边界](compatibility.md)。
+入队排序按 priority 高到低，同级按 slug 字典序；依赖未完成的任务不进入同一 Run，依赖链逐层推进。append 仅排序新增批次后整体放到尾部，不按新优先级重排原队列。仅接受协议 0.12；旧记录停止准入并提示先归档切换，详见 [版本边界](compatibility.md)。
 
 ## Ready Gate
 
@@ -24,3 +24,5 @@
 ready 只适用于展示状态 draft/ready：通过时 preparation=ready；未通过时 preparation=draft。旧 Gate 记录保留；同一定义重复通过不重复追加等价放行记录。其他状态先按恢复或修订入口处理，不靠 ready 重开终态。只有该修订已通过 Gate 且此次复核通过，才可进入 Run。
 
 已有交付或 Run 执行依据时，起点项按 [完整契约与前置检查](contract.md#前置检查与首个动作) 核对候选适用性、控制字段及合法首动作；定义变更时按 [重启准入](revision-rules.md) 核对。add 的身份绑定不替代上述检查，缺口未解除不得放行。
+
+生成收尾任务仅在来源 Run 的内部准备中执行本 Gate；不得因来自执行器就跳过八项准入。普通全部 ready／显式选择排除 origin 非 null 的生成任务，见 [收尾审查](closeout.md)。

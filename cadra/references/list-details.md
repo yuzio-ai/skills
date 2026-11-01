@@ -14,3 +14,5 @@
 - 完整契约、额外原始载荷及 candidate.inputs 的省略以 `omitted_fields` / `inputs_count` 标明。摘要不是完整交付契约，不能替代执行前的原文核验。
 - 用户要求完整字段时，用同一范围加 `--full-results`，得到 `result_mode: full`：指定 Run 的 result，或单 slug 的 checkpoint/result，按已保存原文解析值原样返回。该参数不扩大查询范围，也不迁移、重跑阶段或写入记录。亦可按返回的 Run 绝对路径及 slug 精确读取相应条目。
 - 不批量展开无关记录补充省略内容；完整身份、原始结果和全量任务明细仍随实际返回量增长。千级/万级验证不表示这些明细会自动限制在模型上下文预算内。
+
+0.12 Run 的 closeout 摘要由引用的普通任务派生，显示轮数、任务、覆盖数量、只读边界及 passed／outdated 等结果；0.10/0.11 保持原语义，不补造收尾状态。origin 非 null 的生成任务不可推荐普通 run／append，未完成来源 Run 才按实际活性建议 resume。

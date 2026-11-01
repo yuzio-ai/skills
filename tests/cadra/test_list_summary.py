@@ -10,13 +10,19 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from .test_run_guard import example, binding, pending, raw_document, guard
+from .test_run_guard import example as current_example, binding, pending, raw_document
 from .test_cadra import contract
 
 SCRIPT = Path(__file__).resolve().parents[2] / 'cadra/scripts/list_summary.py'
 spec = importlib.util.spec_from_file_location('cadra_list_summary', SCRIPT)
 reader = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(reader)
+guard = reader.legacy011
+
+def example():
+    data = current_example(protocol='0.11')
+    data.pop('closeout')
+    return data
 
 
 def finalized_fixture(data, slug):

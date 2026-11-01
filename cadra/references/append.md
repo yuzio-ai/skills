@@ -8,7 +8,7 @@ Run：<run-id；省略时选择唯一 running Run>
 任务：<明确指定的 slug 列表>
 ```
 
-只接受协议 0.11 的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
+只接受协议 0.12 的 running Run，不要求成为其执行 owner，也不因 owner 活跃而拒绝受限追加。interrupted 先按 resume 恢复；completed/stopped 不重开。缺失、多个未完成 Run 或状态矛盾时停止，不猜最新批次，不初始化替代。
 
 1. 明确目标 Run 和非空任务集合。重复输入或 Run 中已有 slug 整批拒绝；不重开旧终态条目。append 不提供失败恢复列表，需恢复或业务修订先走原有 add/ready/run 准入。
 2. 每项必须是当前可入队且与目标 Run 同协议的 ready 定义，并通过与 run 相同的协议、Gate、来源链、授权、输入、Cohestra 绑定及首个动作核对。混合协议整批拒绝，不自动迁移。依赖当前定义必须已 completed，不接受仅排在队列前面的未完成依赖。
@@ -20,3 +20,5 @@ Run：<run-id；省略时选择唯一 running Run>
 append_history 每条为 `{at: <带时区时间>, source: <本次明确追加请求及执行者来源>, tasks: [{slug, revision}, ...]}`；tasks 顺序与本次新增后缀一致。审计记录不冒充 executor 的执行进展。追加与收尾在同一锁下裁决：追加先成功则执行器需处理新条目；收尾先成功则追加拒绝。
 
 追加不接管、不唤醒、不向执行聊天发送消息。执行器按 Run 规则重读最新队列。交付 Run 路径、新增 slug、追加后总项数与状态；未写入时明确整批未追加。
+
+生成收尾任务的 origin 非 null，普通 append 一律拒绝；仅 owner 可按 [收尾审查](closeout.md) 登记。向已有收尾任务的 Run 追加普通任务仍保留全部旧记录；新的队列后缀使旧收尾不再覆盖最终范围，由执行器完成新增任务后重新审查。

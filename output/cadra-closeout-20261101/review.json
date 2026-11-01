@@ -1,0 +1,108 @@
+{
+  "reviewed_at": "2026-11-01T15:07:20.435421+08:00",
+  "base_commit": "ef7445f72214ac4d8a8ecd119caf286ae4d40207",
+  "packages": {
+    "cadra": {
+      "version": "0.16.0",
+      "protocol_version": "0.12",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cadra"
+    },
+    "cohestra": {
+      "version": "0.15.0",
+      "protocol_version": "0.8",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cohestra"
+    }
+  },
+  "resolved_findings": [
+    "Only granted files/agent extensions are inherited as closeout write permission; ungranted requests remain review inputs.",
+    "Runtime scope paths, observed candidate dependencies and grant before-images cannot disappear from closeout coverage.",
+    "Actual first call must be review; follow-up calls consume verified next or an actual candidate refresh, preserving budget charges.",
+    "Read-only closeout cannot pass with failed acceptance; pending, blocked and absent acceptance retain their declared boundary.",
+    "Synchronized owner-operation enums, append exceptions, project template compatibility and worker creation rules."
+  ],
+  "tests": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "count": 498,
+    "seconds": 37.699,
+    "result": "passed",
+    "skipped": 0,
+    "log": "review-unittest.log"
+  },
+  "independent_reviews": [
+    {
+      "scope": "rules and contract conflicts",
+      "result": "no remaining confirmed findings",
+      "closeout_tests": 31
+    },
+    {
+      "scope": "guard, authorization and candidate control",
+      "result": "no remaining confirmed findings",
+      "closeout_tests": 31
+    }
+  ],
+  "format_validation": {
+    "cadra": "passed",
+    "cohestra": "passed"
+  },
+  "git_diff_check": "passed",
+  "full_git_history": true,
+  "boundaries": [
+    "Isolated tests use synthetic role observations and Cohestra deliveries; live project end-to-end acceptance was not run.",
+    "Package installation cutover and GitHub Release publication are outside this delivery."
+  ],
+  "source_sha256": {
+    "README.md": "9fe8100dcbaa19edffb49c9d5226d81f16487c34302cec53c634f5ad970c56b5",
+    "README.zh-CN.md": "881cebb3d8dae6ec397fa304f0fc6336cc9b890eb2abeeca33be866a9e44b790",
+    "cadra/SKILL.md": "b43c67257ba4a5d7f081b4988635cbf191743f42475c4ca1ddaccade1f181f5f",
+    "cadra/assets/project/README.md": "cd352eeadff23dd1bd0b35da646d8069d878f995ba8a34a033e0b197e29e2706",
+    "cadra/assets/run.md": "9e801c24bc19cc03226060e51d7e0c5e40c4e6d1b8f8a16f0f2c088a64ef3392",
+    "cadra/assets/task.md": "fe8096bcdf77ea02301bb37dcf55ffa0b6f83cffe72a9e41b5fe96d36b47b7f9",
+    "cadra/references/add.md": "057829bcc139c596545fa16b38c84610f8cc6743658a4a4ab232d6d8a757a0b5",
+    "cadra/references/append.md": "bb0bf43f49dd4a47faebe6b84ee0fdbd858273d4ad741ce77b2f5a58565846d7",
+    "cadra/references/closeout.md": "d59cdfe52a4c6cdd9b4a7eecc64f1790148be62df71cf0173db5d8b5b847fbd0",
+    "cadra/references/compatibility.md": "5f9778ed9381d096a546d43b8180d4a9ed471cc99b42174f27c6287fbed1bc8f",
+    "cadra/references/contract.md": "4b5848ef75ff3e7216607e0d61b4db4646e901f6cebb1521c4777131b8aef5b0",
+    "cadra/references/dispatch.md": "b4f2204d269fcc38f9e9b2da96aa39b5d8cd4bd2d2f7b0bb5fbf60640d07e857",
+    "cadra/references/executor.md": "a69e7a3cb18c8b4c5f4a072b1222f387f1ab80384d53efb06d363c8a4c080717",
+    "cadra/references/flow-config.md": "66148683a5f91db8950372d1ba99e970fec0b0987d7df4a66001e99784a0d86c",
+    "cadra/references/list-details.md": "01e14e833828097d73c0da362e286645674a087510932482e48f5a8ad31fd7bd",
+    "cadra/references/list.md": "92c6a7851fc54c1d16128a7e9ef3e7fdae06af22cc2137c46dc841dcbb5fc5db",
+    "cadra/references/preflight.md": "9307fdf69ffe8e0fc59a6a1c154524fe5a1be37eeeb0973afd167e78bc32f986",
+    "cadra/references/ready.md": "9b9ff5016958c88fb2523cd458e8fe6ff648194b3be6457afbb199fda6dcec28",
+    "cadra/references/report.md": "3514dc478f1320a415237be3d0f1c125f472b917bbd0a2d196f7ccead437e3af",
+    "cadra/references/resume.md": "395bde76c5ded08504645e2fcdd7d4de42924bb6464b403096170071b7006586",
+    "cadra/references/run-rules.md": "71698a38b0c66e769845dd77e4f8af5d76aed76e1a1a8ee235ed6102e5b5f516",
+    "cadra/references/run.md": "9fb18fa0d726b8727500d3d8692bae71700e198ebe5004c29d898c6cd1f0265c",
+    "cadra/references/scheduling.md": "2dc4223df531098afbb1538aa19d85904a3d36c6aa509dcda490d65018ad54b9",
+    "cadra/references/task-definition.md": "3a682dddc013996a5fbaaa590d6374e5d1ed9c45ad03d1c3a5f81ef9b7e1ae46",
+    "cadra/references/task-rules.md": "241aaa1e9bc3ab378ba8ddfa3a3b10d553006082b70c23176a79aca66767c674",
+    "cadra/references/workflow.md": "2a4d6fe55bc3bde11140ac8cbc171a2e8fb4e16d269ecf3ff871c251de698e7e",
+    "cadra/release.json": "e106ac58cf9dcfc914bb218286f3c267475bff62888ebec2dee6e3dd516bbd00",
+    "cadra/scripts/closeout.py": "190f298dd14c713479711bc1e57ab3176919234e40f86c5a2380d386ee0c5074",
+    "cadra/scripts/list_legacy_011.py": "d770ab0fd28896f3c7ada66880c67cb1a5f9a4dfabb22a389242ac7717790dca",
+    "cadra/scripts/list_summary.py": "553b9aea7fc419ca0664a11ea5995a2c84f3794eba599b843c2441e570f855f9",
+    "cadra/scripts/run_guard.py": "35ce06345540f47d2fc000e7cee01f13f846f8e0821d7ceee848c68a10d71cd3",
+    "cadra/scripts/scheduler.py": "0acc2bf105b3adf2137f8cc24b03a0b81b1ed2057de2f9631fdd8a4068702f94",
+    "cohestra/references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+    "cohestra/references/fix.md": "13c2ad5a7f8505f044b46b4a36809282fae29b5b070898fc48c73cbabf5a5823",
+    "cohestra/references/review-coverage.md": "5738737846768ae8809be78f00712ce706f6549794dbd2ca97087d83f0e37a13",
+    "cohestra/references/review.md": "a98e5ed6ae2e828f36a0721e0882db3bc5ed277b86d7f771e21d87ed9ca2eaf9",
+    "cohestra/references/validate.md": "c2165431444d66b29ec40b87249e6874f9cf930ad80bac4a70bfbd4db9ac0ca4",
+    "cohestra/references/workflow.md": "6a092f5e41a6eff1b70580fc8a6ee112363398f806bec37cc0047990bd7d2227",
+    "cohestra/release.json": "604820924eb40b00c4641f0daccc242bea8183c0c74f49dab3099380601e1b8a",
+    "tests/README.md": "5156bbd586d7d227b55f7058f38a41d4d140729d6af13259f151eac5335fa458",
+    "tests/cadra/closeout_fixture.py": "e010a03b1f2a540cb90443dfa463b7491512ba093861e22dd6ab0e4fe5f0fb31",
+    "tests/cadra/model_current.py": "20a483b4579d5c5ab6a8fca546c508b6049463db7c418f10858b8316db502d13",
+    "tests/cadra/scenarios.md": "fc79ea4b9ec5639da8503ed6e1d401f7190495e413f8e73324dc6ea54dca604d",
+    "tests/cadra/test_append_agents.py": "3fb829651f2c20064b4b7f3e93f99161b5d447ff24417f487f90ce8a7b793fff",
+    "tests/cadra/test_closeout.py": "a54efe643b7852aee0638eaaea1e425b21755ca5b8fa1fe17c583bff1914deca",
+    "tests/cadra/test_list_legacy.py": "b0a9dde95ccf859dc8edca405b4ca5de439e8e83743fc6e6c13df8a90a315a1d",
+    "tests/cadra/test_list_optimization.py": "45b31a42895ac4bef404889defedbb3a0c619e19eec2828904aa5e4df289239c",
+    "tests/cadra/test_list_summary.py": "556883e8b7b9bfc32c16b2324a580426ee93aac087644feb7550ae99dccace61",
+    "tests/cadra/test_package.py": "66cd4d2ff318d81d3cd2e892be190ba20ad9d9e3bdcd21009495eafaf277f710",
+    "tests/cadra/test_review_current.py": "5c327db304c20d6816df8171341d00af991d21fc294f598bcabb23b9935eb88c",
+    "tests/cadra/test_run_guard.py": "a5c059fd4f2c3b8b7e2916d057181db1cb86956c4875f8187bdbf39f5c3f1d83"
+  }
+}

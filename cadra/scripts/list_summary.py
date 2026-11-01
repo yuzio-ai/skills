@@ -21,7 +21,10 @@ _spec.loader.exec_module(guard)
 _legacy_spec = importlib.util.spec_from_file_location('cadra_list_010', Path(__file__).with_name('list_legacy_010.py'))
 legacy = importlib.util.module_from_spec(_legacy_spec)
 _legacy_spec.loader.exec_module(legacy)
-READ_PROTOCOLS = (legacy.PROTOCOL, guard.PROTOCOL)
+_legacy_011_spec = importlib.util.spec_from_file_location('cadra_list_011', Path(__file__).with_name('list_legacy_011.py'))
+legacy011 = importlib.util.module_from_spec(_legacy_011_spec)
+_legacy_011_spec.loader.exec_module(legacy011)
+READ_PROTOCOLS = (legacy.PROTOCOL, legacy011.PROTOCOL, guard.PROTOCOL)
 STATES = ('running', 'waiting', 'queued', 'blocked', 'failed', 'unknown', 'ready', 'draft', 'completed')
 END = {'completed', 'blocked', 'failed', 'skipped'}
 LABELS = dict(code='实现', review='评审', fix='整改', validate='验证')
@@ -62,7 +65,9 @@ def record_reader(protocol):
         return guard
     if protocol == legacy.PROTOCOL:
         return legacy
-    raise ValueError('unsupported Cadra protocol for list; only 0.10 and 0.11 are readable')
+    if protocol == legacy011.PROTOCOL:
+        return legacy011
+    raise ValueError('unsupported Cadra protocol for list; only 0.10, 0.11 and 0.12 are readable')
 
 
 def yaml_batch(blocks):
@@ -111,6 +116,8 @@ def task_valid(data, slug):
     deps = data.get('dependencies', [])
     require(isinstance(deps, list) and all(isinstance(d, str) and d for d in deps), 'invalid dependencies')
     rules.normalize_flow(data.get('flow', 'code'), data['protocol'])
+    if rules is guard:
+        guard.closeout.origin(data)
 
 
 def same_definition(task, item):
@@ -347,6 +354,8 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
             require(isinstance(data, dict), 'Task header must be a mapping')
             record['protocol'] = data.get('protocol')
             task_valid(data, p.stem)
+            if data.get('origin') is not None and data.get('protocol') == guard.PROTOCOL:
+                record['origin'] = data['origin']
             record['title'] = data['title']
             stamp, display = creation(data, doc['body'], zone)
             tasks[p.stem]['sort_time'] = stamp
@@ -367,9 +376,9 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
             require(guard.split_document(doc['raw'])[0].lstrip().startswith('{'), 'Run requires a JSON header')
             require(data.get('run_id') == p.stem, 'Run identity mismatch')
             display_issues = []
-            if rules is guard:
-                view = guard.validate(data, display_issues=display_issues, return_view=True)
-                is_unfinished = guard.unfinished(data, scheduler_view=view)
+            if rules in (guard, legacy011):
+                view = rules.validate(data, display_issues=display_issues, return_view=True)
+                is_unfinished = rules.unfinished(data, scheduler_view=view)
             else:
                 rules.validate(data, display_issues=display_issues)
                 view, is_unfinished = None, rules.unfinished(data)
@@ -447,7 +456,7 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
     out['protocols'] = dict(protocols)
     if len(protocols) == 1:
         out['protocol'] = next(iter(protocols))
-    if legacy.PROTOCOL in protocols:
+    if any(p != guard.PROTOCOL for p in protocols):
         out['legacy_read_only'] = True
     # Filter only AFTER global closure, ownership and per-slug chain checks.
     selected = {s: t for s, t in tasks.items() if not slugs or s in slugs}
@@ -537,10 +546,12 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
                 if t['slug'] in selected:
                     add_roles(rid, t['slug'])
             summary['roles_ref'] = rid
-        if data['protocol'] == guard.PROTOCOL:
+        if data['protocol'] in (guard.PROTOCOL, legacy011.PROTOCOL):
             summary['scheduling'] = scheduling_summary(run['view'], details=bool(run_id), history=bool(history or run_id))
-        else:
+        if data['protocol'] != guard.PROTOCOL:
             summary['legacy_read_only'] = True
+        else:
+            summary['closeout'] = guard.closeout.summary(data)
         if top or run_id:
             summary['queue'] = []
             hidden = 0

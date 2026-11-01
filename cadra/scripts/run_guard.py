@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Cadra 0.11 Run publication guard. Stdlib only; never dispatches work.
+"""Cadra 0.12 Run publication guard. Stdlib only; never dispatches work.
 
-Runs use JSON inside YAML Front Matter. Only protocol 0.11 is accepted;
+Runs use JSON inside YAML Front Matter. Only protocol 0.12 is accepted;
 full provenance and Cohestra contract checks remain the caller's job.
 """
 import argparse
@@ -19,8 +19,12 @@ _spec = importlib.util.spec_from_file_location('cadra_scheduler', Path(__file__)
 scheduler = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(scheduler)
 
+_closeout_spec = importlib.util.spec_from_file_location('cadra_closeout', Path(__file__).with_name('closeout.py'))
+closeout = importlib.util.module_from_spec(_closeout_spec)
+_closeout_spec.loader.exec_module(closeout)
+
 STAGES = ('code', 'review', 'fix', 'validate')
-PROTOCOL = '0.11'
+PROTOCOL = '0.12'
 PROTOCOL_ERROR = 'unsupported Cadra protocol; finish old Runs and archive the old container before cutover'
 PRESETS = {
     'code': ('code', 'review', 'fix', 'validate'),
@@ -260,6 +264,7 @@ def validate(data, display_issues=None, *, return_view=False):
         require(all(t['state'] not in ('queued', 'running', 'waiting') for t in tasks), 'completed Run has unfinished task')
     validate_append_history(data)
     view = scheduler.validate(data)
+    closeout.validate(data, view, scheduler, normalize_flow)
     if return_view:
         return view
 
@@ -418,6 +423,7 @@ def validate_update(old, new):
     for key in ('protocol', 'run_id', 'created_at', 'execution_mode', 'skill_version'):
         require(old.get(key) == new.get(key), 'Run identity is frozen')
     require([t['slug'] for t in old['tasks']] == [t['slug'] for t in new['tasks']], 'queue is frozen')
+    require(old['closeout'] == new['closeout'], 'closeout history changes require owner closeout operation')
     require(old['append_history'] == new['append_history'], 'append history changes require append operation')
     require(sum(len(b['calls']) - len(a['calls']) for a, b in zip(old['tasks'], new['tasks'])) <= 1,
             'publish one call intent at a time')
@@ -478,9 +484,9 @@ def fresh_task(task):
             and task['checkpoint'] == {'pending_call': None, 'last_delivery': None})
 
 
-def validate_append(old, new):
+def validate_append(old, new, *, is_closeout=False):
     require(old['status'] == new['status'] == 'running', 'append requires running Run')
-    mutable = {'tasks', 'preflight', 'append_history'}
+    mutable = {'tasks', 'preflight', 'append_history'} | ({'closeout'} if is_closeout else set())
     require({k:v for k,v in old.items() if k not in mutable} ==
             {k:v for k,v in new.items() if k not in mutable}, 'append cannot change execution or ownership')
     count = len(old['tasks'])
@@ -488,6 +494,17 @@ def validate_append(old, new):
             'append may only extend queue suffix')
     added = new['tasks'][count:]
     require(all(fresh_task(t) for t in added), 'appended tasks must be fresh queued entries')
+    if is_closeout:
+        require(len(added) == 1 and closeout.origin(added[0]['definition']) is not None, 'closeout adds exactly one generated task')
+        require(new['closeout'][:-1] == old['closeout'] and len(new['closeout']) == len(old['closeout']) + 1, 'closeout history is append-only')
+        record = new['closeout'][-1]
+        require(record['event_count'] == len(old['scheduler']['events']) and record['generation'] == old['executor']['generation'], 'closeout requires current event boundary and generation')
+        require(all(t['state'] in scheduler.TERMINAL for t in old['tasks']), 'drain queue before closeout')
+        view = scheduler.replay(old)
+        require(view['group'] and view['group']['phase'] == 'closed', 'close groups before closeout')
+        require(not scheduler._policy_failures(old), 'stopped policy forbids closeout')
+    else:
+        require(all(closeout.origin(t['definition']) is None for t in added), 'generated closeout requires owner operation')
     priority = {'high': 0, 'medium': 1, 'low': 2}
     require(all(t['definition'].get('priority', 'medium') in priority for t in added), 'invalid task priority')
     require(added == sorted(added, key=lambda t: (priority[t['definition'].get('priority', 'medium')], t['slug'])),
@@ -526,6 +543,7 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             require(new['executor']['generation'] == 1 and not new['ownership_history'], 'new Run cannot invent ownership history')
             require(new['status'] == 'running' and all(fresh_task(t) for t in new['tasks']), 'new Run must start queued')
             require(new['append_history'] == [], 'new Run cannot invent append history')
+            require(new['closeout'] == [] and all(closeout.origin(t['definition']) is None for t in new['tasks']), 'new Run cannot import generated closeout tasks')
             priority = {'high': 0, 'medium': 1, 'low': 2}
             require(all(t['definition'].get('priority', 'medium') in priority for t in new['tasks']),
                     'invalid task priority')
@@ -544,9 +562,11 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
         else:
             require(raw is not None, 'missing Run')
             old, old_body = current(raw)
-            if mode == 'append':
+            if mode in ('append', 'closeout'):
                 require(new_body == old_body, 'append cannot rewrite Run body')
-                validate_append(old, new)
+                validate_append(old, new, is_closeout=mode == 'closeout')
+                if mode == 'closeout':
+                    require((instance, generation) == (old['executor']['instance_id'], old['executor']['generation']), 'writer does not own Run')
             else:
                 validate_update(old, new)
                 for event in new['scheduler']['events'][len(old['scheduler']['events']):]:
@@ -556,7 +576,7 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
                         require(file.stat().st_nlink == 1, 'linked resource request')
                         require(file.read_bytes() == json.dumps(request['body'], ensure_ascii=False,
                             sort_keys=True, separators=(',', ':')).encode(), 'resource request file changed')
-            if mode == 'append':
+            if mode in ('append', 'closeout'):
                 pass
             elif mode == 'takeover':
                 require(new_body == old_body, 'takeover cannot rewrite Run body')
@@ -583,6 +603,15 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             require(new.get('reports', [])[:len(old.get('reports', []))] == old.get('reports', []), 'report links are append-only')
         if mode not in ('report', 'append'):
             require((instance, generation) == (new['executor']['instance_id'], new['executor']['generation']), 'writer does not own Run')
+        if new['status'] == 'completed' and mode == 'update':
+            # Only the closing transition checks live bytes. Historical results
+            # remain valid evidence of their original candidate after later edits.
+            final = closeout.result_candidate(new['tasks'][-1])
+            for name, expected_hash in final['inputs'].items():
+                scheduler.validate_paths(project, dict(mode='parallel', files=[name], dirs=[]))
+                source = project / name
+                actual = digest(source.read_bytes()) if source.exists() else None
+                require(actual == expected_hash, 'live inputs invalidate final closeout candidate: ' + name)
         fd, temporary = tempfile.mkstemp(prefix='.run-', dir=path.parent)
         try:
             with os.fdopen(fd, 'wb') as file:
@@ -600,7 +629,7 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
-    parser.add_argument('mode', choices=('inspect', 'create', 'update', 'takeover', 'report', 'append'))
+    parser.add_argument('mode', choices=('inspect', 'create', 'update', 'takeover', 'report', 'append', 'closeout'))
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--proposal', type=Path)
     parser.add_argument('--expected-sha256')
@@ -615,7 +644,7 @@ def main():
             data, _ = current(raw)
             result = {'sha256': digest(raw), 'protocol': data['protocol'], 'status': data['status'],
                       'executor': data['executor'], 'activity': activity(data['executor'], observation),
-                      'scheduling': scheduler.summary(data)}
+                      'scheduling': scheduler.summary(data), 'closeout': closeout.summary(data)}
             if result['activity'] == 'stopped' and not descendants_stopped(data, observation):
                 result['activity'] = 'unknown'
             print(json.dumps(result, ensure_ascii=False))

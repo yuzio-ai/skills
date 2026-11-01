@@ -1,10 +1,11 @@
 ---
-protocol: "0.11"
+protocol: "0.12"
 slug: <stable-slug>
 title: <任务名>
 revision: 1
 preparation: draft
 ready_scope: null
+origin: null
 priority: medium
 dependencies: []
 flow: code
@@ -38,3 +39,5 @@ revision_base 有值时为 `{run: <run-id>, revision: <整数>}`，指向分代�
 本文件不保存 queued/running/终态、所属 Run、调用结果或预算；查询通过 Run 来源链解析。
 
 ready 通过时填写 `ready_scope: {revision: <当前修订>, scope: {mode: parallel, files: [], dirs: []}, inputs: {<相关输入路径>: <SHA-256 或 null>}}`。这是准入结果，不是资源占用；Gate 失效或 revision、范围、输入语义变化时清空，由 ready 重新计算；不确定范围用 mode=exclusive。路径与失效规则见 [小组调度](../references/scheduling.md)。
+
+`origin` 普通任务为 null；生成收尾任务为 `{run: <来源 run-id>, round: <正整数>}`，只描述不可变来源，不能手工改绑。其内部准备、排除普通选择与准入规则见 [收尾审查](../references/closeout.md)。

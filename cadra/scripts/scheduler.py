@@ -1,4 +1,4 @@
-"""Deterministic Cadra 0.11 scheduling journal. Stdlib; no tools or dispatch.
+"""Deterministic Cadra 0.12 scheduling journal. Stdlib; no tools or dispatch.
 
 Run.scheduler.events is the source of resource decisions. A view is derived,
 never stored beside it. Observations and project input hashes are caller evidence,
@@ -291,6 +291,10 @@ def _step(view, event, data):
             if event['resource'] == 'verification':
                 need(body.get('argv') == event.get('argv'), 'verification request argv mismatch')
         wanted = scope(event.get('scope'))
+        if data.get('protocol') == '0.12' and task['definition'].get('origin') is not None:
+            inherited = {**admission(task), 'mode': 'parallel'}
+            need(wanted['mode'] == 'exclusive' and covers(inherited, {**wanted, 'mode': 'parallel'}),
+                 'closeout cannot expand inherited write scope')
         need(covers(wanted, view['scope'][slug]), 'runtime scope cannot shrink')
         candidate(event.get('candidate'))
         if event['resource'] == 'verification':

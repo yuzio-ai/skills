@@ -66,7 +66,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 ## 终态映射
 
-协议0.11中，下表 completed 是本任务的临时工程终点：先进入 waiting/finalization 并释放范围，不立即将 Run 条目标为 completed；组最终候选和证据核对通过、close 落盘后才保存成功终态。无需新调用的核对收尾同样遵循 [小组调度](scheduling.md)，Task 始终只保存定义与准入。failed/blocked 保存实际结果前先核查工具；已停止者用 abort 取消资源请求，未知者保留未完成组。
+协议0.12中，下表 completed 是本任务的临时工程终点：先进入 waiting/finalization 并释放范围，不立即将 Run 条目标为 completed；组最终候选和证据核对通过、close 落盘后才保存成功终态。无需新调用的核对收尾同样遵循 [小组调度](scheduling.md)，Task 始终只保存定义与准入。failed/blocked 保存实际结果前先核查工具；已停止者用 abort 取消资源请求，未知者保留未完成组。
 
 行序即优先级。先确定已完成、失败、受阻或正常范围边界；只有仍需调用时才检查预算，不能把第 16 次调用刚成立的完成结果改判失败。首次/恢复/修订的首个动作先按各自准入，不拿旧受阻结果提前结束新执行。
 

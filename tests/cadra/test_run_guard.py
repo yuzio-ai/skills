@@ -17,22 +17,22 @@ AT = '2026-10-25T10:00:00+08:00'
 LATER = '2026-10-25T11:00:00+08:00'
 
 
-def example(protocol='0.11', flow='code'):
+def example(protocol='0.12', flow='code'):
     data = {
         'protocol': protocol, 'run_id': 'run-20261025-01', 'status': 'running',
         'created_at': AT, 'execution_mode': 'unattended',
-        'skill_version': '0.11.0',
+        'skill_version': '0.12.0',
         'executor': {'instance_id': 'first', 'generation': 1, 'host_id': 'local',
                      'thread_id': 'chat-1', 'turn_id': 'turn-1', 'claimed_at': AT,
                      'progress': {'at': AT, 'event': 'run_created'}},
-        'ownership_history': [], 'reports': [], 'append_history': [], 'scheduler': guard.scheduler.initial(),
+        'ownership_history': [], 'reports': [], 'append_history': [], 'closeout': [], 'scheduler': guard.scheduler.initial(),
         'preflight': [dict(scope='project', status='passed', at=AT, inputs={}, evidence='project check'),
                       dict(scope='task', slug='camera', status='passed', at=AT, inputs={}, evidence='inputs and commands')],
         'tasks': [{'slug': 'camera', 'revision': 1, 'previous_run': None,
                    'definition': {'protocol': protocol, 'slug': 'camera', 'revision': 1,
                                   'requirement': 'preserve camera dependency', 'flow': flow, 'preparation': 'ready',
                                   'ready_scope': {'revision': 1, 'scope': {'mode': 'exclusive', 'files': [], 'dirs': []}, 'inputs': {}}},
-                   'start_action': {'kind': 'first_start', 'stage': guard.normalize_flow(flow, protocol)[0]},
+                   'start_action': {'kind': 'first_start', 'stage': (guard.normalize_flow(flow)[0] if protocol == guard.PROTOCOL else guard.PRESETS.get(flow, flow)[0])},
                    'authorization_consumed': False, 'state': 'queued',
                    'budget': {'calls': 0, 'remediation': 0, 'retries': {}},
                    'checkpoint': {'pending_call': None, 'last_delivery': None},
@@ -96,7 +96,7 @@ class RunGuardTests(unittest.TestCase):
         self.runs = self.root / '.yuzio/cadra/runs'
         self.runs.mkdir(parents=True)
         self.path = self.runs / 'run-20261025-01.md'
-        self.data = example(getattr(self, 'protocol', '0.11'), getattr(self, 'configured_flow', 'code'))
+        self.data = example(getattr(self, 'protocol', '0.12'), getattr(self, 'configured_flow', 'code'))
         self.sha = guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
 
     def bind_worker(self):
@@ -120,6 +120,11 @@ class RunGuardTests(unittest.TestCase):
             'findings': ['fixture finding'], 'acceptance': {'status': 'pending'},
             'human_action': 'verify runtime', 'next': 'manual acceptance'})
         self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        if status == 'completed':
+            from .closeout_fixture import complete
+            def save(proposal, mode):
+                self.sha = guard.publish(self.path, raw_document(proposal), self.sha, 'first', 1, mode)
+            self.data = complete(self.data, save)
         self.data['status'] = status
         self.data['executor']['progress'] = {'at': LATER, 'event': 'run_closed'}
         self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
