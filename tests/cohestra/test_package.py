@@ -25,6 +25,13 @@ class CohestraPackagingTests(SkillPackageChecks, unittest.TestCase):
         self.assertIsNotNone(block)
         self.assertEqual(keys(frontmatter(self.package / "assets/task-index.md")), keys(block[1]))
 
+    def test_nullable_placeholders_are_documented(self):
+        template = (self.package / "assets/task-index.md").read_text()
+        for placeholder in ("commit: <sha 或 null>", "snapshot: <可复核快照来源或 null>",
+                            "stage: <六阶段名或 null>", "candidate_unavailable|other|null>"):
+            with self.subTest(placeholder=placeholder):
+                self.assertIn(placeholder, template)
+
 
 if __name__ == "__main__":
     unittest.main()

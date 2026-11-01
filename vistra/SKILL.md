@@ -1,6 +1,7 @@
 ---
 name: vistra
 description: 依据项目 UI/UX 与品牌规范，通过 review 评审、explore 探索、compare 比较、handoff 交接移动端、桌面端与品牌静态视觉。直接生成或编辑图片，不制作 HTML 或交互原型；仅讨论规则不执行，不直接修改生产代码或进行工程验收。
+license: MIT
 ---
 
 # Vistra

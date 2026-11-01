@@ -11,7 +11,7 @@
 | Vistra | 发现、视觉候选、选择依据、交接 | 默认写 `.yuzio/vistra`，返回准确产物引用 |
 | Relatra | 事实采集、目标归并与周期报告 | 接入适配后只读证据，非每次设计的必经步骤 |
 
-`.yuzio` 是被 Git 整体忽略的本机执行资料根目录，不是 Skill 安装路径；正式交付遵循 [存储约定](storage.md)。Cohestra、Cadra、Relatra 的项目资料分别位于 `.yuzio/cohestra`、`.yuzio/cadra`、`.yuzio/relatra`，由各 Skill 管理。Vistra 可以引用这些资料，不初始化或改写其他 Skill 的容器。
+`.yuzio` 是被 Git 整体忽略的本机执行资料根目录，不是 Skill 安装路径；正式交付遵循 [存储约定](storage.md)。Cohestra、Cadra 的项目资料分别位于 `.yuzio/cohestra`、`.yuzio/cadra`，由各 Skill 管理。Relatra 单项目默认使用 `<项目>/.yuzio/relatra`，跨项目使用调用方明确指定的共享报告目录。Vistra 可以引用这些资料，不初始化或改写其他 Skill 的容器。
 
 ## 调用输入
 
@@ -31,6 +31,6 @@ Cohestra 依据自己的阶段契约发布控制状态，Cadra 只消费该控�
 
 工程 review/validate 调用应记录执行者、与候选作者的关系及实际检查范围。作者自检不能冒充独立审查；概念图不能替代所需运行、交互或无障碍验证。Vistra 结果不降低父任务验收要求。
 
-Relatra 按独立目标与证据归并，不以图片、候选、报告数计成果。成本只用可观察值。当前自动采集器对 `.yuzio/vistra` 的支持留待后续升级并验证；过渡使用明确产物引用与既有证据机制，不改其采集脚本。
+Relatra 按独立目标与证据归并，不以图片、候选、报告数计成果。成本只用可观察值。当前自动采集器不采集 `.yuzio/vistra`；过渡使用明确产物引用与既有证据机制，不改其采集脚本。
 
 项目专用 UI/UX Skill 保留在项目。迁移其方法依赖必须是明确授权的项目变更，不能随 Vistra 安装自动修改。局部/整页/概念等内部分类映射为探索范围，不替代四种模式；尚未迁移的 Taste 引用在报告中说明兼容缺口。

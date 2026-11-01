@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
-from shared.package_checks import SkillPackageChecks
+from shared.package_checks import SkillPackageChecks, frontmatter
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -55,6 +55,7 @@ class VistraPackagingTests(SkillPackageChecks, unittest.TestCase):
         self.assertRegex(release["protocol_version"], r"^[1-9]\d*$")
         self.assertEqual(release["skill_path"], PACKAGE.name)
         self.assertEqual(release["repository"], "https://github.com/yuzio-ai/skills")
+        self.assertIn("license: MIT", frontmatter(PACKAGE / "SKILL.md"))
 
     def test_portable_package_contents(self):
         self.assertFalse((PACKAGE / "agents").exists())

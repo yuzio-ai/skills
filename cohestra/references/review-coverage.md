@@ -19,7 +19,7 @@ design 定义适用风险；直接从 code/review 起步时在当前阶段补齐
 
 review 能在现有授权内补查时先完成；确定缺陷写 finding 并转 fix。必要路径无法核查时，保留已有 findings，按现有 blocked 契约交付缺口和原因，不以 blocking=0 转 validate。覆盖未完成不等于发现产品缺陷。
 
-validate 核对覆盖对应的候选与必要路径；漏审且可补时按既有 pending/next=review 返回，缺输入/权限则 blocked。它不代替 reviewer 重做静态评审。复审先查候选差异、原 findings 与受影响路径；不重复无关检查。验收规则、字段与协议 0.8 保持不变。
+validate 核对覆盖对应的候选与必要路径；漏审且可补时按既有 pending/next=review 返回，缺输入/权限则 blocked。它不代替 reviewer 重做静态评审。复审先查候选差异、原 findings 与受影响路径；不重复无关检查。不改变验收规则与契约字段。
 
 后续发现漏检时新增 review/fix 轮次及来源引用；旧交付与旧 Run 的结论保留为当时事实。项目正式总结可另列后续修复，不回写历史掩盖遗漏。
 

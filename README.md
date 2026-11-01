@@ -473,7 +473,7 @@ flowchart TB
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-Use Cohestra directly for one engineering task. For multiple requirements, prepare tasks with Cadra and dispatch Cohestra serially. Cadra flows contain only Cohestra engineering stages; Vistra is not a flow stage. Engineering stages may use specialist visual capabilities as needed, but this does not bypass required decisions.
+Use Cohestra directly for one engineering task. For multiple requirements, prepare tasks with Cadra and dispatch Cohestra in fixed groups of up to two tasks. Cadra flows contain only Cohestra engineering stages; Vistra is not a flow stage. Engineering stages may use specialist visual capabilities as needed, but this does not bypass required decisions.
 
 For new visual directions, the recommended sequence is **Vistra explore/compare → human selection of an exact candidate → Vistra handoff → Cohestra design → Cadra add → ready → run**. The visual handoff is an engineering input; settle necessary engineering design with the user outside Cadra first. You can `add` a draft earlier, but unresolved visual directions or key assets prevent `ready`. Tasks that need no visual exploration can be prepared directly with Cadra.
 
@@ -584,7 +584,3 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 See the [test guide](tests/README.md) for test layout, per-skill commands and acceptance scenarios. Checks cover package metadata, document links, resource integrity in isolated copies and offline regressions. Actual installer behavior, agent execution and visual acceptance are validated separately.
 
 Versions and protocols are maintained in each package's `release.json`. See the [maintenance and versioning rules](AGENTS.md#版本管理) for bump criteria, compatibility and pre-commit checks. Keep both README languages in sync. Commits, pushes and release tags require explicit authorization. License: [MIT](LICENSE).
-
-### Cadra fixed groups of up to two tasks
-
-Protocol 0.11 retains one queue and one unfinished Run. Ready records expected write scopes; run scans the frozen queue for disjoint tasks and freezes one or two members without refilling. Waiting releases every file lease; executable resource requests follow FIFO and verification is serial after writes stop. Stage-local waits retain the original call and budget. See [Group scheduling](cadra/references/scheduling.md). Cohestra contract remains 0.8; installed copies must support resource waiting. Old 0.10 records are not automatically migrated: finish them in their original environment and archive unchanged.

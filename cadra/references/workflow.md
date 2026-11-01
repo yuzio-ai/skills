@@ -1,4 +1,4 @@
-# 公共流程 · cadra v0.11
+# 公共流程 · cadra（协议 0.11）
 
 本文件定义存储、状态来源与共同写入规则；详细判定按需读取。
 
@@ -53,7 +53,7 @@ Task 的 slug 与 `cohestra_task: .yuzio/cohestra/handoffs/<slug>/` 稳定绑定
 | [Flow 配置](flow-config.md) | add；其他入口通过 Flow 执行加载 |
 | [Flow 执行](flow.md) | ready 核对首动作，run、append、resume 阶段判定时 |
 | [既有交付身份绑定](binding.md) | add 发现同名交付；后续接续核对身份时 |
-| [任务执行者](agents.md) | run/resume 派发与恢复；预检角色能力 |
+| [任务执行者](dispatch.md) | run/resume 派发与恢复；预检角色能力 |
 | [Cohestra 契约与预算](contract.md) | ready 核对既有交付的首动作，或调用及核对阶段 |
 | [显式恢复](recovery.md) | run 恢复列表非空，或 skipped 来源为恢复 |
 | [修订重启准入](revision-rules.md) | ready 核对修订首动作，或执行恢复/重启；add 不读 |

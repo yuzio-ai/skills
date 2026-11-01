@@ -31,7 +31,7 @@ flowchart TB
 | Skill | 用途 | 入口 | 版本与协议 |
 |---|---|---|---|
 | cohestra | 初始化项目上下文，按需执行工程阶段、偏差核对和只读报告 | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
-| cadra | 准备任务、按固定两任务小组调用 Cohestra，并管理执行状态与恢复 | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
+| cadra | 准备任务、按固定一至两任务小组调用 Cohestra，并管理执行状态与恢复 | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
 | relatra | 汇总指定项目的 agent 成果、遗留与已观测资源 | [SKILL.md](relatra/SKILL.md) | [release.json](relatra/release.json) |
 | vistra | 评审、探索、比较和交接移动端、桌面端及品牌静态视觉 | [SKILL.md](vistra/SKILL.md) | [release.json](vistra/release.json) |
 
@@ -117,7 +117,7 @@ review 按适用风险核查真实调用方、装配与生命周期路径，证�
 
 ### Cadra
 
-用于任务准备、固定两任务小组执行和中断恢复。实际工程阶段由 Cohestra 完成。执行前确认目标是可安全写入的业务 Git 工作区，且实际加载的 Cohestra 支持 Cadra 所需契约和无人值守模式；Cadra 不代建 Git 仓库，也不在本技能源仓库执行业务任务。缺少项目容器时由对应写入口最小初始化，无需把安装和项目初始化混为一步。
+用于任务准备、固定一至两任务小组执行和中断恢复。实际工程阶段由 Cohestra 完成。执行前确认目标是可安全写入的业务 Git 工作区，且实际加载的 Cohestra 支持 Cadra 所需契约和无人值守模式；Cadra 不代建 Git 仓库，也不在本技能源仓库执行业务任务。缺少项目容器时由对应写入口最小初始化，无需把安装和项目初始化混为一步。
 
 | 入口 | 用法 |
 |---|---|
@@ -473,7 +473,7 @@ flowchart TB
     classDef result fill:#e8f5ed,stroke:#57916c,color:#224c31
 ```
 
-单个工程任务可直接使用 Cohestra；多个需求推荐用 Cadra 准备任务，再按固定两任务小组调度 Cohestra。Cadra 的流程只包含 Cohestra 的工程阶段，Vistra 不是可填写的 flow 阶段；工程阶段可按需使用视觉专项能力，但不能据此跳过必要决定。
+单个工程任务可直接使用 Cohestra；多个需求推荐用 Cadra 准备任务，再按固定一至两任务小组调度 Cohestra。Cadra 的流程只包含 Cohestra 的工程阶段，Vistra 不是可填写的 flow 阶段；工程阶段可按需使用视觉专项能力，但不能据此跳过必要决定。
 
 涉及新视觉方向时，推荐先完成 **Vistra explore/compare → 人工选定准确候选 → Vistra handoff → Cohestra design → Cadra add → ready → run**。Vistra handoff 是工程输入；必要的工程设计先在 Cadra 外与用户确认。可以提前 `add` 为草稿，但视觉方向或关键素材未定时不能通过 `ready`；无需视觉探索的任务可直接准备 Cadra。
 
@@ -584,7 +584,3 @@ python3 -B -m unittest discover -s tests -p 'test_*.py'
 测试布局、单技能命令与验收场景见 [测试说明](tests/README.md)。检查覆盖包元数据、文档链接、隔离副本资源完整性及离线回归；实际安装器行为、智能体执行和视觉验收单独验证。
 
 版本与协议在各包 `release.json` 维护，更新条件、兼容性和提交前检查见 [维护与版本规则](AGENTS.md#版本管理)。保持中英文 README 同步。提交、推送和发布标签需明确授权。许可证：[MIT](LICENSE)。
-
-### Cadra 固定两任务小组
-
-协议0.11仍为单队列、单未完成Run。ready记录预计修改范围；run按冻结顺序扫描不重叠任务，固定一至两项且不补位。等待释放全部文件，可执行资源申请FIFO；全组停止写入后串行验证，阶段内等待保留原call和预算。完整约定见[小组调度](cadra/references/scheduling.md)。Cohestra正式契约仍为0.8；安装副本须支持阶段内等待。旧0.10记录不自动迁移，先由原环境闭合再归档。

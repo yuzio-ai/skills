@@ -345,6 +345,30 @@ class RunGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             guard.publish(self.runs / (new['run_id'] + '.md'), document(new), None, 'first', 1, 'create')
 
+    def test_create_requires_priority_slug_order(self):
+        data = example()
+        data['run_id'] = 'run-20261025-02'
+        data['scheduler'] = guard.scheduler.initial()
+        second = deepcopy(data['tasks'][0])
+        second['slug'] = 'beta'
+        second['definition']['slug'] = 'beta'
+        second['definition']['priority'] = 'high'
+        data['tasks'][0]['definition']['priority'] = 'low'
+        data['tasks'].append(second)
+        data['preflight'].append(dict(scope='task', slug='beta', status='passed', at=AT,
+                                     inputs={}, evidence='inputs and commands'))
+        with self.assertRaisesRegex(ValueError, 'priority/slug order'):
+            guard.publish(self.runs / 'run-20261025-02.md', document(data), None, 'first', 1, 'create')
+
+    def test_prepared_call_cannot_carry_dispatch_evidence(self):
+        self.bind_worker()
+        pending(self.data)
+        self.sha = guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+        self.data['tasks'][0]['calls'][0]['dispatch_evidence'] = {
+            'agent_id': 'agent-worker', 'source': 'fixture dispatch', 'at': AT}
+        with self.assertRaisesRegex(ValueError, 'prepared call cannot carry dispatch evidence'):
+            guard.publish(self.path, document(self.data), self.sha, 'first', 1)
+
     def test_duplicate_fields_and_legacy_definition_cannot_be_published(self):
         field = ('"protocol": "' + self.data['protocol'] + '",').encode()
         raw = document(self.data).replace(field, field + b' ' + field, 1)

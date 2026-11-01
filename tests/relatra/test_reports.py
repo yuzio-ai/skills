@@ -267,5 +267,24 @@ class ReportPresentationTests(unittest.TestCase):
             self.assertEqual(baseline[key], after[key])
 
 
+    def test_scope_notices_are_not_collection_diagnostics(self):
+        facts, ledger = example_data()
+        facts["warnings"].append("账本从周期活动建立，未全面盘点更早遗留目标")
+        stats = statistics(facts, ledger)
+        main = r.render(stats, facts)
+        self.assertNotIn("部分观测值", main)
+        self.assertNotIn("另有采集与历史提示", main)
+        details = r.render_details(stats, facts)
+        self.assertNotIn("采集与历史覆盖有", details)
+        self.assertIn("账本未全面盘点更早遗留目标", details)
+
+    def test_basic_details_include_completion_cycle(self):
+        facts, ledger = example_data()
+        stats = statistics(facts, ledger)
+        details = r.render_details(stats, facts)
+        self.assertIn("完成周期中位数", details)
+        self.assertIn("有效", details)
+
+
 if __name__ == "__main__":
     unittest.main()

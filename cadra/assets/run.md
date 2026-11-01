@@ -35,7 +35,10 @@ tasks:
     previous_run: null
     state: queued
     definition: <完整 Task 定义、requirement、修订依据与 Gate 快照；使用 YAML 映射>
-    start_action: <首次启动/正常接续/恢复重试/恢复核对收尾/修订重启/修订收尾，阶段或核对动作及来源依据>
+    start_action:
+      kind: <首次启动|正常接续|恢复重试|恢复核对收尾|修订重启|修订收尾>
+      stage: <六阶段名或 null>
+      source: <准入依据与来源>
     authorization_consumed: false
     budget:
       calls: 0
@@ -63,7 +66,7 @@ reports: []
 
 ## 记录约定
 
-tasks 数组顺序是入队与扫描顺序，实际小组和资源顺序由 scheduler.events 记录，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。已有条目不可重排；append_history 记录每次尾部追加的 at、source、tasks=[{slug,revision}]，仅 append 可追加。agents 的绑定形状及恢复规则见 [任务执行者](../references/agents.md)，按需创建后单独落盘，不与首次调用意图合并。
+tasks 数组顺序是入队与扫描顺序，实际小组和资源顺序由 scheduler.events 记录，slug 唯一；条目状态、预算与记录只维护在 Front Matter，不另建重复状态表。previous_run 引用该 slug 的上一个 Run，首次为 null。definition 是固定快照，正文只补建立依据与恢复说明。已有条目不可重排；append_history 记录每次尾部追加的 at、source、tasks=[{slug,revision}]，仅 append 可追加。agents 的绑定形状及恢复规则见 [任务执行者](../references/dispatch.md)，按需创建后单独落盘，不与首次调用意图合并。
 
 每次调用向 calls 追加：
 

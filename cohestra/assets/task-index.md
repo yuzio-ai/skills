@@ -8,8 +8,8 @@ stage_result:
   status: <completed|blocked|failed>
   round: <阶段轮次>
 candidate:
-  commit: <sha>
-  snapshot: <可复核快照来源>
+  commit: <sha 或 null>
+  snapshot: <可复核快照来源或 null>
 findings:            # review/fix 交付后维护，可省
   blocking: <未关闭必做数>
   non_blocking: <非必做数>
@@ -17,12 +17,12 @@ findings:            # review/fix 交付后维护，可省
 acceptance:          # validate 交付后维护，可省
   status: <passed|failed|pending|blocked>
 next:
-  stage: <六阶段名>
+  stage: <六阶段名或 null>
   allowed: <true|false>
   reason: <stage_completed|blocking_findings|acceptance_failed|stage_failed|task_completed|human_decision_required|blocked|other>
 blocked:
   value: <true|false>
-  reason: <human_decision_required|missing_input|missing_permission|dependency_unavailable|environment_blocked|candidate_unavailable|other>
+  reason: <human_decision_required|missing_input|missing_permission|dependency_unavailable|environment_blocked|candidate_unavailable|other|null>
 ---
 
 # <任务名称>

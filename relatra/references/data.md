@@ -53,7 +53,7 @@ agent 整理 tasks.json，不让用户手工填表。示例中的引用替换为
 
 事件必须有唯一 id、kind、at（带时区 ISO 或 null）、非空 evidence 列表和 note。时间不得超出截止或早于已知起点；未定日期 workflow 不能单独确定事件日期，关联 dated turn 也必须确实定位该事件，不能随便引用旧消息。current_only README 不作历史证明。
 
-交付/验收/验证需 basis：static/build/runtime/user_acceptance/other/artifact/answer。实现交付需 tool_result 或有效 workflow；工具引用需核读 locations 指向的实际源行，在 verified_excerpt 保存去敏摘录。源行不可读或截断时保持待确认。user_acceptance 需明确用户认可；工具中的答复也需核对摘录。answer 仅可证明咨询、审查、设计、文档、研究的实际答案交付，不能证明实现或验收。脚本验证结构、引用与时间，语义及验收条件由 agent 核实。
+交付/验收需 basis：static/build/runtime/user_acceptance/other/artifact/answer；validation_passed/validation_failed 的 category 与 basis 只能用 static/build/runtime/user_acceptance/other，且两者一致。实现交付需 tool_result 或有效 workflow；工具引用需核读 locations 指向的实际源行，在 verified_excerpt 保存去敏摘录。源行不可读或截断时保持待确认。user_acceptance 需明确用户认可；工具中的答复也需核对摘录。answer 仅可证明咨询、审查、设计、文档、研究的实际答案交付，不能证明实现或验收。脚本验证结构、引用与时间，语义及验收条件由 agent 核实。
 
 建议最多三条，形状为 `{"text":"建议", "task_ids":["目标id"], "evidence":["证据id"]}`，须来自相关任务的真实问题；所引任务未出现在本期报告时不展示。summary/recommendations 先写到账本，report 才是最终产物生成入口。summary 按 [报告写作](reporting.md) 整理为带标题和任务明细链接的重点摘要，字段仍为字符串；recommendations 的完整引证列在明细，关键判断可归纳进摘要，不重复堆入正文。
 
@@ -73,7 +73,7 @@ python3 /path/to/relatra/scripts/relatra.py report --snapshot /reports/.yuzio/re
 
 report 的 `--baseline PATH` 明确指定前期报告，校验其哈希并从基础输入重算。比较规则见 [统计口径](metrics.md#比较与覆盖)。没有基线不输出空比较章节。
 
-0.3.0 沿用 schema v2；本次仅调整阅读结构，不改变采集、状态、统计及 JSON 字段语义。旧报告保留原样，不补写 details.md。沿用既有同版本范围核对和格式检查，不新增跨包版本复用或自动迁移承诺；不适用的旧输入需重新 configure/collect。`correct` 和 `--correction` 已移除。不要手工修改 schema 或重签哈希伪造兼容。
+当前报告沿用 schema v2；采集、状态、统计及 JSON 字段语义以本页与[统计口径](metrics.md)为准。旧报告保留原样，不补写 details.md。沿用既有同版本范围核对和格式检查，不新增跨包版本复用或自动迁移承诺；不适用的旧输入需重新 configure/collect。不要手工修改 schema 或重签哈希伪造兼容。
 
 本地适配器识别 session_meta、turn_context、生命周期、token_count、token_usage_record 及消息/工具结果引用。只保存用户、assistant final 和实际用户输入工具答复引用；不导入思考、系统指令或账户元数据，harness 注入仍需 agent 识别。工具原输出仅存哈希与源行，不复制任意原文。
 

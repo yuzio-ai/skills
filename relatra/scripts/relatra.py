@@ -18,7 +18,7 @@ from datetime import date, datetime, time, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from zoneinfo import ZoneInfo
 
-VERSION = "0.3.1"
+VERSION = "0.3.3"
 SCHEMA = 2
 STATES = {"pending_confirmation", "in_progress", "delivered", "accepted", "blocked", "failed", "cancelled"}
 PROCESS = {"reopened", "rework", "retry", "scope_changed", "validation_passed", "validation_failed", "intervention", "wait"}
@@ -34,6 +34,11 @@ CATEGORY_LABELS = {"clarification": "需求澄清", "decision": "方向决策", 
 PERIODS = {"daily": "日报", "weekly": "周报", "monthly": "月报", "quarterly": "季报", "yearly": "年报", "custom": "自定义报告"}
 TYPE_LABELS = {"implementation": "功能实现", "fix": "修复", "review": "审查", "design": "设计", "documentation": "文档", "research": "研究", "operations": "运维", "consultation": "咨询", "other": "待分类"}
 BASIS_LABELS = {"static": "静态核对", "build": "构建", "runtime": "运行时验证", "user_acceptance": "用户验收", "other": "其他验证", "artifact": "产物核实", "answer": "答案本身"}
+
+
+def scope_notice(message):
+    """Fixed scope limitations are not collection diagnostics."""
+    return message.startswith(("覆盖范围仅为", "账本从周期活动建立"))
 
 
 class DataError(ValueError):
@@ -696,6 +701,8 @@ def validate_ledger(facts, ledger):
             require(isinstance(event.get("id"), str) and event["id"] and event["id"] not in ids, "事件 id 缺失或重复")
             ids.add(event["id"])
             require(event.get("kind") in STATES | PROCESS, "未知事件类型")
+            require(event.get("at") is None or isinstance(event.get("at"), str),
+                    "事件 at 必须是带时区 ISO 字符串或 null")
             at = stamp(event.get("at"))
             require(at is None or at < cutoff and (start is None or at >= start), "事件时间超出快照/早于任务开始")
             refs_ev = event.get("evidence")
@@ -988,7 +995,7 @@ def compare(stats, facts, baseline_folder):
         return (c["mapped_period_turns"] / n, ex["token_turn_coverage"]["known"] / n, ex["timed_turns"] / n,
                 bool(c["unknown_date_events"]), bool(ex["partial_usage_turns"]),
                 tuple(ex["token_field_turn_coverage"][k] / n for k in TOKENS)) if n else None
-    diagnostics = any(not w.startswith(("覆盖范围仅为", "账本从周期活动建立"))
+    diagnostics = any(not scope_notice(w)
                       for value in (stats, baseline) for w in value["warnings"])
     comparable = not diagnostics and coverage_profile(stats) is not None and coverage_profile(stats) == coverage_profile(baseline)
     process_comparable = (comparable and stats["process_reviewed"] and baseline["process_reviewed"] and
@@ -1115,7 +1122,7 @@ def render(stats, facts):
         output += ["## 本期概况", "", "尚未整理重点摘要；完整任务、限制与后续行动见明细。",
                    f"本期交付（含验收） {counts['delivered']}；首次验收 {counts['accepted']}；发生失败的任务 {counts['failed']}。",
                    "期末状态：" + ("；".join(f"{LABELS[k]} {v}" for k, v in sorted(stats["end_states"].items()) if v) or "未发现可归属任务") + "。", ""]
-    diagnostics = [w for w in stats["warnings"] if not w.startswith("覆盖范围仅为")]
+    diagnostics = [w for w in stats["warnings"] if not scope_notice(w)]
     ex = stats["execution"]
     output += [coverage_text(stats) + ("另有采集与历史提示，具体影响见[明细](details.md)。" if diagnostics else ""), ""]
     timing = duration(ex["execution_seconds_sum"], brief=True)
@@ -1173,13 +1180,15 @@ def render_details(stats, facts):
                coverage_text(stats),
                "执行时间包含工具及轮内等待，不代表人工投入；未知不补零，不换算费用。", ""]
     if not deep:
-        output += ["返工、重试、人工介入与等待未统计；不能解释为零次。", ""]
-    diagnostics = [w for w in stats["warnings"] if not w.startswith("覆盖范围仅为")]
+        cycle = stats["completion_cycle"]
+        output += [f"完成周期中位数 {display(cycle['median_seconds'], ' 秒')}；有效 {cycle['known_samples']} / 缺失 {cycle['missing_samples']}。",
+                   "返工、重试、人工介入与等待未统计；不能解释为零次。", ""]
+    if any("未全面盘点更早遗留" in w for w in stats["warnings"]):
+        output += ["账本未全面盘点更早遗留目标。", ""]
+    diagnostics = [w for w in stats["warnings"] if not scope_notice(w)]
     if diagnostics:
         output += [f"采集与历史覆盖有 {len(diagnostics)} 条提示，成果和资源可能不完整：", ""]
         output += [f"- {md_text(w)}" for w in diagnostics]
-        if any("未全面盘点更早遗留" in w for w in diagnostics):
-            output += ["", "账本未全面盘点更早遗留目标。"]
         output += [""]
     if deep:
         cycle = stats["completion_cycle"]

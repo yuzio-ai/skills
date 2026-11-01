@@ -1,6 +1,6 @@
 # 执行归属与活性
 
-run/resume 写入前、append 受限写入前及 list 推荐后续动作时读取本页。子 agent 规则见 [任务执行者](agents.md)。Run 状态和执行者活性是不同维度；running、prepared、长时间无更新均不能证明需要恢复。
+run/resume 写入前、append 受限写入前及 list 推荐后续动作时读取本页。子 agent 规则见 [任务执行者](dispatch.md)。Run 状态和执行者活性是不同维度；running、prepared、长时间无更新均不能证明需要恢复。
 
 ## 记录与观察
 

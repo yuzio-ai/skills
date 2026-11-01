@@ -93,6 +93,13 @@ class RelatraTests(unittest.TestCase):
         self.assertEqual(s["end_states"]["pending_confirmation"], 1)
         self.assertEqual(s["execution"]["execution_seconds_sum"], 600)
 
+    def test_ledger_event_at_requires_iso_string(self):
+        self.save(self.log())
+        facts = self.facts()
+        ledger = self.ledger(facts, events=[self.event(facts, at=1728000000)])
+        with self.assertRaisesRegex(r.DataError, "ISO"):
+            r.validate_ledger(facts, ledger)
+
     def test_duplicate_records_and_cumulative_do_not_double_count(self):
         records = self.log() + [self.rec("event_msg", {"type": "token_count", "info": {"total_token_usage": {"total_tokens": 120}}})]
         self.save(records)

@@ -28,6 +28,8 @@ def check_package():
             failures.append(f'{label} protocol mismatch')
     if {'status', 'state', 'budget', 'calls', 'result', 'current_run'} & keys(task):
         failures.append('Task template stores execution state')
+    if not re.search(r'^    start_action:[ \t]*\n      kind:[ \t]*\S[^\n]*\n      stage:[ \t]*\S[^\n]*\n      source:[ \t]*\S', run, re.M):
+        failures.append('Run template start_action must be a {kind, stage, source} mapping')
     if (ROOT / 'cadra/assets/project/queue').exists():
         failures.append('Obsolete queue template remains')
     for entry in ('add', 'ready', 'list', 'run', 'append', 'resume', 'report'):

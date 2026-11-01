@@ -1,16 +1,16 @@
 # 测试与场景清单
 
-本目录保留当前自动化测试、行为场景与可复用测试输入，也保留被当前测试复用的旧模型及部分冻结验证报告。其他历史资料可从 Git 历史查阅。历史报告、快照和日志只证明记录时的结果，不代表当前环境已经复测；旧模型的复用范围见下表，不表示技能运行时支持旧协议。
+本目录保留当前自动化测试、行为场景与可复用测试输入，也保留被当前测试复用的旧模型及部分冻结验证报告。历史报告、快照和日志只证明记录时的结果，不代表当前环境已经复测；旧模型的复用范围见下表，不表示技能运行时支持旧协议。一次性审查与发布验证记录见 [output/](../output/)。
 
 ## 目录
 
 ```text
 tests/
-├── cadra/      # 模型、回归测试、包检查、场景和夹具
+├── cadra/      # 模型、回归测试、包检查、场景、夹具和冻结验证报告
 ├── cohestra/   # 包检查、场景、输入生成器和产物核对器
-├── relatra/    # 包检查、离线回归测试和场景
+├── relatra/    # 包检查、离线回归测试、场景和周期报告样例
 ├── vistra/     # 包检查和行为场景
-└── shared/     # 通用包检查工具、存储与路径测试和场景
+└── shared/     # 通用包检查工具、版本检查、存储与路径测试和场景
 ```
 
 ## 自动化检查
@@ -40,6 +40,10 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 历史 0.10 环境的本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；工具要求匹配的 0.10 来源包，不用于当前 0.11 迁移；离线旧 YAML 读取需 macOS 系统 Ruby |
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [test_guard_safety.py](cadra/test_guard_safety.py) | 停止与 skipped、计费依据及上限、合法恢复、复审旧轮次的真实文件回归；跨 Run 轮次另用当前模型核对 |
+| [test_scheduler.py](cadra/test_scheduler.py) | 直接调用包内 reducer 与真实 CAS 发布：小组范围、FIFO、阶段内等待、验证窗口、失败取消、候选刷新及跨代恢复；工具观察为合成输入 |
+| [test_list_summary.py](cadra/test_list_summary.py) | 列表摘要的状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
+| [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
+| [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
@@ -47,16 +51,13 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_vistra.py](vistra/test_vistra.py) | 包内引用、元数据、来源、许可证与可移植性 |
 | [package_checks.py](shared/package_checks.py)、[test_package_checks.py](shared/test_package_checks.py) | 通用链接与资源检查、缺失及越界回归、仓库文档链接、双语 README 导航一致性 |
 | [test_local_storage.py](shared/test_local_storage.py)、[test_project_data_paths.py](shared/test_project_data_paths.py) | 临时 Git 仓库中的存储语义、维护路径 |
+| [test_release_versions.py](shared/test_release_versions.py)、[release_checks.py](shared/release_checks.py) | 对照完整 Git 历史检查同号变更、新增未跟踪文件与版本回退；无历史或浅克隆时明确跳过 |
 
 包检查只依赖 Python 标准库。共享工具留在 `tests/shared/`，不会成为已安装技能的依赖。隔离检查完整复制单个技能包（含隐藏模板文件），核对资源可达性、包内边界及逐文件内容；不等于通过安装器安装、宿主发现入口或实际技能执行。链接检查验证内联 Markdown 链接的文件/目录目标，不验证章节锚点和外部网址。
 
 [Cadra 修订夹具](cadra/fixtures/pre-call-blocked-revision.json)保留当前回归所需输入，不包含历史错误输出；期望结果由测试断言维护。
 
-固定小组的 [test_scheduler.py](cadra/test_scheduler.py) 直接调用包内 reducer 和真实 CAS 发布，覆盖文件范围、FIFO、阶段内等待、验证窗口、失败取消、候选刷新及跨代恢复；另覆盖输入路径别名、明确不存在与缺失记录的区别、停止策略下已完成阶段的收尾，以及无新调用仍须经过小组 close。工具观察是明确的合成输入，不代表真实工程阶段已执行。
-
-[列表汇总](cadra/test_list_summary.py)检查状态、来源链、折叠、详情与只读快照，包括未属于已 close 小组的 0.11 completed 条目显示 unknown；[0.10 历史查询](cadra/test_list_legacy.py)覆盖原协议语义、混合版本、跨协议链拒绝、独立安装副本和文件/时间不变，并直接验证 0.11 执行写入器仍拒绝旧记录。YAML 列表夹具使用系统 Ruby/Psych，JSON 夹具及包结构检查只用 Python 标准库。
-
-[列表成本与生命周期](cadra/test_list_optimization.py)覆盖未闭合前驱、合法闭合前驱、过滤后的异常保留、身份去重、结果摘要/原文等价性、预检索引及调度视图复用。千级/万级队列、密集异常和真实历史详情的对照验证见 [独立验证脚本](../output/cadra-list-scaling-20261030/verify.py)；合成身份不是实际工程执行证据，耗时和 token 计数分别报告。
+固定小组、列表汇总、旧协议查询与列表成本测试直接调用包内 reducer、写入器和只读脚本；工具观察是明确的合成输入，不代表真实工程阶段已执行。YAML 列表夹具使用系统 Ruby/Psych，JSON 夹具及包结构检查只用 Python 标准库。千级/万级队列、密集异常和真实历史详情的对照验证见 [独立验证脚本](../output/cadra-list-scaling-20261030/verify.py)；合成身份不是实际工程执行证据，耗时和 token 计数分别报告。
 
 ## 版本检查
 
@@ -72,6 +73,14 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 
 Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见对应场景清单；它们辅助隔离验证，不代替实际阶段执行。场景清单定义验收要求，不记录一次性通过数量。结构检查、模型测试、实际调用和视觉验收分别报告。
 
-真实宿主验证单独保存：[2026-10-25 Cadra 跨会话接管](cadra/reports/2026-10-25-live-handoff.md)及其机器可读证据覆盖两个实际中断点、完成后的重复 resume 与旧协议拒绝。普通 unittest 不启动这些会话，也不将历史实测当作当前环境已经复测。
+真实宿主与冻结验证记录单独保存，只证明记录时的版本和环境；普通 unittest 不启动这些会话，也不把历史实测当作当前环境已经复测：
 
-[2026-10-25 两个真实会话竞争接管](cadra/reports/2026-10-25-live-race.md)补充同时 resume 的实际竞争、唯一所有者、失败方工具调用审计与预算保护；保留首轮测试驱动中止及修正后重跑的边界。
+| 日期 | 记录 | 当时版本 | 内容 |
+|---|---|---|---|
+| 2026-10-25 | [Cadra 跨会话接管](cadra/reports/2026-10-25-live-handoff.md) | Cadra 0.7.0 / 协议 0.7；Cohestra 0.12.0 / 契约 0.8 | 两个实际中断点、完成后重复 resume 与旧协议拒绝 |
+| 2026-10-25 | [两个真实会话竞争接管](cadra/reports/2026-10-25-live-race.md) | 同上 | 同时 resume 的实际竞争、唯一所有者、失败方调用审计与预算保护 |
+| 2026-10-26 | [add 规则读取量核对](cadra/reports/2026-10-26-add-reading-scope.md) | Cadra 0.9.0 / 协议 0.8 基线 | 静态字符计数对比，不是实际 agent 运行证据 |
+| 2026-10-26 | [0.10 流程统一与本地切换](cadra/reports/2026-10-26-flow-unification.md) | Cadra 0.10.0 / 协议 0.10；Cohestra 0.13.1 / 契约 0.8 | 0.10 切换、网站检查和真实 live smoke；已被 0.11 取代 |
+| 2026-10-26 | [review 闭环预设验证](cadra/reports/2026-10-26-review-preset.md) | Cadra 0.10.0 / 协议 0.9 方案 | 已标注为历史检查点，被协议 0.10 取代 |
+
+当前验收要求以各[场景清单](#行为场景与辅助工具)为准；报告中的通过数量只对应所列版本。

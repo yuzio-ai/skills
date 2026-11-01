@@ -815,7 +815,8 @@ class SchedulerTests(unittest.TestCase):
         self.assertFalse(schedule.overlap(footprint('Views2/A.swift'), footprint(dirs=['views'])))
         self.assertTrue(schedule.overlap(footprint('x'), footprint(exclusive=True)))
         self.assertTrue(schedule.overlap(footprint('caf\u00e9.swift'), footprint('cafe\u0301.swift')))
-        for p in ['../escape','/absolute','x/../a','x//y','x/./y','.git/config','.yuzio/cadra/x']:
+        for p in ['../escape','/absolute','x/../a','x//y','x/./y','.git/config','.yuzio/cadra/x',
+                  'Sources/.git/config','Sources/.yuzio/x']:
             with self.subTest(path=p), self.assertRaises(ValueError): schedule.scope(footprint(p))
         with self.assertRaisesRegex(ValueError, 'aliases'):schedule.scope(footprint('A.swift','a.swift'))
 

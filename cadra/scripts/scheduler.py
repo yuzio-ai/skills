@@ -33,7 +33,8 @@ def path_key(value):
     p = PurePosixPath(value)
     need(not p.is_absolute() and all(x not in ('', '.', '..') for x in value.split('/')),
          'scope must be a canonical project relative path')
-    need(p.parts[0].casefold() not in ('.git', '.yuzio'), 'process/private paths are not business scope')
+    need(all(part.casefold() not in ('.git', '.yuzio') for part in p.parts),
+         'process/private paths are not business scope')
     # Conservative across case-sensitive and case-insensitive installations.
     return unicodedata.normalize('NFC', value).casefold()
 

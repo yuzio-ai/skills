@@ -53,17 +53,17 @@
 
 ### 编排派发
 
-Cadra 新版为每个任务分别绑定 worker 与 reviewer，并逐阶段派发。worker 执行 code/fix/validate，reviewer 执行 review；同任务可复用各自角色，跨任务不复用。子 agent 的初始上下文只含任务定义、有效决定、项目规范、实际技能路径和必要上游交付，不继承整个队列聊天。上下文隔离不隔离共享工作区，仍须核对实际候选和文件所有权。
+Cadra 按固定小组（每组一至两项任务）为每个任务分别绑定 worker 与 reviewer，并逐阶段派发。worker 执行 code/fix/validate，reviewer 执行 review；同任务可复用各自角色，跨任务不复用。同一任务同一时刻至多一个阶段，组内最多两个任务阶段并行。子 agent 的初始上下文只含任务定义快照、有效决定与授权、项目规范、实际技能路径、必要上游交付和固定候选证据，不继承整个队列聊天。上下文隔离不隔离共享工作区，仍须核对实际候选和文件所有权。
 
 - 接到角色初始化消息时只确认身份与可用性，不执行工程阶段。只有收到明确阶段派发后，才核对 Run/slug/call id、agent_ref、角色和实际 agent 身份；来源缺失、身份不符或角色不适用时报告缺口，不代替另一角色执行。
-- 每次派发仅执行指定阶段。本阶段执行者按发布规则独占写入对应 handoff 和任务索引；发布完成并报告后停止。主编排者只核对交付与维护 Run，不代写 Cohestra 索引；阶段之间由 Cadra 串行移交写入权。阶段 agent 不修改 Run，也不自行创建其他 agent 或推进阶段。
+- 每次派发仅执行指定阶段。本阶段执行者按发布规则独占写入对应 handoff 和任务索引；发布完成并报告后停止。主编排者只核对交付、授予资源并维护 Run，不代写 Cohestra 索引；同一任务内阶段之间由 Cadra 串行移交写入权，不同任务按互不重叠的范围并行。全组停止写入后，验证按 FIFO 串行授予。阶段 agent 不修改 Run，也不自行创建其他 agent 或推进阶段。
 - Cadra 的 code/fix 交付必须交独立 reviewer 审查；fix 后的复审包括从已定位问题直接起步的首次 fix。reviewer 不得是本任务实现或整改作者，不能以切换角色、会话名称或重述作者检查代替独立审查。仅 `[review]` 的任务直接使用独立 reviewer，不要求虚构 worker。
 - review 期间候选保持固定；复审核对新旧候选关系、原 findings 和受影响路径。validate 必须核对适用于最终候选的独立 review 及整改复审；缺口按既有 pending → review 或 blocked 路径交付，不由 worker 自行补作独立审查。
 - 确认来源和角色审计只写 handoff，不新增 Front Matter 控制字段。新编排交付需如实记录；旧交付缺字段不等于协议损坏，不能据此补造独立审查事实。无法核实所需审查身份或候选时仍是验收缺口。
 
-#### Cadra 0.11 阶段内资源等待
+#### Cadra 协议 0.11 阶段内资源等待
 
-仅收到 Cadra 0.11 调度上下文时启用；单独调用 Cohestra 不申请编排资源。先核对 Run、执行实例／代次、slug、call、agent_ref、授权文件范围和固定候选。正式阶段字段、枚举和契约0.8不变。
+仅收到 Cadra 协议 0.11 的调度上下文时启用；单独调用 Cohestra 不申请编排资源。先核对 Run、执行实例／代次、slug、call、agent_ref、授权文件范围和固定候选。正式阶段字段、枚举与契约 0.8 的状态语义不变。
 
 - 请求候选的 inputs 使用项目相对业务路径与 SHA-256，不存在写 null；同一表不得包含 NFC／大小写别名。刷新候选时明确保留先前证据依赖的路径，不能用省略路径表示不存在；路径别名按同一输入比较，实际变化后仍须核验旧审查／验收证据是否适用。
 - 修改额外文件前、执行任何阶段内互斥验证前，先在安全边界确认写入和子进程停止。在本任务 `scratch/resources/<唯一标识>.json` 写入不可变、键排序紧凑 UTF-8 JSON 请求，正文包含 `run_id,generation,slug,call_id,agent_ref,resource,scope,candidate`，验证另含完整 argv；向主调度器报告路径并结束当前执行回合。同一个请求文件在整个Run内只消费一次，实际新动作使用新的唯一文件；不能复用旧请求触发第二次命令。
@@ -151,12 +151,12 @@ blocked:
 - `contract`：契约版本，取当前协作协议版本（`"0.8"`），随协议一起演进。消费方据此核对版本；缺失或不支持时按「契约未就绪」处理，不猜测字段含义。协作协议版本变更时，同仓维护的编排技能（Cadra）须同步发布支持新契约的版本，否则其 run 前置检查将停在「契约未就绪」。
 - `task`：任务目录 slug，与目录名一致。
 - `status`（任务）：`in_progress`／`completed`／`blocked`／`failed`。不使用编排队列状态（如 draft、ready、queued、running）——那属于外部 Orchestrator。写入规则：正常推进写 `in_progress`；**终点到达**（用户声明的终点已完成，见第 7.3 节）或 validate 交付且 `acceptance.status: passed` 并满足既有完成条件时写 `completed`；`blocked.value: true` 时同步写 `blocked`，受阻解除、阶段继续交付后回到 `in_progress`；阶段产出被判无效且不可继续时写 `failed`。
-- `execution_mode`：产生当前状态那次调用的执行上下文，缺省 `attended`。
+- `execution_mode`：产生当前状态那次调用的执行上下文；调用方未声明时按 `attended` 执行，但 Front Matter 仍须写出该字段，不得省略。
 - `stage_result`：刚结束的正式阶段及其结果；`status` 只取 `completed`／`blocked`／`failed`（阶段随交付结束，不设进行中值），`round` 为阶段轮次（见第 5 节）。
 - `candidate`：被审查或验收的固定候选，优先 `commit`；无 commit 时用 `snapshot` 指向既有候选机制的可复核快照来源（不削弱第 4 节候选规则）。形状恒为映射、叶子可空：无候选（need/design）写 `candidate: {commit: null, snapshot: null}`。
 - `findings`：当前**未关闭**的问题计数。review 交付时即其输出计数；fix 交付后按裁决与修复结果更新，`blocking` 表示仍未关闭的必做问题数；`unresolved` 为待核实未裁决数，可省。
 - `acceptance`：validate 的验收判断。**validate 交付时**，只有 `status: passed`（且满足既有完成条件）才把任务 `status` 写 `completed`。终点未经 validate（终点到达于 validate 之前）时该字段可缺省（等价 `null`），不阻止 `completed`。
-- **必填与可选**：必填字段为 `contract`、`task`、`status`、`execution_mode`、`stage_result`、`candidate`、`next`、`blocked`，每次正式阶段交付后全部写出；可选字段为 `findings`（review/fix）、`acceptance`（validate）及 `findings.unresolved`，阶段适用时写出，缺省等价 `null`。「协议输出不合法」的判定只针对必填字段；可选字段缺失合法。第 7.5 节的最小写入同样给出完整必填集，只是只含本次交付的值。
+- **必填与可选**：必填字段为 `contract`、`task`、`status`、`execution_mode`、`stage_result`、`candidate`、`next`、`blocked`，每次正式阶段交付后全部写出；可选字段为 `findings`（review/fix）、`acceptance`（validate）及 `findings.unresolved`，阶段适用时写出，缺省等价 `null`。「协议输出不合法」的判定只针对必填字段；可选字段缺失合法。首次正式阶段交付同样写出本次已确定值的完整必填集，不回填历史轮次。
 - `blocked.value: false` 时 `blocked.reason: null`；`next.allowed: false` 时 `next.stage: null`。`reason: other` 时必须在正文说明。
 
 ### 7.3 next 标准化

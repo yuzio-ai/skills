@@ -318,6 +318,7 @@ def validate_call_agent(task, call):
                 and isinstance(evidence.get('source'), str) and evidence['source'].strip(), 'dispatch evidence identity/source mismatch')
         require(timestamp(evidence.get('at')) >= timestamp(call['prepared_at']), 'dispatch evidence predates intent')
     require(call['dispatch'] != 'dispatched' or evidence is not None, 'dispatched call requires evidence')
+    require(call['dispatch'] == 'dispatched' or evidence is None, 'prepared call cannot carry dispatch evidence')
 
 
 def validate_append_history(data):
@@ -525,6 +526,12 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             require(new['executor']['generation'] == 1 and not new['ownership_history'], 'new Run cannot invent ownership history')
             require(new['status'] == 'running' and all(fresh_task(t) for t in new['tasks']), 'new Run must start queued')
             require(new['append_history'] == [], 'new Run cannot invent append history')
+            priority = {'high': 0, 'medium': 1, 'low': 2}
+            require(all(t['definition'].get('priority', 'medium') in priority for t in new['tasks']),
+                    'invalid task priority')
+            require(new['tasks'] == sorted(new['tasks'], key=lambda t: (
+                priority[t['definition'].get('priority', 'medium')], t['slug'])),
+                    'new Run queue must follow priority/slug order')
             events = new['scheduler']['events']
             require(not events or len(events) == 1 and events[0]['kind'] == 'group' and
                     events[0]['members'] == scheduler.select_group(new), 'new Run cannot invent scheduling history')

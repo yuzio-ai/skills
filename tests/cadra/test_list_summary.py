@@ -210,6 +210,7 @@ class ListSummaryTests(unittest.TestCase):
     def test_archive_reports_scratch_and_temporary_files_are_excluded(self):
         self.task()
         for directory, filename in ((self.runs, 'run-20261025-01-report-01.md'),
+                                    (self.runs, 'run-20261025-01-report-1.md'),
                                     (self.runs, '.run-20261025-01.md'),
                                     (self.runs / 'archive', 'run-20261025-01.md'),
                                     (self.tasks / 'archive', 'bad.md')):

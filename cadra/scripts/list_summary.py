@@ -284,7 +284,7 @@ def result_summary(value):
 def inventory(root):
     tasks = sorted(p for p in (root / 'tasks').glob('*.md') if not p.name.startswith('.'))
     runs = sorted(p for p in (root / 'runs').glob('*.md') if not p.name.startswith('.')
-                  and not re.fullmatch(r'run-\d{8}-\d{2,}-report-\d{2,}\.md', p.name))
+                  and '-report-' not in p.name.casefold())
     return tasks, runs
 
 

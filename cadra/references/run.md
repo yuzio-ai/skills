@@ -9,7 +9,7 @@ $cadra run
 补充：<本次输入、解除证据或限定条件，可空>
 ```
 
-先读 [预检](preflight.md)、[执行归属](executor.md)、[任务执行者](agents.md)；含旧记录时读 [版本边界](compatibility.md)。任何未完成 Run 存在都不新建；0.11 按 resume 核对继续，旧协议停止并提示先完成归档切换，不迁移。
+先读 [预检](preflight.md)、[执行归属](executor.md)、[任务执行者](dispatch.md)；含旧记录时读 [版本边界](compatibility.md)。任何未完成 Run 存在都不新建；0.11 按 resume 核对继续，旧协议停止并提示先完成归档切换，不迁移。
 
 ## 建立 Run
 

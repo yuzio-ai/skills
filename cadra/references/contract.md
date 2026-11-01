@@ -43,7 +43,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 - 显式恢复按 [恢复准入](recovery.md)，定义变更按 [修订准入](revision-rules.md)，不能将旧 blocked/failed 直接当作新的完成结论，也不能重新当首次启动。
 - 已有正式交付或调用但缺 README、契约缺失/不支持/损坏时，停止整个 run 并报告路径；不允许忽略。索引修复归 Cohestra 或人工。
 
-编排传入适用项目评审要求、预检引用、执行来源及 [独立角色安排](agents.md)；Cohestra handoff 记录这些审计信息，不增加契约 0.8 的字段。审查充分性归 Cohestra，Cadra 不解析覆盖表驱动控制状态；报告可引用作者/独立方式与覆盖及验收边界。
+编排传入适用项目评审要求、预检引用、执行来源及 [独立角色安排](dispatch.md)；Cohestra handoff 记录这些审计信息，不增加契约 0.8 的字段。审查充分性归 Cohestra，Cadra 不解析覆盖表驱动控制状态；报告可引用作者/独立方式与覆盖及验收边界。
 
 ### 完成前置核对
 

@@ -9,7 +9,7 @@
 | `profile_version` | 整数 `2`；其他版本报告配置缺口，不按 v2 解释 |
 | `project` | 稳定名称或标识 |
 | `sources` | 资料角色到引用列表的映射，只读取本轮相关来源 |
-| `defaults` | 可覆盖的 `locale`、`appearance`、`output_directory`、`budget` |
+| `defaults` | 可覆盖的 `locale`、`appearance`、`output_directory`、`budget`；`appearance` 是项目声明的观察外观标签（如 `light`／`dark`），合法值与默认由项目规范定义，Vistra 不内置 |
 
 `sources` 角色可用 `canonical`、`design`、`brand`、`tokens`、`components`、`page_overlay`、`adapter`、`policies`、`assets`、`mock_data`。文件、链接或宿主暴露的 Skill 标识须解析到可读取内容后才能采用；Skill 入口与其他资料一样作为来源引用，不另建导入、作用域或条件加载配置。
 
@@ -24,6 +24,6 @@ v2 删除 v1 的领域、目标和导入继承，不兼容 v1 的解释方式。
 - profile 的相对路径（含 `output_directory`）以目标项目根目录为基点；包内引用以实际加载文件为基点。绝对路径和链接保留明确位置，不猜跨仓库机器路径。
 - `null` 为未知或未设置，空列表为未声明来源，都不证明没有约束或已获授权。只记录影响本轮的缺失、冲突和回退。
 
-Vistra 默认值见 [入口](../SKILL.md#共享预算与默认值)。
+Vistra 的预算与方向默认值见 [入口](../SKILL.md#共享预算与默认值)；输出目录默认值见 [存储约定](storage.md#本机产物)。
 
 profile 不保存选择、授权布尔值、当前截图或旧运行状态；旧文件即使包含这些数据，也不能作为本轮依据。本机配置引用共享规范，不取代项目真源。建立或修改配置前读取 [存储约定](storage.md)。
