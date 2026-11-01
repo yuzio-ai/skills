@@ -1,0 +1,241 @@
+{
+  "at": "2026-10-30T05:50:00.502323+00:00",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-B",
+    "/Users/zhubowen/Documents/yuzio-ai/skills/cadra/scripts/list_summary.py",
+    "--project",
+    "/Users/zhubowen/Documents/yuzio-ai/mewoo-ios"
+  ],
+  "source_project": "/Users/zhubowen/Documents/yuzio-ai/mewoo-ios",
+  "package": {
+    "version": "0.14.0",
+    "protocol_version": "0.11",
+    "repository": "https://github.com/yuzio-ai/skills",
+    "skill_path": "cadra"
+  },
+  "reader_sha256": "26ef9df0b02b914f070195c33619264c9d502a2716c6d4374ea755f3e782a9ec",
+  "legacy_validator_sha256": "53458f2ac348e40d8ad2fce3ffe69e99e097a75605fffd11caef74b40d859c2d",
+  "protocol": "0.10",
+  "execution_protocol": "0.11",
+  "protocols": {
+    "0.10": 37
+  },
+  "scan": {
+    "tasks": 31,
+    "runs": 6,
+    "stable": true
+  },
+  "counts": {
+    "completed": 29,
+    "queued": 1,
+    "running": 1
+  },
+  "issues": [],
+  "data_bytes": 1414,
+  "records_unchanged": true,
+  "source_records": {
+    ".yuzio/cadra/tasks/app-architecture-review.md": {
+      "bytes": 24992,
+      "sha256": "d3d6a15240c8ed47ea8e960dce703d1ff43c37d1bb3c6ab08781dfb3f44bf058",
+      "mtime_ns": 1793206846060748212
+    },
+    ".yuzio/cadra/tasks/architecture-authentication-errors.md": {
+      "bytes": 6484,
+      "sha256": "206c67ce98d0088b88909420dd89869150c750451cb47c4ecd9ec3c8080ff1e2",
+      "mtime_ns": 1793243643276517173
+    },
+    ".yuzio/cadra/tasks/architecture-composition-matrix.md": {
+      "bytes": 6097,
+      "sha256": "746b67dbcd9719c93d94f8ede853fa9baea55603541ad36e63cd2eb4139b2996",
+      "mtime_ns": 1793243643265593668
+    },
+    ".yuzio/cadra/tasks/architecture-dependency-contracts.md": {
+      "bytes": 6481,
+      "sha256": "be8daa233ce5ba638ef483c1a1ddc800dc3f3e26d1233a23bd819e8fc464ed69",
+      "mtime_ns": 1793243643270813712
+    },
+    ".yuzio/cadra/tasks/architecture-performance-baseline.md": {
+      "bytes": 7244,
+      "sha256": "75ff28a165496ddcf6aa0a462f2a9d5fdfc3c84b6a8ed315718f9983fed04727",
+      "mtime_ns": 1793243643281954092
+    },
+    ".yuzio/cadra/tasks/care-header-whitespace.md": {
+      "bytes": 9691,
+      "sha256": "6b081c31508501094a09ffa0de244fa88e93c4d981d58de66863d845a167fe6c",
+      "mtime_ns": 1793267513567437636
+    },
+    ".yuzio/cadra/tasks/care-plan-calendar-card-interactions.md": {
+      "bytes": 19996,
+      "sha256": "4042bc545b150cf923ec4b28460faa8bc59e280b886a9db75cad1552a2323146",
+      "mtime_ns": 1793022021374433547
+    },
+    ".yuzio/cadra/tasks/care-plan-calendar-style-hit-regions.md": {
+      "bytes": 26770,
+      "sha256": "c37fe50ed22a675fb1e945e83a7aef8c3cea7bba2fe77cb96c36073c62048c52",
+      "mtime_ns": 1793205270444451178
+    },
+    ".yuzio/cadra/tasks/care-plan-card-layout-selection-paging.md": {
+      "bytes": 21107,
+      "sha256": "fc3c6e6accfc575245865630d86eabd0c9d8a4bf7b92d5d4ac3fd0ae282e4143",
+      "mtime_ns": 1793269322725921013
+    },
+    ".yuzio/cadra/tasks/care-plan-paging-type-groups.md": {
+      "bytes": 27082,
+      "sha256": "c9f204dc6abaa2a4c4e954fa5999c3bccb831394b10fa53a3d80152f3fe72b9e",
+      "mtime_ns": 1793205270445652512
+    },
+    ".yuzio/cadra/tasks/care-task-detail-push-source-restore.md": {
+      "bytes": 15347,
+      "sha256": "b3a90f20c55e19834636c818b162392a6b501f01adba5924c30912c085b8a14b",
+      "mtime_ns": 1793241774431918161
+    },
+    ".yuzio/cadra/tasks/daily-inventory.md": {
+      "bytes": 18781,
+      "sha256": "9d66603d1910a0496f21563cd003f827689f73cd4b785bf50779c7a22c314f10",
+      "mtime_ns": 1793266816415991332
+    },
+    ".yuzio/cadra/tasks/daily-personal-state-card.md": {
+      "bytes": 11416,
+      "sha256": "17bc91c1248b6d55d788da03406b055b4e25d174a0b5cda88b5659de224050a4",
+      "mtime_ns": 1793246246102724904
+    },
+    ".yuzio/cadra/tasks/daily-section-order.md": {
+      "bytes": 18343,
+      "sha256": "e87d542d37ff4fe420f3ba9455dc284a6a645a063337949f436587a9644dcc16",
+      "mtime_ns": 1793206846061435214
+    },
+    ".yuzio/cadra/tasks/health-section-order.md": {
+      "bytes": 10182,
+      "sha256": "72e7ec80d3dadfb1b40b7ebddf31ed704d9925a9844f924dd84b6d89236ab1fa",
+      "mtime_ns": 1793027919101789913
+    },
+    ".yuzio/cadra/tasks/home-mood-compact-guided-recording.md": {
+      "bytes": 15535,
+      "sha256": "f046cb8d53473478e2389c7ea0d35f6766e4cca20bdc208eb55ca9b1c339469b",
+      "mtime_ns": 1793269292733858622
+    },
+    ".yuzio/cadra/tasks/home-motto-handwritten-signature.md": {
+      "bytes": 11733,
+      "sha256": "c62073e0ce6fc02789e4264c722d18bd9db00c8322c088164a37ad115ed65f98",
+      "mtime_ns": 1793206074343922120
+    },
+    ".yuzio/cadra/tasks/home-section-header-navigation.md": {
+      "bytes": 12869,
+      "sha256": "1cfa31c95112e694e1280c55510cc8eaeec94687ef51a11b8c681449dcefd086",
+      "mtime_ns": 1793205183063327150
+    },
+    ".yuzio/cadra/tasks/life-review-card-v2.md": {
+      "bytes": 14311,
+      "sha256": "7cde6edbd4809ba19d2881b2135057ddbe484824cefa6f931f08c723f550a379",
+      "mtime_ns": 1793021290044339296
+    },
+    ".yuzio/cadra/tasks/local-recovery-inventory-optimization.md": {
+      "bytes": 7672,
+      "sha256": "98d92d1b9a19567469bae6b958e3e45f6567384daebeb267928f9d476e26b62a",
+      "mtime_ns": 1793267952314387069
+    },
+    ".yuzio/cadra/tasks/medical-document-query-profiling.md": {
+      "bytes": 7708,
+      "sha256": "0aa9860c3d7fbeae64df934b83ca664b3b80990dd6ea583bd36642ce03ff7e34",
+      "mtime_ns": 1793267952314881695
+    },
+    ".yuzio/cadra/tasks/medical-lifecycle-scoped-reads.md": {
+      "bytes": 7601,
+      "sha256": "33c276cb6536b1a16bc071cfa2546c951948e232ce70077a8d702cf50e56561d",
+      "mtime_ns": 1793267952313986527
+    },
+    ".yuzio/cadra/tasks/personal-daily-state-mvp.md": {
+      "bytes": 18629,
+      "sha256": "304cbfa0cd2eeedc835d56b29b4c6abd926c40e7e8c9e0025b2142f969ac53de",
+      "mtime_ns": 1793207222673326604
+    },
+    ".yuzio/cadra/tasks/personal-state-review.md": {
+      "bytes": 18366,
+      "sha256": "8b00da3aaf2339cb455d1de6a54b86e26adfba9428d44b5e4ef2397a91415c48",
+      "mtime_ns": 1793270208686832190
+    },
+    ".yuzio/cadra/tasks/pet-knowledge-source-single-line.md": {
+      "bytes": 10502,
+      "sha256": "7797c4bd81726049f94fd5ed69af23f6fb936a9849106fa57a4186e37c2c80f4",
+      "mtime_ns": 1793245271028244596
+    },
+    ".yuzio/cadra/tasks/profile-cover-personal-tags.md": {
+      "bytes": 18016,
+      "sha256": "42f0b29f296bd43fc38e514761df048bc57971f8d39b11093c9c3f520d86341e",
+      "mtime_ns": 1793269192445072520
+    },
+    ".yuzio/cadra/tasks/profile-horizontal-tabs-settings.md": {
+      "bytes": 13608,
+      "sha256": "efe5b2c2638558feb4099952799c69cb7929038fdf68aaa4ac10a084ef744c9c",
+      "mtime_ns": 1793245589678817182
+    },
+    ".yuzio/cadra/tasks/swiftui-review-fixes.md": {
+      "bytes": 24936,
+      "sha256": "6593a745e07eee541bffa3421bbc1a1cbd52b29d91b0ede518cf0ab248f7ae02",
+      "mtime_ns": 1793204188423226381
+    },
+    ".yuzio/cadra/tasks/timeline-adaptive-card-groups.md": {
+      "bytes": 13135,
+      "sha256": "a461fe053ace7f007c52738e7197c02852cca61ec43effd05827043ddaea7482",
+      "mtime_ns": 1793246151147275120
+    },
+    ".yuzio/cadra/tasks/timeline-record-associations.md": {
+      "bytes": 20058,
+      "sha256": "b45e9457c445d628ae75490fa30cb66d28c0df6c6d38cb2953ce69dca55e855e",
+      "mtime_ns": 1793029086741760132
+    },
+    ".yuzio/cadra/tasks/timeline-record-card-unification.md": {
+      "bytes": 20370,
+      "sha256": "e6f9b1aa93151aed66250cbb833aa5365a0a877207d3a935f1dedcaee1a4314f",
+      "mtime_ns": 1793204026874341320
+    },
+    ".yuzio/cadra/runs/run-20261026-01.md": {
+      "bytes": 121482,
+      "sha256": "1ef69320d918c0b69169df6ae75ccdd36697c46433e0f256c44eee1d7aaad77f",
+      "mtime_ns": 1793027371784488781
+    },
+    ".yuzio/cadra/runs/run-20261027-01.md": {
+      "bytes": 141919,
+      "sha256": "d2e7db9fd61a7967b4578890047602636281aa34bd372c51e3917c24bc09c6db",
+      "mtime_ns": 1793181309267503041
+    },
+    ".yuzio/cadra/runs/run-20261029-01.md": {
+      "bytes": 377881,
+      "sha256": "49faac2334a92b5c70ad0ec367bcd1149fb55427ccba2eeff1db825efa06481f",
+      "mtime_ns": 1793232666574098079
+    },
+    ".yuzio/cadra/runs/run-20261029-02.md": {
+      "bytes": 40946,
+      "sha256": "4b6880e203fa49e79107252d31f6900e31341483f0a09a96fbd0cf97ee953c3e",
+      "mtime_ns": 1793244708747351750
+    },
+    ".yuzio/cadra/runs/run-20261029-03.md": {
+      "bytes": 288726,
+      "sha256": "2983341459b395fe06198be011048db554fda3d9458994a217fe7d75d67c218b",
+      "mtime_ns": 1793263608380527081
+    },
+    ".yuzio/cadra/runs/run-20261029-04.md": {
+      "bytes": 362503,
+      "sha256": "be119c48996aa2416ea8a5b16ad5d191b5fcb50d2dc59e624210a1c80ef64ef2",
+      "mtime_ns": 1793337975173490123
+    }
+  },
+  "seconds": {
+    "median": 0.14856179201160558,
+    "min": 0.14705612501711585,
+    "max": 0.16429404099471867,
+    "samples": [
+      0.16429404099471867,
+      0.1482663750066422,
+      0.1490757499996107,
+      0.14856179201160558,
+      0.14705612501711585
+    ]
+  },
+  "snapshot_attempt": 1,
+  "scope": "Native CLI only; no installed-skill update, migration, writer or agent execution.",
+  "token_scope": "Returned data only; excludes rules, tool framing, host queries and final replies.",
+  "tokenizer": "o200k_base",
+  "data_tokens": 418
+}

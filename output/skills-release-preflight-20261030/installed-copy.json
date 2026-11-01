@@ -1,0 +1,26 @@
+{
+  "cadra": {
+    "installed_path": "/Users/zhubowen/.agents/skills/cadra",
+    "resolved_path": "/Users/zhubowen/.agents/skills/cadra",
+    "release": {
+      "version": "0.10.0",
+      "protocol_version": "0.10",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cadra"
+    },
+    "source_same_path": false,
+    "same_package_bytes": false
+  },
+  "cohestra": {
+    "installed_path": "/Users/zhubowen/.agents/skills/cohestra",
+    "resolved_path": "/Users/zhubowen/.agents/skills/cohestra",
+    "release": {
+      "version": "0.13.1",
+      "protocol_version": "0.8",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cohestra"
+    },
+    "source_same_path": false,
+    "same_package_bytes": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "commit": "8cddff27e7d5ac1e294e8bfac428ee621495048a",
+  "tree": "3d159d9cff906db4dfc40bff09d0b1b5e51101d1",
+  "release_history_issues": {
+    "cadra": [],
+    "cohestra": [],
+    "vistra": [],
+    "relatra": []
+  },
+  "blobs": {
+    "cadra/release.json": "41d293d27f068f0c165ec4261afa945506a4aaed",
+    "cohestra/release.json": "aee2bef48de02194f441842841e04a328b55ae73",
+    "cadra/references/list-details.md": "e0f06323dcca27e891f3531944f479b785382709",
+    "cadra/references/scheduling.md": "0ab7c0edd36bf316d469677230c9de8d690a2a56",
+    "cadra/scripts/list_legacy_010.py": "754b8f3cb5cfb02f05d1c4d71eac6003ed19e760",
+    "cadra/scripts/list_summary.py": "ffba7e8bf89a2db7e109705fe0309406f77cf58c",
+    "cadra/scripts/scheduler.py": "0d8bf21228a192db5bc7b0c89c262070df158b8d"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "status": "pushed_and_public_files_verified",
+  "repository": "yuzio-ai/skills",
+  "branch": "main",
+  "commit": "8cddff27e7d5ac1e294e8bfac428ee621495048a",
+  "tree": "3d159d9cff906db4dfc40bff09d0b1b5e51101d1",
+  "files": [
+    {
+      "path": "cadra/release.json",
+      "sha": "41d293d27f068f0c165ec4261afa945506a4aaed",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/release.json",
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.11",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cadra"
+      }
+    },
+    {
+      "path": "cohestra/release.json",
+      "sha": "aee2bef48de02194f441842841e04a328b55ae73",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cohestra/release.json",
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.8",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cohestra"
+      }
+    },
+    {
+      "path": "cadra/references/list-details.md",
+      "sha": "e0f06323dcca27e891f3531944f479b785382709",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/references/list-details.md"
+    },
+    {
+      "path": "cadra/references/scheduling.md",
+      "sha": "0ab7c0edd36bf316d469677230c9de8d690a2a56",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/references/scheduling.md"
+    },
+    {
+      "path": "cadra/scripts/list_legacy_010.py",
+      "sha": "754b8f3cb5cfb02f05d1c4d71eac6003ed19e760",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/scripts/list_legacy_010.py"
+    },
+    {
+      "path": "cadra/scripts/list_summary.py",
+      "sha": "ffba7e8bf89a2db7e109705fe0309406f77cf58c",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/scripts/list_summary.py"
+    },
+    {
+      "path": "cadra/scripts/scheduler.py",
+      "sha": "0d8bf21228a192db5bc7b0c89c262070df158b8d",
+      "url": "https://github.com/yuzio-ai/skills/blob/main/cadra/scripts/scheduler.py"
+    }
+  ],
+  "tests": {
+    "count": 461,
+    "skipped": 0,
+    "scope": "Exact staged tree in clean full-history clone"
+  },
+  "real_host_acceptance": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/acceptance.json",
+  "release_history_after_commit": {
+    "cadra": [],
+    "cohestra": [],
+    "vistra": [],
+    "relatra": []
+  },
+  "website_pushed": false,
+  "github_release_created": false,
+  "verified_at": "2026-10-30T09:59:41.928525+00:00",
+  "remote_main": "8cddff27e7d5ac1e294e8bfac428ee621495048a",
+  "user_scope": "Only skills repository; website explicitly excluded by user.",
+  "tracked_worktree_clean": true
+}

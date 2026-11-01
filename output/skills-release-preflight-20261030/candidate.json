@@ -1,0 +1,159 @@
+{
+  "checked_at": "2026-10-30T08:53:20.687883+00:00",
+  "git_head": "e1d7fcbbb7ceb3a4b8193ae19dfeb7954264ef11",
+  "full_history": true,
+  "packages": {
+    "cadra": {
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.11",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cadra"
+      },
+      "version_history_issues": [],
+      "file_count": 37,
+      "reachable_files": 37,
+      "local_links_checked": 167,
+      "hashes": {
+        "cadra/LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "cadra/release.json": "d5bf8d6a4f9f5278b844a5d4a6ee043a8fbc93d5e8f977e53d80c63be2033a8e",
+        "cadra/SKILL.md": "cf8c5d0b9430f091e1d9a06c0884a2b2c0efd6bf27b7f30c229e67d28fce777b",
+        "cadra/references/storage.md": "bbd9955fe2485e87721b7e553c76d2e42778c67b4e423588e4d0153cdb72ce02",
+        "cadra/references/scheduling.md": "c3b3e6096c1de42ce7510159aabd609e4fab1d53117ac7acad3e7ff37d4e936f",
+        "cadra/references/task-definition.md": "db204fe4230caa79c883554c89212b6b12ce82d9b87e3ea5800605946fe3df87",
+        "cadra/references/list-details.md": "f3c7c53afc0ef93227c714917a0451814bfd1abfd885ae93c7882e96c927beb1",
+        "cadra/references/ready.md": "d6bd710a15982b15c8cafbd747fd6282ec91cef86d16b47e84466f6452c365fd",
+        "cadra/references/report.md": "3043f14b5d81b43055114ac88c1376f08df74704073ce431e51fe87dcac55d0a",
+        "cadra/references/preflight.md": "f32f0494941d41c965c56a0555a2e050353478dac594357600ba8bd1b01deaa3",
+        "cadra/references/executor.md": "96b589b5676b9b347bfe86db9d7b02b1ae5e8d07b62859396647f4cec41c1219",
+        "cadra/references/revision-rules.md": "28c2df472602f0ea4f198f6bbe4c311f36e2e3da127a704336d3c7be336db75b",
+        "cadra/references/workflow.md": "44e6e7d3c0cd39811c96a5a17e4dd2471c44f96ac0da22c6d06a57305c5d1f30",
+        "cadra/references/binding.md": "ed1001ff4acfc99fe415f78e04d54c2417952a4b254f84cb5ae2d9085563d136",
+        "cadra/references/contract.md": "c6d86394ea716db2900c19b2e265fbe812f8e10f8df2b8753df87aedf3ca7024",
+        "cadra/references/task-rules.md": "8d2086780ead41110ae0bf1682509f0c86fbbe5ccfd61b7d876264a749c60f21",
+        "cadra/references/append.md": "35fccf2b9e7194bf1c8c0ae117e364caab97ec92691dd8cfb15b1058bab5cde0",
+        "cadra/references/add.md": "f1514366fa8f47a251abf6e4bb8b361691c9eada9e60777aa2af00f6e84decf8",
+        "cadra/references/list.md": "81ad56dfbff6a533b4834b2de5bfab9ba9056860bc1e1a79d3f3738cc72b7098",
+        "cadra/references/resume.md": "f0f32edd50ebcf25bf70640d57d07a75a69410f265e928460be9a038fad32991",
+        "cadra/references/recovery.md": "abb4f7b8913495236f20154e033a2ea5b86898cc3eaf9e7e215064544e7f764d",
+        "cadra/references/run-rules.md": "b55221912cf4618ca3dbfb64b82e9b96de14cfeb33d5ce3aabb05c21601d85d9",
+        "cadra/references/run.md": "e4a687858de371a67947f982d5e203fd531651c0426cd798cb67e705c3e2c39e",
+        "cadra/references/compatibility.md": "d27374726c271749cfb9e13acd4d9a31590fd1ab49d97f43c56dc544ee64921a",
+        "cadra/references/flow.md": "cee1f86584a2d4f64a6d90cce54a1d2bd9bcef72492a89f30caa10a08e2b1f12",
+        "cadra/references/agents.md": "0305adfc8ac29becac1089342768494558f37f867a6f62668e24821069d08bfd",
+        "cadra/references/flow-config.md": "ba70bcdcc2c8f515e03357f4c81a416ea7df9fde1ff3e1fab556788150fe01c1",
+        "cadra/scripts/run_guard.py": "712fa727d2d4061a9b7558c90f5ba2dc144097e2839d409b40ac9d16da04d27a",
+        "cadra/scripts/list_summary.py": "26ef9df0b02b914f070195c33619264c9d502a2716c6d4374ea755f3e782a9ec",
+        "cadra/scripts/scheduler.py": "c36928964706079479774bed1e8a491179b4c27cf1a0416639368a0c4fc4a820",
+        "cadra/scripts/list_legacy_010.py": "53458f2ac348e40d8ad2fce3ffe69e99e097a75605fffd11caef74b40d859c2d",
+        "cadra/assets/run.md": "2b1cd541a14f87b0028671f5c4565112973abd4975ab00cd99ee25e7de94f141",
+        "cadra/assets/task.md": "58de31be140cd1ae32ea663ab6e706951e31f58fde11e01b517c319ed77761af",
+        "cadra/assets/project/README.md": "df72d4ac5179e0921dbcf8eb662cfdcadd5749c93f5ac75413571a7dabad251a",
+        "cadra/assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "cadra/assets/project/tasks/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cadra/assets/project/runs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "cohestra": {
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.8",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cohestra"
+      },
+      "version_history_issues": [],
+      "file_count": 23,
+      "reachable_files": 23,
+      "local_links_checked": 67,
+      "hashes": {
+        "cohestra/LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "cohestra/release.json": "5daba9c9a8972d53351a550a42d03fe3d1762c882d30ef65a6bd276c246f4710",
+        "cohestra/SKILL.md": "2c15e9104fde415995b811372779f482aded9050bf8f29e3df75db056ac15441",
+        "cohestra/references/publication.md": "24cecf12815036c2b6ce6019cf9a7d5ade9a9def6c09af3d17ce666e3a7e67c4",
+        "cohestra/references/storage.md": "b81723a0ea75a24fee92738d2ea9e3b1a653b14e68123bf100df31a2c7bcb1fe",
+        "cohestra/references/fix.md": "2463506d8c3c973c46dcdbe30a5d7f710335a50b8332cbcaa79517c958ea4a06",
+        "cohestra/references/need.md": "0f717c3d7e58b09baff0e464f392c562a4abe1ac78a8ded95175d0074a9baf21",
+        "cohestra/references/validate.md": "f007432c1b917d15935d559e854504e57361d0b2b63f1b417a35a7499468efae",
+        "cohestra/references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+        "cohestra/references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+        "cohestra/references/workflow.md": "16fd4d7936948e8f582d993307d432a80a6bedb26e2a297de38e0efa92526aec",
+        "cohestra/references/init.md": "5bc430a1581a597c3212fcca39dab22d9d4084b4d35a767b670d37f4060ae100",
+        "cohestra/references/review-coverage.md": "6e67cdb616c67d436bcb4407e1c92b80b87a18fe129a429ac3d53885cc8401bc",
+        "cohestra/references/design.md": "5589a89cb2e2065bb860e9c596fec13d7f335f29d363e995c81c1c96d6f01219",
+        "cohestra/references/code.md": "174c4e4069d61593efa607eec0ad79e5f5079f6c41956688604095839a8e4344",
+        "cohestra/references/review.md": "6ed7218f153cd8830c27f0801479068ff58a33e3e14e51dade54b1c65b10057f",
+        "cohestra/references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+        "cohestra/assets/task-index.md": "a8a2e0ecb62bfd9683ecb48ac17e67fca55ce5ac7870696014e3292aa16637b9",
+        "cohestra/assets/handoff.md": "285f605908872e4fb414204f8245196a5ec6e149406ef7c12dd9bd8ae7cfdde4",
+        "cohestra/assets/project/README.md": "7876686516f59204c0fd22a28f3b252cf3b75ad643263bdcdebdfb80437e6a5e",
+        "cohestra/assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "cohestra/assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cohestra/assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "vistra": {
+      "release": {
+        "version": "0.1.3",
+        "protocol_version": "1",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "vistra"
+      },
+      "version_history_issues": [],
+      "file_count": 20,
+      "reachable_files": 20,
+      "local_links_checked": 81,
+      "hashes": {
+        "vistra/LICENSE": "09ddd02581d3e49d494f41483226de60f30f24a5f868a1e7226a0b890a11038d",
+        "vistra/release.json": "02f6edaef80610633b6355e01fdbd5e87558cee9ccc3c8843b98308357077108",
+        "vistra/SKILL.md": "15a5eabf6203166d1c941de115675e5926e595b60f153020cdf70b3cab38da25",
+        "vistra/references/storage.md": "a170a919a5796d4b139d8209384e74776352cb5953a3a447bdd5d933aba175df",
+        "vistra/references/art-direction.md": "5f15cab49a5ab96ae78ae42008e1d235b39249e1659333a24d4838b63e1b1904",
+        "vistra/references/integrations.md": "dbc3cf08eaa3f9ae930435e86d286df55244d0e553fd793c8d5395ca6d61245b",
+        "vistra/references/evidence.md": "9d395a46c06a6b7ce473466b0b668745f513292450f8b88fc16184fdbe566fc3",
+        "vistra/references/provenance.md": "6caa85c9b08ffd10f626ed92d26c7f199c27605106314117d0dd1d3971357dad",
+        "vistra/references/constraints.md": "843aab342b2deaa4840f184ca47eb104a97b0708bf8de0a62746c8f8c52b424c",
+        "vistra/references/project-adapter.md": "4e453a7acd05381cbd5cb24792131383fb2f255f46a5ce84eecd671cde888e0f",
+        "vistra/references/profile.md": "4cb411da3d337107b4f2e4ea4b94da533ddbcce4e60d2e1a6d49a1c468dca470",
+        "vistra/assets/report.template.md": "c83af7f940a99e06a64645ab803adc78f9e5550cd4787b84ae60be6a1087c1fb",
+        "vistra/assets/project-profile.example.yaml": "a6a9ffa67c0e75ca23cff0f2fb01eaccdfd238accbabe084a8a6fd8c39951dd6",
+        "vistra/references/domains/brand.md": "018bf6f41dbcbf63faf12ff61dc462c8b23c3f2c9b40ecef8eac34faeea85689",
+        "vistra/references/domains/desktop.md": "3593e057cb6a86d55b8c2ece8090bf68b21bbb292ea1b50582c5d0a5ddd34a12",
+        "vistra/references/domains/mobile.md": "6907841b0ce59590d47172c69c8c5fd05ac324f3e5e63d22665ee76e7b089040",
+        "vistra/references/modes/explore.md": "407d0059f7551b024e036c5d3e879f280def0f3afdadf4c67f26c7cd4841b508",
+        "vistra/references/modes/compare.md": "c56c39951a8575f1b28bfc7081a9f1f0bda9101f7783db9b900fc150fc1911d7",
+        "vistra/references/modes/review.md": "415c6eed7c6b6304c6d7d2b206b60d2dfdc98b74711fb65011d3ff051c31ea98",
+        "vistra/references/modes/handoff.md": "4b2da26cd6fff77b8c983bd19ec0c5d74a585338bf93c11e35750273956777bf"
+      }
+    },
+    "relatra": {
+      "release": {
+        "version": "0.3.1",
+        "protocol_version": "2",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "relatra"
+      },
+      "version_history_issues": [],
+      "file_count": 9,
+      "reachable_files": 7,
+      "local_links_checked": 11,
+      "hashes": {
+        "relatra/LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "relatra/release.json": "9ca6bbd9b4c92c8897ad03b54df23836c45241652f14720809b01f27f211de4e",
+        "relatra/SKILL.md": "37799cdc3be01128436a7fe6b01bfa16150141cf5d857b074db143db810ce19c",
+        "relatra/references/storage.md": "a2be0684e6ca116a60009601e25bcf5ff935428bcb4a8d0155948e2f1bd9b7f0",
+        "relatra/references/reporting.md": "39e36cba9c54450860dd305981b0fb5ad71ca69027fb6e1e671dc201b4263159",
+        "relatra/references/data.md": "a190d18e8faf8dbf41c973c9d509bf506530eb39ffaf00cc06f732dea258b976",
+        "relatra/references/metrics.md": "21a22757f88e57391dc9a4890b2cf92e15eafdf07aac09f67f8b24a1eda4e001",
+        "relatra/agents/openai.yaml": "7cb11c5b0389839442743545f198ae4373894248a0a96540e5ec448d4c8e4569",
+        "relatra/scripts/relatra.py": "99baea58da3342e31fb53b277d0e070b1aab5cb9576d288dba6aa3942288e5a7"
+      }
+    }
+  },
+  "untracked_package_files": [
+    "cadra/references/list-details.md",
+    "cadra/references/scheduling.md",
+    "cadra/scripts/list_legacy_010.py",
+    "cadra/scripts/list_summary.py",
+    "cadra/scripts/scheduler.py"
+  ]
+}

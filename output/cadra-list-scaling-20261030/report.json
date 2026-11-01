@@ -1,0 +1,1046 @@
+{
+  "at": "2026-10-30T05:36:22.727075+00:00",
+  "work": "/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-list-scale-q1gjnif1",
+  "baseline_version": "0.13.0",
+  "candidate_version": "0.14.0",
+  "reader_sha256": {
+    "baseline": "a1e2c518fda746b136e9051612e15a036d83fac2c75426be366f492886562f3e",
+    "candidate": "26ef9df0b02b914f070195c33619264c9d502a2716c6d4374ea755f3e782a9ec"
+  },
+  "shared_scheduler_sha256": "1fadb8fb7867bbfff276e30a00b2b453b764e85c439390c71767628b516e3459",
+  "tokenizer": "o200k_base",
+  "synthetic": [
+    {
+      "protocol": "0.10",
+      "tasks": 1000,
+      "run_entries": 1000,
+      "scenarios": {
+        "default": {
+          "baseline": {
+            "seconds": {
+              "median": 0.2570168329984881,
+              "min": 0.2557465420104563,
+              "max": 0.2672312500071712,
+              "samples": [
+                0.2557465420104563,
+                0.2570168329984881,
+                0.2672312500071712
+              ]
+            },
+            "bytes": 224497,
+            "tokens": 67179,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.21001662500202656,
+              "min": 0.20770454101148061,
+              "max": 0.2152996670047287,
+              "samples": [
+                0.2152996670047287,
+                0.21001662500202656,
+                0.20770454101148061
+              ]
+            },
+            "bytes": 224497,
+            "tokens": 67179,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "speedup": 1.2237927973369156
+        },
+        "roles": {
+          "baseline": {
+            "seconds": {
+              "median": 0.2597705000080168,
+              "min": 0.2597705000080168,
+              "max": 0.2597705000080168,
+              "samples": [
+                0.2597705000080168
+              ]
+            },
+            "bytes": 1032773,
+            "tokens": 319265,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.21164820899139158,
+              "min": 0.21164820899139158,
+              "max": 0.21164820899139158,
+              "samples": [
+                0.21164820899139158
+              ]
+            },
+            "bytes": 474908,
+            "tokens": 144310,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "speedup": 1.2273692333422133
+        },
+        "single": {
+          "baseline": {
+            "seconds": {
+              "median": 0.2533980000007432,
+              "min": 0.2533980000007432,
+              "max": 0.2533980000007432,
+              "samples": [
+                0.2533980000007432
+              ]
+            },
+            "bytes": 1734,
+            "tokens": 516,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.20312004201696254,
+              "min": 0.20312004201696254,
+              "max": 0.20312004201696254,
+              "samples": [
+                0.20312004201696254
+              ]
+            },
+            "bytes": 1694,
+            "tokens": 508,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "speedup": 1.247528296491697
+        },
+        "dense_anomalies": {
+          "baseline": {
+            "seconds": {
+              "median": 0.18145875001209788,
+              "min": 0.18145875001209788,
+              "max": 0.18145875001209788,
+              "samples": [
+                0.18145875001209788
+              ]
+            },
+            "bytes": 422482,
+            "tokens": 111141,
+            "counts": {
+              "unknown": 1000
+            },
+            "total": 1000,
+            "issues": 1001
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.1654113749973476,
+              "min": 0.1654113749973476,
+              "max": 0.1654113749973476,
+              "samples": [
+                0.1654113749973476
+              ]
+            },
+            "bytes": 422482,
+            "tokens": 111141,
+            "counts": {
+              "unknown": 1000
+            },
+            "total": 1000,
+            "issues": 1001
+          }
+        }
+      },
+      "records_unchanged": true
+    },
+    {
+      "protocol": "0.10",
+      "tasks": 10000,
+      "run_entries": 10000,
+      "scenarios": {
+        "default": {
+          "baseline": {
+            "seconds": {
+              "median": 7.151948207989335,
+              "min": 6.9582269999955315,
+              "max": 7.16619383401121,
+              "samples": [
+                7.16619383401121,
+                6.9582269999955315,
+                7.151948207989335
+              ]
+            },
+            "bytes": 2249503,
+            "tokens": 679179,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.6586191660026088,
+              "min": 1.6514373339887243,
+              "max": 1.7171553339867387,
+              "samples": [
+                1.7171553339867387,
+                1.6514373339887243,
+                1.6586191660026088
+              ]
+            },
+            "bytes": 2249503,
+            "tokens": 679179,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "speedup": 4.311989367171033
+        },
+        "roles": {
+          "baseline": {
+            "seconds": {
+              "median": 6.810111166007118,
+              "min": 6.810111166007118,
+              "max": 6.810111166007118,
+              "samples": [
+                6.810111166007118
+              ]
+            },
+            "bytes": 10329779,
+            "tokens": 3199265,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.6587121250049677,
+              "min": 1.6587121250049677,
+              "max": 1.6587121250049677,
+              "samples": [
+                1.6587121250049677
+              ]
+            },
+            "bytes": 4749914,
+            "tokens": 1449310,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "speedup": 4.105661894758696
+        },
+        "single": {
+          "baseline": {
+            "seconds": {
+              "median": 7.716848292009672,
+              "min": 7.716848292009672,
+              "max": 7.716848292009672,
+              "samples": [
+                7.716848292009672
+              ]
+            },
+            "bytes": 1738,
+            "tokens": 517,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.6386612500064075,
+              "min": 1.6386612500064075,
+              "max": 1.6386612500064075,
+              "samples": [
+                1.6386612500064075
+              ]
+            },
+            "bytes": 1698,
+            "tokens": 509,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "speedup": 4.7092395038812915
+        },
+        "dense_anomalies": {
+          "baseline": {
+            "seconds": {
+              "median": 2.9341860830027144,
+              "min": 2.9341860830027144,
+              "max": 2.9341860830027144,
+              "samples": [
+                2.9341860830027144
+              ]
+            },
+            "bytes": 4220487,
+            "tokens": 1110141,
+            "counts": {
+              "unknown": 10000
+            },
+            "total": 10000,
+            "issues": 10001
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.2520502919796854,
+              "min": 1.2520502919796854,
+              "max": 1.2520502919796854,
+              "samples": [
+                1.2520502919796854
+              ]
+            },
+            "bytes": 4220487,
+            "tokens": 1110141,
+            "counts": {
+              "unknown": 10000
+            },
+            "total": 10000,
+            "issues": 10001
+          }
+        }
+      },
+      "records_unchanged": true
+    },
+    {
+      "protocol": "0.11",
+      "tasks": 1000,
+      "run_entries": 1000,
+      "scenarios": {
+        "default": {
+          "baseline": {
+            "seconds": {
+              "median": 0.2977156249980908,
+              "min": 0.2788388750050217,
+              "max": 0.31718858299427666,
+              "samples": [
+                0.31718858299427666,
+                0.2977156249980908,
+                0.2788388750050217
+              ]
+            },
+            "bytes": 224565,
+            "tokens": 67197,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.23192575000575744,
+              "min": 0.23101612500613555,
+              "max": 0.23329941698466428,
+              "samples": [
+                0.23192575000575744,
+                0.23101612500613555,
+                0.23329941698466428
+              ]
+            },
+            "bytes": 224565,
+            "tokens": 67197,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "speedup": 1.2836678333074276
+        },
+        "roles": {
+          "baseline": {
+            "seconds": {
+              "median": 0.2830926669994369,
+              "min": 0.2830926669994369,
+              "max": 0.2830926669994369,
+              "samples": [
+                0.2830926669994369
+              ]
+            },
+            "bytes": 1032841,
+            "tokens": 319283,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.23130929199396633,
+              "min": 0.23130929199396633,
+              "max": 0.23130929199396633,
+              "samples": [
+                0.23130929199396633
+              ]
+            },
+            "bytes": 474976,
+            "tokens": 144328,
+            "counts": {
+              "queued": 1000
+            },
+            "total": 1000,
+            "issues": 0
+          },
+          "speedup": 1.2238707081720752
+        },
+        "single": {
+          "baseline": {
+            "seconds": {
+              "median": 0.27722216700203717,
+              "min": 0.27722216700203717,
+              "max": 0.27722216700203717,
+              "samples": [
+                0.27722216700203717
+              ]
+            },
+            "bytes": 1802,
+            "tokens": 534,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.2290709159860853,
+              "min": 0.2290709159860853,
+              "max": 0.2290709159860853,
+              "samples": [
+                0.2290709159860853
+              ]
+            },
+            "bytes": 1762,
+            "tokens": 526,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "speedup": 1.2102023768869756
+        },
+        "dense_anomalies": {
+          "baseline": {
+            "seconds": {
+              "median": 0.19624983298126608,
+              "min": 0.19624983298126608,
+              "max": 0.19624983298126608,
+              "samples": [
+                0.19624983298126608
+              ]
+            },
+            "bytes": 422458,
+            "tokens": 111135,
+            "counts": {
+              "unknown": 1000
+            },
+            "total": 1000,
+            "issues": 1001
+          },
+          "candidate": {
+            "seconds": {
+              "median": 0.1916815420263447,
+              "min": 0.1916815420263447,
+              "max": 0.1916815420263447,
+              "samples": [
+                0.1916815420263447
+              ]
+            },
+            "bytes": 422458,
+            "tokens": 111135,
+            "counts": {
+              "unknown": 1000
+            },
+            "total": 1000,
+            "issues": 1001
+          }
+        }
+      },
+      "records_unchanged": true
+    },
+    {
+      "protocol": "0.11",
+      "tasks": 10000,
+      "run_entries": 10000,
+      "scenarios": {
+        "default": {
+          "baseline": {
+            "seconds": {
+              "median": 7.261373542016372,
+              "min": 7.185344249999616,
+              "max": 7.347321999986889,
+              "samples": [
+                7.261373542016372,
+                7.347321999986889,
+                7.185344249999616
+              ]
+            },
+            "bytes": 2249571,
+            "tokens": 679197,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 2.1295490420015994,
+              "min": 2.000868458999321,
+              "max": 2.133462249999866,
+              "samples": [
+                2.1295490420015994,
+                2.000868458999321,
+                2.133462249999866
+              ]
+            },
+            "bytes": 2249571,
+            "tokens": 679197,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "speedup": 3.409817477221038
+        },
+        "roles": {
+          "baseline": {
+            "seconds": {
+              "median": 7.195186750002904,
+              "min": 7.195186750002904,
+              "max": 7.195186750002904,
+              "samples": [
+                7.195186750002904
+              ]
+            },
+            "bytes": 10329847,
+            "tokens": 3199283,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 2.0182198330003303,
+              "min": 2.0182198330003303,
+              "max": 2.0182198330003303,
+              "samples": [
+                2.0182198330003303
+              ]
+            },
+            "bytes": 4749982,
+            "tokens": 1449328,
+            "counts": {
+              "queued": 10000
+            },
+            "total": 10000,
+            "issues": 0
+          },
+          "speedup": 3.565115470749477
+        },
+        "single": {
+          "baseline": {
+            "seconds": {
+              "median": 7.040631625015521,
+              "min": 7.040631625015521,
+              "max": 7.040631625015521,
+              "samples": [
+                7.040631625015521
+              ]
+            },
+            "bytes": 1806,
+            "tokens": 535,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.7933128750009928,
+              "min": 1.7933128750009928,
+              "max": 1.7933128750009928,
+              "samples": [
+                1.7933128750009928
+              ]
+            },
+            "bytes": 1766,
+            "tokens": 527,
+            "counts": {
+              "queued": 1
+            },
+            "total": 1,
+            "issues": 0
+          },
+          "speedup": 3.926047553197667
+        },
+        "dense_anomalies": {
+          "baseline": {
+            "seconds": {
+              "median": 2.983172582986299,
+              "min": 2.983172582986299,
+              "max": 2.983172582986299,
+              "samples": [
+                2.983172582986299
+              ]
+            },
+            "bytes": 4220463,
+            "tokens": 1110135,
+            "counts": {
+              "unknown": 10000
+            },
+            "total": 10000,
+            "issues": 10001
+          },
+          "candidate": {
+            "seconds": {
+              "median": 1.3370365829905495,
+              "min": 1.3370365829905495,
+              "max": 1.3370365829905495,
+              "samples": [
+                1.3370365829905495
+              ]
+            },
+            "bytes": 4220463,
+            "tokens": 1110135,
+            "counts": {
+              "unknown": 10000
+            },
+            "total": 10000,
+            "issues": 10001
+          }
+        }
+      },
+      "records_unchanged": true
+    }
+  ],
+  "history": [
+    {
+      "view": "default",
+      "run": null,
+      "comparison": {
+        "baseline": {
+          "seconds": {
+            "median": 0.16628008297993802,
+            "min": 0.15715158401872031,
+            "max": 0.17807295901002362,
+            "samples": [
+              0.17807295901002362,
+              0.16628008297993802,
+              0.15715158401872031
+            ]
+          },
+          "bytes": 1310,
+          "tokens": 366,
+          "counts": {
+            "completed": 29,
+            "queued": 1,
+            "running": 1
+          },
+          "total": 31,
+          "issues": 0
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.15945379200275056,
+            "min": 0.15944904199568555,
+            "max": 0.16040791597333737,
+            "samples": [
+              0.15944904199568555,
+              0.15945379200275056,
+              0.16040791597333737
+            ]
+          },
+          "bytes": 1310,
+          "tokens": 366,
+          "counts": {
+            "completed": 29,
+            "queued": 1,
+            "running": 1
+          },
+          "total": 31,
+          "issues": 0
+        },
+        "token_reduction_percent": 0.0
+      }
+    },
+    {
+      "view": "roles",
+      "run": null,
+      "comparison": {
+        "baseline": {
+          "seconds": {
+            "median": 0.1618272500054445,
+            "min": 0.15998229198157787,
+            "max": 0.1708596250100527,
+            "samples": [
+              0.1618272500054445,
+              0.1708596250100527,
+              0.15998229198157787
+            ]
+          },
+          "bytes": 36914,
+          "tokens": 11848,
+          "counts": {
+            "completed": 29,
+            "queued": 1,
+            "running": 1
+          },
+          "total": 31,
+          "issues": 0
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.1615798750135582,
+            "min": 0.15854975002002902,
+            "max": 0.16352845897199586,
+            "samples": [
+              0.1615798750135582,
+              0.15854975002002902,
+              0.16352845897199586
+            ]
+          },
+          "bytes": 22588,
+          "tokens": 6515,
+          "counts": {
+            "completed": 29,
+            "queued": 1,
+            "running": 1
+          },
+          "total": 31,
+          "issues": 0
+        },
+        "token_reduction_percent": 45.01181634031061
+      }
+    },
+    {
+      "view": "run",
+      "run": "run-20261029-01",
+      "comparison": {
+        "baseline": {
+          "seconds": {
+            "median": 0.16339866700582206,
+            "min": 0.16128249999019317,
+            "max": 0.16549424998811446,
+            "samples": [
+              0.16339866700582206,
+              0.16128249999019317,
+              0.16549424998811446
+            ]
+          },
+          "bytes": 23190,
+          "tokens": 6424,
+          "counts": {
+            "completed": 9
+          },
+          "total": 9,
+          "issues": 0
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.16292162498575635,
+            "min": 0.15799016700475477,
+            "max": 0.1630987499956973,
+            "samples": [
+              0.1630987499956973,
+              0.16292162498575635,
+              0.15799016700475477
+            ]
+          },
+          "bytes": 19532,
+          "tokens": 5446,
+          "counts": {
+            "completed": 9
+          },
+          "total": 9,
+          "issues": 0
+        },
+        "token_reduction_percent": 15.2241594022416
+      }
+    }
+  ],
+  "methodology": "Cold process samples; immutable input; full record validation before filtering. Token counts cover returned data only. No agent execution, migration, installation or model billing measurement.",
+  "history_source": {
+    "project": "/Users/zhubowen/Documents/yuzio-ai/mewoo-ios",
+    "tasks": 31,
+    "runs": 6,
+    "frozen_records_unchanged": true,
+    "source_files": [
+      {
+        "path": ".yuzio/cadra/tasks/app-architecture-review.md",
+        "sha256": "d3d6a15240c8ed47ea8e960dce703d1ff43c37d1bb3c6ab08781dfb3f44bf058"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/architecture-authentication-errors.md",
+        "sha256": "206c67ce98d0088b88909420dd89869150c750451cb47c4ecd9ec3c8080ff1e2"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/architecture-composition-matrix.md",
+        "sha256": "746b67dbcd9719c93d94f8ede853fa9baea55603541ad36e63cd2eb4139b2996"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/architecture-dependency-contracts.md",
+        "sha256": "be8daa233ce5ba638ef483c1a1ddc800dc3f3e26d1233a23bd819e8fc464ed69"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/architecture-performance-baseline.md",
+        "sha256": "75ff28a165496ddcf6aa0a462f2a9d5fdfc3c84b6a8ed315718f9983fed04727"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-header-whitespace.md",
+        "sha256": "6b081c31508501094a09ffa0de244fa88e93c4d981d58de66863d845a167fe6c"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-plan-calendar-card-interactions.md",
+        "sha256": "4042bc545b150cf923ec4b28460faa8bc59e280b886a9db75cad1552a2323146"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-plan-calendar-style-hit-regions.md",
+        "sha256": "c37fe50ed22a675fb1e945e83a7aef8c3cea7bba2fe77cb96c36073c62048c52"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-plan-card-layout-selection-paging.md",
+        "sha256": "fc3c6e6accfc575245865630d86eabd0c9d8a4bf7b92d5d4ac3fd0ae282e4143"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-plan-paging-type-groups.md",
+        "sha256": "c9f204dc6abaa2a4c4e954fa5999c3bccb831394b10fa53a3d80152f3fe72b9e"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/care-task-detail-push-source-restore.md",
+        "sha256": "b3a90f20c55e19834636c818b162392a6b501f01adba5924c30912c085b8a14b"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/daily-inventory.md",
+        "sha256": "9d66603d1910a0496f21563cd003f827689f73cd4b785bf50779c7a22c314f10"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/daily-personal-state-card.md",
+        "sha256": "17bc91c1248b6d55d788da03406b055b4e25d174a0b5cda88b5659de224050a4"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/daily-section-order.md",
+        "sha256": "e87d542d37ff4fe420f3ba9455dc284a6a645a063337949f436587a9644dcc16"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/health-section-order.md",
+        "sha256": "72e7ec80d3dadfb1b40b7ebddf31ed704d9925a9844f924dd84b6d89236ab1fa"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/home-mood-compact-guided-recording.md",
+        "sha256": "f046cb8d53473478e2389c7ea0d35f6766e4cca20bdc208eb55ca9b1c339469b"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/home-motto-handwritten-signature.md",
+        "sha256": "c62073e0ce6fc02789e4264c722d18bd9db00c8322c088164a37ad115ed65f98"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/home-section-header-navigation.md",
+        "sha256": "1cfa31c95112e694e1280c55510cc8eaeec94687ef51a11b8c681449dcefd086"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/life-review-card-v2.md",
+        "sha256": "7cde6edbd4809ba19d2881b2135057ddbe484824cefa6f931f08c723f550a379"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/local-recovery-inventory-optimization.md",
+        "sha256": "98d92d1b9a19567469bae6b958e3e45f6567384daebeb267928f9d476e26b62a"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/medical-document-query-profiling.md",
+        "sha256": "0aa9860c3d7fbeae64df934b83ca664b3b80990dd6ea583bd36642ce03ff7e34"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/medical-lifecycle-scoped-reads.md",
+        "sha256": "33c276cb6536b1a16bc071cfa2546c951948e232ce70077a8d702cf50e56561d"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/personal-daily-state-mvp.md",
+        "sha256": "304cbfa0cd2eeedc835d56b29b4c6abd926c40e7e8c9e0025b2142f969ac53de"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/personal-state-review.md",
+        "sha256": "8b00da3aaf2339cb455d1de6a54b86e26adfba9428d44b5e4ef2397a91415c48"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/pet-knowledge-source-single-line.md",
+        "sha256": "7797c4bd81726049f94fd5ed69af23f6fb936a9849106fa57a4186e37c2c80f4"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/profile-cover-personal-tags.md",
+        "sha256": "42f0b29f296bd43fc38e514761df048bc57971f8d39b11093c9c3f520d86341e"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/profile-horizontal-tabs-settings.md",
+        "sha256": "efe5b2c2638558feb4099952799c69cb7929038fdf68aaa4ac10a084ef744c9c"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/swiftui-review-fixes.md",
+        "sha256": "6593a745e07eee541bffa3421bbc1a1cbd52b29d91b0ede518cf0ab248f7ae02"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/timeline-adaptive-card-groups.md",
+        "sha256": "a461fe053ace7f007c52738e7197c02852cca61ec43effd05827043ddaea7482"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/timeline-record-associations.md",
+        "sha256": "b45e9457c445d628ae75490fa30cb66d28c0df6c6d38cb2953ce69dca55e855e"
+      },
+      {
+        "path": ".yuzio/cadra/tasks/timeline-record-card-unification.md",
+        "sha256": "e6f9b1aa93151aed66250cbb833aa5365a0a877207d3a935f1dedcaee1a4314f"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261026-01.md",
+        "sha256": "1ef69320d918c0b69169df6ae75ccdd36697c46433e0f256c44eee1d7aaad77f"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261027-01.md",
+        "sha256": "d2e7db9fd61a7967b4578890047602636281aa34bd372c51e3917c24bc09c6db"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261029-01.md",
+        "sha256": "49faac2334a92b5c70ad0ec367bcd1149fb55427ccba2eeff1db825efa06481f"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261029-02.md",
+        "sha256": "4b6880e203fa49e79107252d31f6900e31341483f0a09a96fbd0cf97ee953c3e"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261029-03.md",
+        "sha256": "2983341459b395fe06198be011048db554fda3d9458994a217fe7d75d67c218b"
+      },
+      {
+        "path": ".yuzio/cadra/runs/run-20261029-04.md",
+        "sha256": "be119c48996aa2416ea8a5b16ad5d191b5fcb50d2dc59e624210a1c80ef64ef2"
+      }
+    ]
+  },
+  "rule_reading": {
+    "scope": "Six same-named rule files counted in full; actual section reads/cache may differ. Details reference loaded only for explicit detail queries.",
+    "tokenizer": "o200k_base",
+    "files": [
+      "SKILL.md",
+      "release.json",
+      "references/list.md",
+      "references/workflow.md",
+      "references/storage.md",
+      "references/executor.md"
+    ],
+    "baseline_tokens": 8481,
+    "candidate_default_tokens": 8484,
+    "candidate_detail_reference_tokens": 524
+  },
+  "source_hashes": {
+    "baseline": {
+      "list_summary.py": "a1e2c518fda746b136e9051612e15a036d83fac2c75426be366f492886562f3e",
+      "run_guard.py": "ba2b9ed6f10607335bd58bd1b3cfae3425143e9e4dd23fcdf07dc332d3cc5d21",
+      "list_legacy_010.py": "830d6b299408b04e0c25531b233b81613370b6063712a558cecff43a9f483050",
+      "scheduler.py": "1fadb8fb7867bbfff276e30a00b2b453b764e85c439390c71767628b516e3459"
+    },
+    "candidate": {
+      "list_summary.py": "26ef9df0b02b914f070195c33619264c9d502a2716c6d4374ea755f3e782a9ec",
+      "run_guard.py": "712fa727d2d4061a9b7558c90f5ba2dc144097e2839d409b40ac9d16da04d27a",
+      "list_legacy_010.py": "53458f2ac348e40d8ad2fce3ffe69e99e097a75605fffd11caef74b40d859c2d",
+      "scheduler.py": "1fadb8fb7867bbfff276e30a00b2b453b764e85c439390c71767628b516e3459"
+    }
+  },
+  "yaml_validation": {
+    "reader_sha256": "26ef9df0b02b914f070195c33619264c9d502a2716c6d4374ea755f3e782a9ec",
+    "work": "/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/cadra-list-yaml-ewov3cmk",
+    "cases": [
+      {
+        "protocol": "0.10",
+        "tasks": 1000,
+        "format": "YAML Task / JSON Run",
+        "seconds": 0.3481292910000775,
+        "counts": {
+          "queued": 1000
+        },
+        "issues": 0,
+        "records_unchanged": true
+      },
+      {
+        "protocol": "0.10",
+        "tasks": 10000,
+        "format": "YAML Task / JSON Run",
+        "seconds": 2.5652138329751324,
+        "counts": {
+          "queued": 10000
+        },
+        "issues": 0,
+        "records_unchanged": true
+      },
+      {
+        "protocol": "0.11",
+        "tasks": 1000,
+        "format": "YAML Task / JSON Run",
+        "seconds": 0.4798685419955291,
+        "counts": {
+          "queued": 1000
+        },
+        "issues": 0,
+        "records_unchanged": true
+      },
+      {
+        "protocol": "0.11",
+        "tasks": 10000,
+        "format": "YAML Task / JSON Run",
+        "seconds": 3.10640287498245,
+        "counts": {
+          "queued": 10000
+        },
+        "issues": 0,
+        "records_unchanged": true
+      }
+    ],
+    "scope": "Native CLI, synthetic records and identities; no execution or migration. Single timing sample per format case."
+  },
+  "native_history_validation": {
+    "report": "native-history.json",
+    "records_unchanged": true
+  },
+  "checks": {
+    "unittest": {
+      "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+      "tests": 447,
+      "passed": true
+    },
+    "skill_validator_passed": true,
+    "git_diff_check_passed": true,
+    "full_git_history_release_checks": "passed without skips"
+  }
+}

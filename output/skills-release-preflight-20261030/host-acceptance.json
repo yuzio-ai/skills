@@ -1,0 +1,356 @@
+{
+  "status": "passed",
+  "checked_at": "2026-10-30T09:46:11.785150+00:00",
+  "project": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project",
+  "selected_packages": {
+    "cadra": {
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.11",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cadra"
+      },
+      "exact_original_copy": true,
+      "files": 37
+    },
+    "cohestra": {
+      "release": {
+        "version": "0.14.0",
+        "protocol_version": "0.8",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cohestra"
+      },
+      "exact_original_copy": true,
+      "files": 23
+    }
+  },
+  "run": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/.yuzio/cadra/runs/run-20261030-01.md",
+  "run_sha256": "c1e0135971f4746e95332abf96f390d57ed699d0b5f3632b4842a0bfb28dfce5",
+  "capabilities": {
+    "fixed_two_task_group": true,
+    "disjoint_write_scopes": true,
+    "actual_clean_context_role_agents": {
+      "alpha/worker": "/root/alpha_worker",
+      "alpha/reviewer": "/root/alpha_reviewer",
+      "beta/worker": "/root/beta_worker",
+      "beta/reviewer": "/root/beta_reviewer"
+    },
+    "verification_resource_wait": true,
+    "original_role_and_call_resumed": true,
+    "waits_do_not_add_call_budget": true,
+    "verification_commands_serial": true,
+    "group_closed_before_success_states": true,
+    "guarded_CAS_publication": true
+  },
+  "tasks": {
+    "alpha": {
+      "state": "completed",
+      "stages": [
+        "code",
+        "review",
+        "validate"
+      ],
+      "budget": {
+        "calls": 3,
+        "remediation": 0,
+        "retries": {}
+      },
+      "acceptance": {
+        "status": "passed"
+      }
+    },
+    "beta": {
+      "state": "completed",
+      "stages": [
+        "code",
+        "review",
+        "fix",
+        "review",
+        "validate"
+      ],
+      "budget": {
+        "calls": 5,
+        "remediation": 1,
+        "retries": {}
+      },
+      "acceptance": {
+        "status": "passed"
+      }
+    }
+  },
+  "actual_verification": [
+    {
+      "path": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/.yuzio/cohestra/handoffs/alpha/scratch/verification-code-1-1.json",
+      "sha256": "cf40cf972b8f9cdc9cd1c26665268c00ee5a7401be34c9b28e994677a4f93ba9",
+      "agent_id": "/root/alpha_worker",
+      "slug": "alpha",
+      "call_id": 1,
+      "stage": "code",
+      "sequence": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_alpha.py"
+      ],
+      "cwd": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project",
+      "started_at": "2026-10-30T09:13:52.922424+00:00",
+      "candidate": {
+        "snapshot": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/snapshots/stable-verification-1568018007c3430c825122b4eab8fa98.json",
+        "sha256": "0b70cc533a7325c846dbda4504db1e855faf2dedadda90514c06dbd357d9c30b",
+        "inputs": {
+          "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+          "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+          "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+          "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4",
+          "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+          "tests/test_beta.py": "bd4588668948bc0258d2b1f1792c0482009b97520708f76d8c5a64aaeb782b15"
+        }
+      },
+      "inputs_before": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+        "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4"
+      },
+      "pid": 50933,
+      "finished_at": "2026-10-30T09:13:52.973142+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".........\n----------------------------------------------------------------------\nRan 9 tests in 0.001s\n\nOK\n",
+      "inputs_after": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+        "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4"
+      }
+    },
+    {
+      "path": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/.yuzio/cohestra/handoffs/beta/scratch/verification-code-1-2.json",
+      "sha256": "b8d328b89a826e6aa4ff1a1d6aa95271eb3123faad21c95df04493f5bcb79244",
+      "agent_id": "/root/beta_worker",
+      "slug": "beta",
+      "call_id": 1,
+      "stage": "code",
+      "sequence": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_beta.py"
+      ],
+      "cwd": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project",
+      "started_at": "2026-10-30T09:14:49.280767+00:00",
+      "candidate": {
+        "snapshot": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/snapshots/stable-verification-1568018007c3430c825122b4eab8fa98.json",
+        "sha256": "0b70cc533a7325c846dbda4504db1e855faf2dedadda90514c06dbd357d9c30b",
+        "inputs": {
+          "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+          "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+          "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+          "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4",
+          "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+          "tests/test_beta.py": "bd4588668948bc0258d2b1f1792c0482009b97520708f76d8c5a64aaeb782b15"
+        }
+      },
+      "inputs_before": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+        "tests/test_beta.py": "bd4588668948bc0258d2b1f1792c0482009b97520708f76d8c5a64aaeb782b15"
+      },
+      "pid": 51824,
+      "finished_at": "2026-10-30T09:14:49.393288+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.001s\n\nOK\n",
+      "inputs_after": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+        "tests/test_beta.py": "bd4588668948bc0258d2b1f1792c0482009b97520708f76d8c5a64aaeb782b15"
+      }
+    },
+    {
+      "path": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/.yuzio/cohestra/handoffs/beta/scratch/verification-fix-3-6.json",
+      "sha256": "875fedb64408fcaae32aed83dba222dd7a1450a3a33b6509a398dd2b62311d25",
+      "agent_id": "/root/beta_worker",
+      "slug": "beta",
+      "call_id": 3,
+      "stage": "fix",
+      "sequence": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_beta.py"
+      ],
+      "cwd": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project",
+      "started_at": "2026-10-30T09:32:32.209027+00:00",
+      "candidate": {
+        "snapshot": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/snapshots/stable-verification-89e53088123a4fce97330082400e187f.json",
+        "sha256": "10c44d82882620de4ebea749da3b32bbb11c286f00c75b8489ec1d342846c47e",
+        "inputs": {
+          "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+          "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+          "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+          "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4",
+          "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+          "tests/test_beta.py": "9c1325c2986582222fd79cf7c3f9946dad604b482e799215e9cbe088296da13b"
+        }
+      },
+      "inputs_before": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+        "tests/test_beta.py": "9c1325c2986582222fd79cf7c3f9946dad604b482e799215e9cbe088296da13b"
+      },
+      "pid": 58940,
+      "finished_at": "2026-10-30T09:32:32.256231+00:00",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "..E.....\n======================================================================\nERROR: test_integer_beyond_interpreter_decimal_limit (test_beta.FormatBetaTests.test_integer_beyond_interpreter_decimal_limit)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/tests/test_beta.py\", line 34, in test_integer_beyond_interpreter_decimal_limit\n    self.assertEqual(format_beta(10 ** 5000), \"beta:1\" + \"0\" * 5000)\n                     ~~~~~~~~~~~^^^^^^^^^^^^\n  File \"/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/src/beta.py\", line 10, in format_beta\n    return f\"beta:{value:03d}\"\n                  ^^^^^^^^^^^\nValueError: Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit\n\n----------------------------------------------------------------------\nRan 8 tests in 0.001s\n\nFAILED (errors=1)\n",
+      "inputs_after": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "291d6646935477d76458736e05da69f2279c7d29c6e61d64483185c47903d1f8",
+        "tests/test_beta.py": "9c1325c2986582222fd79cf7c3f9946dad604b482e799215e9cbe088296da13b"
+      }
+    },
+    {
+      "path": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project/.yuzio/cohestra/handoffs/beta/scratch/verification-fix-3-8.json",
+      "sha256": "94f87446ec257e6dabb4604100e6b94afc948e3b9f051eed1a26af2fdad6e4b5",
+      "agent_id": "/root/beta_worker",
+      "slug": "beta",
+      "call_id": 3,
+      "stage": "fix",
+      "sequence": 8,
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_beta.py"
+      ],
+      "cwd": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/project",
+      "started_at": "2026-10-30T09:35:15.655669+00:00",
+      "candidate": {
+        "snapshot": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/snapshots/stable-verification-47cda0bcb7a84df0b0a882d56ccb0e7f.json",
+        "sha256": "7c1fe40bf4ecabb45d70298f241a1dea06a1ae8adb3ae4b1beae1e2a87d0a659",
+        "inputs": {
+          "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+          "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+          "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "src/alpha.py": "4c8f39bf58e18388fdbbbe07b4bc5cf10215b24575edcc80258e18e015c26d81",
+          "tests/test_alpha.py": "0e671a65f26b45520577f3450e9e4b1706450260b30e026780029b722b8516f4",
+          "src/beta.py": "037278f32c620a8df32100c17de1370e39401fa0e8bbee86700c453c35417715",
+          "tests/test_beta.py": "1d76cf6d5a388ed7c2c12c9d185fdf733b83811208d17700c0ffee73611a3737"
+        }
+      },
+      "inputs_before": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "037278f32c620a8df32100c17de1370e39401fa0e8bbee86700c453c35417715",
+        "tests/test_beta.py": "1d76cf6d5a388ed7c2c12c9d185fdf733b83811208d17700c0ffee73611a3737"
+      },
+      "pid": 59540,
+      "finished_at": "2026-10-30T09:35:15.701393+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "..........\n----------------------------------------------------------------------\nRan 10 tests in 0.002s\n\nOK\n",
+      "inputs_after": {
+        "AGENTS.md": "70a4123ecbb8e2b0e7a62851b540e1bd655c3217bb7910ea25f46f21d09d2720",
+        "README.md": "899ce56e2525f442349ce21e92924b9b310903491d220799a6da9b66ea8e3517",
+        "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "src/beta.py": "037278f32c620a8df32100c17de1370e39401fa0e8bbee86700c453c35417715",
+        "tests/test_beta.py": "1d76cf6d5a388ed7c2c12c9d185fdf733b83811208d17700c0ffee73611a3737"
+      }
+    }
+  ],
+  "existing_projects": {
+    "skills": {
+      "same_status": true,
+      "same_diff": true
+    },
+    "website": {
+      "same_status": true,
+      "same_diff": true
+    },
+    "mewoo-ios": {
+      "same_status": false,
+      "same_diff": false
+    }
+  },
+  "guard_publications": 59,
+  "resolved_report_helper_rejection": {
+    "count": 1,
+    "evidence": "/private/tmp/cadra-cohestra-host-20261030-b959_c_u/evidence/report-link-recovery.json",
+    "stages_replayed": false
+  },
+  "report_links": [
+    ".yuzio/cadra/runs/run-20261030-01-report-01.md"
+  ],
+  "finding_exercised": "Independent beta review found the decimal digit conversion bound in the disposable sample. Actual regression failed then passed after original-author fix and same-reviewer re-review. No skill source bug was identified.",
+  "limits": [
+    "Mewoo worktree changed concurrently during this session. This acceptance wrote only inside the disposable harness; those external changes were preserved, not attributed or reverted.",
+    "The temporary report serializer initially added a newline; the shipped guard rejected the body change. Existing report was then registered with exact body preservation, without replaying stages.",
+    "Skill copies were selected by explicit paths in a disposable environment; global installation and automatic host discovery were not changed or tested.",
+    "No host restart/takeover, crash recovery or unknown-command replay scenario was exercised.",
+    "No publication, push, release, real business queue or existing-project task was executed.",
+    "list_agents calls initially aborted before dispatch while host messages arrived; later successful host status queries and actual process evidence were used.",
+    "Alpha finalization retains all six actual alpha test dependencies; independent beta paths are not alpha inputs. Group closure checks the final overall candidate."
+  ],
+  "original_source_matches_tested_copies_at_completion": {
+    "cadra": true,
+    "cohestra": true
+  },
+  "final_successful_test_cases": {
+    "alpha": 9,
+    "beta": 10
+  },
+  "total_stage_calls": 8,
+  "all_acceptance_writes_within_disposable_harness": true,
+  "completed_at": "2026-10-30T09:47:27.034950+00:00",
+  "no_commit_or_publication": true
+}

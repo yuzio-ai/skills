@@ -1,0 +1,50 @@
+{
+  "links_checked": 122,
+  "missing": [],
+  "untracked_document_references": [
+    {
+      "source": "README.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "README.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "README.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "README.zh-CN.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "README.zh-CN.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "README.zh-CN.md",
+      "required_file": "cadra/references/scheduling.md"
+    },
+    {
+      "source": "tests/README.md",
+      "required_file": "tests/cadra/test_scheduler.py"
+    },
+    {
+      "source": "tests/README.md",
+      "required_file": "tests/cadra/test_list_summary.py"
+    },
+    {
+      "source": "tests/README.md",
+      "required_file": "tests/cadra/test_list_legacy.py"
+    },
+    {
+      "source": "tests/README.md",
+      "required_file": "tests/cadra/test_list_optimization.py"
+    },
+    {
+      "source": "tests/README.md",
+      "required_file": "output/cadra-list-scaling-20261030/verify.py"
+    }
+  ]
+}

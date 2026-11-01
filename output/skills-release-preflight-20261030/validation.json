@@ -1,0 +1,79 @@
+{
+  "checked_at": "2026-10-30T08:57:32.163724+00:00",
+  "status": "local_checks_passed_live_host_acceptance_pending",
+  "packages": {
+    "cadra": {
+      "version": "0.14.0",
+      "protocol_version": "0.11",
+      "files": 37,
+      "links": 167,
+      "entry_format": "passed",
+      "version_history": "passed"
+    },
+    "cohestra": {
+      "version": "0.14.0",
+      "protocol_version": "0.8",
+      "files": 23,
+      "links": 67,
+      "entry_format": "passed",
+      "version_history": "passed"
+    }
+  },
+  "tests": {
+    "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+    "exit_code": 0,
+    "count": 461,
+    "skipped": 0,
+    "log": "unittest.log"
+  },
+  "compatibility_review": {
+    "Cadra": "New mandatory ready_scope/scheduler and group state semantics use protocol 0.11; execution does not accept 0.10, only list reads it without migration. Package minor increment is appropriate for pre-1.0 incompatible protocol changes.",
+    "Cohestra": "New stage-local orchestration waits and process delivery require a minor package increment; formal control contract remains 0.8 with unchanged fields/enums.",
+    "other_skills": "Full-suite and version-history checks pass for unchanged Vistra and Relatra."
+  },
+  "integrity": {
+    "full_git_history": true,
+    "source_unchanged_during_tests": true,
+    "matches_website_source_snapshot": true,
+    "website_candidate_matches_complete_verification": true,
+    "diff_check": "passed",
+    "repository_doc_links_checked": 122,
+    "missing_links": []
+  },
+  "release_preparation": {
+    "branch": "main",
+    "local_head": "e1d7fcbbb7ceb3a4b8193ae19dfeb7954264ef11",
+    "package_changes_uncommitted": true,
+    "required_new_package_files": [
+      "cadra/references/list-details.md",
+      "cadra/references/scheduling.md",
+      "cadra/scripts/list_legacy_010.py",
+      "cadra/scripts/list_summary.py",
+      "cadra/scripts/scheduler.py"
+    ],
+    "required_new_test_files": [
+      "tests/cadra/test_list_legacy.py",
+      "tests/cadra/test_list_optimization.py",
+      "tests/cadra/test_list_summary.py",
+      "tests/cadra/test_scheduler.py"
+    ],
+    "additional_untracked_doc_reference": "output/cadra-list-scaling-20261030/verify.py",
+    "reviewable_file_list": "publish-files.json"
+  },
+  "public_source": "public-source.json",
+  "installed_copy": "installed-copy.json",
+  "before_publication": [
+    "Include all 5 new package files and accompanying tests/docs; omitting untracked modules would break the package.",
+    "Recommended: accept an isolated real-host run with both 0.14 packages loaded, disjoint fixed grouping, original-role resource waiting/resume and group closure. Current installed copies are older; no such new-host execution was performed in this check.",
+    "Publish the two compatible package candidates together; confirm public files/versions after publishing before deploying the new website copy."
+  ],
+  "local_upgrade_boundary": "Before replacing a 0.10 Cadra environment, close old runs in their original environment, back up/archive unchanged records, and re-prepare remaining work. This check did not inspect or operate any business queue.",
+  "environment_notes": [
+    "Default Python lacked PyYAML for the optional system skill-format validator. Validation passed using an isolated uv environment with PyYAML; no global Python packages or skill dependencies were changed."
+  ],
+  "limits": [
+    "No installer invocation, real child-agent run or business queue execution.",
+    "No source edits, staging, commit, push, tag, GitHub Release or website deployment.",
+    "Offline tests use actual shipped reducer/guard with synthetic host observations; they do not establish real host execution behavior."
+  ]
+}

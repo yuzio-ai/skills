@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-10-30T08:57:32.163411+00:00",
+  "cadra": {
+    "version": "0.10.0",
+    "protocol_version": "0.10",
+    "sha": "cef5f7008c942b184baafa503871a2b8fe68d1d7",
+    "source": "https://github.com/yuzio-ai/skills/blob/main/cadra/release.json"
+  },
+  "cohestra": {
+    "version": "0.13.1",
+    "protocol_version": "0.8",
+    "sha": "81bf99f08119c1a2944083fcaa84e31617b8cabc",
+    "source": "https://github.com/yuzio-ai/skills/blob/main/cohestra/release.json"
+  }
+}

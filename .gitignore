@@ -1,6 +1,14 @@
 # Local execution data and maintenance backups (repository root only)
 /.yuzio/
 
+# Temporary output only; keep reports, logs, scripts, and evidence archives trackable
+/output/.local/
+/output/**/.yuzio/
+/output/**/tmp/
+/output/**/.tmp/
+/output/**/*.tmp
+/output/**/*.bak
+
 # Python caches and bytecode
 __pycache__/
 *.py[cod]
