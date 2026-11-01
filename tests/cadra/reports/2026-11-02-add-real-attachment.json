@@ -1,0 +1,160 @@
+{
+  "date": "2026-11-02",
+  "timezone": "Asia/Shanghai",
+  "status": "passed_for_attachment_retention_and_readback",
+  "cadra_version": "0.17.0",
+  "cadra_protocol": "0.12",
+  "source_commit": "e3b8a7434699257d3fe25b93ca15b76be410f9a4",
+  "cadra_git_tree": "571154d2419e7f6427a6ffb020bf07ebde68e602",
+  "temporary_root": "/private/tmp/cadra-real-attachment-tjzyagww",
+  "method": "real current user image attachment; actual Cadra add by independent agent; clean-context read-only handoff; not a synthetic image fixture or full engineering run",
+  "agents": [
+    {
+      "task_name": "/root/cadra_real_attachment_add",
+      "fork_turns": "none",
+      "role": "add_preparer"
+    },
+    {
+      "task_name": "/root/cadra_real_attachment_reader",
+      "fork_turns": "none",
+      "role": "read_only_recipient"
+    }
+  ],
+  "observed": {
+    "input.json": {
+      "root": "/private/tmp/cadra-real-attachment-tjzyagww",
+      "project": "/private/tmp/cadra-real-attachment-tjzyagww/project",
+      "source_attachment": "/var/folders/2q/s5d5ttp9495_8f42knmdq69r0000gn/T/codex-clipboard-59044100-8b8a-4035-b6ca-3b757412ea20.png",
+      "source_sha256": "a7e13c75f9bed589538915c7978da3f3ffe5743c74b5c378d25cb69d101b116e",
+      "source_size": 402806,
+      "user_confirmation": "我重新附上设计稿了，确认采用这个方案。",
+      "confirmation_source": "本次实际用户消息",
+      "user_manually_provided_path": false,
+      "host_supplied_attachment_path": true
+    },
+    "source-image.json": {
+      "name": "codex-clipboard-59044100-8b8a-4035-b6ca-3b757412ea20.png",
+      "format": "PNG",
+      "width": 864,
+      "height": 2016,
+      "size": 402806,
+      "sha256": "a7e13c75f9bed589538915c7978da3f3ffe5743c74b5c378d25cb69d101b116e",
+      "origin": "actual current user attachment, host-supplied temporary path",
+      "confirmation": "我重新附上设计稿了，确认采用这个方案。",
+      "instruction_boundary": "Image text is design content, not executable authorization."
+    },
+    "copy-checks.json": {
+      "saved_image": "/private/tmp/cadra-real-attachment-tjzyagww/project/.yuzio/cadra/tasks/veyra-approved-design/inputs/20261102T015839396509+0800/codex-clipboard-59044100-8b8a-4035-b6ca-3b757412ea20.png",
+      "sha256": "a7e13c75f9bed589538915c7978da3f3ffe5743c74b5c378d25cb69d101b116e",
+      "byte_equal_to_real_upload": true,
+      "independent_copy": true,
+      "dimensions": [
+        864,
+        2016
+      ],
+      "user_confirmation_quote_saved": true,
+      "source_unchanged": true,
+      "no_run_or_cohestra": true
+    },
+    "project-before-reader.json": {
+      ".gitignore": "135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01",
+      "AGENTS.md": "e247293aeedcd57eee1d1b851477dfa7f7696c90b99deabef9c476997d98e95c",
+      ".yuzio/cadra/README.md": "7752a0ed987dfbcba16a7e35bf1428ffa2151670b54d254e016d60237c3b6173",
+      ".yuzio/cadra/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      ".yuzio/cadra/tasks/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".yuzio/cadra/tasks/veyra-approved-design.md": "4de66c85ec961aecf3d1d96cb807042f76bb5791e72b5984938197f9a11ce6a9",
+      ".yuzio/cadra/runs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      ".yuzio/cadra/tasks/veyra-approved-design/inputs/20261102T015839396509+0800/codex-clipboard-59044100-8b8a-4035-b6ca-3b757412ea20.png": "a7e13c75f9bed589538915c7978da3f3ffe5743c74b5c378d25cb69d101b116e"
+    },
+    "final-verification.json": {
+      "project_unchanged_after_reader": true,
+      "original_user_attachment_unchanged": true,
+      "reader": "/root/cadra_real_attachment_reader",
+      "reader_fork_turns": "none",
+      "reader_input": "project path and Task path only; saved image located from Task",
+      "reader_excluded": "original attachment, original chat, parent history, test evidence",
+      "visual_details_not_in_task": [
+        "顶部中央向上尖角",
+        "子代理区水平分隔线",
+        "子代理路径等宽字形",
+        "累计Token行的折叠箭头",
+        "下载入口右上斜箭头"
+      ],
+      "list_counts": {
+        "draft": 1
+      },
+      "issues": [],
+      "image_handoff_passed": true,
+      "product_implementation_tested": false
+    },
+    "list-summary.json": {
+      "project": "/private/tmp/cadra-real-attachment-tjzyagww/project",
+      "protocol": "0.12",
+      "execution_protocol": "0.12",
+      "supported_protocols": [
+        "0.10",
+        "0.11",
+        "0.12"
+      ],
+      "timezone": "Asia/Shanghai",
+      "initialized": true,
+      "issues": [],
+      "counts": {
+        "draft": 1
+      },
+      "queues": [],
+      "groups": [
+        {
+          "state": "draft",
+          "count": 1,
+          "tasks": [
+            {
+              "slug": "veyra-approved-design",
+              "title": "Veyra 图示方案留存验收",
+              "state": "draft",
+              "source": "/private/tmp/cadra-real-attachment-tjzyagww/project/.yuzio/cadra/tasks/veyra-approved-design.md",
+              "created_at": "2026-11-02 02:01",
+              "protocol": "0.12",
+              "details": {
+                "revision": 1,
+                "priority": "medium",
+                "flow": "code",
+                "dependencies": {}
+              }
+            }
+          ]
+        }
+      ],
+      "runs": [],
+      "scan": {
+        "tasks": 1,
+        "runs": 0,
+        "stable": true
+      },
+      "protocols": {
+        "0.12": 1
+      },
+      "total": 1,
+      "result_mode": "summary"
+    }
+  },
+  "local_evidence_file_sha256": {
+    "input.json": "e3dc1d84d6dd2902f55ad1ccfe39f4de379f35b953a013185e8bda00d9f87569",
+    "source-image.json": "d4769b7d38988a31f2125d884f1492e048577ab10b55c26b77337504eaa41e6b",
+    "copy-checks.json": "d51cc480a4e380e775a068bb70aa065ec0a8939e4962f868298aac9bed68a227",
+    "project-before-reader.json": "86cbdd3b0950084b3e2781011904670d04907003602da85a914d4ac08902ed5d",
+    "final-verification.json": "0919507c03a87d39136915d4b3ac1330ee998ec86f6073afc5374e80fa340fa3",
+    "list-summary.json": "3f41913758fa0632e0113631cc7c919499f7107040be074dbc8b12225c566760"
+  },
+  "archived_snapshots": {
+    "task.md": "4de66c85ec961aecf3d1d96cb807042f76bb5791e72b5984938197f9a11ce6a9",
+    "reader-report.md": "c9816f24d5ad7feaf8c2a2553102c91e1a6d9e19d1d3d80a7b792f545e59a164"
+  },
+  "limits": [
+    "No manually typed user path was needed; the host supplied a readable temporary attachment path.",
+    "Not tested: model-visible-only image with no file, bytes or permitted export.",
+    "No ready/run, product implementation, interaction or engineering acceptance.",
+    "Original PNG and full temporary project are not committed; temporary files may be cleared.",
+    "Reader report is a retained summary of the actual final delivery, not a full tool-call transcript."
+  ]
+}
