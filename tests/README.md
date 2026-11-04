@@ -46,6 +46,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
 | [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
+| [test_closeout_concurrency_fixture.py](cohestra/test_closeout_concurrency_fixture.py)、[closeout_concurrency_fixture.py](cohestra/closeout_concurrency_fixture.py) | closeout 并发实测的隔离输入、受控 Cadra 记录与真实进程探针；回归验证两个进程等待后互斥执行，并拒绝重叠占用日志，不模拟 agent 决策 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
 | [test_reports.py](relatra/test_reports.py)、[周期报告样例](relatra/examples/README.md) | 重点正文与完整明细、日周月归纳、锚点、资源覆盖及可复现样例 |
@@ -84,5 +85,7 @@ Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见�
 | 2026-10-26 | [0.10 流程统一与本地切换](cadra/reports/2026-10-26-flow-unification.md) | Cadra 0.10.0 / 协议 0.10；Cohestra 0.13.1 / 契约 0.8 | 0.10 切换、网站检查和真实 live smoke；已被 0.11 取代 |
 | 2026-10-26 | [review 闭环预设验证](cadra/reports/2026-10-26-review-preset.md) | Cadra 0.10.0 / 协议 0.9 方案 | 已标注为历史检查点，被协议 0.10 取代 |
 | 2026-11-02 | [add 真实会话附件留存](cadra/reports/2026-11-02-add-real-attachment.md) | Cadra 0.17.0 / 协议 0.12 | 真实上传图片与采用确认留存、独立只读交接；宿主自动提供附件临时路径，未执行 ready/run 或工程验收 |
+| 2026-11-04 | [单任务 closeout 前向验证](cohestra/reports/2026-11-04-closeout.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 隔离项目实际独立初审、整改、复审、验收与收尾；最终草稿重复调用复用证据，未实测全部异常路径 |
+| 2026-11-04 | [closeout 跨会话并发实测](cohestra/reports/2026-11-04-closeout-concurrency.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 两个实际执行会话与未完成 Run 夹具共存、真实验证进程互斥、已知同文件冲突停止及安全接续；占用信息和项目锁为明确输入 |
 
 当前验收要求以各[场景清单](#行为场景与辅助工具)为准；报告中的通过数量只对应所列版本。

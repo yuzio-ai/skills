@@ -1,0 +1,393 @@
+{
+  "observed_at": "2026-11-04T13:26:57.062664+08:00",
+  "source": {
+    "repository_head": "b508a5bdc3242812cba7a7141f00de39872e8163",
+    "release": {
+      "version": "0.16.0",
+      "protocol_version": "0.8",
+      "repository": "https://github.com/yuzio-ai/skills",
+      "skill_path": "cohestra"
+    },
+    "normal_flow_skill_files": {
+      "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+      "release.json": "d0b7e5a47a63c6810248f8afccbb9793bd56a7988ebf2e0fc92d723d8a4b4f65",
+      "SKILL.md": "558a641798940db0557187f1b3f854ec97a5b156632fc86d6b78b19ebb1c72c3",
+      "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+      "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+      "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+      "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+      "references/need.md": "0f717c3d7e58b09baff0e464f392c562a4abe1ac78a8ded95175d0074a9baf21",
+      "references/closeout.md": "a28c940a375a5f1d0e8f18da14253d60e16aa1a9055ec66381dcc4ada17420de",
+      "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+      "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+      "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+      "references/workflow.md": "cba109d0f6b45783b5a019623d904b54533b719807a70044335f623483fd9487",
+      "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+      "references/review-coverage.md": "10930ece168aaaf6b78238795bf895e6a100796cd02822a7abc8ed419aae1488",
+      "references/design.md": "5589a89cb2e2065bb860e9c596fec13d7f335f29d363e995c81c1c96d6f01219",
+      "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+      "references/review.md": "1c2dc2273d6c82b0d19407dbdc5d7df9f10e9b6df9cdc389a2136c2ae3c38850",
+      "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+      "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+      "assets/handoff.md": "285f605908872e4fb414204f8245196a5ec6e149406ef7c12dd9bd8ae7cfdde4",
+      "assets/project/README.md": "68a42db1d255b79749be9274d286dfd495d1c37158b2d1408a6abfc15e5d4cd4",
+      "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "final_repeat_skill_files": {
+      "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+      "release.json": "d0b7e5a47a63c6810248f8afccbb9793bd56a7988ebf2e0fc92d723d8a4b4f65",
+      "SKILL.md": "558a641798940db0557187f1b3f854ec97a5b156632fc86d6b78b19ebb1c72c3",
+      "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+      "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+      "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+      "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+      "references/need.md": "0f717c3d7e58b09baff0e464f392c562a4abe1ac78a8ded95175d0074a9baf21",
+      "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+      "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+      "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+      "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+      "references/workflow.md": "cba109d0f6b45783b5a019623d904b54533b719807a70044335f623483fd9487",
+      "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+      "references/review-coverage.md": "10930ece168aaaf6b78238795bf895e6a100796cd02822a7abc8ed419aae1488",
+      "references/design.md": "5589a89cb2e2065bb860e9c596fec13d7f335f29d363e995c81c1c96d6f01219",
+      "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+      "references/review.md": "1c2dc2273d6c82b0d19407dbdc5d7df9f10e9b6df9cdc389a2136c2ae3c38850",
+      "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+      "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+      "assets/handoff.md": "285f605908872e4fb414204f8245196a5ec6e149406ef7c12dd9bd8ae7cfdde4",
+      "assets/project/README.md": "68a42db1d255b79749be9274d286dfd495d1c37158b2d1408a6abfc15e5d4cd4",
+      "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "variant_changed_files": [
+      "references/closeout.md"
+    ],
+    "final_repeat_skill_matches_repository": true,
+    "skill_copies_unchanged_during_execution": true
+  },
+  "environment": {
+    "python": "3.14.8",
+    "host": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "prepublication_parser": "Ruby Psych; Python yaml unavailable in executing agent environment"
+  },
+  "normal_flow": {
+    "request_sha256": "dc651a5b16404455f71a1a10bd40fb7a28402dc15a9bbf2600bec296e313e1ee",
+    "task_directory": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization",
+    "baseline_and_unchanged_head": "3046caf70f79550529b1aaee63a11ce696569633",
+    "reviewer": "/root/closeout_forward_test/independent_label_reviewer",
+    "worker_and_validator": "/root/closeout_forward_test",
+    "identity_source": "actual collaboration agent tree and stage publications",
+    "stages": [
+      {
+        "name": "review-01",
+        "handoff_sha256": "8bcad077976849a54cb32135032f203384f2d85878a221abfa5fbb9be3422dff",
+        "publication": {
+          "result": "PASS",
+          "index_sync": "succeeded",
+          "index_path": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/README.md",
+          "index_sha256": "a4baaa8dfe2cf2c0ed4b724b505fde96d3e418ed1fb1a6867b93d980c3da1148",
+          "stage": "review",
+          "round": 1,
+          "actual_agent": "/root/closeout_forward_test/independent_label_reviewer",
+          "precheck_path": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/review-01-index-precheck.json",
+          "candidate_source": "review-01.md",
+          "business_candidate_unchanged": true,
+          "unrelated_files_preserved": true,
+          "readback_at": "2026-11-04T13:16:22.759005+08:00"
+        }
+      },
+      {
+        "name": "fix-01",
+        "handoff_sha256": "25a2e4b5be9798466fa5711e4c24e29e2659cd7a12f5c17903d1787c26b56893",
+        "publication": {
+          "result": "PASS",
+          "index_sync": "succeeded",
+          "stage": "fix",
+          "round": 1,
+          "index_sha256": "11d7bbda4f4a0624529c7fd6ec2c14858ff597f413d191eefc61110754cf5d28",
+          "precheck_sha256": "54c16c556f9fffe63fb20d8770c4be00de74cfdf463d541f8c16a128bbfb9ff0",
+          "readback_at": "2026-11-04T13:19:14.367550+08:00"
+        }
+      },
+      {
+        "name": "review-02",
+        "handoff_sha256": "f753d5154eb835f686f17c79f5e3556886ba5aea8c02090908e8025ff7896d83",
+        "publication": {
+          "result": "PASS",
+          "index_sync": "succeeded",
+          "index_path": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/README.md",
+          "index_sha256": "6462839c1aadeda16c3a968c54cf3dd81a443990b2309f4055771d54c7066959",
+          "stage": "review",
+          "round": 2,
+          "actual_agent": "/root/closeout_forward_test/independent_label_reviewer",
+          "candidate_source": "review-02.md",
+          "business_candidate_unchanged": true,
+          "unrelated_files_preserved": true,
+          "readback_at": "2026-11-04T13:22:11.607964+08:00"
+        }
+      },
+      {
+        "name": "validate-01",
+        "handoff_sha256": "f1d2c29cbbeafcecf5b894facc4bea96b51292e6576b184673589413bdd41794",
+        "publication": {
+          "result": "PASS",
+          "index_sync": "succeeded",
+          "stage": "validate",
+          "round": 1,
+          "index_sha256": "923831743182631f67c79c5b9a890bf7f9831b6488dc5d88a755830b8be47de7",
+          "precheck_sha256": "f743aa98d6be8337a7d6245483223481e1f5b467c09cd6f7011e9d0581239c3a",
+          "readback_at": "2026-11-04T13:23:45.492645+08:00"
+        }
+      }
+    ],
+    "initial_blocking_findings": 3,
+    "final_blocking_findings": 0,
+    "fix_rounds": 1,
+    "candidate_manifest_sha256": "96cfeecedf71440f64c22f796797e30409272bc86d3e936b9afa0a42a0ff5997",
+    "review_checks": {
+      "result": "PASS",
+      "candidate": "candidate-02",
+      "timestamp": "2026-11-04T13:20:15.940544+08:00",
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "test_methods": 2,
+      "suite_subcases": 12,
+      "independent_direct_cases": [
+        {
+          "input": "Mewoo",
+          "expected": "Mewoo",
+          "actual": "Mewoo"
+        },
+        {
+          "input": "  Mewoo  ",
+          "expected": "Mewoo",
+          "actual": "Mewoo"
+        },
+        {
+          "input": "",
+          "expected": "Untitled",
+          "actual": "Untitled"
+        },
+        {
+          "input": "   ",
+          "expected": "Untitled",
+          "actual": "Untitled"
+        },
+        {
+          "input": "\t\n",
+          "expected": "Untitled",
+          "actual": "Untitled"
+        },
+        {
+          "input": "  Mewoo  Cat  ",
+          "expected": "Mewoo  Cat",
+          "actual": "Mewoo  Cat"
+        }
+      ],
+      "independent_cli_cases": 6,
+      "runs": [
+        {
+          "name": "candidate suite",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "",
+          "stderr": "test_cli (test_labels.LabelTests.test_cli) ... ok\ntest_display_label (test_labels.LabelTests.test_display_label) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.120s\n\nOK\n"
+        },
+        {
+          "name": "independent direct matrix",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "-c",
+            "from labels import display_label; import json; cases=[['Mewoo', 'Mewoo'], ['  Mewoo  ', 'Mewoo'], ['', 'Untitled'], ['   ', 'Untitled'], ['\\t\\n', 'Untitled'], ['  Mewoo  Cat  ', 'Mewoo  Cat']]; print(json.dumps([{\"input\":x,\"expected\":want,\"actual\":display_label(x)} for x,want in cases]))"
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "[{\"input\": \"Mewoo\", \"expected\": \"Mewoo\", \"actual\": \"Mewoo\"}, {\"input\": \"  Mewoo  \", \"expected\": \"Mewoo\", \"actual\": \"Mewoo\"}, {\"input\": \"\", \"expected\": \"Untitled\", \"actual\": \"Untitled\"}, {\"input\": \"   \", \"expected\": \"Untitled\", \"actual\": \"Untitled\"}, {\"input\": \"\\t\\n\", \"expected\": \"Untitled\", \"actual\": \"Untitled\"}, {\"input\": \"  Mewoo  Cat  \", \"expected\": \"Mewoo  Cat\", \"actual\": \"Mewoo  Cat\"}]\n",
+          "stderr": ""
+        },
+        {
+          "name": "independent CLI 'Mewoo'",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            "Mewoo"
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Mewoo\n",
+          "stderr": "",
+          "expected_stdout": "Mewoo\n",
+          "matches": true
+        },
+        {
+          "name": "independent CLI '  Mewoo  '",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            "  Mewoo  "
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Mewoo\n",
+          "stderr": "",
+          "expected_stdout": "Mewoo\n",
+          "matches": true
+        },
+        {
+          "name": "independent CLI ''",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            ""
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Untitled\n",
+          "stderr": "",
+          "expected_stdout": "Untitled\n",
+          "matches": true
+        },
+        {
+          "name": "independent CLI '   '",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            "   "
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Untitled\n",
+          "stderr": "",
+          "expected_stdout": "Untitled\n",
+          "matches": true
+        },
+        {
+          "name": "independent CLI '\\t\\n'",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            "\t\n"
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Untitled\n",
+          "stderr": "",
+          "expected_stdout": "Untitled\n",
+          "matches": true
+        },
+        {
+          "name": "independent CLI '  Mewoo  Cat  '",
+          "argv": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "-B",
+            "cli.py",
+            "  Mewoo  Cat  "
+          ],
+          "cwd": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization/scratch/candidate-02/files",
+          "returncode": 0,
+          "stdout": "Mewoo  Cat\n",
+          "stderr": "",
+          "expected_stdout": "Mewoo  Cat\n",
+          "matches": true
+        }
+      ]
+    },
+    "validation_checks": {
+      "result": "PASS",
+      "checked_at": "2026-11-04T13:22:48.306877+08:00",
+      "candidate_manifest_sha256": "96cfeecedf71440f64c22f796797e30409272bc86d3e936b9afa0a42a0ff5997",
+      "current_candidate_and_dependency_match": true,
+      "baseline_and_exact_diff_match": true,
+      "other_session_files_preserved": true,
+      "independent_review": "review-02.md",
+      "reviewer": "/root/closeout_forward_test/independent_label_reviewer",
+      "fix_author_and_validator": "/root/closeout_forward_test",
+      "reviewer_identity_distinct": true,
+      "review_handoff_sha256": "f753d5154eb835f686f17c79f5e3556886ba5aea8c02090908e8025ff7896d83",
+      "review_checks_sha256": "8f6b8b713e391a5837df33cb82bfc7d996abb3613b937a4a30653f2e04de2c51",
+      "reused_checks": "review-02-checks.json",
+      "new_runtime_tests": "none; existing candidate-specific independent evidence is complete",
+      "acceptance": "passed"
+    },
+    "final_contract": {
+      "contract": "0.8",
+      "task": "label-name-normalization",
+      "status": "completed",
+      "execution_mode": "attended",
+      "stage_result": {
+        "stage": "validate",
+        "status": "completed",
+        "round": 1
+      },
+      "candidate": {
+        "commit": null,
+        "snapshot": "validate-01.md"
+      },
+      "findings": {
+        "blocking": 0,
+        "non_blocking": 0,
+        "unresolved": 0
+      },
+      "acceptance": {
+        "status": "passed"
+      },
+      "next": {
+        "stage": null,
+        "allowed": false,
+        "reason": "task_completed"
+      },
+      "blocked": {
+        "value": false,
+        "reason": null
+      }
+    },
+    "preserved_other_session_and_dependency": {
+      "notes/other-session.txt": true,
+      "unrelated.tmp": true,
+      "cli.py": true
+    },
+    "cadra_records_created": false,
+    "original_reply_sha256": "719d113222f1ad2f5c64e36e8070d3f665146d424ba3222a18713a19b702fdcc"
+  },
+  "repeat": {
+    "skill_source": "/private/tmp/cohestra-closeout-qa-megimo4l/skill-final",
+    "task_directory": "/private/tmp/cohestra-closeout-qa-megimo4l/project/.yuzio/cohestra/handoffs/label-name-normalization",
+    "changed_existing_files": [],
+    "added_files": [
+      "repeat-reply.md"
+    ],
+    "existing_file_count": 51,
+    "new_stages": 0,
+    "new_agents_reported": 0,
+    "new_test_runs_reported": 0,
+    "reply_sha256": "d1f2cebc84d23843c9517677864f23e5e9fc1c5969c76e9e34dc3ce44f05ae64",
+    "comparison_source": "SHA-256 before/after comparison plus executing agent final result"
+  },
+  "limits": [
+    "Normal flow used the first frozen draft; final repeat used the final draft. Only references/closeout.md changed between them: review-only endpoint continuation, total-call budget, prepublication closeout recording and more precise readonly/reviewer wording.",
+    "Fault, exhaustion, missing-agent and concurrent-drift paths are documented acceptance scenarios, not live-tested here.",
+    "Temporary fixture and full logs may later be removed by the operating system. This record preserves observations, identities and hashes, not the complete runtime workspace.",
+    "No global installation, commit, push or release was performed."
+  ]
+}

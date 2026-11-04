@@ -1,0 +1,966 @@
+{
+  "observed_at": "2026-11-04T15:33:53.359454+08:00",
+  "source_repository_head": "b508a5bdc3242812cba7a7141f00de39872e8163",
+  "release": {
+    "version": "0.16.0",
+    "protocol_version": "0.8",
+    "repository": "https://github.com/yuzio-ai/skills",
+    "skill_path": "cohestra"
+  },
+  "tested_skill_matches_repository": true,
+  "disjoint_and_shared_validation": {
+    "observed_at": "2026-11-04T14:52:59.942521+08:00",
+    "fixture": {
+      "mode": "disjoint",
+      "baseline": "3277ad65e4f46d60621e18e34552be51a70e9386",
+      "project": "/private/tmp/cohestra-concurrent-disjoint-20261104/project",
+      "skill": "/private/tmp/cohestra-concurrent-disjoint-20261104/skill",
+      "cadra_run": "/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cadra/runs/run-20261104-91.md",
+      "cadra_sha256": "6c9902eb86a7b611fe1641e50a1df12936e4c6fcf081416b038a67c294d700fd",
+      "preserved": {
+        "other-session.txt": "2cb7fcfe910f159c652c33d3567db29b20574b6f0674e6be4876140c15080e0d",
+        "cadra-owned.txt": "633125f9f60eb250a7f00b14892cf21d5af0081c52a063f26db8044869bf3d86",
+        "tools/probe.py": "eaae6b97d7352c8e85efd9b39b1380da352dc10a2a494fad2190461f6eda3e69",
+        "AGENTS.md": "cc6c2c87090bee0844259646f2cdc5a76c24c2eb688336ec5118afd10df11d93"
+      },
+      "skill_hashes": {
+        "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "release.json": "d0b7e5a47a63c6810248f8afccbb9793bd56a7988ebf2e0fc92d723d8a4b4f65",
+        "SKILL.md": "558a641798940db0557187f1b3f854ec97a5b156632fc86d6b78b19ebb1c72c3",
+        "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+        "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+        "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+        "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+        "references/need.md": "0f717c3d7e58b09baff0e464f392c562a4abe1ac78a8ded95175d0074a9baf21",
+        "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+        "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+        "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+        "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+        "references/workflow.md": "cba109d0f6b45783b5a019623d904b54533b719807a70044335f623483fd9487",
+        "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+        "references/review-coverage.md": "10930ece168aaaf6b78238795bf895e6a100796cd02822a7abc8ed419aae1488",
+        "references/design.md": "5589a89cb2e2065bb860e9c596fec13d7f335f29d363e995c81c1c96d6f01219",
+        "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+        "references/review.md": "1c2dc2273d6c82b0d19407dbdc5d7df9f10e9b6df9cdc389a2136c2ae3c38850",
+        "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+        "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+        "assets/handoff.md": "285f605908872e4fb414204f8245196a5ec6e149406ef7c12dd9bd8ae7cfdde4",
+        "assets/project/README.md": "68a42db1d255b79749be9274d286dfd495d1c37158b2d1408a6abfc15e5d4cd4",
+        "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "tasks": {
+      "alpha": {
+        "contract": {
+          "contract": "0.8",
+          "task": "parallel-alpha",
+          "status": "completed",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": "3277ad65e4f46d60621e18e34552be51a70e9386",
+            "snapshot": null
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "index_sha256": "97fee7dac0026f818633fb114de521ca9ccfabd633675320771fab46321e38b8",
+        "handoffs": {
+          "README.md": "97fee7dac0026f818633fb114de521ca9ccfabd633675320771fab46321e38b8",
+          "validate-01.md": "aa005d0aaa7e13c4ef0dc5a85330cd9a5f265fe2001cd846bba25e83ed7f646b",
+          "review-01.md": "1077bf3361eb1209931fa2075e7c9f3a05e3172f2cb8386cef1600389ca5edae"
+        },
+        "reply": "Alpha closeout 已完成。最终候选：`3277ad65e4f46d60621e18e34552be51a70e9386`。\n\n- 独立 reviewer：`/root/parallel_alpha/alpha_reviewer`。零 findings；无需 fix。实际执行 review-01、validate-01，共 2/12 次调用，fix 0/3。\n- 1 个相关测试、8 个直接调用用例通过。`python3 -B tools/probe.py validate alpha` 实际退出码 0；共享锁等待 408.533 秒。未旁路、重放或修改控制资源。\n- [任务索引](/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cohestra/handoffs/parallel-alpha/README.md) 已原子发布并回读：completed / passed，next=null。[验收交付](/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cohestra/handoffs/parallel-alpha/validate-01.md) 与[运行证据](/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cohestra/handoffs/parallel-alpha/evidence/validate-01-evidence.json) 已保留。\n- 角色与验证工具已停止；reviewer 槽已释放；本次临时发布文件已清理。业务文件及必要依赖未改，Cadra 记录、cadra-owned.txt、other-session.txt 与控制输入保持原字节。\n- 已解决的限制：sandbox 不允许本地进程探测，使用 controller 的真实 session 观察；Python yaml 缺失，使用已有 Ruby Psych 完成发布前校验。无剩余阻塞。未安装、提交或推送。\n",
+        "reviewer": "/root/parallel_alpha/alpha_reviewer",
+        "executor": "/root/parallel_alpha",
+        "business_and_dependency_unchanged": true
+      },
+      "beta": {
+        "contract": {
+          "contract": "0.8",
+          "task": "parallel-beta",
+          "status": "completed",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": "3277ad65e4f46d60621e18e34552be51a70e9386",
+            "snapshot": null
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "index_sha256": "975dd43932f06c978be88fcc72e9d5c7732d5babb4a9ad3623d34943e70b9ab1",
+        "handoffs": {
+          "README.md": "975dd43932f06c978be88fcc72e9d5c7732d5babb4a9ad3623d34943e70b9ab1",
+          "validate-01.md": "58d215d0f55c90f8848836d5c5984571f355c105fb6b16e70eb60fb654250a89",
+          "review-01.md": "34bd629c8c6ba4961d029a6d0565c71a7edc74435a6e738b5103754b131a4a01"
+        },
+        "reply": "beta closeout 已完成。最终候选：`3277ad65e4f46d60621e18e34552be51a70e9386`。业务无需整改。\n\n独立评审者 `/root/parallel_beta/beta_reviewer` 未发现问题。1 项相关测试、9 组直接调用及受锁保护的共享验证均通过；共享命令实际等待 50.302 秒后退出 0。\n\n[任务索引](/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cohestra/handoffs/parallel-beta/README.md) 与 [验收交付](/private/tmp/cohestra-concurrent-disjoint-20261104/project/.yuzio/cohestra/handoffs/parallel-beta/validate-01.md) 已发布并完整回读，状态为 completed / passed。角色及工具已停止；本次临时提案已清理，核心证据保留。\n\nCadra 记录、保护文件及其他会话文件均保留。未提交、推送或安装。无遗留或人工事项。\n",
+        "reviewer": "/root/parallel_beta/beta_reviewer",
+        "executor": "/root/parallel_beta",
+        "business_and_dependency_unchanged": true
+      }
+    },
+    "resource": {
+      "attempts": [
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 609982099192125,
+          "pid": 84009,
+          "resource": "shared-validator",
+          "source_sha256": "43e5419b8a5b711d10473051489ae55c334095c28cd9cc75b138d938321d74c6",
+          "task": "alpha",
+          "wall_ns": 1793774466348406000
+        },
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 610341348587916,
+          "pid": 85576,
+          "resource": "shared-validator",
+          "source_sha256": "96df50fdad4bdd3f22cf3a8d1cec600711975a19a0b89fe481c617098efb2e2d",
+          "task": "beta",
+          "wall_ns": 1793774825599220000
+        }
+      ],
+      "intervals": [
+        {
+          "task": "alpha",
+          "pid": 84009,
+          "start_ns": 610390631997000,
+          "end_ns": 610391640949541
+        },
+        {
+          "task": "beta",
+          "pid": 85576,
+          "start_ns": 610391650306666,
+          "end_ns": 610392660474791
+        }
+      ],
+      "pending_pids": [],
+      "queued_before_holder_release": [
+        "alpha",
+        "beta"
+      ],
+      "passed_tasks": [
+        "alpha",
+        "beta"
+      ],
+      "failures": [],
+      "events": [
+        {
+          "kind": "cadra_fixture_owner_started",
+          "monotonic_ns": 609605035187875,
+          "pid": 79227,
+          "wall_ns": 1793774089280970000
+        },
+        {
+          "kind": "holder_acquired",
+          "monotonic_ns": 609606168867000,
+          "pid": 79241,
+          "resource": "shared-validator",
+          "wall_ns": 1793774090414653000
+        },
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 609982099192125,
+          "pid": 84009,
+          "resource": "shared-validator",
+          "source_sha256": "43e5419b8a5b711d10473051489ae55c334095c28cd9cc75b138d938321d74c6",
+          "task": "alpha",
+          "wall_ns": 1793774466348406000
+        },
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 610341348587916,
+          "pid": 85576,
+          "resource": "shared-validator",
+          "source_sha256": "96df50fdad4bdd3f22cf3a8d1cec600711975a19a0b89fe481c617098efb2e2d",
+          "task": "beta",
+          "wall_ns": 1793774825599220000
+        },
+        {
+          "kind": "holder_releasing",
+          "monotonic_ns": 610390611096125,
+          "pid": 79241,
+          "resource": "shared-validator",
+          "wall_ns": 1793774874861923000
+        },
+        {
+          "kind": "validation_acquired",
+          "monotonic_ns": 610390631997000,
+          "pid": 84009,
+          "resource": "shared-validator",
+          "task": "alpha",
+          "wall_ns": 1793774874882822000
+        },
+        {
+          "kind": "validation_passed",
+          "monotonic_ns": 610391640325458,
+          "pid": 84009,
+          "results": [
+            {
+              "actual": "Mewoo",
+              "expected": "Mewoo",
+              "input": "  Mewoo  "
+            },
+            {
+              "actual": "Alpha Untitled",
+              "expected": "Alpha Untitled",
+              "input": ""
+            },
+            {
+              "actual": "Alpha Untitled",
+              "expected": "Alpha Untitled",
+              "input": "   "
+            }
+          ],
+          "source_sha256": "43e5419b8a5b711d10473051489ae55c334095c28cd9cc75b138d938321d74c6",
+          "task": "alpha",
+          "wall_ns": 1793774875891154000
+        },
+        {
+          "kind": "validation_releasing",
+          "monotonic_ns": 610391640949541,
+          "pid": 84009,
+          "resource": "shared-validator",
+          "task": "alpha",
+          "wall_ns": 1793774875891779000
+        },
+        {
+          "kind": "validation_acquired",
+          "monotonic_ns": 610391650306666,
+          "pid": 85576,
+          "resource": "shared-validator",
+          "task": "beta",
+          "wall_ns": 1793774875901134000
+        },
+        {
+          "kind": "validation_passed",
+          "monotonic_ns": 610392659960333,
+          "pid": 85576,
+          "results": [
+            {
+              "actual": "Mewoo",
+              "expected": "Mewoo",
+              "input": "  Mewoo  "
+            },
+            {
+              "actual": "Beta Untitled",
+              "expected": "Beta Untitled",
+              "input": ""
+            },
+            {
+              "actual": "Beta Untitled",
+              "expected": "Beta Untitled",
+              "input": "   "
+            }
+          ],
+          "source_sha256": "96df50fdad4bdd3f22cf3a8d1cec600711975a19a0b89fe481c617098efb2e2d",
+          "task": "beta",
+          "wall_ns": 1793774876910793000
+        },
+        {
+          "kind": "validation_releasing",
+          "monotonic_ns": 610392660474791,
+          "pid": 85576,
+          "resource": "shared-validator",
+          "task": "beta",
+          "wall_ns": 1793774876911310000
+        },
+        {
+          "kind": "cadra_fixture_owner_stopped",
+          "monotonic_ns": 610637908993458,
+          "pid": 79227,
+          "wall_ns": 1793775122160796000
+        }
+      ],
+      "complete": true
+    },
+    "controller_release_observation": {
+      "observed_at": "2026-11-04T14:47:54.769364+08:00",
+      "attempts": [
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 609982099192125,
+          "pid": 84009,
+          "resource": "shared-validator",
+          "source_sha256": "43e5419b8a5b711d10473051489ae55c334095c28cd9cc75b138d938321d74c6",
+          "task": "alpha",
+          "wall_ns": 1793774466348406000
+        },
+        {
+          "kind": "validation_attempt",
+          "monotonic_ns": 610341348587916,
+          "pid": 85576,
+          "resource": "shared-validator",
+          "source_sha256": "96df50fdad4bdd3f22cf3a8d1cec600711975a19a0b89fe481c617098efb2e2d",
+          "task": "beta",
+          "wall_ns": 1793774825599220000
+        }
+      ],
+      "critical_sections_before_release": 0,
+      "cadra_record_unchanged": true,
+      "cadra_owner_session": 95083,
+      "holder_session": 56461,
+      "host_observation": "Both owner/holder exec-session polls returned still-running session IDs immediately before this release; alpha and beta independently reported active queued commands."
+    },
+    "protected_and_cadra_bytes_unchanged": true,
+    "stage_sequences_verified": true,
+    "fixture_skill_unchanged": true,
+    "cleanup": "controller owner and resource-holder exec sessions returned exit 0"
+  },
+  "overlap": {
+    "fixture": {
+      "mode": "overlap",
+      "baseline": "a23a11b683cc9646eda89546d0244d23b051f545",
+      "project": "/private/tmp/cohestra-concurrent-overlap-20261104/project",
+      "skill": "/private/tmp/cohestra-concurrent-overlap-20261104/skill",
+      "cadra_run": "/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cadra/runs/run-20261104-91.md",
+      "cadra_sha256": "dc8b4a237c4ff1899ff9b6c2d0a23a337646d8ed2e7b7db31a4c28b02030c326",
+      "preserved": {
+        "other-session.txt": "2cb7fcfe910f159c652c33d3567db29b20574b6f0674e6be4876140c15080e0d",
+        "cadra-owned.txt": "633125f9f60eb250a7f00b14892cf21d5af0081c52a063f26db8044869bf3d86",
+        "tools/probe.py": "d92c6c566254f5b769ef001dba470719a0acb5bdef1e951057df58b4bd8f2a74",
+        "AGENTS.md": "cc6c2c87090bee0844259646f2cdc5a76c24c2eb688336ec5118afd10df11d93"
+      },
+      "skill_hashes": {
+        "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "release.json": "d0b7e5a47a63c6810248f8afccbb9793bd56a7988ebf2e0fc92d723d8a4b4f65",
+        "SKILL.md": "558a641798940db0557187f1b3f854ec97a5b156632fc86d6b78b19ebb1c72c3",
+        "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+        "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+        "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+        "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+        "references/need.md": "0f717c3d7e58b09baff0e464f392c562a4abe1ac78a8ded95175d0074a9baf21",
+        "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+        "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+        "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+        "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+        "references/workflow.md": "cba109d0f6b45783b5a019623d904b54533b719807a70044335f623483fd9487",
+        "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+        "references/review-coverage.md": "10930ece168aaaf6b78238795bf895e6a100796cd02822a7abc8ed419aae1488",
+        "references/design.md": "5589a89cb2e2065bb860e9c596fec13d7f335f29d363e995c81c1c96d6f01219",
+        "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+        "references/review.md": "1c2dc2273d6c82b0d19407dbdc5d7df9f10e9b6df9cdc389a2136c2ae3c38850",
+        "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+        "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+        "assets/handoff.md": "285f605908872e4fb414204f8245196a5ec6e149406ef7c12dd9bd8ae7cfdde4",
+        "assets/project/README.md": "68a42db1d255b79749be9274d286dfd495d1c37158b2d1408a6abfc15e5d4cd4",
+        "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "tasks": {
+      "alpha": {
+        "contract": {
+          "contract": "0.8",
+          "task": "overlap-alpha",
+          "status": "completed",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": "fix-01.md"
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "reviewer": "/root/parallel_alpha/overlap_alpha_reviewer",
+        "executor": "/root/parallel_alpha",
+        "handoff_sha256": {
+          "review-02.md": "875d1325d9c2eff4af52cb2b59d1aaa2c58138d75d103f7f78dffa0e4c303466",
+          "README.md": "d335291afbcdb0ac56c4b19abc4703f2368ea6f4c740c3b7a88c7672493b1a47",
+          "validate-01.md": "32e3c394346758ef4e3e2bd749f9d87aba9cb40405b021c41d7c9a7cbf2b361f",
+          "review-01.md": "14c846942274dda5e2a16f5860b1f057b94664f743c0cacdafd0ff7916aff003",
+          "fix-01.md": "b9fbd941f7c236aa562dce8ea9d4d66a0eaf9b6ebb8c17f3dfc3921167554b90"
+        },
+        "final_reply": "Alpha closeout 已完成。空名称默认值已修正为 `Alpha Untitled`，回归测试和文档已同步。beta 函数及文件保持原字节。\n\n- 实际阶段：review-01 → fix-01 → review-02 → validate-01，共 4/12 次调用、fix 1/3。独立 reviewer：`/root/parallel_alpha/overlap_alpha_reviewer`；F-ALPHA-001 已关闭。\n- 验证：独立复审 4 项测试、8 个直接调用通过；`python3 -B tools/probe.py validate alpha` 实际退出码 0，锁等待 0.000504 秒。\n- 首轮审查发布后已保持调用者活跃暂停，收到 controller `CONTINUE` 且 beta 入口实际停止后才整改。角色/工具均已停止，reviewer 槽已归还，临时发布文件已清理。\n- [任务索引](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha/README.md) 已原子发布并回读为 completed / passed，next=null。[最终候选快照](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/manifest.json) SHA-256：`7da38337393f00576d8cd73ce5774ff06658e0c1ce57473de5787ac5160f1002`。\n- [验收交付](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha/validate-01.md) 和[证据](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-evidence.json) 保留真实结果。sandbox 进程观察限制、Ruby UTF-8 与辅助断言问题均已解决；无剩余阻塞。\n- Cadra、controller 原始输入、other-session.txt、cadra-owned.txt 和必要依赖保持原字节。未安装、提交或推送。\n",
+        "reply_sha256": "44422285070e6a68c2122241fba16604563e18315ff7bf9ed48f7d79fd8bacea"
+      },
+      "beta": {
+        "contract": {
+          "contract": "0.8",
+          "task": "overlap-beta",
+          "status": "completed",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "validate",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": "fix-01.md"
+          },
+          "findings": {
+            "blocking": 0,
+            "non_blocking": 0,
+            "unresolved": 0
+          },
+          "acceptance": {
+            "status": "passed"
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "task_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "reviewer": "/root/parallel_beta/overlap_beta_reviewer",
+        "executor": "/root/parallel_beta",
+        "handoff_sha256": {
+          "review-02.md": "c05fd5f0e8b332e6684f6d2fdab6486bc8f67679623be9f86789a928a201b3cb",
+          "README.md": "5eeccba701961c0008bdf14c42eebffb6a28cf9ad01984a384e0737c530ad9f8",
+          "validate-01.md": "9bb1080470c58f9a3975487575f1da6fa679f530dfc879bf45c73a6cde5e1e9e",
+          "review-01.md": "8156749e6aebebffb14bb64e4db8d4d30b2bf487dad170cc6150512fa0b24a88",
+          "fix-01.md": "2296eac21dca67f39991bb97de22ab600d57e389971be8330c5fdc21b43c78fe"
+        },
+        "final_reply": "beta closeout 已完成。已将空名称默认值修正为 `Beta Untitled`，补齐回归测试并同步文档。F-BETA-001 已由独立 reviewer `/root/parallel_beta/overlap_beta_reviewer` 复审关闭。\n\n实际执行 review-01 → fix-01 → review-02 → validate-01。最终 4 项相关测试、8 组直接调用通过；项目 guarded shared validator 实际退出 0，锁等待 0.000444 秒。\n\n最终候选为 [fix-01 snapshot](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-beta/candidates/fix-01/manifest.json)，shared.py SHA-256：`39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055`。它继承 alpha 已接受的改动，再加入 beta 三文件增量；初始 commit 仅作基线。\n\n[任务索引](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-beta/README.md) 与 [验收交付](/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-beta/validate-01.md) 已通过独立预校验、原子发布和完整回读，状态为 completed / passed。角色及工具均停止，本次写入权已释放；仅本次临时提案已清理，核心证据保留。\n\nalpha 函数、文件、回复及全部任务记录，历史 reply-beta.md 和 Cadra/其他保护项均保持原字节。未提交、推送、安装或修改 controller 控制文件。无遗留或人工事项。\n",
+        "reply_sha256": "76add4e2e5f8e64aa520cc29b8b3f428788d641f9ff3c5a621e087e3232e9c05"
+      }
+    },
+    "beta_entry_stop": {
+      "observed_at": "2026-11-04T14:56:34.011127+08:00",
+      "source": "beta actual final response plus controller file checks",
+      "executor": "/root/parallel_beta",
+      "stage_calls": 0,
+      "reviewer_spawns": 0,
+      "beta_task_directory_exists": false,
+      "shared_file_sha256": "661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87",
+      "cadra_unchanged": true,
+      "reply_sha256": "853b37b7c88ac320703ac91dad69a6b45a88d282445c973139ee7c0974abe77c",
+      "reply": "beta closeout 尚未完成，已在入口核对后停止冲突范围。未进入 review、fix 或 validate；未创建阶段交付或任务索引，正式阶段调用数为 0。执行者为 `/root/parallel_beta`，未申请或占用 reviewer 容量，未启动 reviewer。\n\n当前事实：`.test/peer-alpha.json` 记录 `/root/parallel_alpha` 与其独立评审者 `/root/parallel_alpha/overlap_alpha_reviewer` 正在运行；本轮实际 `list_agents` 再次确认两者为 running。alpha 的作用范围包含 `shared.py`，该文件也属于 beta；alpha closeout 尚未退出或释放目标。两项任务虽分别修改不同函数，仍共享同一候选文件，不能在占用期间接管。\n\n依据本次冻结 [closeout 规则](/private/tmp/cohestra-concurrent-overlap-20261104/skill/references/closeout.md)：『目标若正被 Cadra 或其他会话占用，或相关执行活性未知，停止冲突部分，不接管。』实际 Skill 为 `/private/tmp/cohestra-concurrent-overlap-20261104/skill/SKILL.md`，发行版本 0.16.0，协议 0.8。\n\n初始候选 `a23a11b683cc9646eda89546d0244d23b051f545` 尚未接受独立 beta 审查或验收。`shared.py`、双方测试/文档和必要依赖均仍逐字节匹配该提交；共享文件 SHA-256 为 `661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87`。本次未运行私有测试或共享验证，未修改任何业务文件，也未把源码观察当作正式 finding 或验收结论。此前 disjoint 项目的证据未用于本任务。\n\n无关 synthetic Cadra Run 仅拥有 `cadra-owned.txt`；controller 提供其 owner 仍在 session 77792 运行的观察。它与本任务不冲突，不是停止原因。本次未接管或修改 Cadra、alpha、控制文件、`other-session.txt` 或 `cadra-owned.txt`。当前 Cadra Run SHA-256：`dc8b4a237c4ff1899ff9b6c2d0a23a337646d8ed2e7b7db31a4c28b02030c326`。\n\n恢复输入：确认 alpha 的阶段、工具和 closeout caller 已实际停止或完成明确安全交接，并确认 `shared.py` 的写入权；随后重读 alpha 的实际差异和最新共享候选，保留另一函数，重新固定 beta 候选，再请求 reviewer 容量并用干净上下文执行独立 review。完成必要整改、复审和 guarded validate 后才能收口。本轮不要求用户额外授权，也不停止其他会话。\n",
+      "watch_events": [
+        {
+          "kind": "cadra_fixture_owner_started",
+          "monotonic_ns": 610432966967750,
+          "pid": 85962,
+          "wall_ns": 1793774917217961000
+        },
+        {
+          "kind": "watch_started",
+          "monotonic_ns": 610434140115625,
+          "pid": 85972,
+          "wall_ns": 1793774918391114000
+        },
+        {
+          "content": "def normalize_alpha(name):\n    return name.strip() or \"wrong-alpha\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+          "kind": "shared_file_observed",
+          "monotonic_ns": 610434140547041,
+          "pid": 85972,
+          "sha256": "661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87",
+          "wall_ns": 1793774918391546000
+        }
+      ]
+    },
+    "peer_before_beta_start": {
+      "observed_at": "2026-11-04T14:54:08.402258+08:00",
+      "source": "actual collaboration list_agents and alpha started message",
+      "executor": "/root/parallel_alpha",
+      "executor_status": "running",
+      "reviewer": "/root/parallel_alpha/overlap_alpha_reviewer",
+      "reviewer_status": "running",
+      "task_directory": "/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha",
+      "business_scope": {
+        "files": [
+          "shared.py",
+          "tests/test_alpha.py",
+          "docs/alpha.md"
+        ],
+        "behavior": "normalize_alpha only"
+      },
+      "request_source": "/private/tmp/cohestra-concurrent-overlap-20261104/request-alpha.txt",
+      "source_candidate_commit": "a23a11b683cc9646eda89546d0244d23b051f545",
+      "host_observation": "Alpha closeout has not returned; its first independent review is actually running. Controller will observe its first review safe boundary before allowing its fix.",
+      "shared_file_sha256": "661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87"
+    },
+    "alpha_continue": {
+      "observed_at": "2026-11-04T14:58:52.072174+08:00",
+      "source": "actual alpha reviewer completion, caller readback and controller YAML/hash checks",
+      "alpha_review_contract": {
+        "contract": "0.8",
+        "task": "overlap-alpha",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 1
+        },
+        "candidate": {
+          "commit": "a23a11b683cc9646eda89546d0244d23b051f545",
+          "snapshot": null
+        },
+        "findings": {
+          "blocking": 1,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "next": {
+          "stage": "fix",
+          "allowed": true,
+          "reason": "blocking_findings"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "beta_stopped_before_stage": true,
+      "continue_granted": true
+    },
+    "accepted_alpha": {
+      "observed_at": "2026-11-04T15:12:49.129350+08:00",
+      "source": "actual alpha final response and controller contract/hash checks",
+      "executor": "/root/parallel_alpha",
+      "executor_status": "completed",
+      "roles_and_tools_stopped": true,
+      "write_ownership_released": true,
+      "task_directory": "/private/tmp/cohestra-concurrent-overlap-20261104/project/.yuzio/cohestra/handoffs/overlap-alpha",
+      "contract": {
+        "contract": "0.8",
+        "task": "overlap-alpha",
+        "status": "completed",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "validate",
+          "status": "completed",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": "fix-01.md"
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "passed"
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "shared_file_sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+      "alpha_function_source": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"",
+      "alpha_task_file_hashes": {
+        ".yuzio/cohestra/handoffs/overlap-alpha/review-02.md": "875d1325d9c2eff4af52cb2b59d1aaa2c58138d75d103f7f78dffa0e4c303466",
+        ".yuzio/cohestra/handoffs/overlap-alpha/README.md": "d335291afbcdb0ac56c4b19abc4703f2368ea6f4c740c3b7a88c7672493b1a47",
+        ".yuzio/cohestra/handoffs/overlap-alpha/validate-01.md": "32e3c394346758ef4e3e2bd749f9d87aba9cb40405b021c41d7c9a7cbf2b361f",
+        ".yuzio/cohestra/handoffs/overlap-alpha/review-01.md": "14c846942274dda5e2a16f5860b1f057b94664f743c0cacdafd0ff7916aff003",
+        ".yuzio/cohestra/handoffs/overlap-alpha/fix-01.md": "b9fbd941f7c236aa562dce8ea9d4d66a0eaf9b6ebb8c17f3dfc3921167554b90",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/fix-01-checks.json": "e96e78cbcee5c9648be9c79327577580ed9e489bac2b352a636589a4cf7e4441",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/review-01-candidate.json": "837d516708909997a24f1b800982d845b570c925c370215870d109b49ab01860",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-shared.log": "11f47eaa3962bd6d2766ba38187c8d8b49ac563f418cb763255ae8d6c004d2d2",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-index-prevalidation.json": "79c961d08b211afe853c79624afb13285588b61fc2c315eafc91d60ad2709cd7",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-shared-result.json": "290559508da327204c2b7b43ba5c9d6c6683be177ac0f0638fdc9ca78bc3f50e",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-publication.json": "80874f60045126d1c4f31f7464ebbfaf512e37feaa1ec3293527ca051c90b3a7",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/review-02-publication.json": "21f9dc2200236c8a010add0eac9d309e8b972a051b7037363f6f868a5154b13b",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/validate-01-evidence.json": "98c99c909fdaf5ef760425c8d186eca706f9b5822d28e1e06310b8d2894f94c2",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/review-01-publication.json": "50b65054a8350fabda21216bafebd20dde5d1e107a25e7ed890bb49aa95c8e3c",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/review-01-checks.json": "59eed2233ee462157e11a8ffff7f5d765f0bb8b8d1d05754576cb937220bd9bb",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/review-02-checks.json": "a69173b261e0a80fcea8b64403944aca13d00e4cc4f0252147be7bae78509580",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/fix-01-index-prevalidation.json": "ea20022952cec86ee19cef4b4161b4f592686b99b5ad96d59e3596e19951067d",
+        ".yuzio/cohestra/handoffs/overlap-alpha/scratch/fix-01-publication.json": "4e993fc260a212ee67ade42a16264aced83c17f1e2430d0158c9eafafb23ca91",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/shared.py": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/difference.patch": "cdd87437d14d979759f1f62d185679fe2d1f26fd0ed49177d0aef81a90778d22",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/manifest.json": "7da38337393f00576d8cd73ce5774ff06658e0c1ce57473de5787ac5160f1002",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/AGENTS.md": "cc6c2c87090bee0844259646f2cdc5a76c24c2eb688336ec5118afd10df11d93",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/tools/probe.py": "d92c6c566254f5b769ef001dba470719a0acb5bdef1e951057df58b4bd8f2a74",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/tests/test_alpha.py": "5fe3a7e81a28b60bfad85419193d187b9e72028f7e0fce0dba70fdecf41ac3d7",
+        ".yuzio/cohestra/handoffs/overlap-alpha/candidates/fix-01/docs/alpha.md": "36a844ac1c729f36f4983085beff3f1929953b02d916dac91d86189943235bc5"
+      },
+      "alpha_reply_sha256": "44422285070e6a68c2122241fba16604563e18315ff7bf9ed48f7d79fd8bacea"
+    },
+    "watch_renewal": {
+      "observed_at": "2026-11-04T15:12:50.506296+08:00",
+      "source": "controller actual exec-session exits and fresh watch startup",
+      "old_watch_exit": 0,
+      "cadra_owner_exit": 0,
+      "alpha_completed_and_beta_not_resumed": true,
+      "shared_file_unchanged_during_renewal": true
+    },
+    "observed_source_transitions": [
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"wrong-alpha\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 610434140547041,
+        "pid": 85972,
+        "sha256": "661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87",
+        "wall_ns": 1793774918391546000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 611099279573666,
+        "pid": 85972,
+        "sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        "wall_ns": 1793775583530484000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"\n\ndef normalize_beta(name):\n    return name.strip() or \"Beta Untitled\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 612431850356125,
+        "pid": 97828,
+        "sha256": "39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055",
+        "wall_ns": 1793776916101273000
+      }
+    ],
+    "all_runtime_events": [
+      {
+        "kind": "cadra_fixture_owner_started",
+        "monotonic_ns": 610432966967750,
+        "pid": 85962,
+        "wall_ns": 1793774917217961000
+      },
+      {
+        "kind": "watch_started",
+        "monotonic_ns": 610434140115625,
+        "pid": 85972,
+        "wall_ns": 1793774918391114000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"wrong-alpha\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 610434140547041,
+        "pid": 85972,
+        "sha256": "661e7533e5b21e29afdbf5f2f79a7badf7c3cc4286b2c92b2aa263b144e7dc87",
+        "wall_ns": 1793774918391546000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 611099279573666,
+        "pid": 85972,
+        "sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        "wall_ns": 1793775583530484000
+      },
+      {
+        "kind": "validation_attempt",
+        "monotonic_ns": 611635205971666,
+        "pid": 96793,
+        "resource": "shared-validator",
+        "source_sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        "task": "alpha",
+        "wall_ns": 1793776119458752000
+      },
+      {
+        "kind": "validation_acquired",
+        "monotonic_ns": 611635206475250,
+        "pid": 96793,
+        "resource": "shared-validator",
+        "task": "alpha",
+        "wall_ns": 1793776119459256000
+      },
+      {
+        "kind": "validation_passed",
+        "monotonic_ns": 611636213324833,
+        "pid": 96793,
+        "results": [
+          {
+            "actual": "Mewoo",
+            "expected": "Mewoo",
+            "input": "  Mewoo  "
+          },
+          {
+            "actual": "Alpha Untitled",
+            "expected": "Alpha Untitled",
+            "input": ""
+          },
+          {
+            "actual": "Alpha Untitled",
+            "expected": "Alpha Untitled",
+            "input": "   "
+          }
+        ],
+        "source_sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        "task": "alpha",
+        "wall_ns": 1793776120466108000
+      },
+      {
+        "kind": "validation_releasing",
+        "monotonic_ns": 611636213933041,
+        "pid": 96793,
+        "resource": "shared-validator",
+        "task": "alpha",
+        "wall_ns": 1793776120466717000
+      },
+      {
+        "kind": "watch_stopped",
+        "monotonic_ns": 611884899759666,
+        "pid": 85972,
+        "wall_ns": 1793776369149169000
+      },
+      {
+        "kind": "cadra_fixture_owner_stopped",
+        "monotonic_ns": 611884931718208,
+        "pid": 85962,
+        "wall_ns": 1793776369181128000
+      },
+      {
+        "kind": "watch_started",
+        "monotonic_ns": 611885074753083,
+        "pid": 97828,
+        "wall_ns": 1793776369324163000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"\n\ndef normalize_beta(name):\n    return name.strip() or \"wrong-beta\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 611885074912541,
+        "pid": 97828,
+        "sha256": "643b48ca61174fa231dc7b4317cccde5b20db73ff3f8fd95e9ac48c495713a53",
+        "wall_ns": 1793776369324323000
+      },
+      {
+        "content": "def normalize_alpha(name):\n    return name.strip() or \"Alpha Untitled\"\n\ndef normalize_beta(name):\n    return name.strip() or \"Beta Untitled\"\n",
+        "kind": "shared_file_observed",
+        "monotonic_ns": 612431850356125,
+        "pid": 97828,
+        "sha256": "39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055",
+        "wall_ns": 1793776916101273000
+      },
+      {
+        "kind": "validation_attempt",
+        "monotonic_ns": 612862681235583,
+        "pid": 4805,
+        "resource": "shared-validator",
+        "source_sha256": "39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055",
+        "task": "beta",
+        "wall_ns": 1793777346934257000
+      },
+      {
+        "kind": "validation_acquired",
+        "monotonic_ns": 612862681679583,
+        "pid": 4805,
+        "resource": "shared-validator",
+        "task": "beta",
+        "wall_ns": 1793777346934701000
+      },
+      {
+        "kind": "validation_passed",
+        "monotonic_ns": 612863689329875,
+        "pid": 4805,
+        "results": [
+          {
+            "actual": "Mewoo",
+            "expected": "Mewoo",
+            "input": "  Mewoo  "
+          },
+          {
+            "actual": "Beta Untitled",
+            "expected": "Beta Untitled",
+            "input": ""
+          },
+          {
+            "actual": "Beta Untitled",
+            "expected": "Beta Untitled",
+            "input": "   "
+          }
+        ],
+        "source_sha256": "39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055",
+        "task": "beta",
+        "wall_ns": 1793777347942353000
+      },
+      {
+        "kind": "validation_releasing",
+        "monotonic_ns": 612863689806375,
+        "pid": 4805,
+        "resource": "shared-validator",
+        "task": "beta",
+        "wall_ns": 1793777347942830000
+      },
+      {
+        "kind": "watch_stopped",
+        "monotonic_ns": 613069480855333,
+        "pid": 97828,
+        "wall_ns": 1793777553734480000
+      }
+    ],
+    "integration": {
+      "observed_at": "2026-11-04T15:25:35.457191+08:00",
+      "source": "independent controller checks after beta fix, before final publication; final audit must bind unchanged candidate",
+      "shared_file_sha256": "39e13677c11df3c5e9d27fc8110c72e40f991aa5b5f01a7f52c6c41662de2055",
+      "alpha_function_and_files_and_records_preserved": true,
+      "unittest": {
+        "argv": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-p",
+          "test_*.py",
+          "-v"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_empty_name (test_alpha.NormalizationTests.test_empty_name) ... ok\ntest_name (test_alpha.NormalizationTests.test_name) ... ok\ntest_preserves_internal_whitespace (test_alpha.NormalizationTests.test_preserves_internal_whitespace) ... ok\ntest_whitespace_only_name (test_alpha.NormalizationTests.test_whitespace_only_name) ... ok\ntest_empty_name (test_beta.NormalizationTests.test_empty_name) ... ok\ntest_internal_whitespace_is_preserved (test_beta.NormalizationTests.test_internal_whitespace_is_preserved) ... ok\ntest_name (test_beta.NormalizationTests.test_name) ... ok\ntest_whitespace_only_name (test_beta.NormalizationTests.test_whitespace_only_name) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.000s\n\nOK\n"
+      },
+      "direct_cases": [
+        {
+          "task": "alpha",
+          "input": "  Mewoo  ",
+          "actual": "Mewoo",
+          "expected": "Mewoo"
+        },
+        {
+          "task": "alpha",
+          "input": "",
+          "actual": "Alpha Untitled",
+          "expected": "Alpha Untitled"
+        },
+        {
+          "task": "alpha",
+          "input": "   ",
+          "actual": "Alpha Untitled",
+          "expected": "Alpha Untitled"
+        },
+        {
+          "task": "alpha",
+          "input": "\t\n",
+          "actual": "Alpha Untitled",
+          "expected": "Alpha Untitled"
+        },
+        {
+          "task": "alpha",
+          "input": "  A  B  ",
+          "actual": "A  B",
+          "expected": "A  B"
+        },
+        {
+          "task": "alpha",
+          "input": "Mewoo",
+          "actual": "Mewoo",
+          "expected": "Mewoo"
+        },
+        {
+          "task": "beta",
+          "input": "  Mewoo  ",
+          "actual": "Mewoo",
+          "expected": "Mewoo"
+        },
+        {
+          "task": "beta",
+          "input": "",
+          "actual": "Beta Untitled",
+          "expected": "Beta Untitled"
+        },
+        {
+          "task": "beta",
+          "input": "   ",
+          "actual": "Beta Untitled",
+          "expected": "Beta Untitled"
+        },
+        {
+          "task": "beta",
+          "input": "\t\n",
+          "actual": "Beta Untitled",
+          "expected": "Beta Untitled"
+        },
+        {
+          "task": "beta",
+          "input": "  A  B  ",
+          "actual": "A  B",
+          "expected": "A  B"
+        },
+        {
+          "task": "beta",
+          "input": "Mewoo",
+          "actual": "Mewoo",
+          "expected": "Mewoo"
+        }
+      ]
+    },
+    "alpha_function_files_task_records_and_replies_preserved": true,
+    "cadra_record_unchanged": true,
+    "actual_business_changed_paths": [
+      "docs/alpha.md",
+      "docs/beta.md",
+      "shared.py",
+      "tests/test_alpha.py",
+      "tests/test_beta.py"
+    ],
+    "process_cleanup": "all controller owner/holder/watch exec sessions returned exit 0; executing agents reported all tools stopped"
+  },
+  "limits": [
+    "Actual independent agent executor sessions share one host/workspace; the host limited independent reviewer capacity to one at a time. Main closeout calls and guarded validation processes overlapped in real time.",
+    "Cadra Run records are explicitly synthetic control inputs accepted by the production guard, not an actual Cadra engineering dispatch; owner liveness and validator occupation used real controlled local processes.",
+    "File overlap test supplied actual host-observed peer occupancy; the resource test supplied a project-provided OS process lock. This does not establish automatic discovery or prevention of unannounced concurrent writes, or a Cohestra global scheduler.",
+    "The passive source watcher sampled every 20 ms and was renewed between completed alpha and not-yet-resumed beta; the file hash was unchanged during renewal.",
+    "Temporary workspaces may later be removed; saved evidence retains observations, source hashes, runtime events and outcomes, not complete workspaces."
+  ]
+}

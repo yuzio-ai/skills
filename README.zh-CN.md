@@ -30,12 +30,12 @@ flowchart TB
 
 | Skill | 用途 | 入口 | 版本与协议 |
 |---|---|---|---|
-| cohestra | 初始化项目上下文，按需执行工程阶段、偏差核对和只读报告 | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
+| cohestra | 执行工程阶段、单任务收尾编排、偏差核对和只读报告 | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
 | cadra | 准备任务、按固定一至两任务小组调用 Cohestra，并管理执行状态与恢复 | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
 | relatra | 汇总指定项目的 agent 成果、遗留与已观测资源 | [SKILL.md](relatra/SKILL.md) | [release.json](relatra/release.json) |
 | vistra | 评审、探索、比较和交接移动端、桌面端及品牌静态视觉 | [SKILL.md](vistra/SKILL.md) | [release.json](vistra/release.json) |
 
-执行规则以各包内文档为准。Cohestra 每次调用执行一个阶段；Cadra 的工程阶段执行需要可用的 Cohestra。Relatra 需要 Python 3.9+，仅使用标准库；Vistra 生成或编辑图片需要宿主提供图像能力。
+执行规则以各包内文档为准。Cohestra 的普通阶段入口每次调用执行一个阶段，明确调用 `closeout` 可编排单任务直至审查、验收与收尾；Cadra 的工程阶段执行需要可用的 Cohestra。Relatra 需要 Python 3.9+，仅使用标准库；Vistra 生成或编辑图片需要宿主提供图像能力。
 
 ## 安装
 
@@ -69,7 +69,7 @@ npx skills add yuzio-ai/skills --skill vistra
 
 ### Cohestra
 
-用于推进单个工程任务。可以从任意阶段起步，**每次调用只执行一个阶段**；未指定入口时会根据目标选择。
+用于推进单个工程任务。可以从任意阶段起步，**普通阶段每次调用只执行一个阶段**；未指定入口时会根据目标选择。明确调用 `closeout`，可在一次调用内完成该任务的审查、必要整改、独立复审、验收和收尾，无需加入 Cadra 队列。
 
 | 入口 | 用法 |
 |---|---|
@@ -80,6 +80,7 @@ npx skills add yuzio-ai/skills --skill vistra
 | `review` | 审查指定候选，列出问题 |
 | `fix` | 裁决并修复审查问题 |
 | `validate` | 补足验证证据，判断是否达到验收条件 |
+| `closeout` | 编排单任务的独立审查、必要整改、复审、验收与收尾 |
 | `verify` | 核对某阶段产出与上游依据之间的偏差 |
 | `report` | 只读汇总当前项目任务、遗留问题和状态异常 |
 
@@ -90,6 +91,16 @@ $cohestra design
 ```
 
 继续同一任务时，可附上前一阶段的交付文件或任务目录。阶段调用缺少上下文容器时会提醒并最小初始化；`report` 不初始化、不写文件。执行资料保存在项目 `.yuzio/cohestra`，必要正式文档按项目规范整理。
+
+在完成任务的原会话中直接调用 `$cohestra closeout`；换会话接续时附项目和任务目录：
+
+```text
+$cohestra closeout
+项目：<项目绝对路径>
+任务目录：<已有任务目录绝对路径>
+```
+
+closeout 创建独立 reviewer，复用现有阶段契约。在 review 检查文档与被替代内容，在范围内整改必做问题，整改后必须独立复审，再验收最终候选；没有整改不生成空 fix，已有适用证据优先复用。权限缺失、决定未定、索引同步失败或预算耗尽时停止依赖它的工作并给出恢复条件。不创建 Cadra 记录，不自动提交、推送或发布。详见[单任务收尾编排](cohestra/references/closeout.md)。
 
 <details>
 <summary>展开：验收、偏差核对及证据边界</summary>
@@ -109,7 +120,7 @@ $cohestra verify
 
 接续任务时明确原任务目录，不能把“自动衔接”理解为自动执行后续阶段。阶段只读业务代码也可能写交付文件，只有 `report` 是不落盘的查询入口。检查和验收绑定固定候选，构建通过不等于运行验收通过；同一作者换阶段也不构成独立审查。
 
-review 按适用风险核查真实调用方、装配与生命周期路径，证据覆盖固定候选及必要未修改依赖；零 findings 不代表覆盖完整。review 先在已有授权内补查，必要路径仍无法核实时受阻；validate 核对最终候选的覆盖及复审证据。详见[风险覆盖](cohestra/references/review-coverage.md)。单独调用默认单智能体；Cadra 明确安排的 worker/reviewer 按[编排派发](cohestra/references/workflow.md#编排派发)执行。
+review 按适用风险核查真实调用方、装配与生命周期路径，证据覆盖固定候选及必要未修改依赖；零 findings 不代表覆盖完整。review 先在已有授权内补查，必要路径仍无法核实时受阻；validate 核对最终候选的覆盖及复审证据。详见[风险覆盖](cohestra/references/review-coverage.md)。普通单独阶段调用默认单智能体，明确 closeout 时安排独立 reviewer；Cadra 的 worker/reviewer 按[编排派发](cohestra/references/workflow.md#编排派发)执行。
 
 </details>
 

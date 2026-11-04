@@ -22,6 +22,8 @@ $cohestra validate
 
 Cadra 派发时，独立 review 属于既定验收前提：核对审查者身份与本任务作者分离、被审候选与最终候选一致或存在可核实的适用关系、fix 后所需复审已完成。角色名称、作者 PASS 或其他候选的旧 review 均不能代替这些证据。缺必要复审且条件齐备时交付 pending 并推荐 review；身份、输入或执行条件缺失则 blocked。worker 不得自行补作独立 review 或修改业务候选。
 
+[closeout](closeout.md) 编排也明确要求上述独立 review／复审证据，沿用同一 pending → review／blocked 出口；执行者发布本阶段后停止，由其主会话核对验收与收尾条件。
+
 ## 本阶段工作
 
 1. 按 [风险覆盖](review-coverage.md) 核对覆盖证据是否对应最终候选；已有 review 漏掉必要路径时按现有 pending → review 或 blocked 出口处理，不重复静态审查或自行降低要求。核对最终候选、有效 AC、必做 findings 及必要复审，从 code/fix 引用候选清单；按[公共流程第 4 节](workflow.md#4-候选证据与完成)判断证据适用性和缺口，不重复静态审查填满阶段。

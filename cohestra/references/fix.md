@@ -34,4 +34,6 @@ $cohestra fix
 
 按既定要求转 review 复审，否则转 validate。Cadra 派发的 fix 必须转独立 review，包括从已定位问题直接起步的首次 fix；复审输入或角色条件缺失时按既有受阻路径交付，不跳到 validate。传递本轮 fix、原 findings、剩余证据与前提；未确定角色标待指派。
 
+[closeout](closeout.md) 编排同样要求每次 fix 后转独立 review；执行者发布本阶段后停止，由其主会话核对并安排复审。
+
 整改同步适用的文档、配置与测试，并按 [文档与清理要求](review-coverage.md#文档同步与替代内容清理) 处理替代内容。保留 finding ID，交付新候选与复审输入，收尾整改只更新当前收尾任务的契约，不改被审原任务或历史 Run 的当时结论。

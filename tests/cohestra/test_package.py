@@ -13,7 +13,7 @@ class CohestraPackagingTests(SkillPackageChecks, unittest.TestCase):
 
     def test_routes_and_contract(self):
         skill = (self.package / "SKILL.md").read_text()
-        for entry in ("init", "need", "design", "code", "review", "fix", "validate", "verify", "report"):
+        for entry in ("init", "need", "design", "code", "review", "fix", "validate", "closeout", "verify", "report"):
             with self.subTest(entry=entry):
                 self.assertIn(f"references/{entry}.md", skill)
                 self.assertTrue((self.package / f"references/{entry}.md").is_file())

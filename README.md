@@ -30,12 +30,12 @@ flowchart TB
 
 | Skill | Purpose | Entry | Version and protocol |
 |---|---|---|---|
-| cohestra | Initializes project context and runs engineering stages, drift checks and read-only reports as needed | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
+| cohestra | Runs engineering stages, single-task closeout, drift checks and read-only reports | [SKILL.md](cohestra/SKILL.md) | [release.json](cohestra/release.json) |
 | cadra | Prepares tasks, calls Cohestra in fixed groups of up to two tasks, and manages execution state and recovery | [SKILL.md](cadra/SKILL.md) | [release.json](cadra/release.json) |
 | relatra | Reports agent outcomes, outstanding work and observed usage across selected projects | [SKILL.md](relatra/SKILL.md) | [release.json](relatra/release.json) |
 | vistra | Reviews, explores, compares and hands off static mobile, desktop and brand visuals | [SKILL.md](vistra/SKILL.md) | [release.json](vistra/release.json) |
 
-Each package owns its execution rules. Cohestra executes one stage per call; Cadra requires an available Cohestra skill to execute engineering stages. Relatra requires Python 3.9+ and uses only the standard library. Vistra requires host image capabilities to generate or edit images.
+Each package owns its execution rules. Cohestra's stage entries execute one stage per call; explicit `closeout` orchestrates one task through review and acceptance. Cadra requires an available Cohestra skill to execute engineering stages. Relatra requires Python 3.9+ and uses only the standard library. Vistra requires host image capabilities to generate or edit images.
 
 ## Install
 
@@ -69,7 +69,7 @@ Cohestra and Cadra default to the current task's project. Relatra needs a define
 
 ### Cohestra
 
-Advance one engineering task. Start at any stage; **each call executes one stage**. If no entry is specified, the skill selects one based on the goal.
+Advance one engineering task. Start at any stage; **each stage call executes one stage**. If no entry is specified, the skill selects one based on the goal. Explicit `closeout` orchestrates the remaining review, fixes, independent re-review, validation and final delivery in one call, without a Cadra queue.
 
 | Entry | Purpose |
 |---|---|
@@ -80,6 +80,7 @@ Advance one engineering task. Start at any stage; **each call executes one stage
 | `review` | Review a fixed candidate and report findings |
 | `fix` | Assess and fix review findings |
 | `validate` | Gather validation evidence and assess acceptance |
+| `closeout` | Orchestrate independent review, necessary fixes, re-review, validation and final delivery for one task |
 | `verify` | Check a stage's output against its upstream basis for drift |
 | `report` | Read-only overview of project tasks, outstanding work and state anomalies |
 
@@ -90,6 +91,16 @@ $cohestra design
 ```
 
 To continue a task, attach the previous handoff file or task directory. Stage calls announce and minimally initialize missing project context; `report` neither initializes nor writes files. Execution data lives in `.yuzio/cohestra`; necessary formal documents follow project conventions.
+
+After completing work in the original chat, call `$cohestra closeout` to close out that task. In another chat, provide its project and task directory:
+
+```text
+$cohestra closeout
+项目：<项目绝对路径>
+任务目录：<已有任务目录绝对路径>
+```
+
+Closeout creates an independent reviewer and reuses the existing stage contracts. It checks documentation and superseded content during review, fixes required issues within scope, requires independent re-review after fixes, then validates the final candidate. It skips empty fix stages and reuses applicable evidence. Missing permissions, unresolved decisions, publication failures or exhausted budgets stop dependent work with recovery details. No Cadra records, commits, pushes or releases are created. See [Single-task closeout](cohestra/references/closeout.md).
 
 <details>
 <summary>Acceptance, drift checks and evidence boundaries</summary>
@@ -109,7 +120,7 @@ $cohestra verify
 
 Identify the original task directory when continuing work. Automatic input handoff does not execute subsequent stages. A stage that reads business code without changing it can still write handoff files; `report` is the query entry that writes nothing. Checks and acceptance apply to a fixed candidate. A passing build does not establish runtime acceptance, and switching stages does not make the same author's review independent.
 
-Review follows applicable risks through actual callers, assembly and lifecycle paths, with evidence for the fixed candidate and necessary unchanged dependencies. Zero findings do not establish complete coverage. Review fills coverage gaps within existing authorization first; if required paths cannot be verified, it reports blocked. Validate checks coverage and re-review evidence for the final candidate. See [Risk coverage](cohestra/references/review-coverage.md). Standalone calls default to one agent; Cadra's explicit worker/reviewer arrangement follows [Orchestration dispatch](cohestra/references/workflow.md#编排派发).
+Review follows applicable risks through actual callers, assembly and lifecycle paths, with evidence for the fixed candidate and necessary unchanged dependencies. Zero findings do not establish complete coverage. Review fills coverage gaps within existing authorization first; if required paths cannot be verified, it reports blocked. Validate checks coverage and re-review evidence for the final candidate. See [Risk coverage](cohestra/references/review-coverage.md). Ordinary standalone stage calls default to one agent; explicit closeout arranges its independent reviewer. Cadra's worker/reviewer arrangement follows [Orchestration dispatch](cohestra/references/workflow.md#编排派发).
 
 </details>
 
