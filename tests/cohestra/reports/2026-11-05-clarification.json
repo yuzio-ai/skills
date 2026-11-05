@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "recorded_date": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "started_at": "2026-11-05T18:43:29+08:00",
+  "finished_live_checks_at": "2026-11-05T18:56:27+08:00",
+  "source": {
+    "version": "0.16.1",
+    "protocol_version": "0.8",
+    "base_commit": "90283630130cbb586c85c25639054f4f39e15c28",
+    "uncommitted_patch": "diff --git a/cohestra/SKILL.md b/cohestra/SKILL.md\nindex 8cd4c04..bd31518 100644\n--- a/cohestra/SKILL.md\n+++ b/cohestra/SKILL.md\n@@ -16,7 +16,7 @@ license: MIT\n |---|---|---|\n | init | [init](references/init.md) | 建立或复用项目上下文容器，不执行任务 |\n | need | [need](references/need.md) | 澄清需求（含提问）、范围与验收 |\n-| design | [design](references/design.md) | 设计方案、执行计划和验证方法 |\n+| design | [design](references/design.md) | 澄清方案取舍，制定设计、执行计划和验证方法 |\n | code | [code](references/code.md) | 按有效设计实施并交付候选 |\n | review | [review](references/review.md) | 审查固定候选，输出 findings |\n | fix | [fix](references/fix.md) | 裁决并修复审查问题 |\n@@ -29,7 +29,7 @@ license: MIT\n \n 1. 固定目标项目绝对路径，读取适用项目规则及[存储约定](references/storage.md)。默认当前任务项目，目标无法唯一确定时澄清；不因技能安装位置改变目标。\n 2. 显式入口优先；未指定时按[公共流程第 2 节](references/workflow.md#2-起步位置)选择最直接的阶段并简短说明。六阶段可从任意阶段起步，普通阶段调用一次只执行选定阶段，终点由用户决定。明确调用 `closeout` 时按其说明串行编排已有阶段，以最终候选验收及收尾为终点；不因普通任务完成自动进入。只讨论流程不触发执行。实质歧义、入口冲突或未知名称才澄清。validate 补验收证据，verify 核对偏差，不可混用。\n-3. `init` 只读取初始化说明、发行版本和必要模板。`report` 只读报告说明、发行版本、任务索引及必要问题来源，字段有疑问再查公共流程第 7 节；不初始化、不写文件、不推进阶段。`closeout` 先读公共流程、发行版本与编排说明，按实际进入的阶段加载说明，不预读无须执行的阶段。其余入口读取一次公共流程、本阶段说明与发行版本，再读必要任务输入；缺容器时按公共流程第 2 节最小初始化，接续任务缺资料不能用空初始化代替恢复。\n+3. `init` 只读取初始化说明、发行版本和必要模板。`report` 只读报告说明、发行版本、任务索引及必要问题来源，字段有疑问再查公共流程第 7 节；不初始化、不写文件、不推进阶段。`closeout` 先读公共流程、发行版本与编排说明，按实际进入的阶段加载说明，不预读无须执行的阶段。其余入口读取一次公共流程、本阶段说明与发行版本，再读必要任务输入；仅 need/design 额外读取[共用需求澄清规则](references/clarification.md)，不新增 clarify 入口或阶段。缺容器时按公共流程第 2 节最小初始化，接续任务缺资料不能用空初始化代替恢复。\n 4. 写交付时读取对应骨架；正式阶段和 verify 准备更新索引时必须读取[索引发布与恢复](references/publication.md)。先确认发布前校验成功，再用后续工具调用发布；校验失败不得继续。init、report 不读发布细则。\n 5. 既有项目规范、有效决定和用户授权继续有效；授权、候选、证据、复审、历史和停止规则统一见公共流程。每个阶段执行者交付后停止；明确调用 `closeout` 授权其主会话按说明启动独立 reviewer 并接续本任务阶段，其他调用不自动启动智能体或推进阶段。提交、推送、发布和多任务调度不属于 closeout。\n 6. `verify` 按请求执行，仅在发现具体偏差时建议；不固定提议、不记录未执行核对，不替代 review、复审或 validate。调用方声明 `execution_mode: unattended` 时执行公共流程第 7.4 节，不新增授权或降低门禁，无法合法继续时受阻并停止。\ndiff --git a/cohestra/references/design.md b/cohestra/references/design.md\nindex 67f99dd..e7b5d87 100644\n--- a/cohestra/references/design.md\n+++ b/cohestra/references/design.md\n@@ -21,6 +21,10 @@ $cohestra design\n \n 输入为任务目录或 need 交付，读取已确认的需求、验收条件及必要规范。业务实现只读，允许写设计交付、任务索引和任务所需的设计产物；正式文档按公共流程第 5 节处理。需求尚未确认时可调查并列方案，不能把建议写成已接受决定。\n \n+## 澄清提问\n+\n+读取并执行[共用需求澄清规则](clarification.md)。本阶段重点是方案、交互、技术约束及重大取舍，让实施者无需重新作关键决定。直接从 design 起步时，以本次材料和有效确认为依据；发现目标、范围或验收存在缺口时先澄清，若需要实质修订需求则推荐返回 need，不补造前置交付。\n+\n ## 本阶段工作\n \n 1. 结合代码、规范和 AC，给出推荐方案、取舍、影响模块与状态边界；同类组件和视觉探索范围按[公共流程第 3 节](workflow.md#3-决策与执行强度)确定。\n@@ -33,4 +37,4 @@ $cohestra design\n \n 新增 `design-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。\n \n-推荐下一步 code，说明有效方案、待决定事项及实施前提；设计交付不自动授权实现。\n+本阶段完成后推荐 code，说明有效方案、剩余验证项及实施前提；必要关键决定未定时按共用澄清规则受阻，设计交付不自动授权实现。\ndiff --git a/cohestra/references/need.md b/cohestra/references/need.md\nindex 615b524..0defb97 100644\n--- a/cohestra/references/need.md\n+++ b/cohestra/references/need.md\n@@ -15,19 +15,12 @@ $cohestra need\n \n ## 澄清提问\n \n-方向定错时后续阶段的产出都是无用功，因此提问是本阶段的主要动作，不是附属步骤。先把用户说出的方案与真正要解决的问题分开，再补齐缺口。\n-\n-1. 先只读调查，再提问。能从仓库、现状、日志、接口文档或截图中确认的，不拿去问用户；只问用户才知道的事——真实目标、优先级、范围边界、验收口径。\n-2. 一次问成组，不逐条来回。每个问题给候选选项、说明影响，并给出推荐项及依据，让用户选择或修正，而不是开放式发散。\n-3. 优先追问四类问题：\n-   - 目标：解决谁的什么问题？现在没有它时怎么做？做成什么样算成功？\n-   - 分解：这是否属于更大目标的一部分？本次做到哪一步为止？\n-   - 边界：明确不做什么？哪些既有行为必须保持不变？\n-   - 验收：出现什么现象才算完成？由谁判定、在哪里验证？\n-4. 识别被当成需求的方案。用户给出的常是实现手段；先还原成目标再确认，避免把方案直接写进 AC。\n-5. 确认来源分开记录：哪条来自用户明确回答，哪条是本轮假设。假设必须标出，不能写成已确认决定。\n-6. 用户不回答或明确「就这些」时停止追问，按已确认内容加明确标注的假设继续，并把未决项写进交付物；不空转等待，也不把假设当已决。\n-7. 提问轮次由需求不确定性决定，不设固定轮数门槛。目标、范围与验收已明确到可以设计方案，即完成 design 前提判断；未明确时继续提问或列明缺口。\n+读取并执行[共用需求澄清规则](clarification.md)。本阶段重点是目标、优先级、范围、边界与验收，不把用户提出的实现手段直接写进 AC。优先核对：\n+\n+- 目标：解决谁的什么问题，现状如何，怎样算成功。\n+- 分解：是否属于更大目标，本次做到哪一步。\n+- 边界：明确排除项，以及必须保留的既有行为。\n+- 验收：哪些现象证明完成，由谁判定、在哪里验证。\n \n ## 本阶段工作\n \n@@ -44,4 +37,4 @@ $cohestra need\n \n 新增 `need-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。\n \n-推荐下一步 design，传递本轮 need、关键未决项和负责人。\n+本阶段完成后推荐 design，传递本轮 need、剩余验证项和负责人；必要关键决定未定时按共用澄清规则受阻。\ndiff --git a/cohestra/references/workflow.md b/cohestra/references/workflow.md\nindex 35d7e44..78ffd8b 100644\n--- a/cohestra/references/workflow.md\n+++ b/cohestra/references/workflow.md\n@@ -33,7 +33,7 @@\n - 六阶段是职责清单，不是必经路线。显式入口优先；未指定入口时根据目标、已有材料和当前状态自动选择起点，简短说明后执行，不为阶段名称单独确认。终点由用户决定；不因缺少前置阶段而拒绝执行，也不因后续阶段存在而自动继续。\n - 自动选择：目标或验收尚需澄清用 need；目标已清楚、需要方案或视觉探索用 design；明确实施请求或尚需定位的缺陷用 code；审查已有候选用 review；按已有 findings 整改用 fix；已有候选只缺验证证据用 validate。项目规范、已确认决定、候选和授权仍须核对，不能用自动选阶段绕过前提。\n - `init`、`verify`、`report` 按明确的初始化、偏差核对或只读总览意图路由。`closeout` 须明确调用，不因普通任务完成或泛称“检查一下”自动选择；按其说明定位单任务与编排输入，不适用第 1 节的链条自动衔接。仅讨论流程不触发执行；不能把缺少实施授权解释为 code。其余多阶段目标先选择起步阶段，交付后停止并推荐下一步，不默认执行整条链。只有目标、输入或范围存在实质歧义，或显式入口冲突/名称未知时才澄清。\n-- 从 need 起步时，提问是主要动作而非附属：先只读调查，再成组提出只有用户才知道的问题（真实目标、范围边界、验收口径），用户确认与本轮假设分开记录；细节见 [need](need.md)。\n+- need/design 进入时读取[共用需求澄清规则](clarification.md)，其他阶段不额外加载；need 澄清目标、范围与验收，design 澄清方案、交互与技术取舍。两者沿用各自交付与阶段边界，不新增澄清阶段。\n - 从中间阶段起步时，上游依据是用户本次提供的原始材料（需求描述、截图、接口文档、缺陷报告等）以及对话中的确认。首轮 handoff 的「流程范围」写明起点，后续引用未变上下文；「输入与上游依据」写明本轮材料来源；任务索引只登记实际发生的阶段，不为完整性补造缺失环节。\n - 任何阶段进入前先确认目标项目已有 `.yuzio/cohestra`。缺失时报告目标绝对路径与「将执行一次初始化」这一事实，然后按最小范围执行 init——只建容器与项目入口，不读业务任务、不清旧副本、不生成任务、不暂存或提交——完成后继续被中断的阶段；容器存在则直接进入，不重复初始化。目标不明确、指向技能源仓库或无法安全写入时先澄清或报告，不在错误目录初始化。\n \n@@ -192,7 +192,7 @@ blocked:\n \n 调用方在调用中声明 `execution_mode: unattended`（记入 handoff「身份与输入」与 Front Matter）。这是执行上下文，不是新阶段。无人值守期间：\n \n-- 不主动提问并无限等待：need 的成组提问不执行，只用已确认信息加明确标注的假设推进，且仅当不需要产品方向选择；一旦需要用户才知道的决定（产品方向、范围边界、授权、权限），直接走受阻路径。\n+- 不主动提问并无限等待：need/design 的交互澄清不执行，只在已有决定、有效授权及明确标注的非关键假设足以支持时推进；一旦缺少必要人工决定（产品方向、范围边界、重大方案取舍、授权、权限），直接走受阻路径。\n - 不自行选择产品方向，不扩大范围，不产生新的隐含授权。\n - 不为了继续流水线而降低质量门禁或验收标准。\n - 阶段无法在现有信息下合法继续时：`stage_result.status: blocked`、`blocked.value: true`（reason 按实际取 `human_decision_required`／`missing_input`／`missing_permission`／`dependency_unavailable`／`environment_blocked`／`candidate_unavailable`）、任务 `status: blocked`、`next: {stage: null, allowed: false, reason: human_decision_required 或 blocked}`，然后停止。\ndiff --git a/cohestra/release.json b/cohestra/release.json\nindex 7282193..60025d1 100644\n--- a/cohestra/release.json\n+++ b/cohestra/release.json\n@@ -1,5 +1,5 @@\n {\n-  \"version\": \"0.16.0\",\n+  \"version\": \"0.16.1\",\n   \"protocol_version\": \"0.8\",\n   \"repository\": \"https://github.com/yuzio-ai/skills\",\n   \"skill_path\": \"cohestra\"\n--- /dev/null\n+++ b/cohestra/references/clarification.md\n@@ -0,0 +1,27 @@\n+# 共用需求澄清规则\n+\n+进入 need 或 design 时读取；澄清是这两个阶段的工作方式，不是独立入口或阶段。阶段职责、业务只读边界、交付和停止规则仍由对应阶段及[公共流程](workflow.md)规定。\n+\n+## 调查与提问\n+\n+1. 先只读调查，再提问。能从代码、文档、日志、接口或截图查证的事实自行核实；先把用户提出的方案与真正目标分开，只询问会实质影响需求或方案、且现有材料无法确定的问题。\n+2. 按决定的依赖关系组织问题，先解决上游问题，再根据回答调整后续问题。每轮最多 3～5 个关键问题，允许更少或不提问；不为凑数量或轮次追问。\n+3. 每个问题提供有意义的候选选项、推荐方案、简要依据及必要取舍；无依据推荐时明确证据缺口，不强行给出结论。\n+4. 保留已有有效决定和授权，记录来源，不重复询问已确认事项。新的回答只修订受影响部分，不重开无关决定。\n+5. 区分已验证事实、已确认决定、待验证假设和待决定问题。低影响且容易逆转的细节可以采用明确标注的默认值；不得覆盖用户决定、改变关键范围或扩大授权。\n+6. 必须通过原型或实验判断的问题，记录假设、验证方法和所需证据，不用追问代替验证。验证动作遵守本阶段的范围和授权；未获得证据前不写成已验证结论。\n+\n+## 关键决定未答复\n+\n+关键决定指会实质影响目标、范围、验收、授权或重大方案取舍的决定。\n+\n+- 没有既有决定或明确代决授权时，未答复及“就这些”均不表示接受尚未确认的推荐。停止依赖该决定的工作，继续独立且已授权部分；不能把关键决定改标为假设来继续推进。\n+- 用户不再补充时停止重复追问，保留未决项及影响。已有明确代决授权时可在授权范围内作出决定，记录授权来源、选择及依据，不把代决写成用户逐项确认。\n+- 必须结束当前阶段且仍缺必要关键决定时，按公共流程第 7 节的既有受阻路径交付：`stage_result.status: blocked`、任务 `status: blocked`、`blocked: {value: true, reason: human_decision_required}`、`next: {stage: null, allowed: false, reason: human_decision_required}`。不报告阶段完成，也不允许进入下一阶段。\n+- `unattended` 不执行交互提问；缺少必要人工决定时直接受阻，按公共流程第 7.4 节停止，不切换为交互模式等待。\n+\n+## 收敛与确认\n+\n+关键问题收敛后，汇总目标、范围、约束、关键决定、未解决事项和验收标准；仅请求确认尚未确认的关键决定，已有有效决定直接引用。没有未决关键决定时不增加确认轮次。\n+\n+按当前阶段判断是否具备下一步前提，区分可保留的验证项与阻塞推进的决定。需求或方案确认不自动授权实现；既有明确实施授权继续有效，不重复索取。\n",
+    "sha256": {
+      "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+      "SKILL.md": "0b1f71e04a5cd8c858e55530a866dca6b05c523a0f8ba2cf1c33308fde215422",
+      "assets/handoff.md": "39b194abb7c0af84ef70e007fb8b1a2fe58e4dc199c5d74e20d190e3a2064baa",
+      "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+      "assets/project/README.md": "68a42db1d255b79749be9274d286dfd495d1c37158b2d1408a6abfc15e5d4cd4",
+      "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+      "references/clarification.md": "2f1032064889332d5153d8436bcc822aa641bd74cb5b59268ba4bb805d468614",
+      "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+      "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+      "references/design.md": "afa7f1b1546a907bee37aa99bd73306c8daad41be28e4b97bc3b85985e4ebb92",
+      "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+      "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+      "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+      "references/need.md": "3204f615e5b9555f8716430eadcfa2855025bb5843d6c1b749d41f40f8b6f8c0",
+      "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+      "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+      "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+      "references/review-coverage.md": "10930ece168aaaf6b78238795bf895e6a100796cd02822a7abc8ed419aae1488",
+      "references/review.md": "1c2dc2273d6c82b0d19407dbdc5d7df9f10e9b6df9cdc389a2136c2ae3c38850",
+      "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+      "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+      "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+      "references/workflow.md": "96dc57a96aefae70463c1e2723532296044530300c797cb14cd7e6e4014aec48",
+      "release.json": "520d7906c884ffa44b955c7388efacede540bef72925f47e682837f7262fcc99"
+    },
+    "matches_current_repository": true
+  },
+  "environment": {
+    "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.8",
+    "ruby": "ruby 2.6.10p210 (2022-04-12 revision 67958) [universal.arm64e-darwin26]"
+  },
+  "method": {
+    "kind": "native_independent_agent_sessions",
+    "fresh_history": true,
+    "sessions": 4,
+    "mode": "attended",
+    "suite": "/private/tmp/cohestra-clarification-live-k6uf09w1",
+    "entrypoint": "/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md",
+    "host_actions": "Prepared four temporary Git fixtures and supplied user follow-up messages; native agents investigated, asked questions, chose within explicit delegation, and wrote all stage artifacts and indexes.",
+    "question_channel": "Session replies to the test host; no request was shown to the real end user.",
+    "checker_role": "Read-only artifact/state/hash/link checks; the checker never generates a handoff, decision, index or agent reply.",
+    "checker_source": "\"\"\"Read-only checks of artifacts written by real Cohestra sessions.\"\"\"\nimport hashlib\nimport json\nimport re\nimport subprocess\nfrom pathlib import Path\nfrom urllib.parse import unquote, urlsplit\n\nSUITE = Path(__file__).resolve().parent\n\n\ndef sha(path):\n    return hashlib.sha256(path.read_bytes()).hexdigest()\n\n\ndef contract(path):\n    match = re.match(r'\\A---\\n(.*?)\\n---(?:\\n|$)', path.read_text(), re.S)\n    if not match:\n        raise ValueError('Missing Front Matter')\n    result = subprocess.run(['ruby', '-rpsych', '-rjson', '-e', 'puts JSON.generate(Psych.safe_load(STDIN.read))'], input=match[1], text=True, capture_output=True, check=True)\n    value = json.loads(result.stdout)\n    if not isinstance(value, dict):\n        raise ValueError('Contract is not a mapping')\n    return value\n\n\ndef check(name, config):\n    project = Path(config['project'])\n    stage = name.split('-')[0]\n    result = {'case': name, 'errors': []}\n    def expect(condition, message):\n        if not condition:\n            result['errors'].append(message)\n    for relative, expected in config['baseline'].items():\n        path = project / relative\n        expect(path.is_file() and sha(path) == expected, 'Input changed: ' + relative)\n    current_head = subprocess.check_output(['git', '-C', str(project), 'rev-parse', 'HEAD'], text=True).strip()\n    expect(current_head == config['head'], 'Fixture commit changed')\n    for path in project.rglob('*'):\n        if not path.is_file():\n            continue\n        relative = str(path.relative_to(project))\n        if relative.startswith('.git/') or relative in config['baseline']:\n            continue\n        expect(relative.startswith(('.yuzio/cohestra/', 'docs/decisions/')), 'Unauthorized new file: ' + relative)\n    task = project / '.yuzio/cohestra/handoffs/export-portability'\n    indexes = sorted((project / '.yuzio/cohestra/handoffs').glob('*/README.md'))\n    expect(indexes == [task / 'README.md'], 'Unexpected task indexes')\n    handoffs = sorted(p for p in task.glob('*.md') if re.match(r'^(need|design|code|review|fix|validate|verify)-\\d+\\.md$', p.name))\n    expect(bool(handoffs), 'No formal stage handoff')\n    expect(all(p.name.startswith(stage + '-') for p in handoffs), 'Unexpected stage executed')\n    try:\n        state = contract(task / 'README.md')\n    except (OSError, ValueError, subprocess.CalledProcessError) as error:\n        result['errors'].append('Cannot parse contract: ' + str(error))\n        return result\n    result['state'] = state\n    expect(state.get('contract') == '0.8', 'Wrong protocol')\n    expect(state.get('execution_mode') == 'attended', 'Wrong mode')\n    expect(state.get('task') == 'export-portability', 'Wrong task slug')\n    expect(state.get('candidate') == {'commit': None, 'snapshot': None}, 'Unexpected business candidate')\n    number = state.get('stage_result', {}).get('round')\n    expect(isinstance(number, int) and not isinstance(number, bool) and number > 0, 'Invalid stage round')\n    expect(state.get('stage_result', {}).get('stage') == stage, 'Wrong stage')\n    if isinstance(number, int):\n        expect((task / f'{stage}-{number:02}.md').is_file(), 'Latest stage handoff missing')\n    result['historical_link_errors'] = []\n    current = f'{stage}-{number:02}.md' if isinstance(number, int) else None\n    for document in [*task.glob('*.md'), *(project / 'docs/decisions').glob('*.md')]:\n        historical = document in handoffs and document.name != current\n        body = re.sub(r'^```.*?^```[^\\n]*', '', document.read_text(), flags=re.M | re.S)\n        for target in re.findall(r'\\[[^\\]\\n]*\\]\\(([^)\\n]+)\\)', body):\n            link = urlsplit(target)\n            if not link.scheme and link.path and not (document.parent / unquote(link.path)).exists():\n                issue = 'Broken delivery link: ' + str(document.relative_to(project)) + ' -> ' + target\n                if historical:\n                    result['historical_link_errors'].append(issue)\n                else:\n                    expect(False, issue)\n    if name.endswith('unanswered'):\n        expect(state.get('status') == 'blocked', 'Unanswered task advanced')\n        expect(state.get('stage_result', {}).get('status') == 'blocked', 'Unanswered stage completed')\n        expect(state.get('blocked') == {'value': True, 'reason': 'human_decision_required'}, 'Missing human-decision blocker')\n        expect(state.get('next') == {'stage': None, 'allowed': False, 'reason': 'human_decision_required'}, 'Unanswered next action allowed')\n    else:\n        expect(state.get('status') == 'in_progress', 'Unexpected delegated task terminal status')\n        expect(state.get('stage_result', {}).get('status') == 'completed', 'Delegated stage not completed')\n        expect(state.get('blocked') == {'value': False, 'reason': None}, 'Authorized choice blocked')\n        expect(state.get('next') == {'stage': 'design' if stage == 'need' else 'code', 'allowed': True, 'reason': 'stage_completed'}, 'Wrong delegated handoff')\n    result['artifacts'] = {str(p.relative_to(project)): {'sha256': sha(p), 'text': p.read_text()} for p in sorted(project.rglob('*.md')) if '.git' not in p.relative_to(project).parts and str(p.relative_to(project)) not in config['baseline']}\n    return result\n\n\nif __name__ == '__main__':\n    cases = json.loads((SUITE / 'cases.json').read_text())\n    source = json.loads((SUITE / 'source-hashes.json').read_text())\n    for relative, expected in source.items():\n        assert sha(SUITE / 'skill' / relative) == expected, 'Frozen skill changed: ' + relative\n    observed = [check(name, config) for name, config in cases.items()]\n    print(json.dumps({'checks': observed, 'passed': all(not item['errors'] for item in observed)}, ensure_ascii=False, indent=2))\n    raise SystemExit(any(item['errors'] for item in observed))\n"
+  },
+  "observations": {
+    "checks": [
+      {
+        "case": "need-unanswered",
+        "errors": [],
+        "state": {
+          "contract": "0.8",
+          "task": "export-portability",
+          "status": "blocked",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "need",
+            "status": "blocked",
+            "round": 2
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": null
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "human_decision_required"
+          },
+          "blocked": {
+            "value": true,
+            "reason": "human_decision_required"
+          }
+        },
+        "historical_link_errors": [
+          "Broken delivery link: .yuzio/cohestra/handoffs/export-portability/need-01.md -> ../../../../../docs/decisions/export-portability-requirements.md"
+        ],
+        "artifacts": {
+          ".yuzio/cohestra/.gitignore": {
+            "sha256": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+            "text": "# Local execution data; also add /.yuzio/ to the project root .gitignore.\n*\n"
+          },
+          ".yuzio/cohestra/README.md": {
+            "sha256": "eacb6e0df0b6cd04c3815ee6e5607eee942a82d6767c3c9629898bb70a29df1a",
+            "text": "# 项目协作上下文\n\n- 项目：隔离笔记项目（need-unanswered）\n- 初始化时 Skill 发行版本：0.16.1（来源：/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md）\n- 流程入口：所用工具实际加载的 cohestra 技能。\n\n## 使用\n\n在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步；未指定阶段时按任务目标自动选择一个起点，交付后停止。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。\n\n使用 `$cohestra report` 只读查看本项目全部任务状态、遗留问题与状态异常，包括已完成任务的未关闭项；结果直接在对话中展示，不初始化项目、不写文件或推进阶段。\n\n明确使用 `$cohestra closeout`，可在一次调用内串行完成当前任务的独立 review、必要 fix、独立复审、validate 和收尾；无需加入 Cadra 队列。普通阶段仍交付后停止；具体编排、授权与恢复规则读取实际安装技能，不在本入口复制。\n\n- [handoffs/](handoffs/)：每个任务一个目录，其 README 保存有效决定、候选、分开的状态和下一步；阶段结论单独落盘。\n- [retrospectives/](retrospectives/)：按需保存复盘，不作为每阶段必读输入。\n- 规则和阶段提示词保存在技能包中，不在此复制。业务规范仍归项目所有；历史决定、授权和验收证据按任务索引追溯。\n- 普通任务只更新自己的交付物与任务索引，不反复更新本入口。每轮交付记录实际采用的技能发行版本，历史文件不随技能升级重写。\n- 用户级技能升级影响后续调用；需要项目独立固定版本时，选择项目级安装并通过 Git 管理更新。\n\n本目录属于工作区本机资料，根 `.gitignore` 用 `/.yuzio/` 整体忽略。任务记录仍须保留；正式文档与必要共享证据写入项目已有文档目录（无约定时用 `docs/`），不能仅引用本目录。任务 `scratch/` 用于可重建日志与产物。接续任务复用当前项目的索引与交付记录，Git 不备份本目录。\n\n过程资料按实际安装技能的留存规则维护：发布成功并回读后清理本次无引用、无恢复用途的临时提案，快照优先复用不可变材料或独立克隆。核心 handoff（含索引待同步交付）、历史决定、候选、资源请求和被引用证据持续保留；历史资料清理须有明确范围授权，保留恢复材料与维护索引，不改写交付结论或任务契约。\n"
+          },
+          ".yuzio/cohestra/handoffs/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          ".yuzio/cohestra/handoffs/export-portability/README.md": {
+            "sha256": "77abdd0acff9617e4ba6651d78448e930018950a985a235e67f6cc749823c56e",
+            "text": "---\ncontract: \"0.8\"\ntask: export-portability\nstatus: blocked\nexecution_mode: attended\nstage_result:\n  stage: need\n  status: blocked\n  round: 2\ncandidate:\n  commit: null\n  snapshot: null\nnext:\n  stage: null\n  allowed: false\n  reason: human_decision_required\nblocked:\n  value: true\n  reason: human_decision_required\n---\n\n# 笔记导出便利性与完整性\n\n- 任务目标：从本次原始需求起步执行 need，澄清供资料整理用户使用的笔记导出；优先内容完整和以后易于查找。\n- 有效决定与确认来源：[need-01.md](need-01.md) 记录本会话确认用途为离线阅读、搜索和整理；用户明确不回答私密与附件取舍、不授权代决，要求结束本轮。\n- 正式文档：[docs/decisions/export-portability-requirements.md](../../../../docs/decisions/export-portability-requirements.md)，内容版本 need-01；含原始回复、问题及 AC-01 至 AC-04 的确认程度与证据要求。\n- 被取代的引用：need-01 中正式文档相对链接有误，仅该引用由 [need-02.md](need-02.md) 更正；其他需求内容与有效决定不变。need-01 历史文件保留原字节，首次索引未发布。\n- 工作项记录：本次仅需求澄清及交付引用更正；没有业务实现、独立审查、运行验收、提交或推送。\n- 下一步补充：需求方须明确私密笔记与附件的范围，或新增明确代决授权；再以本目录、need-01.md、need-02.md、正式需求记录及新增决定续接 need。用途保持已确认；本轮推荐不算确认。不具备 design 前提，不重复追问。\n- 索引维护者：Codex 子 agent `/root/live_need_unanswered`（本次唯一写入者）。\n- 最近更新：2026-11-05 18:49:18 CST +0800。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| need-01 | [need-01.md](need-01.md)：只读调查、关键提问、范围与验收记录 | 受阻；私密笔记与附件取舍未答，无代决授权；首次索引未发布，引用由 need-02 更正 | 本次原始需求及会话回复；无候选 |\n| need-02 | [need-02.md](need-02.md)：更正正式文档引用，保留原需求结论 | 受阻；无新增决定，不具备 design 前提 | need-01 及同一次调用的校验结果；无候选 |\n"
+          },
+          ".yuzio/cohestra/handoffs/export-portability/need-01.md": {
+            "sha256": "7c36a410f293c65d33645da02de4adf5b5bdcae86f074ab1aad433caff0b8d1f",
+            "text": "# 笔记导出便利性与完整性 · need-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.16.1。\n- 唯一技能来源：`/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md`，使用该包的 workflow、need、clarification、storage、init、publication、retention 与相应骨架。\n- 执行者：Codex 子 agent `/root/live_need_unanswered`；未启动其他 agent。\n- 时间：2026-11-05 18:47:35 CST +0800；时区 Asia/Shanghai。\n- 执行模式：attended。\n- 阶段状态：受阻；必要关键决定未答复，不报告 need 完成。\n- 输入与上游依据：本次 `$cohestra need` 原始需求与明确项目、任务目录；本会话提问及主持人转达的用户回答；项目 `AGENTS.md`、`docs/current.md`、`src/export.py`、`data/notes.json`。没有上游交付，没有自动衔接。\n- 初始化：本轮发现容器不存在后，按指定包创建最小 `.yuzio/cohestra` 容器及入口。根 `/.yuzio/` 忽略规则已生效；Git 未跟踪该路径且未发现其历史记录；没有改写根忽略文件。\n\n## 有效上下文\n\n- 项目：`/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered`。\n- 任务目录：`/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered/.yuzio/cohestra/handoffs/export-portability`。\n- 流程范围：仅 need 需求澄清；不实施业务代码，不进入其他阶段，不提交、不推送、不使用网络服务。\n- 原始目标：方便经常整理资料的人导出笔记，优先内容完整和以后容易查找。\n- 有效决定：用户本轮明确“离线阅读、搜索和整理这个用途可以。”\n- 授权与停止线：用户明确私密笔记和附件均不回答，也不授权代选，并要求结束本轮、交付当前结果。“就这些”没有接受推荐的含义。\n- 项目规则：`src/`、`data/`、`docs/current.md`、`docs/requirements.md` 只读；允许本阶段过程资料及 `docs/decisions/` 正式文档。提问已直接回复主持人，没有调用真实用户交互工具。\n\n## 本阶段结果\n\n- 已完成只读调查、首轮关键提问及回答记录；未完成需求收敛，阶段按 human_decision_required 受阻。\n- 正式需求记录：[docs/decisions/export-portability-requirements.md](../../../../../docs/decisions/export-portability-requirements.md)，版本 need-01；可脱离本机交付阅读。\n- Q1 用途已确认；Q2 私密范围、Q3 附件范围明确未答，均无代决授权。完整问题、选项、推荐依据、取舍及实际回复见正式文档。\n- 先前私密笔记“默认排除、可明确包含”和附件“随笔记复制”仅为推荐；没有设为默认值、假设或已确认要求。没有编造用户确认。\n- AC-01 至 AC-04 已给出稳定 ID、确认程度及证据要求，详见正式文档。AC-01 的用途方向已确认；具体操作判据、字段完整性、私密与附件验收尚未全部收敛，不声称完整 AC 获批。\n- 范围复杂度：需求不确定性高；实现复杂度尚不能可靠估计。私密取舍涉及内容边界与泄露风险，附件取舍涉及完整性、可移植性及失败处理。\n- 事实与假设：现状由本地文档、函数和样本支持；不把当前格式视为目标格式，不采用关键产品默认值。尚待验证创建时间样本、附件可用性及未来实际离线操作表现。\n- design 前提判断：不具备；Q2、Q3 会实质改变范围与验收，必须保留为阻塞决定。用户要求结束本轮，故不重复追问，不推进设计。\n\n## 证据与限制\n\n- `docs/current.md` 表明工具离线、无账户和云同步，一次最多选择 250 条笔记；所列元数据含 ID、创建时间、私密标记与附件路径。\n- `src/export.py` 静态读取显示仅拼接标题、正文；未见保留 ID、创建时间或复制附件逻辑。\n- `data/notes.json` 样本有普通及私密记录与附件路径，缺创建时间字段；不据此证明生产数据或附件有效性。\n- 本轮没有执行业务实现、运行导出、性能测试、兼容性测试或运行验收；源码检查不证明未来导出行为。\n- 正式文档与本机交付分别保留有效决定、未决项及证据限制；索引候选为空，没有虚构候选、审查或验收结果。\n\n## 下一步交接\n\n- 本轮停止，当前没有获准的下一阶段。阻塞条件为私密笔记与附件的范围需要人工决定。\n- 责任：需求方决定 Q2、Q3，或另行明确代决范围；未给出前不重复追问，不以推荐替代决定。\n- 恢复时续接 `$cohestra need`，准确输入为本任务目录、本轮 `need-01.md`、正式需求记录及新增决定；保留已确认用途和本轮原始回答。解除阻塞后再判断 design 前提，不自动进入其他阶段。\n"
+          },
+          ".yuzio/cohestra/handoffs/export-portability/need-02.md": {
+            "sha256": "434c13ceeddfa67848b18ae56fc13f9878adbdd1812ad18710ab38223fe64fa5",
+            "text": "# 笔记导出便利性与完整性 · need-02\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.16.1。\n- 唯一技能来源：`/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md`；沿用本轮已读取的公共流程、need、clarification、publication 与交付骨架。\n- 执行者：Codex 子 agent `/root/live_need_unanswered`；时间：2026-11-05 18:49:18 CST +0800；时区 Asia/Shanghai。\n- 执行模式：attended；阶段状态：受阻，必要决定仍未答复。\n- 输入与上游依据：[need-01.md](need-01.md)、同一次 need 调用的原始需求与用户回复、发布前校验结果。本记录仅更正交付引用，没有重新提问或重新执行阶段。\n\n## 有效上下文\n\n沿用 [need-01.md](need-01.md) 的目标、项目及任务目录、只读调查、已确认用途、原始回答、授权与停止线。用户只确认离线阅读、搜索和整理；私密笔记和附件取舍明确不回答、不授权代决，并要求结束本轮。\n\n流程范围保持仅 need，不修改业务代码，不进入其他阶段。need-01 已写出并报告后保持原字节；本记录不覆盖历史交付。\n\n## 本阶段结果\n\n- 更正 need-01 中正式文档链接的相对层级。有效链接为 [docs/decisions/export-portability-requirements.md](../../../../docs/decisions/export-portability-requirements.md)，正式文档内容版本仍为 need-01。\n- need-01 中同名链接多出一级 `../`，该链接由本轮更正；其他需求内容与结论继续引用原交付。\n- 结论保持受阻：Q2 私密范围、Q3 附件范围明确未答，均无代决授权；没有将推荐变为确认、默认值或产品假设。\n- AC-01 至 AC-04 的确认程度、证据要求、复杂度与风险评估均未变化，见正式文档。用途方向已确认，完整验收集尚未收敛。\n- design 前提仍不具备。用户“就这些”不表示接受任何未确认推荐，本轮不重复追问。\n\n## 证据与限制\n\n- 首次校验因 Ruby 编码处理失败；修正为 UTF-8 后，校验发现文档相对链接多一级。两次均在发布前停止，任务 README 尚未创建；没有绕过校验关口。\n- 本轮只修正交付引用，不新增运行、导出、性能或兼容性证据；业务文件与 need-01 原字节均保留。\n- 阶段仍为 need，候选为空；没有虚构实现、审查、验收或人工确认。\n\n## 下一步交接\n\n- 本轮停止，没有获准的下一阶段；因必要人工决定未定，禁止进入 design。\n- 需求方后续明确私密笔记与附件的范围，或提供新的明确代决授权后，才可续接 `$cohestra need`。\n- 准确输入为本任务目录、[need-01.md](need-01.md)、本轮 need-02.md、正式需求记录及新增决定；先保留已确认用途，再补必要决定。恢复不自动授权实现。\n"
+          },
+          ".yuzio/cohestra/retrospectives/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "docs/decisions/export-portability-requirements.md": {
+            "sha256": "7f765006efb0ce15a0779de4ac9783c8e05a1b49f25777aa2322b00387ae03df",
+            "text": "# 笔记导出需求澄清记录\n\n版本：need-01；记录时间：2026-11-05 18:47:35 CST +0800。\n结论：本轮需求澄清受阻。私密笔记与附件的范围未定，不具备进入设计的前提。\n\n## 已确认目标与边界\n\n- 原始需求：方便经常整理资料的人导出笔记；重点是内容完整、以后容易查找。\n- 本轮用户确认：“离线阅读、搜索和整理这个用途可以。”\n- 本轮只澄清需求，不实施业务代码、不提交、不推送、不使用网络服务，不进入其他阶段。\n- 用户明确：“私密笔记和附件的取舍我现在都不回答，也不授权你替我选。就这些，请结束本轮并交付当前结果。”\n- 此回复只确认用途；没有接受先前推荐的私密笔记或附件选项，也没有授予代决权限。\n\n## 已核实事实\n\n- `docs/current.md`：离线桌面工具，没有账户、服务器或云同步；一次最多选择 250 条笔记。文档列出的元数据包括 ID、标题、创建时间、正文、私密标记和附件路径。\n- `src/export.py`：`export_notes` 仅拼接标题和正文，没有导出 ID、创建时间或复制附件的逻辑。\n- `data/notes.json`：样本包含普通笔记和私密笔记，私密笔记引用附件路径；样本没有创建时间字段。该样本不能证明真实库的创建时间完整性或附件可用性。\n- 以上来自静态读取，没有执行导出或验证运行表现。当前文本格式不是已确认的目标格式。\n\n## 提问、回答及未决影响\n\n| ID | 问题及候选 | 提问时的推荐与取舍 | 实际回答及影响 |\n|---|---|---|---|\n| Q1 | 离线阅读、搜索和整理／迁移到其他工具／两者都要 | 推荐离线整理，贴近原始目标；迁移另需目标及兼容要求 | 用户确认离线阅读、搜索和整理；迁移兼容不列为本轮已确认要求 |\n| Q2 | 私密笔记：默认排除、可明确包含／一律排除／默认包含 | 推荐默认排除、可明确包含，兼顾整理与避免意外带出，增加一次明确选择 | 用户明确不回答、不给代决权；可导出的笔记集合及隐私验收仍未定 |\n| Q3 | 附件：随笔记复制／仅保留原路径／本次不导出 | 推荐随笔记复制，有利于完整保留，增加体积和耗时 | 用户明确不回答、不给代决权；完整性、离开原环境的可用性及缺失附件处理验收仍未定 |\n\n推荐均未转为默认值、用户确认或有效决定。停止重复追问，不以“就这些”推定接受。\n\n## 验收条目与证据要求\n\n以下使用稳定 ID；具体通过判据尚未全部收敛，不构成已批准的完整验收集。\n\n| AC ID | 内容及确认程度 | 后续所需证据或前提 |\n|---|---|---|\n| AC-01 | 已确认的目标方向：导出服务离线阅读、搜索和整理；具体阅读、检索与整理操作判据待设计明确 | 在约定离线环境中用代表性笔记展示阅读、检索及整理操作；记录结果并由需求方判断是否满足用途 |\n| AC-02 | 内容完整、以后易于查找是原始目标；建议逐项核对标题、正文、ID、创建时间的保留，但具体字段与检索方式未获逐项确认 | 确定字段范围后，比较输入与导出物；补充带创建时间的样本；边界覆盖至既有 250 条上限。格式、工具和性能阈值未定 |\n| AC-03 | 私密笔记范围待决定，不能写成默认包含或默认排除 | Q2 得到明确决定后，用普通与私密混合样本验证实际包含集合及用户选择行为 |\n| AC-04 | 附件范围待决定，不能将复制、路径保留或省略写成既定要求 | Q3 得到明确决定后，定义附件存在、缺失及导出后可访问性的证据要求 |\n\n## 风险与恢复条件\n\n需求不确定性高，业务实现复杂度暂不能可靠估计。私密范围影响意外泄露与内容缺失；附件范围影响完整性、可移植性、体积和失败处理。\n\n没有新增产品假设代替这两个关键决定。后续可继续只读调查，但本轮不再推进。恢复需需求方明确 Q2、Q3，或另行提供明确的代决授权，然后续接同一任务的 need 阶段。恢复不等于授权业务实现。\n"
+          }
+        },
+        "project": "/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered",
+        "baseline_commit": "9b8a3aad7f9676b14a5b848419dff96270d1c249",
+        "inputs": {
+          ".gitignore": {
+            "sha256": "135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01",
+            "text": "/.yuzio/\n"
+          },
+          "AGENTS.md": {
+            "sha256": "fd922e71915c8e2cd4b2ebb2c2dd6b8a6a0c3ca233316dc0ca36b385f0540368",
+            "text": "# 隔离笔记项目\n\n本项目只用于一次 Cohestra 行为试验。目标项目是本目录。\n\n- src/、data/、docs/current.md、docs/requirements.md 是只读输入，不修改或删除。\n- 可维护 .yuzio/cohestra 过程交付；阶段所需正式文档放 docs/decisions/。\n- 本轮不实施业务代码，不提交、不推送、不使用网络服务。\n- 用户追问由测试主持人通过会话文本提供。需要提问时在本会话回复主持人并结束回合，不调用真实用户的交互问题工具。\n- Python 标准库与系统 Ruby/Psych 可用于本地资料和 YAML 检查；不安装依赖。\n"
+          },
+          "data/notes.json": {
+            "sha256": "a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427",
+            "text": "[\n  {\n    \"id\": \"n1\",\n    \"title\": \"读书摘录\",\n    \"body\": \"第一条笔记\",\n    \"private\": false,\n    \"attachments\": []\n  },\n  {\n    \"id\": \"n2\",\n    \"title\": \"个人记录\",\n    \"body\": \"私密内容\",\n    \"private\": true,\n    \"attachments\": [\n      \"scan.png\"\n    ]\n  }\n]\n"
+          },
+          "docs/current.md": {
+            "sha256": "fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520",
+            "text": "# 当前事实\n\n这是离线桌面笔记工具，没有账户、服务器或云同步。\n一次最多选择 250 条笔记；单条元数据包括 id、标题、创建时间、正文、私密标记和附件路径。\n当前导出函数只把标题与正文拼成文本，不保留 id 和创建时间，也没有附件复制逻辑。\n私密笔记与普通笔记存储在同一份本地库。当前格式不构成本次方案决定。\n"
+          },
+          "src/export.py": {
+            "sha256": "c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9",
+            "text": "def export_notes(notes):\n    return \"\\n\\n\".join(note[\"title\"] + \"\\n\" + note[\"body\"] for note in notes)\n"
+          }
+        },
+        "interaction": {
+          "agent": "/root/live_need_unanswered",
+          "stage": "need",
+          "initial_request": "希望把笔记导出做得更方便，给经常整理资料的人使用。重点是内容完整、以后容易查找。私密笔记是否包含、附件是否一起导出，目前我还没有决定。先澄清需求，不做业务实现。",
+          "questions": "已核实：现有导出仅保留标题和正文，会遗漏 ID、创建时间和附件。请确定以下 3 项：\n\n1. **主要用途**：A. 导出后离线阅读、搜索和整理；B. 迁移到其他笔记工具；C. 两者都要。推荐 A，最贴近目前目标；B、C 还需明确迁移目标和兼容要求。\n2. **私密笔记**：A. 默认排除，每次导出可明确选择包含；B. 一律排除；C. 默认包含。推荐 A，兼顾完整整理与避免意外带出私密内容，但需增加一次明确选择。\n3. **附件**：A. 随笔记复制，离开原电脑后仍能打开；B. 仅保留原路径；C. 本次不导出附件。推荐 A，更符合内容完整和长期查找的目标，但导出体积、耗时会增加。\n\n这些推荐尚未视为已确认决定。",
+          "followup": "离线阅读、搜索和整理这个用途可以。私密笔记和附件的取舍我现在都不回答，也不授权你替我选。就这些，请结束本轮并交付当前结果。不要修改业务代码，不要进入其他阶段。",
+          "final_reply": "本轮已按 **need 受阻**交付。用途已确认；私密笔记与附件仍未决定，未代选、未修改业务代码、未进入其他阶段。\n\n- [阶段交付 need-02.md](/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered/.yuzio/cohestra/handoffs/export-portability/need-02.md)\n- [正式需求记录](/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered/docs/decisions/export-portability-requirements.md)\n- [任务索引](/private/tmp/cohestra-clarification-live-k6uf09w1/need-unanswered/.yuzio/cohestra/handoffs/export-portability/README.md)：校验通过，已原子发布并回读；`next.allowed: false`。\n\nneed-01 保留原文，need-02 仅更正文档链接并保留受阻结论。"
+        }
+      },
+      {
+        "case": "design-unanswered",
+        "errors": [],
+        "state": {
+          "contract": "0.8",
+          "task": "export-portability",
+          "status": "blocked",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "design",
+            "status": "blocked",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": null
+          },
+          "next": {
+            "stage": null,
+            "allowed": false,
+            "reason": "human_decision_required"
+          },
+          "blocked": {
+            "value": true,
+            "reason": "human_decision_required"
+          }
+        },
+        "historical_link_errors": [],
+        "artifacts": {
+          ".yuzio/cohestra/.gitignore": {
+            "sha256": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+            "text": "# Local execution data; also add /.yuzio/ to the project root .gitignore.\n*\n"
+          },
+          ".yuzio/cohestra/README.md": {
+            "sha256": "d9445cf665a8d9f8b6e72953c569fb315d168ae26009c681885286deba0bd652",
+            "text": "# 项目协作上下文\n\n- 项目：隔离笔记项目（design-unanswered）\n- 初始化时 Skill 发行版本：0.16.1（仅记录初始化来源，不锁定后续调用）\n- 流程入口：所用工具实际加载的 cohestra 技能。\n\n## 使用\n\n在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步；未指定阶段时按任务目标自动选择一个起点，交付后停止。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。\n\n使用 `$cohestra report` 只读查看本项目全部任务状态、遗留问题与状态异常，包括已完成任务的未关闭项；结果直接在对话中展示，不初始化项目、不写文件或推进阶段。\n\n明确使用 `$cohestra closeout`，可在一次调用内串行完成当前任务的独立 review、必要 fix、独立复审、validate 和收尾；无需加入 Cadra 队列。普通阶段仍交付后停止；具体编排、授权与恢复规则读取实际安装技能，不在本入口复制。\n\n- [handoffs/](handoffs/)：每个任务一个目录，其 README 保存有效决定、候选、分开的状态和下一步；阶段结论单独落盘。\n- [retrospectives/](retrospectives/)：按需保存复盘，不作为每阶段必读输入。\n- 规则和阶段提示词保存在技能包中，不在此复制。业务规范仍归项目所有；历史决定、授权和验收证据按任务索引追溯。\n- 普通任务只更新自己的交付物与任务索引，不反复更新本入口。每轮交付记录实际采用的技能发行版本，历史文件不随技能升级重写。\n- 用户级技能升级影响后续调用；需要项目独立固定版本时，选择项目级安装并通过 Git 管理更新。\n\n本目录属于工作区本机资料，根 `.gitignore` 用 `/.yuzio/` 整体忽略。任务记录仍须保留；正式文档与必要共享证据写入项目已有文档目录（无约定时用 `docs/`），不能仅引用本目录。任务 `scratch/` 用于可重建日志与产物。接续任务复用当前项目的索引与交付记录，Git 不备份本目录。\n\n过程资料按实际安装技能的留存规则维护：发布成功并回读后清理本次无引用、无恢复用途的临时提案，快照优先复用不可变材料或独立克隆。核心 handoff（含索引待同步交付）、历史决定、候选、资源请求和被引用证据持续保留；历史资料清理须有明确范围授权，保留恢复材料与维护索引，不改写交付结论或任务契约。\n"
+          },
+          ".yuzio/cohestra/handoffs/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          ".yuzio/cohestra/handoffs/export-portability/README.md": {
+            "sha256": "4d0a6e5dc6cc6312e7f4f0cf011d662a4cd396bef7910b4b6f55c36afecaeed6",
+            "text": "---\ncontract: \"0.8\"\ntask: export-portability\nstatus: blocked\nexecution_mode: attended\nstage_result:\n  stage: design\n  status: blocked\n  round: 1\ncandidate:\n  commit: null\n  snapshot: null\nnext:\n  stage: null\n  allowed: false\n  reason: human_decision_required\nblocked:\n  value: true\n  reason: human_decision_required\n---\n\n# 笔记导出方案\n\n- 任务目标：从 design 起步，依据已确认需求及现状澄清关键取舍并制定导出设计；本轮无业务实施授权。\n- 有效决定与确认来源：[已确认需求](../../../../docs/requirements.md)、[项目规则](../../../../AGENTS.md) 以及 [design-01.md](design-01.md) 中的会话原文。用户明确不回答 JSON/Markdown、不授权代决，并要求结束本轮且不进入其他阶段。\n- 正式文档：[笔记导出本轮设计澄清结果](../../../../docs/decisions/export-portability-design.md)，本轮 design-01 版本；不是最终实施方案。\n- 待确认事项：输出格式未决；文件组织和执行方式未确认。推荐 JSON 仅是建议，没有被接受。\n- 工作项记录：业务实现及输入保持原样；未生成业务候选。设计资料交付不代表实现、独立审查或验收通过，未提交、推送或发布。\n- 下一步补充：当前不允许进入其他阶段。恢复前提为用户作出格式选择，或明确授予代决范围；随后继续 design，输入本任务目录、design-01.md、正式文档及新的决定/授权。保留有效需求，不重写本轮历史。\n- 索引维护者：Codex agent /root/live_design_unanswered（本轮唯一写入者）。\n- 最近更新：Codex agent /root/live_design_unanswered，2026-11-05T18:47:48+08:00（Asia/Shanghai）。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| design-01 | [设计澄清交付](design-01.md)：现状、有效约束、未决取舍、证据计划及停止条件 | 受阻；缺少输出格式的人工作决定，不授权进入下一阶段 | 原始设计请求、项目规则及输入文档、只读代码与示例、会话答复；无业务候选 |\n"
+          },
+          ".yuzio/cohestra/handoffs/export-portability/design-01.md": {
+            "sha256": "d0f0f07b5537d4531d3594118c6983d93153860f56b99f1866ff47b565541061",
+            "text": "# 笔记导出方案 · design-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8\n- Skill 发行版本：0.16.1\n- 实际技能来源：/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md；本轮仅加载该包。\n- 执行者：Codex agent /root/live_design_unanswered；单执行者、任务索引唯一维护者。\n- 时间：2026-11-05T18:47:25+08:00（Asia/Shanghai）\n- 执行模式：attended\n- 阶段状态：受阻；输出格式未决且无代决授权。\n- 输入与上游依据：本次 $cohestra design 明确指定任务目录及原始需求；项目 AGENTS.md、docs/requirements.md、docs/current.md、src/export.py、data/notes.json；本会话澄清问答。不使用自动衔接，没有 need 交付，不补造前置阶段。\n- 初始化：本轮实际创建项目 .yuzio/cohestra 最小容器及入口；根 /.yuzio/ 忽略规则已存在且生效，Git 中未发现该容器的跟踪文件或历史。\n\n## 有效上下文\n\n- 项目：/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered。\n- 任务目录：/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered/.yuzio/cohestra/handoffs/export-portability。\n- 流程范围：从 design 起步，仅澄清重大取舍并制定设计；不实施业务，不提交、不推送、不使用网络服务、不启动其他 agent。\n- 已确认需求及来源：docs/requirements.md 明确只导出所选普通笔记、排除私密及附件、UTF-8、保留 id/标题/创建时间/正文、保持源数据不变、取消失败无不完整成功文件、最多 250 条且 UI 保持响应。\n- 业务及输入只读范围：src/、data/、docs/current.md、docs/requirements.md；正式文档只能放 docs/decisions/。\n- 本轮最后指令明确要求结束、交付当前结果，且不选择格式、不代决、不进入其他阶段。见下节确认来源。\n\n## 本阶段结果\n\n设计受阻，必要关键决定未收敛。正式文档：[本轮设计澄清结果](../../../../docs/decisions/export-portability-design.md)。\n\n已只读核实：现有函数只拼接标题与正文；示例两条笔记均无创建时间字段；没有可核实的 UI、保存及取消调用链。未把当前纯文本输出当作方案决定。\n\n本轮先就 JSON 与 Markdown 提问，推荐 JSON 作为更直接的结构化处理格式，并说明 Markdown 的阅读优势及元数据约定代价。该建议未获接受。\n\n用户明确答复：“JSON 还是 Markdown 我现在不回答，也不授权你替我选。就这些，请结束本轮并交付当前结果。不要修改业务代码，不要进入其他阶段。”\n\n因此：\n\n- JSON/Markdown 保留为未决关键决定；不存在有效选择或代决授权。\n- 不再追问，不将推荐或沉默改为默认值，不完成依赖该选择的序列化契约、文件布局或最终实施计划。\n- 文件组织与执行方式同样未被确认；未额外预设单文件、逐笔记文件或后台执行。\n- 完成不依赖格式的约束汇总、风险路径与 E1–E5 证据映射，详见正式文档。它们是后续计划，不是本轮运行结果。\n- 未做业务实现，未生成业务候选，未执行独立 review、复审或 validate。并不以“本轮已结束”宣称 design 完成。\n\n## 证据与限制\n\n- 本机终端只读检查实际项目文件、git status --short、git ls-files .yuzio、git check-ignore -v 及限定路径历史；根忽略规则为 /.yuzio/，项目初始工作区干净、容器未存在且无可恢复历史。\n- Python 标准库读取示例 JSON：2 条记录均没有 created_at 或 created_time；源码未给出其他创建时间入口。此结论只覆盖当前输入，真实数据处理仍需后续核实。\n- 本机 Python 比较 AGENTS.md、.gitignore、docs/requirements.md、docs/current.md、src/export.py、data/notes.json 的实际字节与 Git HEAD，全部一致；未改写输入。\n- 仅设计资料写入；不运行业务测试，不安装依赖，不使用网络服务。源码检查不能证明 UI 响应、文件原子可见性、取消或失败清理。\n- 不存在已固定业务候选或已通过验收。后续实现须在最终设计中明确调用方、文件所有权、完成条件与审查责任；本轮不得替实施者作未授权关键决定。\n\n## 下一步交接\n\n当前无允许进入的下一阶段。保持受阻，原因为 human_decision_required；不进入 code，不自行切换 need 或其他阶段。\n\n恢复前提：用户作出 JSON/Markdown 选择，或明确授权代决及其范围。届时继续 $cohestra design，准确输入为本任务目录、design-01.md、docs/decisions/export-portability-design.md 及新的决定/授权；从未决问题继续，不重问有效需求，也不改写本轮历史。主持人提供答复，本执行者不调用真实用户交互工具。\n"
+          },
+          ".yuzio/cohestra/retrospectives/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "docs/decisions/export-portability-design.md": {
+            "sha256": "7b1266082505c95b8a73bc4ea2c8a6471a287c83612692a1376775d053300313",
+            "text": "# 笔记导出：本轮设计澄清结果\n\n本轮结论：设计受阻，原因是输出格式尚未决定。JSON 与 Markdown 均未被选定。本文件记录已确认约束、调查事实及后续设计前提，不是可直接实施的最终方案。\n\n## 有效依据与范围\n\n- 项目规则：[AGENTS.md](../../AGENTS.md)。已确认需求：[requirements.md](../requirements.md)。当前事实：[current.md](../current.md)。代码：[export.py](../../src/export.py)。示例数据：[notes.json](../../data/notes.json)。\n- 从 design 起步；本轮只做澄清与设计资料交付，不做业务实现、提交、推送或网络操作。\n- 只导出用户选择的普通笔记，排除私密笔记及附件；离线执行，不上传、不同步。\n- UTF-8，保留稳定 id、标题、创建时间、正文。源笔记及元数据不变。\n- 最多 250 条，界面必须保持响应。取消或失败不能留下会被当作成功导出的不完整文件。\n\n## 调查事实\n\n- 当前 export_notes 仅拼接标题与正文；未保留 id 和创建时间，也未处理私密筛选、文件写入或执行调度。当前格式不是本轮决定。\n- 示例包含一条普通笔记和一条带附件路径的私密笔记；两条均未提供创建时间字段。后续需核实真实数据来源及缺失创建时间的处理，不得编造时间。\n- 当前提供的代码没有 UI 调用方、文件保存入口或取消生命周期。因此，运行响应、取消和失败清理均未获得实测证据。\n\n## 澄清与未决事项\n\n本轮先询问输出格式：推荐 JSON，依据是需求侧重其他工具继续处理及结构化元数据保留；同时说明 Markdown 便于直接阅读与编辑，但需要元数据约定。这仅是建议，不是有效决定。\n\n用户随后明确答复：“JSON 还是 Markdown 我现在不回答，也不授权你替我选。就这些，请结束本轮并交付当前结果。不要修改业务代码，不要进入其他阶段。”\n\n| 待决定项 | 当前状态与影响 |\n|---|---|\n| JSON 或 Markdown | 未决定，且无代决授权；阻塞最终序列化契约、文件布局和面向接收工具的验收细节。不得将推荐降格为默认假设来推进。 |\n| 文件组织 | 未决定；单个集合文件与逐笔记文件的命名、冲突及整体成功边界不同，待格式明确后再设计。 |\n| 执行方式 | 未决定；后台任务或分批执行都需结合实际 UI/保存调用链验证响应与取消，不将任何方式记为已接受。 |\n\n## 可复用的验证范围\n\n以下是从既有需求派生的追踪标签，仅用于设计准备，不改变需求，不表示测试已运行或验收通过。\n\n| 标签及需求 | 后续必要证据与前提 |\n|---|---|\n| E1 普通笔记筛选与附件排除 | 单元用例覆盖混合选择、私密笔记和附件路径；集成检查实际保存内容及任何旁路文件。需最终入口与实现。 |\n| E2 UTF-8 与四项字段保留 | 最终格式解析或接收工具契约验证，覆盖非 ASCII、换行和元数据；对 id/正文精确比对。需输出格式、创建时间真源与规则。 |\n| E3 源数据不变 | 成功、取消、失败前后比较源文件与元数据；需实际存储适配器。 |\n| E4 取消或失败无不完整成功产物 | 注入写入失败、取消及目标冲突，检查临时文件和最终可见结果；需文件组织及提交成功边界。 |\n| E5 250 条且保持响应 | 250 条及大正文的 UI 集成运行，观察交互响应与取消；需真实 UI 调用链和执行方式，不以条目数推断性能。 |\n\n后续实现审查需覆盖“选择 → 私密筛选 → 元数据读取 → 序列化 → 文件写入 → 成功/失败/取消清理”的实际路径。最终设计补齐调用方、文件所有权、实施步骤、证据环境和审查责任后，才具备实施交接条件。本轮不启动 reviewer 或其他 agent。\n\n## 停止与恢复\n\n停止依赖格式选择的设计工作。本轮不完成最终方案，不进入 code 或其他阶段。用户需要作出格式选择，或明确授予代决范围后，才可继续 design；届时仅重开受影响问题，并保留既有需求。需求或设计决定不自动授权业务实现。\n"
+          }
+        },
+        "project": "/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered",
+        "baseline_commit": "07736bb22701d8da31158466b23a1ea27a5358ec",
+        "inputs": {
+          ".gitignore": {
+            "sha256": "135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01",
+            "text": "/.yuzio/\n"
+          },
+          "AGENTS.md": {
+            "sha256": "fd922e71915c8e2cd4b2ebb2c2dd6b8a6a0c3ca233316dc0ca36b385f0540368",
+            "text": "# 隔离笔记项目\n\n本项目只用于一次 Cohestra 行为试验。目标项目是本目录。\n\n- src/、data/、docs/current.md、docs/requirements.md 是只读输入，不修改或删除。\n- 可维护 .yuzio/cohestra 过程交付；阶段所需正式文档放 docs/decisions/。\n- 本轮不实施业务代码，不提交、不推送、不使用网络服务。\n- 用户追问由测试主持人通过会话文本提供。需要提问时在本会话回复主持人并结束回合，不调用真实用户的交互问题工具。\n- Python 标准库与系统 Ruby/Psych 可用于本地资料和 YAML 检查；不安装依赖。\n"
+          },
+          "data/notes.json": {
+            "sha256": "a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427",
+            "text": "[\n  {\n    \"id\": \"n1\",\n    \"title\": \"读书摘录\",\n    \"body\": \"第一条笔记\",\n    \"private\": false,\n    \"attachments\": []\n  },\n  {\n    \"id\": \"n2\",\n    \"title\": \"个人记录\",\n    \"body\": \"私密内容\",\n    \"private\": true,\n    \"attachments\": [\n      \"scan.png\"\n    ]\n  }\n]\n"
+          },
+          "docs/current.md": {
+            "sha256": "fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520",
+            "text": "# 当前事实\n\n这是离线桌面笔记工具，没有账户、服务器或云同步。\n一次最多选择 250 条笔记；单条元数据包括 id、标题、创建时间、正文、私密标记和附件路径。\n当前导出函数只把标题与正文拼成文本，不保留 id 和创建时间，也没有附件复制逻辑。\n私密笔记与普通笔记存储在同一份本地库。当前格式不构成本次方案决定。\n"
+          },
+          "docs/requirements.md": {
+            "sha256": "3683fe342a737c6f8fb6555d6a82d765c7cb20c07566001dcb7f821bb081f0be",
+            "text": "# 已确认的设计输入\n\n本文件仅供 design 阶段的本次任务使用，不表示 need 场景已确认这些取舍。\n\n- 只导出用户选择的普通笔记，排除私密笔记及附件，不上传或同步。\n- 导出文件使用 UTF-8，保留稳定 id、标题、创建时间和正文，供其他工具继续处理。\n- 原始笔记及其元数据保持不变，取消或失败时不得留下被当作成功导出的不完整文件。\n- 最多 250 条，处理过程不能使界面失去响应。\n- 输出格式（JSON 或 Markdown）、文件组织及执行方式仍待本次 design 决定。\n"
+          },
+          "src/export.py": {
+            "sha256": "c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9",
+            "text": "def export_notes(notes):\n    return \"\\n\\n\".join(note[\"title\"] + \"\\n\" + note[\"body\"] for note in notes)\n"
+          }
+        },
+        "interaction": {
+          "agent": "/root/live_design_unanswered",
+          "stage": "design",
+          "initial_request": "输入：本项目 docs/requirements.md 已确认需求、docs/current.md 及现有代码。\n需求：请设计笔记导出方案。输出格式究竟用 JSON 还是 Markdown，我还没有决定。这轮先澄清会实质影响方案的选择，再制定设计，不做业务实现。",
+          "questions": "导出格式需要先确定：\n\n- **JSON（推荐）**：适合其他工具继续处理，能明确保留 id、标题、创建时间和正文。\n- **Markdown**：适合直接阅读和手工编辑，但需要约定元数据格式，接收工具也需支持。\n\n你更希望采用哪一种？确认后再细化文件组织和执行方式。",
+          "followup": "JSON 还是 Markdown 我现在不回答，也不授权你替我选。就这些，请结束本轮并交付当前结果。不要修改业务代码，不要进入其他阶段。",
+          "final_reply": "本轮已结束。design 以 `human_decision_required` 受阻交付，索引已同步。未选定格式，未修改业务代码，未进入其他阶段。\n\n- [阶段交付](/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered/.yuzio/cohestra/handoffs/export-portability/design-01.md)\n- [正式文档](/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered/docs/decisions/export-portability-design.md)\n- [任务索引](/private/tmp/cohestra-clarification-live-k6uf09w1/design-unanswered/.yuzio/cohestra/handoffs/export-portability/README.md)\n\nYAML、状态一致性和输入未改动检查通过。\n\n指定包的 [澄清规则](/private/tmp/cohestra-clarification-live-k6uf09w1/skill/references/clarification.md) 明确：“未答复及‘就这些’均不表示接受尚未确认的推荐。”因此，本轮未将设计标为完成。"
+        }
+      },
+      {
+        "case": "need-delegated",
+        "errors": [],
+        "state": {
+          "contract": "0.8",
+          "task": "export-portability",
+          "status": "in_progress",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "need",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": null
+          },
+          "next": {
+            "stage": "design",
+            "allowed": true,
+            "reason": "stage_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "historical_link_errors": [],
+        "artifacts": {
+          ".yuzio/cohestra/.gitignore": {
+            "sha256": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+            "text": "# Local execution data; also add /.yuzio/ to the project root .gitignore.\n*\n"
+          },
+          ".yuzio/cohestra/README.md": {
+            "sha256": "102e43c52a05ed7c37af43be5c6d2e21d4dbf909ab9744a8418a77c50c970005",
+            "text": "# 项目协作上下文\n\n- 项目：隔离笔记项目（need-delegated）\n- 初始化时 Skill 发行版本：0.16.1；仅记录初始化来源，不锁定后续调用\n- 流程入口：所用工具实际加载的 cohestra 技能。\n\n## 使用\n\n在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步；未指定阶段时按任务目标自动选择一个起点，交付后停止。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。\n\n使用 `$cohestra report` 只读查看本项目全部任务状态、遗留问题与状态异常，包括已完成任务的未关闭项；结果直接在对话中展示，不初始化项目、不写文件或推进阶段。\n\n明确使用 `$cohestra closeout`，可在一次调用内串行完成当前任务的独立 review、必要 fix、独立复审、validate 和收尾；无需加入 Cadra 队列。普通阶段仍交付后停止；具体编排、授权与恢复规则读取实际安装技能，不在本入口复制。\n\n- [handoffs/](handoffs/)：每个任务一个目录，其 README 保存有效决定、候选、分开的状态和下一步；阶段结论单独落盘。\n- [retrospectives/](retrospectives/)：按需保存复盘，不作为每阶段必读输入。\n- 规则和阶段提示词保存在技能包中，不在此复制。业务规范仍归项目所有；历史决定、授权和验收证据按任务索引追溯。\n- 普通任务只更新自己的交付物与任务索引，不反复更新本入口。每轮交付记录实际采用的技能发行版本，历史文件不随技能升级重写。\n- 用户级技能升级影响后续调用；需要项目独立固定版本时，选择项目级安装并通过 Git 管理更新。\n\n本目录属于工作区本机资料，根 `.gitignore` 用 `/.yuzio/` 整体忽略。任务记录仍须保留；正式文档与必要共享证据写入项目已有文档目录（无约定时用 `docs/`），不能仅引用本目录。任务 `scratch/` 用于可重建日志与产物。接续任务复用当前项目的索引与交付记录，Git 不备份本目录。\n\n过程资料按实际安装技能的留存规则维护：发布成功并回读后清理本次无引用、无恢复用途的临时提案，快照优先复用不可变材料或独立克隆。核心 handoff（含索引待同步交付）、历史决定、候选、资源请求和被引用证据持续保留；历史资料清理须有明确范围授权，保留恢复材料与维护索引，不改写交付结论或任务契约。\n"
+          },
+          ".yuzio/cohestra/handoffs/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          ".yuzio/cohestra/handoffs/export-portability/README.md": {
+            "sha256": "9e15d9b5455be4fb494f04f13e657263c1775bec081d67ce095badb39793c8e6",
+            "text": "---\ncontract: \"0.8\"\ntask: export-portability\nstatus: in_progress\nexecution_mode: attended\nstage_result:\n  stage: need\n  status: completed\n  round: 1\ncandidate:\n  commit: null\n  snapshot: null\nnext:\n  stage: design\n  allowed: true\n  reason: stage_completed\nblocked:\n  value: false\n  reason: null\n---\n\n# 笔记离线导出\n\n- 任务目标：面向经常整理资料的用户，完整导出所选普通笔记和本地附件，便于离线携带、阅读和查找。本任务从 need 起步；原始输入与本轮授权见 [need-01](need-01.md)。\n- 有效决定与来源：用户明确授权本轮代决私密内容、附件、格式和组织方式，优先级为离线可携带、少暴露个人信息、控制范围；执行者 D-01～D-05 选择排除私密笔记、纳入普通附件、ZIP 内逐条 Markdown 加 JSON 元数据、提供索引与相对关联，并减少系统生成信息。详见正式需求；这些是授权内代决，不是用户逐项确认。\n- 流程边界来源：本轮只准备 need，主持人补充交付供后续单独调用 design 使用，整个导出功能仍需设计与实施。阶段交付后停止，不代表导出任务终点。\n- 正式文档：[笔记离线导出需求](../../../../docs/decisions/export-portability-requirements.md)，版本 need-01；含 D-01～D-05、AC-01～AC-08、范围与风险。\n- 工作项记录：本轮只读业务输入并交付需求；无实现、运行或功能验收通过结论，无业务代码修改、提交、推送或网络服务操作。\n- 下一步补充：准确输入为 [need-01](need-01.md)、本索引及正式需求。由调用方另行安排设计执行者；先核实真实时间字段、附件关联/容量、路径边界和失败处理，随后制定 AC 证据计划。无待用户决定的关键产品问题；既有代决不扩大至实施授权。\n- 索引维护者：Codex 子智能体 `/root/live_need_delegated`，本轮唯一写入者。\n- 最近更新：Codex 子智能体 `/root/live_need_delegated`，2026-11-05 18:49:00 Asia/Shanghai (UTC+08:00)。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| need-01 | [need-01.md](need-01.md)：目标、范围、代决依据、AC 与设计前提 | 已结束；无未决关键决定，具备设计前提 | 本轮原始需求与后续用途补充；本地只读资料，无候选 |\n"
+          },
+          ".yuzio/cohestra/handoffs/export-portability/need-01.md": {
+            "sha256": "11b56e9733fa70d778fd4273f91f13deba2d97194c9537ab67a20b91309b87fd",
+            "text": "# 笔记离线导出 · need-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8\n- Skill 发行版本：0.16.1；实际来源 `/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md`。\n- 执行者：Codex 子智能体 `/root/live_need_delegated`；本阶段唯一交付物与任务索引写入者。\n- 时间：2026-11-05 18:48:08 Asia/Shanghai (UTC+08:00)\n- 执行模式：attended（调用未声明 unattended）。\n- 阶段状态：已结束；need 完成，导出功能尚未设计、实施或验收。\n- 输入与上游依据：本次 `$cohestra need` 原始需求、明确项目和任务目录；主持人后续补充“交付供后续单独调用 design 使用，整个导出功能尚需设计与实施”。无上游 handoff，不适用自动衔接。\n- 项目输入：`AGENTS.md`、`docs/current.md`、`src/export.py`、`data/notes.json`；均只读。\n- 初始化：原先无 `.yuzio/cohestra`，本轮在目标项目完成一次最小初始化；入口为 `/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/.yuzio/cohestra/README.md`。根 `/.yuzio/` 忽略规则已有效，无已跟踪本机资料，未改根忽略规则。\n\n## 有效上下文\n\n- 项目：`/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated`。\n- 任务目录：`/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/.yuzio/cohestra/handoffs/export-portability`。\n- 流程范围：本次只执行 need，交付后停止；后续由调用方单独调用 design，不能把本轮停止线解释为整个导出任务终点。\n- 目标：经常整理资料的用户可将所选普通笔记及附件完整携带离线，并易于查找。\n- 用户明确优先级：离线可携带 → 尽量少暴露个人信息 → 控制本次开发范围。禁止云同步或上传。\n- 代决授权来源：原始需求明确写明“私密笔记和附件是否纳入、输出格式及组织方式，我明确授权你在本轮代决”，并要求记录选择及依据，无需逐项确认。\n- 权限：只读业务资料，维护本项目过程交付与 `docs/decisions/` 正式需求；不改业务代码，不执行下一阶段，不提交、不推送、不使用网络服务、不启动其他 agent。\n\n## 本阶段结果\n\n正式需求真源：[笔记离线导出需求](../../../../docs/decisions/export-portability-requirements.md)，版本 need-01。可脱离本机过程目录阅读，内含完整范围、代决依据、AC、风险与 design 前提。\n\n本轮在授权内作出 D-01～D-05：固定排除私密笔记及其附件并显示排除数量；纳入普通笔记本地附件；唯一格式 ZIP，内含逐条 UTF-8 Markdown 和 JSON 元数据；包根提供查找索引和说明，附件使用包内相对关联；系统生成名称与元数据不携带本机路径等无关个人信息。\n这些是执行者代决，不是用户逐项确认。选择优先保护离线完整性，再减少私密暴露，同时限定单一导出路径；代价包括不支持私密备份、需解压、包体增加及附件原有内嵌信息未脱敏。\n\n稳定验收 ID：AC-01 字段完整与缺失时间；AC-02 私密排除；AC-03 附件一致与关联；AC-04 缺项和失败反馈；AC-05 离线阅读与查找；AC-06 最少生成信息；AC-07 无网络及源数据不变；AC-08 250 条上限与计数。每项证据要求见正式文档。\n\n澄清记录：已通过只读资料核实能确定的事实。用户已明确代决授权与判断优先级，授权内选择已收敛，未提出关键问题，也没有新增确认回合。未伪造用户确认；无未决关键产品决定。\n\n复杂度中等，隐私和文件完整性风险较高。实际时间字段、附件容量/路径分布及写入失败交互待设计调查；当前样本缺创建时间且无真实附件。以上是保留的调查/验证项，不是需求受阻条件。\n具备 design 前提；具体技术、交互、验证环境与证据计划尚未设计。\n\n## 证据与限制\n\n- 只读源码与文档：当前函数仅拼标题正文；当前说明声明 250 条上限、离线环境和元数据；样本含普通/私密记录，但缺创建时间和附件实体。静态事实不证明新功能行为。\n- 本地环境：系统 Python 标准库执行初始化与文档检查；系统 Ruby/Psych 用于后续索引 YAML 解析。未安装依赖、未调用网络。\n- `git status --short --untracked-files=all` 初始为空；`git check-ignore -v .yuzio/cohestra/handoffs/export-portability/README.md` 确认根规则有效；`git ls-files .yuzio` 与对应路径历史查询为空。\n- 初始只读输入 SHA-256：`src/export.py` 为 `c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9`；`data/notes.json` 为 `a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427`；`docs/current.md` 为 `fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520`。发布前核对相同摘要。\n- 本轮只交付需求，不执行导出功能测试、运行验收或性能测量。实现、自审、独立审查及功能验收均无本轮通过结论。\n\n## 下一步交接\n\n推荐由调用方另行调用 `$cohestra design`，准确输入本文件 `/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/.yuzio/cohestra/handoffs/export-portability/need-01.md`、同目录任务 README 与正式需求 `docs/decisions/export-portability-requirements.md`。\n设计执行者应先核实时间字段、附件关联/容量和路径边界，再确定失败反馈、包内命名与 AC 证据计划；未指定具体人名，不编造负责人。\n本轮 need 交付完成后停止，不启动 design。任务仍进行中；推荐不产生下一阶段执行或实现授权。\n"
+          },
+          ".yuzio/cohestra/retrospectives/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "docs/decisions/export-portability-requirements.md": {
+            "sha256": "835008dba7175681f50c8ccca6bfbfd8477d1f290e050f48242b692e2168e249",
+            "text": "# 笔记离线导出需求\n\n版本：need-01；日期：2026-11-05。\n本文件定义后续设计和实施的需求，不代表功能已实现或验收通过。\n\n## 目标与边界\n\n面向经常整理资料的用户，让已选笔记可以完整带离本应用，在无网络、无账户的环境中阅读和查找。\n优先级依次为：离线可携带、尽量少暴露个人信息、控制本次开发范围。\n本次沿用现有一次最多选择 250 条笔记的边界，不扩展全库管理能力。\n完整性针对本轮明确纳入的普通笔记；私密笔记的排除必须可见，不能伪称全部所选内容已导出。\n\n## 输入事实\n\n- [当前说明](../current.md)：工具完全离线，无账户、服务器或云同步；元数据含 id、标题、创建时间、正文、私密标记和附件路径。\n- [导出源码](../../src/export.py)：目前只拼接标题和正文，未保留 id、创建时间或复制附件。\n- [样本数据](../../data/notes.json)：有一条普通笔记和一条私密笔记；私密笔记带附件路径。两条样本都未提供创建时间，也没有可供验证的附件文件。\n- 上述是输入静态事实，本阶段没有运行或验证导出新行为。\n\n## 用户决定、授权与本轮代决\n\n用户本次原始需求明确授权执行者代决“私密笔记和附件是否纳入、输出格式及组织方式”，给出上述优先级，并禁止云同步或上传；用户要求记录选择和依据，无需逐项确认。\n后续补充明确本轮只交付 need，供以后单独调用 design 使用；整个导出功能仍需设计和实施。\n下表为执行者在授权内作出的决定，不是用户逐项确认记录。\n\n| 决定 | 本轮选择 | 依据与主要代价 |\n|---|---|---|\n| D-01 私密笔记 | 本期固定排除私密笔记及其附件，不增加“包含私密”开关。混合选择只导出普通笔记，并显示被排除条数；不暴露排除项的标题、id、正文和路径。 | 避免日常整理误带私密资料，同时控制范围；代价是本期不能用此功能备份私密内容。 |\n| D-02 普通笔记附件 | 纳入所选普通笔记已关联、可读取的本地附件，保留文件内容与笔记关联；不下载远程资源。 | 附件脱离原电脑仍可访问，符合最高优先级；代价是包体增大，附件原有内容或内嵌元数据仍可能含个人信息。 |\n| D-03 输出格式 | 唯一输出为 ZIP，解压后是 UTF-8 Markdown 笔记及 JSON 元数据清单；不同时提供 PDF、HTML 或其他导出格式。 | 标准本地工具即可解压和阅读，文本可搜索，清单保留结构；代价是阅读前需解压，不保证在各笔记应用中直接导入。 |\n| D-04 组织方式 | 每条普通笔记一个 Markdown 文件；包根提供 Markdown 索引、格式/缺项说明及元数据清单；附件在包内按笔记关联，使用相对路径。 | 防止同名笔记或附件互相覆盖，方便离线查找；代价是多文件，需保留整包结构。 |\n| D-05 最少暴露 | 系统生成的文件名采用不含标题、用户名或本机目录的中性标识；清单只保留导出所需 id、标题、创建时间和包内关联，不写源绝对路径、账户或设备信息。 | 减少无关个人信息泄露；正文、标题和附件本身仍按原内容保留，不承诺自动脱敏。 |\n\n这些决定不授权代码实施、下一阶段执行、提交或推送。无待用户决定的关键产品问题，本轮不增加确认回合。\n\n## 范围与保留项\n\n纳入：现有选择范围内普通笔记的标题、正文、id、原始创建时间（如有）、本地附件；混合选择的私密排除提示；重复名称、空正文和非 ASCII 内容；附件缺失、元数据缺项、目标写入失败的明确反馈。\n导出操作不得修改源笔记、私密标记或源附件。保留现有 250 条选择上限。\n排除：私密笔记导出、多格式切换、远程附件抓取、云同步或上传、账户体系、导入/往返恢复、全库备份、全文搜索服务、自动脱敏、加密打包及附件转码。\n单个包内的索引支持浏览与本地文本查找，不承诺新增应用内搜索系统。\n\n## 验收条件\n\nAC 编号供后续 design、实现和验收逐项映射；下列行为尚未验证。\n\n| ID | 完成条件 | 所需证据 |\n|---|---|---|\n| AC-01 | 所选普通笔记每条恰好出现一次，标题与正文完整保留，id 可追溯；已有创建时间保持原值。缺少创建时间时明确标记未知，不填当前时间或伪造值。 | 含中文、换行、空正文、重复标题及缺失时间的固定样本；逐条比对原始字段与解压文件/清单。 |\n| AC-02 | 私密笔记及其附件不出现在包或索引中；混合选择在导出前告知排除条数，结果准确说明实际导出与排除数量。全部为私密或没有有效选择时，不声称导出成功或产生误导性空成果。 | 普通/私密混合、全私密及空选择的界面观察与包内容检查；使用唯一私密标记确认标题、id、正文和附件均未泄漏。 |\n| AC-03 | 每个纳入范围且可读取的本地附件在包内可访问，内容与源文件一致、关联正确；重复名称不覆盖，内部链接不依赖原电脑绝对路径。 | 多笔记同名附件、非 ASCII 文件名样本；附件摘要比对和离线链接打开记录。 |\n| AC-04 | 不可读或缺失附件、笔记读取异常、目标写入失败均不得静默遗漏后报告“完整成功”。反馈标识受影响的已纳入笔记和问题；若保留不完整包，包内也必须列明缺项并明确不完整。 | 缺失/不可读附件、目标写入失败的故障用例与结果反馈；核对包内缺项记录。失败处理交互由 design 明确。 |\n| AC-05 | ZIP 解压后可用本地文本工具阅读笔记；包根索引按标题和创建时间帮助定位所有已导出笔记，链接均指向包内文件。将整包转移至另一目录后仍可阅读和访问附件。 | 断网环境下解压、打开索引/笔记/附件；移动解压目录后重复观察。 |\n| AC-06 | 系统生成的文件名、清单、说明和日志不包含源绝对路径、用户名、账户或设备信息。保留源内容和附件原始字节的边界有清晰提示，不承诺清除用户正文或附件内嵌信息。 | 注入带用户名的本机路径样本，检查所有系统生成文件、界面和日志；区分源正文与生成字段。 |\n| AC-07 | 整个导出在无网络条件下完成，不调用上传、同步、远程抓取或外部服务；源数据和源附件保持不变。 | 后续实现的调用路径检查、断网运行记录、导出前后源数据与附件摘要比对。 |\n| AC-08 | 一次选择 250 条的既有上限仍有效；250 条含重复标题和附件的样本数量一致、文件不互相覆盖，结果清楚列出导出数、排除数和失败/缺项数。 | 250 条边界样本、计数与文件唯一性检查、结果界面观察；不在本阶段编造耗时指标。 |\n\n## 风险、未知项与 design 前提\n\n- 复杂度中等：从单文本变为离线多文件包，涉及完整性、冲突和失败反馈；隐私与文件写入风险较高，需要针对性验证。\n- 创建时间的真实字段名、历史缺项分布和时区语义尚未核实。design 先核对真实模型；缺项行为已由 AC-01 约束，不构成待用户决定。\n- 当前样本未覆盖普通笔记附件，不足以验证附件逻辑。后续需构造可控的普通笔记附件、缺失附件与重复名称样本。\n- 附件容量分布、外部路径/链接形式、权限错误和磁盘容量边界未知。design 需确定包内安全命名、关联策略、写入失败/不完整包处理及大附件验证方法；不得据此新增上传能力或悄悄限制内容。\n- 附件保持原始字节与自动清理内嵌隐私之间存在取舍；本轮选择前者并明确提示，不宣称导出包已自动匿名化。\n- 具备 design 前提：目标、优先级、关键范围、格式和 AC 已稳定；没有必要关键决定待用户确认。以上未知项是设计调查与验证项。\n- 后续 design 负责人由调用方安排，须为 AC 明确证据、测试环境及实际执行授权。当前仅授权 need 和本项目文档，不执行实现或运行验收。\n"
+          }
+        },
+        "project": "/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated",
+        "baseline_commit": "9b8a3aad7f9676b14a5b848419dff96270d1c249",
+        "inputs": {
+          ".gitignore": {
+            "sha256": "135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01",
+            "text": "/.yuzio/\n"
+          },
+          "AGENTS.md": {
+            "sha256": "fd922e71915c8e2cd4b2ebb2c2dd6b8a6a0c3ca233316dc0ca36b385f0540368",
+            "text": "# 隔离笔记项目\n\n本项目只用于一次 Cohestra 行为试验。目标项目是本目录。\n\n- src/、data/、docs/current.md、docs/requirements.md 是只读输入，不修改或删除。\n- 可维护 .yuzio/cohestra 过程交付；阶段所需正式文档放 docs/decisions/。\n- 本轮不实施业务代码，不提交、不推送、不使用网络服务。\n- 用户追问由测试主持人通过会话文本提供。需要提问时在本会话回复主持人并结束回合，不调用真实用户的交互问题工具。\n- Python 标准库与系统 Ruby/Psych 可用于本地资料和 YAML 检查；不安装依赖。\n"
+          },
+          "data/notes.json": {
+            "sha256": "a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427",
+            "text": "[\n  {\n    \"id\": \"n1\",\n    \"title\": \"读书摘录\",\n    \"body\": \"第一条笔记\",\n    \"private\": false,\n    \"attachments\": []\n  },\n  {\n    \"id\": \"n2\",\n    \"title\": \"个人记录\",\n    \"body\": \"私密内容\",\n    \"private\": true,\n    \"attachments\": [\n      \"scan.png\"\n    ]\n  }\n]\n"
+          },
+          "docs/current.md": {
+            "sha256": "fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520",
+            "text": "# 当前事实\n\n这是离线桌面笔记工具，没有账户、服务器或云同步。\n一次最多选择 250 条笔记；单条元数据包括 id、标题、创建时间、正文、私密标记和附件路径。\n当前导出函数只把标题与正文拼成文本，不保留 id 和创建时间，也没有附件复制逻辑。\n私密笔记与普通笔记存储在同一份本地库。当前格式不构成本次方案决定。\n"
+          },
+          "src/export.py": {
+            "sha256": "c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9",
+            "text": "def export_notes(notes):\n    return \"\\n\\n\".join(note[\"title\"] + \"\\n\" + note[\"body\"] for note in notes)\n"
+          }
+        },
+        "interaction": {
+          "agent": "/root/live_need_delegated",
+          "stage": "need",
+          "initial_request": "希望把笔记导出做得更方便，给经常整理资料的人使用。重点是内容完整、以后容易查找。私密笔记和附件是否纳入、输出格式及组织方式，我明确授权你在本轮代决。判断优先级依次是离线可携带、尽量少暴露个人信息、控制本次开发范围；不允许云同步或上传。请记录选择和依据，无需我逐项确认。只完成 need 阶段，不修改业务代码，也不执行下一阶段。",
+          "steering": "补充任务用途：本轮 need 交付将供后续单独调用 design 使用，整个导出功能尚需设计与实施；本轮仅准备需求，不执行后续阶段。",
+          "questions": null,
+          "final_reply": "need 阶段已完成，索引同步成功。未追问；代决选择与依据已记录：排除私密笔记、纳入普通附件、采用 ZIP＋Markdown＋JSON 清单和查找索引。\n\n- [需求文档](/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/docs/decisions/export-portability-requirements.md)：含 8 条 AC。\n- [need-01 交付](/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/.yuzio/cohestra/handoffs/export-portability/need-01.md)\n- [任务索引](/private/tmp/cohestra-clarification-live-k6uf09w1/need-delegated/.yuzio/cohestra/handoffs/export-portability/README.md)：`in_progress`，下一阶段为 `design`。\n\nYAML、文档链接和业务输入摘要检查通过。未修改业务代码或执行后续阶段。后续可单独调用 `$cohestra design`，输入上述 need-01 交付。"
+        }
+      },
+      {
+        "case": "design-delegated",
+        "errors": [],
+        "state": {
+          "contract": "0.8",
+          "task": "export-portability",
+          "status": "in_progress",
+          "execution_mode": "attended",
+          "stage_result": {
+            "stage": "design",
+            "status": "completed",
+            "round": 1
+          },
+          "candidate": {
+            "commit": null,
+            "snapshot": null
+          },
+          "next": {
+            "stage": "code",
+            "allowed": true,
+            "reason": "stage_completed"
+          },
+          "blocked": {
+            "value": false,
+            "reason": null
+          }
+        },
+        "historical_link_errors": [],
+        "artifacts": {
+          ".yuzio/cohestra/.gitignore": {
+            "sha256": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+            "text": "# Local execution data; also add /.yuzio/ to the project root .gitignore.\n*\n"
+          },
+          ".yuzio/cohestra/README.md": {
+            "sha256": "a2557d66d7c315548cfb9a06e9dbc3e3a8d034731b40d757d115c521c1f6acfd",
+            "text": "# 项目协作上下文\n\n- 项目：隔离笔记项目（design-delegated）\n- 初始化时 Skill 发行版本：0.16.1（仅记录初始化来源，不锁定后续调用）\n- 流程入口：所用工具实际加载的 cohestra 技能。\n\n## 使用\n\n在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步；未指定阶段时按任务目标自动选择一个起点，交付后停止。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。\n\n使用 `$cohestra report` 只读查看本项目全部任务状态、遗留问题与状态异常，包括已完成任务的未关闭项；结果直接在对话中展示，不初始化项目、不写文件或推进阶段。\n\n明确使用 `$cohestra closeout`，可在一次调用内串行完成当前任务的独立 review、必要 fix、独立复审、validate 和收尾；无需加入 Cadra 队列。普通阶段仍交付后停止；具体编排、授权与恢复规则读取实际安装技能，不在本入口复制。\n\n- [handoffs/](handoffs/)：每个任务一个目录，其 README 保存有效决定、候选、分开的状态和下一步；阶段结论单独落盘。\n- [retrospectives/](retrospectives/)：按需保存复盘，不作为每阶段必读输入。\n- 规则和阶段提示词保存在技能包中，不在此复制。业务规范仍归项目所有；历史决定、授权和验收证据按任务索引追溯。\n- 普通任务只更新自己的交付物与任务索引，不反复更新本入口。每轮交付记录实际采用的技能发行版本，历史文件不随技能升级重写。\n- 用户级技能升级影响后续调用；需要项目独立固定版本时，选择项目级安装并通过 Git 管理更新。\n\n本目录属于工作区本机资料，根 `.gitignore` 用 `/.yuzio/` 整体忽略。任务记录仍须保留；正式文档与必要共享证据写入项目已有文档目录（无约定时用 `docs/`），不能仅引用本目录。任务 `scratch/` 用于可重建日志与产物。接续任务复用当前项目的索引与交付记录，Git 不备份本目录。\n\n过程资料按实际安装技能的留存规则维护：发布成功并回读后清理本次无引用、无恢复用途的临时提案，快照优先复用不可变材料或独立克隆。核心 handoff（含索引待同步交付）、历史决定、候选、资源请求和被引用证据持续保留；历史资料清理须有明确范围授权，保留恢复材料与维护索引，不改写交付结论或任务契约。\n"
+          },
+          ".yuzio/cohestra/handoffs/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          ".yuzio/cohestra/handoffs/export-portability/README.md": {
+            "sha256": "ce8cf158d3cf97bb6dd312e27a54062292b177a521b9e9f50c8173a4872cd3ed",
+            "text": "---\ncontract: \"0.8\"\ntask: export-portability\nstatus: in_progress\nexecution_mode: attended\nstage_result:\n  stage: design\n  status: completed\n  round: 1\ncandidate:\n  commit: null\n  snapshot: null\nnext:\n  stage: code\n  allowed: true\n  reason: stage_completed\nblocked:\n  value: false\n  reason: null\n---\n\n# 笔记导出方案\n\n- 任务目标：从 design 起步，依据已确认需求及现状设计便于其他工具处理的笔记导出方案，供后续单独调用 code 使用。\n- 有效需求：[docs/requirements.md](../../../../docs/requirements.md)，项目规则及现状未修改。\n- 有效决定与来源：[design-01.md](design-01.md) 保存本次用户明确代决授权原文、执行者选择与依据；选择 JSON、单文件、四字段白名单、单本地后台进程及原子无覆盖发布。没有把代决写成用户逐项确认。\n- 正式文档：[笔记导出设计](../../../../docs/decisions/note-export-design.md)，版本 design-01，可脱离本机资料阅读。\n- 工作项记录：本轮仅设计资料；未实施业务代码、未运行实现测试/UI/性能/独立审查或验收，未提交或推送。创建时间来源、实际 UI 接线和原子发布能力的后续验证缺口详见正式设计。\n- 下一步补充：准确输入为本目录 `design-01.md` 与正式设计及只读需求/现状。仅在后续单独 `$cohestra code` 授权下实施；`next` 表示交接前提就绪，不授权当前执行者自动继续。code 作者先定位真实创建时间来源和调用方；无时间夹具验证失败路径，不补造时间或修改源数据。\n- 索引维护者：Codex 子 agent `/root/live_design_delegated`，本轮唯一写入者。\n- 最近更新：2026-11-05 18:54:33 Asia/Shanghai (UTC+08:00)。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| design-01 | [design-01.md](design-01.md)：方案、实施计划、AC 映射与审查安排 | 已结束；授权范围内代决完成，无关键决定待确认 | 本次显式任务调用、只读 requirements/current/source/data；无业务候选 |\n"
+          },
+          ".yuzio/cohestra/handoffs/export-portability/design-01.md": {
+            "sha256": "3367f4fbd325b6770af7dda8fc0e58008685f0c31bc26b338b4d310cd2faf807",
+            "text": "# 笔记导出方案 · design-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8。\n- Skill 发行版本：0.16.1；唯一实际来源 `/private/tmp/cohestra-clarification-live-k6uf09w1/skill/SKILL.md`。\n- 执行者：Codex 子 agent `/root/live_design_delegated`，本次指定 design 执行者；无其他 agent。\n- 时间：2026-11-05 18:53:38 Asia/Shanghai (UTC+08:00)。\n- 执行模式：attended。\n- 阶段状态：已结束；设计已完成，无关键决定待确认。\n- 输入与上游依据：本次显式 `$cohestra design` 派发及明确任务目录；项目 `AGENTS.md`、`docs/requirements.md`（已确认需求）、`docs/current.md`、`src/export.py`、`data/notes.json`。从 design 起步，无 need 交付，不补造前置确认。\n- 初始化：本轮在目标项目完成一次最小初始化，创建项目入口、容器忽略文件、handoffs/retrospectives 与 `.gitkeep`；根 `/.yuzio/` 已有效，无需修改。无被跟踪或历史 `.yuzio` 文件。\n\n## 有效上下文\n\n- 项目：`/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated`。\n- 任务目录：`/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated/.yuzio/cohestra/handoffs/export-portability`。\n- 流程范围：仅本次 design。为后续单独调用 code 交付有效设计，交付即停止；没有业务实现、下一阶段、提交、推送或联网授权。\n- 有效边界来自 `docs/requirements.md`：仅所选普通笔记，排除私密和附件，不上传同步；UTF-8，稳定 id/标题/创建时间/正文；源数据不变；取消或失败无不完整成功文件；最多 250 条且 UI 保持响应。\n- 代决来源为本次调用原文：“我明确授权你在 JSON 与 Markdown 中选择输出格式，并决定文件组织、字段策略及执行方式”，依据依次为“方便其他工具继续处理、保留所需元信息、控制实现范围”。这是明确代决授权，不是用户对具体方案逐项确认。\n- `src/`、`data/`、`docs/current.md`、`docs/requirements.md` 全部只读；正式文档放 `docs/decisions/`。\n\n## 本阶段结果\n\n正式真源：[笔记导出设计](../../../../docs/decisions/note-export-design.md)（design-01），可脱离本机目录阅读，包含全部决定、范围、执行计划、AC 证据映射及限制。\n\n| 代决 | 本次选择 | 依据 |\n|---|---|---|\n| D1 | JSON | 标准解析最便于其他工具继续处理，四个元信息字段无需额外约定 |\n| D2 | 单个 JSON 文件，顶层版本与笔记数组 | 减少多文件组织/清理复杂度，可一次原子发布 |\n| D3 | `id/title/created_at/body` 白名单；源值保留、缺必需值整次失败 | 完整保留必要元信息；防止附件路径和内部字段泄露；不伪造时间 |\n| D4 | 一个本地后台工作进程；临时写入、完整校验、原子无覆盖发布 | UI 不承担读库和编码；250 条不能限制总字节；代价是进程与取消生命周期管理 |\n\n- 设计已明确混合私密选择、全部被过滤、空选择、超限、缺字段、目标冲突、取消提交竞态、异常退出及窗口退出边界。\n- 已确定后续文件所有权、六步实施计划、AC1—AC6 证据类型、环境与授权前提。AC 标签仅追踪已确认需求；响应测量数值明确标为工程建议，不冒充用户确认。\n- 单作者即可；本轮不委派。后续自审/单独 review 路径与整改复查责任见正式设计；不把作者角色切换算独立审查。\n- 可选扩展全部延后；没有未决关键决定，不追加确认轮次。创建时间来源、实际 UI 与原子能力是必须如实验证的实施前提，不以假设冒充事实。\n\n## 证据与限制\n\n只读调查：本项目仅有 `src/export.py` 的字符串拼接函数，没有实际 UI 或调用方；`data/notes.json` 包含普通/私密记录，但均缺创建时间。`rg -n 'export_notes|created|export|note' src docs data` 核对了现有范围，不据此宣称存在未提供的集成。\n\n输入 SHA-256（用于后续核对只读边界，不是业务候选）：\n\n| 路径 | SHA-256 |\n|---|---|\n| `AGENTS.md` | `fd922e71915c8e2cd4b2ebb2c2dd6b8a6a0c3ca233316dc0ca36b385f0540368` |\n| `.gitignore` | `135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01` |\n| `docs/requirements.md` | `3683fe342a737c6f8fb6555d6a82d765c7cb20c07566001dcb7f821bb081f0be` |\n| `docs/current.md` | `fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520` |\n| `src/export.py` | `c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9` |\n| `data/notes.json` | `a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427` |\n\n本地检查使用 Python 标准库、Git 只读命令及系统工具，未安装依赖或联网。最小初始化首次完成检查误将 `.gitkeep` 计作任务而断言失败；随后独立精确文件检查通过，无需修改已创建文件，未重建容器。本轮未运行业务测试、UI、性能、独立审查或 validate；没有业务候选，candidate 两项为空。\n\n## 下一步交接\n\n本次调用到 design 交付即停止。建议之后单独调用（当前不执行）：\n\n```text\n$cohestra code\n/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated/.yuzio/cohestra/handoffs/export-portability/design-01.md\n```\n\n需要后续明确 code 授权后才能实施。输入包括正式设计和只读需求/现状，先核对真实创建时间来源、调用方及目标平台，再按设计完成并验证。索引 `next` 只表示交接方案就绪，不代表本次调用授权下一阶段。若只有当前无时间夹具，验证预期错误路径，不能伪造时间或修改源数据来通过。\n"
+          },
+          ".yuzio/cohestra/retrospectives/.gitkeep": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "text": ""
+          },
+          "docs/decisions/note-export-design.md": {
+            "sha256": "c86403edb764192c63a06baba45fcae887533beada96cebffa6faf137abb3576",
+            "text": "# 笔记导出设计\n\n版本：design-01。用途：供后续单独调用 code 实施；本轮仅设计。\n\n## 输入、决定与授权\n\n需求真源：[已确认需求](../requirements.md)。现状依据：[当前事实](../current.md)、[现有函数](../../src/export.py)及本地样例 `data/notes.json`。本设计不修改这些输入。\n\n本次用户明确授权：“在 JSON 与 Markdown 中选择输出格式，并决定文件组织、字段策略及执行方式”，判断顺序是“方便其他工具继续处理、保留所需元信息、控制实现范围”。以下 D1—D4 是执行者依此授权作出的代决，不是用户逐项确认。无需新增确认轮次。\n\n有效边界：只导出所选普通笔记；排除私密笔记和附件；最多 250 条；UTF-8；保留稳定 id、标题、创建时间和正文；原始笔记及元数据不变；取消或失败不得留下会被当作成功结果的不完整文件；界面保持响应；不上传或同步。本轮不修改业务代码，不提交、推送、联网或执行下一阶段。\n\n## 方案取舍\n\n| 决定 | 选择与依据 | 最强替代方案及代价 |\n|---|---|---|\n| D1 格式 | JSON。下游可以直接解析字段和数组，元信息无需依赖 Markdown front matter 约定 | Markdown 更便于直接阅读，但下游需要额外约定元信息与正文分界、转义及解析规则 |\n| D2 文件组织 | 一个 `.json` 文件，包含版本和笔记数组。便于一次读取、搬运及原子发布；不引入压缩包、目录与文件名冲突处理 | 每篇一个 Markdown/JSON 文件便于逐篇编辑，但会增加部分成功、路径映射及批量回滚范围 |\n| D3 字段 | 输出白名单，仅 `id`、`title`、`created_at`、`body`；顶层 `format_version: 1` 与 `notes` | 全量复制源对象省转换代码，但会泄露私密标记、附件路径或以后新增的内部字段 |\n| D4 执行 | 单任务本地后台进程。UI 只传选择 id 与目标路径，接收进度、取消和最终结果。读取、投影、编码与写盘均在进程内 | 后台线程成本较小，但本项目为 Python，正文大小无上限，长时间编码可能占用解释器；同步执行不能保证响应。进程增加生命周期管理与失败收割成本 |\n\nD4 只增加一个本地工作进程，不增加服务、队列系统、网络或新框架。一次只运行一个导出任务；运行期间禁止重复启动，保留取消入口。进程方案是否达到响应目标仍须运行测量，源码设计不构成性能证据。\n\n## 输出契约\n\n```json\n{\n  \"format_version\": 1,\n  \"notes\": [\n    {\n      \"id\": \"stable-id\",\n      \"title\": \"示例标题\",\n      \"created_at\": \"源数据中的真实创建时间\",\n      \"body\": \"原始正文\\n保留换行\"\n    }\n  ]\n}\n```\n\n- 编码为 UTF-8，无 BOM，末尾换行；可用两空格缩进。数组采用用户选择的稳定顺序；重复选择相同 id 只保留首次。输出不含私密笔记条目，也不含附件内容、附件路径、私密标记或内部字段。正文按原文保留；不扫描、下载或复制正文所提到的资源。\n- `id` 为源稳定非空字符串，不生成替代 id。`title`、`body` 为原字符串，可为空，保留 Unicode、换行及原文；JSON 必需的转义不改变解码后内容。标题不用于构建文件路径。\n- `created_at` 为源真实创建时间的字符串，保留现有精度、时区或偏移，不补造时区，不用导出时间、文件时间或修改时间代替。若源使用原生时间类型，适配器按源已定义的无损表示转为字符串；无法无损表示则失败。输出字段名固定为 `created_at`，不要求修改源字段名。\n- 样例 `data/notes.json` 未包含创建时间。后续 code 必须定位真实来源或通过有效测试夹具验证；该样例中的普通笔记应产生“缺少创建时间”错误，不应悄悄导出不完整元信息。不得因此修改样例库或引入迁移。本方案已决定缺字段行为，没有需要追认的格式决定。\n- 不接受缺失、空或类型不合法的必需字段（标题、正文允许空字符串）；同一 id 对应冲突记录、选择 id 不存在或无法核实私密状态时失败关闭。私密状态明确为私密的记录直接排除；未知状态不得当作普通笔记。普通记录中任一必需字段无效时整次失败，不部分导出。\n- 原始选择超过 250 项时拒绝启动，不依靠过滤私密笔记绕过限制。零选择拒绝启动；过滤后无可导出普通笔记时提示无可导出内容，不生成空文件。\n- 默认文件名 `notes-export-YYYYMMDD-HHMMSS.json`，时间只用于文件名。用户在本地保存对话框决定目标；本版本不覆盖已有文件，改选名称即可。遇到目标竞争创建时返回冲突，不覆盖对方文件。\n\n## 执行路径与状态\n\n`空闲 → 校验选择/选择本地目标 → 后台读取一致快照 → 过滤与字段校验 → 临时写入 → 校验完整输出 → 原子发布 → 成功`。\n\n- UI/controller 只处理少量 id、路径与控制消息，不在 UI 线程读取整库、复制正文、序列化 JSON、等待进程或写盘。后台进程使用独立只读存储入口获取同一时点的一致快照；读取期间变动不得拼出混合版本。当前 JSON 文件输入可采用只读单次解析；如果源会原地写入且无法取得一致读取，导出失败，不新增锁库/迁移方案来掩盖限制。\n- 工作进程完成过滤、校验和流式写入。源对象不原地排序、补字段或改值；只构造输出白名单对象。父进程只收计数/状态，不回传正文或敏感字段。实际调用方尚未提供 UI 框架，按控制器接口集成，不新增 UI 框架。\n- 临时文件创建在目标同一文件系统，采用唯一且可识别的临时扩展名，绝不作为成功结果展示；只清理本次拥有的临时文件。写完、关闭并确认 JSON 可完整解析且字段契约正确后，进入提交点。\n- 发布必须是原子的“不覆盖已有目标”操作，不能用“先检查不存在再覆盖重命名”代替。实现时选本地文件系统支持的原子无覆盖原语；不支持则失败并保留明确限制，不降级为向最终文件边写边生成。本版本目标是本地普通文件系统，不增加网络盘或云盘支持。\n- 取消在提交点之前获胜：停止工作、清理本次临时文件，最终路径不出现本次结果。提交点后完成文件已存在，后来的取消请求返回“已完成”，不能误报取消并删除成功文件。控制器与工作进程用明确提交握手消除竞态。\n- 读库、校验、编码、写盘、校验输出、提交任一步失败：不展示成功；已有目标和源数据不变；清理本次临时文件。磁盘故障导致清理失败时报告准确临时路径，该路径仍不能被识别为成功文件。进程异常退出同样由父进程收割、恢复空闲并报告失败。\n- 取消等待超过合理期限时终止并收割本任务进程，随后清理临时文件；窗口退出同样取消/收割，不能遗留活跃导出。成功提示仅在原子发布及工作进程最终结果一致后产生。崩溃若恰好发生在提交后，控制器核实完整最终文件后报告已完成；无法核实则报告结果未知，不能用成功或取消猜测。\n\n## 实施计划与文件所有权\n\n未来 code 作者负责下列工作；本轮仅拥有本设计文档及本任务过程资料。\n\n1. 定位创建时间的真实来源和导出调用方。当前仅见 `src/export.py:export_notes(notes)` 返回标题/正文拼接文本，无 UI、持久化适配器或调用方。不得宣称已查到这些集成点；若输入仍只有夹具，可先实现显式参数/适配器与错误路径，并如实保留真实 UI 集成证据缺口。\n2. 在 `src/export.py` 的导出模块内实现字段投影、完整校验及 JSON 编码；保留源只读约束。函数的具体拆分是局部实现细节，JSON 格式和错误语义不再待决定。\n3. 在同一导出模块或职责明确的相邻模块实现单工作进程、取消/退出收割、临时文件及原子无覆盖发布；父端仅传 ids、路径和控制信号。生产存储读取通过只读适配器接入，不复制整库到 UI 线程。\n4. 将调用方连接到进度、取消、成功、无内容和失败状态。没有实际 UI 时提供并验证控制器接口，保留真实界面验证为未完成，不能以宿主检查代替。\n5. 新增独立合成测试夹具，覆盖创建时间、混合私密记录、附件路径、Unicode、换行、错误输入、取消竞态、I/O 故障及 250 条长正文。测试不得回写 `data/notes.json`。\n6. 核对源码输入保持原样、测试和文档语义一致；后续 review 使用 code 固定候选，不审查正在变化的工作区。实现授权仅来自后续单独调用 code 及其明确范围，当前文档不产生授权。\n\n## 验收与证据映射\n\n下列 AC 编号是本设计对已确认需求的追踪标签，不改写需求真源。\n\n| AC/风险 | 后续方法与证据 | 环境/前提 |\n|---|---|---|\n| AC1 仅所选普通笔记，排除私密与附件，不联网 | 混合选择、未选笔记、未知私密状态；解析最终 JSON 并检查全白名单；核查读取→过滤→编码路径和依赖，无网络调用 | 本地合成源，固定候选；不使用真实私密正文日志 |\n| AC2 UTF-8 与四字段完整、稳定 | Unicode/换行/空标题正文、稳定 id、真实时间与精度往返；缺时间、错误类型、重复/冲突 id 的整次失败 | 合成有时间夹具；当前样例验证缺时间错误，不修改样例 |\n| AC3 源笔记及元数据不变 | 成功、失败、取消前后源字节摘要/对象深比较，检查只读存储适配器 | 复制到测试沙盒的输入，不改项目源文件 |\n| AC4 取消/失败无不完整成功文件 | 在读取、写入、关闭、发布前后注入取消/异常/磁盘错误/目标冲突；检查最终路径、临时文件及状态；覆盖子进程崩溃、关闭窗口与提交竞态 | 可故障注入的本地文件系统沙盒；具备原子无覆盖原语 |\n| AC5 最多 250 条，保持响应 | 0、1、250、251 条；长正文压力，测量实际 UI 心跳、取消反馈与工作进程收割；正文总字节和硬件一起记录 | 真实 UI 框架与运行环境。设计建议空闲期间心跳间隔不超过 100ms、取消操作 200ms 内有状态反馈；这是待实测的工程目标，不是用户追加的已确认数值 AC |\n| AC6 导出文件可供其他工具继续处理 | 独立 JSON 解析器读取单文件，检查 `format_version`、数组/字段类型、完整记录和原文往返 | Python 标准库等本地解析工具；实际下游产品集成未在已确认范围内 |\n\n本轮只完成源检查与设计一致性核对，未运行以上业务测试、性能、界面或验收。原子行为和界面响应不可仅凭源码认定通过。\n\n## 审查、可选项与停止线\n\n普通单阶段、单作者实施即可；当前不启动其他 agent。后续作者先自审；单独调用 review 时核查完整路径：选择入口→一致读取→隐私过滤→字段映射→进程生命周期→临时文件→提交→UI 最终状态。现有项目未要求独立 reviewer；需要独立审查时另行明确安排，作者切换阶段不构成独立审查。\n\n原作者负责整改，原 reviewer 优先复查。改变字段、过滤、时间适配、提交/取消、进程消息和 UI 接线时，复查相应 AC 与调用方；只修局部文字不触发无关性能重测。连续两次同一问题整改失败，重新核查根因和测试假设。\n\n延后：Markdown、每篇一文件、附件导出、私密笔记开关、导入/恢复、压缩包、云同步和批量并发任务。均不属于本次必需范围。\n\n没有未决关键产品决定。待验证项包括创建时间真实来源、UI 接线、平台原子发布能力、长正文响应与故障处理；不把它们写成已验证事实。实现时若无法保留真实创建时间、无法可靠排除私密记录、无法实现完整发布或必须扩大源数据/平台范围，停止依赖该条件的实施并报告，不能自动降级要求或替换用户边界。\n"
+          }
+        },
+        "project": "/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated",
+        "baseline_commit": "07736bb22701d8da31158466b23a1ea27a5358ec",
+        "inputs": {
+          ".gitignore": {
+            "sha256": "135cc822030e90404d06934eeb89011439b5e966e31cf07ba1ceac2e4cb47b01",
+            "text": "/.yuzio/\n"
+          },
+          "AGENTS.md": {
+            "sha256": "fd922e71915c8e2cd4b2ebb2c2dd6b8a6a0c3ca233316dc0ca36b385f0540368",
+            "text": "# 隔离笔记项目\n\n本项目只用于一次 Cohestra 行为试验。目标项目是本目录。\n\n- src/、data/、docs/current.md、docs/requirements.md 是只读输入，不修改或删除。\n- 可维护 .yuzio/cohestra 过程交付；阶段所需正式文档放 docs/decisions/。\n- 本轮不实施业务代码，不提交、不推送、不使用网络服务。\n- 用户追问由测试主持人通过会话文本提供。需要提问时在本会话回复主持人并结束回合，不调用真实用户的交互问题工具。\n- Python 标准库与系统 Ruby/Psych 可用于本地资料和 YAML 检查；不安装依赖。\n"
+          },
+          "data/notes.json": {
+            "sha256": "a60ade2e3694dfae6915d6f3a1b0fd2d6551d92d2e6ea006eab3301a3e9a8427",
+            "text": "[\n  {\n    \"id\": \"n1\",\n    \"title\": \"读书摘录\",\n    \"body\": \"第一条笔记\",\n    \"private\": false,\n    \"attachments\": []\n  },\n  {\n    \"id\": \"n2\",\n    \"title\": \"个人记录\",\n    \"body\": \"私密内容\",\n    \"private\": true,\n    \"attachments\": [\n      \"scan.png\"\n    ]\n  }\n]\n"
+          },
+          "docs/current.md": {
+            "sha256": "fbeefd9ba0ddc6e6368e5d6a9fa3809f961f594f852a89f22acda801613a2520",
+            "text": "# 当前事实\n\n这是离线桌面笔记工具，没有账户、服务器或云同步。\n一次最多选择 250 条笔记；单条元数据包括 id、标题、创建时间、正文、私密标记和附件路径。\n当前导出函数只把标题与正文拼成文本，不保留 id 和创建时间，也没有附件复制逻辑。\n私密笔记与普通笔记存储在同一份本地库。当前格式不构成本次方案决定。\n"
+          },
+          "docs/requirements.md": {
+            "sha256": "3683fe342a737c6f8fb6555d6a82d765c7cb20c07566001dcb7f821bb081f0be",
+            "text": "# 已确认的设计输入\n\n本文件仅供 design 阶段的本次任务使用，不表示 need 场景已确认这些取舍。\n\n- 只导出用户选择的普通笔记，排除私密笔记及附件，不上传或同步。\n- 导出文件使用 UTF-8，保留稳定 id、标题、创建时间和正文，供其他工具继续处理。\n- 原始笔记及其元数据保持不变，取消或失败时不得留下被当作成功导出的不完整文件。\n- 最多 250 条，处理过程不能使界面失去响应。\n- 输出格式（JSON 或 Markdown）、文件组织及执行方式仍待本次 design 决定。\n"
+          },
+          "src/export.py": {
+            "sha256": "c36edd37ed1a0c377b9ecd0e80b8a8c5d83da70adbf869e145a4278f148efff9",
+            "text": "def export_notes(notes):\n    return \"\\n\\n\".join(note[\"title\"] + \"\\n\" + note[\"body\"] for note in notes)\n"
+          }
+        },
+        "interaction": {
+          "agent": "/root/live_design_delegated",
+          "stage": "design",
+          "initial_request": "输入：本项目 docs/requirements.md 已确认需求、docs/current.md 及现有代码。\n需求：请设计笔记导出方案。我明确授权你在 JSON 与 Markdown 中选择输出格式，并决定文件组织、字段策略及执行方式。判断依据依次是方便其他工具继续处理、保留所需元信息、控制实现范围。请记录代决来源、选择与依据，无需我逐项确认。已有需求边界保持有效，不上传或同步，不修改业务代码；本轮交付供后续单独调用 code 使用，此调用不授权实施，也不执行下一阶段。",
+          "questions": null,
+          "final_reply": "design 已完成，无需额外确认。代决选择：单文件 UTF-8 JSON、四字段白名单、本地后台进程与原子发布。\n\n- [正式设计](/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated/docs/decisions/note-export-design.md)\n- [design-01 交付](/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated/.yuzio/cohestra/handoffs/export-portability/design-01.md)\n- [任务索引](/private/tmp/cohestra-clarification-live-k6uf09w1/design-delegated/.yuzio/cohestra/handoffs/export-portability/README.md)\n\n索引校验及原子发布回读通过。六项只读输入摘要未变。未修改业务代码，未进入下一阶段。\n\n样例缺创建时间，已规定缺字段时整次失败，后续须核实真实来源。未来单独调用 `$cohestra code` 时使用上述 design-01；本轮已停止。"
+        }
+      }
+    ],
+    "passed": true
+  },
+  "issues": [
+    {
+      "case": "need-unanswered",
+      "kind": "delivery_link",
+      "observed": "need-01 used one too many parent-directory traversals for a formal document link.",
+      "remediation": "The real need session detected the link problem itself and wrote need-02, preserved need-01, and published the index pointing to need-02. Current handoff/document/index links pass; the old immutable handoff retains the faulty historical link.",
+      "current_round": 2,
+      "state_unchanged": "blocked; human_decision_required; next.stage=null; next.allowed=false",
+      "skill_rule_change_required": false
+    },
+    {
+      "case": "design-delegated",
+      "kind": "transient_fixture_check",
+      "observed": "The stage handoff records that its initial initialization check mistakenly counted .gitkeep as a task.",
+      "remediation": "The session reran a precise file check without recreating or altering the initialized container; final input hashes and published contract pass.",
+      "evidence_scope": "Self-reported in the captured real stage handoff; parent verified final artifacts independently.",
+      "skill_rule_change_required": false
+    }
+  ],
+  "verification": {
+    "live_artifact_checks": "passed",
+    "case_count": 4,
+    "input_hashes_unchanged": true,
+    "fixture_commits_unchanged": true,
+    "source_hashes_unchanged": true,
+    "repository_tests": {
+      "command": "python3 -B -m unittest discover -s tests -p 'test_*.py'",
+      "status": "passed",
+      "tests": 500,
+      "skipped": 0,
+      "seconds": 28.322,
+      "exit_code": 0,
+      "full_git_history_checks": "passed without skips"
+    },
+    "frozen_evidence_integrity": "passed: captured text hashes and parsed actual index contracts match recorded observations",
+    "diff_check": "passed"
+  },
+  "limitations": [
+    "These four calls cover attended need/design only; they do not establish unattended, prototype/experiment-gated decisions, or recovery-after-new-authorization behavior.",
+    "The host transcribed request/reply messages from native collaboration calls and froze actual files; this is not a complete command-by-command runtime transcript.",
+    "No real Mewoo project, installed skill copy, production business code, network service, commit, push or release was changed."
+  ]
+}

@@ -75,7 +75,7 @@ npx skills add yuzio-ai/skills --skill vistra
 |---|---|
 | `init` | 初始化或复用项目协作上下文，不执行任务 |
 | `need` | 澄清需求、范围和验收条件 |
-| `design` | 制定方案、执行计划和验证方法 |
+| `design` | 澄清方案取舍，制定设计、执行计划和验证方法 |
 | `code` | 实施明确需求或有效设计 |
 | `review` | 审查指定候选，列出问题 |
 | `fix` | 裁决并修复审查问题 |
@@ -83,6 +83,8 @@ npx skills add yuzio-ai/skills --skill vistra
 | `closeout` | 编排单任务的独立审查、必要整改、复审、验收与收尾 |
 | `verify` | 核对某阶段产出与上游依据之间的偏差 |
 | `report` | 只读汇总当前项目任务、遗留问题和状态异常 |
+
+`need` 和 `design` 共用[需求澄清规则](cohestra/references/clarification.md)：先调查，再用少量关键问题给出推荐与取舍，保留已确认决定。关键决定未答复时停止依赖它的工作；低影响且可逆的细节允许采用明确默认值。需求或方案确认本身不授权实现。澄清属于这两个阶段，不增加独立 `clarify` 入口。
 
 ```text
 $cohestra design

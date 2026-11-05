@@ -75,7 +75,7 @@ Advance one engineering task. Start at any stage; **each stage call executes one
 |---|---|
 | `init` | Initialize or reuse project context without executing a task |
 | `need` | Clarify requirements, scope and acceptance criteria |
-| `design` | Define the approach, implementation plan and validation methods |
+| `design` | Clarify approach tradeoffs and define the design, implementation plan and validation methods |
 | `code` | Implement clear requirements or an established design |
 | `review` | Review a fixed candidate and report findings |
 | `fix` | Assess and fix review findings |
@@ -83,6 +83,8 @@ Advance one engineering task. Start at any stage; **each stage call executes one
 | `closeout` | Orchestrate independent review, necessary fixes, re-review, validation and final delivery for one task |
 | `verify` | Check a stage's output against its upstream basis for drift |
 | `report` | Read-only overview of project tasks, outstanding work and state anomalies |
+
+`need` and `design` share [clarification rules](cohestra/references/clarification.md): investigate first, ask a few key questions with recommendations and tradeoffs, and preserve confirmed decisions. Unanswered key decisions stop dependent work; low-impact, reversible details may use explicit defaults. Confirming requirements or a design does not itself authorize implementation. Clarification is part of these stages, with no separate `clarify` entry.
 
 ```text
 $cohestra design
