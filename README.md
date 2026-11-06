@@ -86,6 +86,8 @@ Advance one engineering task. Start at any stage; **each stage call executes one
 
 `need` and `design` share [clarification rules](cohestra/references/clarification.md): investigate first, ask a few key questions with recommendations and tradeoffs, and preserve confirmed decisions. Unanswered key decisions stop dependent work; low-impact, reversible details may use explicit defaults. Confirming requirements or a design does not itself authorize implementation. Clarification is part of these stages, with no separate `clarify` entry.
 
+Before completing either stage, present the complete requirements/design summary for the user to read and approve as a whole. Individual answers and ordinary delegation do not replace this final approval. Reuse approval of the same unchanged summary, or follow an explicit instruction to waive this final approval; otherwise stop dependent work while it is missing.
+
 ```text
 $cohestra design
 项目：<项目绝对路径>

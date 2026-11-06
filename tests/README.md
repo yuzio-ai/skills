@@ -88,5 +88,6 @@ Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见�
 | 2026-11-04 | [单任务 closeout 前向验证](cohestra/reports/2026-11-04-closeout.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 隔离项目实际独立初审、整改、复审、验收与收尾；最终草稿重复调用复用证据，未实测全部异常路径 |
 | 2026-11-04 | [closeout 跨会话并发实测](cohestra/reports/2026-11-04-closeout-concurrency.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 两个实际执行会话与未完成 Run 夹具共存、真实验证进程互斥、已知同文件冲突停止及安全接续；占用信息和项目锁为明确输入 |
 | 2026-11-05 | [need/design 共用澄清真实会话](cohestra/reports/2026-11-05-clarification.md) | Cohestra 0.16.1 草稿 / 协议 0.8 | 四个隔离项目实际澄清、拒答受阻和授权代决；核对真实交付、YAML 与输入摘要，未覆盖 unattended |
+| 2026-11-06 | [最终整体确认独立真实会话](cohestra/reports/2026-11-06-overall-confirmation.md) | Cohestra 0.17.0 草稿 / 协议 0.8 | 六个执行会话覆盖整体确认、拒答/认可、修订、免除、复用及无人值守；另有独立终态裁决，保留核对器误报与修正证据 |
 
 当前验收要求以各[场景清单](#行为场景与辅助工具)为准；报告中的通过数量只对应所列版本。
