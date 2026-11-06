@@ -124,7 +124,7 @@ $cohestra verify
 
 接续任务时明确原任务目录，不能把“自动衔接”理解为自动执行后续阶段。阶段只读业务代码也可能写交付文件，只有 `report` 是不落盘的查询入口。检查和验收绑定固定候选，构建通过不等于运行验收通过；同一作者换阶段也不构成独立审查。
 
-review 按适用风险核查真实调用方、装配与生命周期路径，证据覆盖固定候选及必要未修改依赖；零 findings 不代表覆盖完整。review 先在已有授权内补查，必要路径仍无法核实时受阻；validate 核对最终候选的覆盖及复审证据。详见[风险覆盖](cohestra/references/review-coverage.md)。普通单独阶段调用默认单智能体，明确 closeout 时安排独立 reviewer；Cadra 的 worker/reviewer 按[编排派发](cohestra/references/workflow.md#编排派发)执行。
+review 按适用风险核查真实调用方、装配与生命周期路径，证据覆盖固定候选及必要未修改依赖；零 findings 不代表覆盖完整。review 先在已有授权内补查，必要路径仍无法核实时受阻；validate 核对最终候选的覆盖及复审证据。详见[风险覆盖](cohestra/references/review-coverage.md)。单独 review 默认委派独立 reviewer 子智能体，交付后停止，不自动整改或验收；其余普通单独阶段默认单智能体，明确 closeout 时安排独立 reviewer。已派发的 reviewer 不再次委派；Cadra 的 worker/reviewer 按[编排派发](cohestra/references/workflow.md#编排派发)执行。
 
 </details>
 

@@ -45,6 +45,8 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_list_summary.py](cadra/test_list_summary.py) | 保留原 0.11 语义的列表摘要状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
 | [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
 | [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
+| [test_review_full_fixture.py](cohestra/test_review_full_fixture.py)、[review_full_fixture.py](cohestra/review_full_fixture.py) | 扩展单独 review 实测输入与实际发布故障：原子替换拒绝、竞争写入保留和解除故障后的发布；不模拟 agent 决策 |
+| [test_review_fixture.py](cohestra/test_review_fixture.py)、[review_fixture.py](cohestra/review_fixture.py) | 单独 review 实测输入：固定候选、真实缺陷、工具不可用及明确自审；unittest 只校验夹具与隔离，不模拟 agent 决策 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
 | [test_closeout_concurrency_fixture.py](cohestra/test_closeout_concurrency_fixture.py)、[closeout_concurrency_fixture.py](cohestra/closeout_concurrency_fixture.py) | closeout 并发实测的隔离输入、受控 Cadra 记录与真实进程探针；回归验证两个进程等待后互斥执行，并拒绝重叠占用日志，不模拟 agent 决策 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
@@ -89,5 +91,7 @@ Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见�
 | 2026-11-04 | [closeout 跨会话并发实测](cohestra/reports/2026-11-04-closeout-concurrency.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 两个实际执行会话与未完成 Run 夹具共存、真实验证进程互斥、已知同文件冲突停止及安全接续；占用信息和项目锁为明确输入 |
 | 2026-11-05 | [need/design 共用澄清真实会话](cohestra/reports/2026-11-05-clarification.md) | Cohestra 0.16.1 草稿 / 协议 0.8 | 四个隔离项目实际澄清、拒答受阻和授权代决；核对真实交付、YAML 与输入摘要，未覆盖 unattended |
 | 2026-11-06 | [最终整体确认独立真实会话](cohestra/reports/2026-11-06-overall-confirmation.md) | Cohestra 0.17.0 草稿 / 协议 0.8 | 六个执行会话覆盖整体确认、拒答/认可、修订、免除、复用及无人值守；另有独立终态裁决，保留核对器误报与修正证据 |
+| 2026-11-06 | [单独 review 独立审查实测](cohestra/reports/2026-11-06-standalone-review.md) | Cohestra 0.18.0 草稿 / 协议 0.8 | 默认独立派发、受控子 agent 禁用、明确自审例外、复用原 reviewer 复审；核对候选、发布与阶段停止边界 |
+| 2026-11-06 | [单独 review 完整验证](cohestra/reports/2026-11-06-standalone-review-full.md) | Cohestra 0.18.0 草稿 / 协议 0.8 | 独立规则审查、真实 CLI 安装/迁移、10 个新增行为场景、发布失败与同轮恢复、竞争写入保留、closeout 实际验收 |
 
 当前验收要求以各[场景清单](#行为场景与辅助工具)为准；报告中的通过数量只对应所列版本。

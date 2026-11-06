@@ -1,0 +1,337 @@
+{
+  "skill_version": "0.18.0",
+  "protocol_version": "0.8",
+  "date": "2026-11-06",
+  "source_baseline": "1c743002923813eb25b0e9a555eb5c4dc70befe6",
+  "source_hashes": {
+    "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+    "release.json": "feaec76347dfced583620ade89dbf5311347f1bdd4d168908cdbaa7cd66cefa1",
+    "SKILL.md": "62b12a2ef71db38448b5ca112dcfcbbbc08228e0b9739dd78d0937b72410ba6d",
+    "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+    "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+    "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+    "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+    "references/need.md": "b4b778131aba4ee271ef5b7f1f805bc59bd5eff8998fad2e7c01a543dd04b6ae",
+    "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+    "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+    "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+    "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+    "references/workflow.md": "dff459b575e9ef229112737a78ccc6ca07d6f968937b5389f4d8b40ec3b1bcd3",
+    "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+    "references/review-coverage.md": "7ec7a5dace8a47bdcae98186c052a0fd64a71274c75085552df0acf892fab27d",
+    "references/design.md": "142b309a969b5f2df821eaf8b84abce0cc10844b54caab4d6d52c7301efc5c97",
+    "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+    "references/clarification.md": "a109af011deed85f44089091a14df9e025b630483f8b885a7c9056f065c6bd89",
+    "references/review.md": "40a9b505d5628977d36dd3073c1c63c9bcd2e34db4089e8adde1cbb3ad9b399e",
+    "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+    "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+    "assets/handoff.md": "33705d23b719f774ae6bb8993bb92105d5fd495f77a3dcc99b7be79284b12539",
+    "assets/project/README.md": "7d7a920cd7b29b8fceb86a8ec7d984748252dd42dfaa325956166e489e25e156",
+    "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+    "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "package_diff": "diff --git a/cohestra/SKILL.md b/cohestra/SKILL.md\nindex bd31518..b50b64b 100644\n--- a/cohestra/SKILL.md\n+++ b/cohestra/SKILL.md\n@@ -1,6 +1,6 @@\n ---\n name: cohestra\n-description: 通过 init 初始化项目协作上下文，按目标选择或显式调用 need、design、code、review、fix、validate 阶段；closeout 单次编排一个任务的独立审查、必要整改、复审、验收和收尾，无需 Cadra 队列；verify 核对阶段偏差，report 只读汇总项目状态。普通阶段单次交付后停止，closeout 须明确调用；仅讨论流程不触发执行。\n+description: 通过 init 初始化项目协作上下文，按目标选择或显式调用 need、design、code、review、fix、validate 阶段，review 默认独立子智能体审查；closeout 单次编排一个任务的独立审查、必要整改、复审、验收和收尾，无需 Cadra 队列；verify 核对阶段偏差，report 只读汇总项目状态。普通阶段单次交付后停止，closeout 须明确调用；仅讨论流程不触发执行。\n license: MIT\n ---\n \n@@ -18,7 +18,7 @@ license: MIT\n | need | [need](references/need.md) | 澄清需求（含提问）、范围与验收 |\n | design | [design](references/design.md) | 澄清方案取舍，制定设计、执行计划和验证方法 |\n | code | [code](references/code.md) | 按有效设计实施并交付候选 |\n-| review | [review](references/review.md) | 审查固定候选，输出 findings |\n+| review | [review](references/review.md) | 默认由独立 reviewer 子智能体审查固定候选，输出 findings |\n | fix | [fix](references/fix.md) | 裁决并修复审查问题 |\n | validate | [validate](references/validate.md) | 补足证据，判断验收状态 |\n | closeout | [closeout](references/closeout.md) | 单次编排一个任务的 review、必要 fix、独立复审、validate 与收尾，不加入 Cadra 队列 |\n@@ -31,9 +31,9 @@ license: MIT\n 2. 显式入口优先；未指定时按[公共流程第 2 节](references/workflow.md#2-起步位置)选择最直接的阶段并简短说明。六阶段可从任意阶段起步，普通阶段调用一次只执行选定阶段，终点由用户决定。明确调用 `closeout` 时按其说明串行编排已有阶段，以最终候选验收及收尾为终点；不因普通任务完成自动进入。只讨论流程不触发执行。实质歧义、入口冲突或未知名称才澄清。validate 补验收证据，verify 核对偏差，不可混用。\n 3. `init` 只读取初始化说明、发行版本和必要模板。`report` 只读报告说明、发行版本、任务索引及必要问题来源，字段有疑问再查公共流程第 7 节；不初始化、不写文件、不推进阶段。`closeout` 先读公共流程、发行版本与编排说明，按实际进入的阶段加载说明，不预读无须执行的阶段。其余入口读取一次公共流程、本阶段说明与发行版本，再读必要任务输入；仅 need/design 额外读取[共用需求澄清规则](references/clarification.md)，不新增 clarify 入口或阶段。缺容器时按公共流程第 2 节最小初始化，接续任务缺资料不能用空初始化代替恢复。\n 4. 写交付时读取对应骨架；正式阶段和 verify 准备更新索引时必须读取[索引发布与恢复](references/publication.md)。先确认发布前校验成功，再用后续工具调用发布；校验失败不得继续。init、report 不读发布细则。\n-5. 既有项目规范、有效决定和用户授权继续有效；授权、候选、证据、复审、历史和停止规则统一见公共流程。每个阶段执行者交付后停止；明确调用 `closeout` 授权其主会话按说明启动独立 reviewer 并接续本任务阶段，其他调用不自动启动智能体或推进阶段。提交、推送、发布和多任务调度不属于 closeout。\n+5. 既有项目规范、有效决定和用户授权继续有效；授权、候选、证据、复审、历史和停止规则统一见公共流程。每个阶段执行者交付后停止；单独进入 `review` 默认授权主会话按[审查说明](references/review.md)委派独立 reviewer，仅完成本轮审查。明确调用 `closeout` 授权其主会话按说明启动独立 reviewer 并接续本任务阶段；其余单独阶段不自动启动智能体或推进阶段。提交、推送、发布和多任务调度不属于 closeout。\n 6. `verify` 按请求执行，仅在发现具体偏差时建议；不固定提议、不记录未执行核对，不替代 review、复审或 validate。调用方声明 `execution_mode: unattended` 时执行公共流程第 7.4 节，不新增授权或降低门禁，无法合法继续时受阻并停止。\n-7. Cadra 派发的阶段按[编排派发](references/workflow.md#编排派发)核对实际角色、候选和来源；本阶段执行者发布 Cohestra 交付与索引，不写 Cadra Run，也不自行启动下一阶段或其他 agent。`closeout` 使用自己的单任务角色与交接规则，不套用 Cadra 调度协议；其余单独调用不因此强制委派。\n+7. Cadra 派发的阶段按[编排派发](references/workflow.md#编排派发)核对实际角色、候选和来源；本阶段执行者发布 Cohestra 交付与索引，不写 Cadra Run，也不自行启动下一阶段或其他 agent。`closeout` 使用自己的单任务角色与交接规则，不套用 Cadra 调度协议；单独 `review` 按自己的委派规则执行，已派发的 reviewer 不重复委派。\n \n ## 来源与版本\n \ndiff --git a/cohestra/assets/handoff.md b/cohestra/assets/handoff.md\nindex 3556421..55fc08f 100644\n--- a/cohestra/assets/handoff.md\n+++ b/cohestra/assets/handoff.md\n@@ -9,7 +9,7 @@\n - 时间：<实际时间及时区>\n - 执行模式：<attended / unattended；verify 仅记在本交付物>\n - 阶段状态：<进行中 / 已结束 / 受阻 / 跳过；说明实际结果>\n-- 输入与上游依据：<本轮准确来源；自动衔接注明取用文件；closeout 注明主会话、实际角色和派发来源，不填写 Cadra 身份字段；verify 列核对对象及上游>\n+- 输入与上游依据：<本轮准确来源；自动衔接注明取用文件；单独 review／closeout 注明主会话、实际角色、派发来源及审查者与作者分离的核实依据，不填写 Cadra 身份字段；verify 列核对对象及上游>\n - 基线/候选来源：<适用阶段填写准确版本及清单来源，否则省略>\n - 初始化：<仅本轮实际发生时记录>\n \ndiff --git a/cohestra/assets/project/README.md b/cohestra/assets/project/README.md\nindex 5b2ca57..8448683 100644\n--- a/cohestra/assets/project/README.md\n+++ b/cohestra/assets/project/README.md\n@@ -8,6 +8,8 @@\n \n 在智能体中使用 `$cohestra need`、`design`、`code`、`review`、`fix`、`validate` 或 `verify`，后附原始需求、已有 handoff 文件或任务目录及本次补充；六阶段可从任意阶段起步；未指定阶段时按任务目标自动选择一个起点，交付后停止。目标项目尚无本目录时，技能会先提醒并执行一次最小初始化，再继续该阶段。其他工具使用各自的技能调用写法。\n \n+单独使用 `$cohestra review` 默认由独立 reviewer 子智能体审查，交付后停止；不会自动整改或验收。具体委派与例外规则读取实际安装技能。\n+\n 使用 `$cohestra report` 只读查看本项目全部任务状态、遗留问题与状态异常，包括已完成任务的未关闭项；结果直接在对话中展示，不初始化项目、不写文件或推进阶段。\n \n 明确使用 `$cohestra closeout`，可在一次调用内串行完成当前任务的独立 review、必要 fix、独立复审、validate 和收尾；无需加入 Cadra 队列。普通阶段仍交付后停止；具体编排、授权与恢复规则读取实际安装技能，不在本入口复制。\ndiff --git a/cohestra/references/review-coverage.md b/cohestra/references/review-coverage.md\nindex c082b9e..3e08f09 100644\n--- a/cohestra/references/review-coverage.md\n+++ b/cohestra/references/review-coverage.md\n@@ -1,6 +1,6 @@\n # 风险覆盖与候选证据\n \n-design 定义适用风险；直接从 code/review 起步时在当前阶段补齐，不补造上游阶段。先读项目的相关检查要求，按实际变更选择路径，不机械填完整清单。深度由风险决定，不按行数或耗时判断。提高已约定门槛时说明新事实；不自动要求独立 Agent。\n+design 定义适用风险；直接从 code/review 起步时在当前阶段补齐，不补造上游阶段。先读项目的相关检查要求，按实际变更选择路径，不机械填完整清单。深度由风险决定，不按行数或耗时判断。提高已约定门槛时说明新事实；执行者按入口与派发规则确定，不从风险标签推导额外委派。\n \n ## 覆盖记录\n \n@@ -13,7 +13,7 @@ design 定义适用风险；直接从 code/review 起步时在当前阶段补齐\n - 只写实际检查的路径，不以作者摘要、测试数量、PASS 或“无问题”代替证据。调用方列表须由 reviewer 核实，尤其是默认参数、环境重建、失败分支和生命周期路径。\n - 固定候选应能读取必要的未修改依赖：可复核提交或快照中的完整文件和摘要。候选缺少相关调用方时，先从原固定版本补取可核实输入并记录来源；只能从当前工作区取得时须重新固定候选并核对差异，无法固定则受阻。不得修改既有不可变清单、静默扩充原快照或用可变工作区代表固定候选。无关文件不要求全部归档。\n - 源码、静态、宿主测试、编译、运行、视觉与无障碍分别描述。未授权的运行证据若本就不在本次验收范围内，记录边界；若为既定必需证据，仍是缺口，不能改称不适用。\n-- 作者自审仍有价值，但切换阶段不构成独立审查。独立评审只在已有要求或明确安排下执行，不从风险标签推导委派授权。明确调用 [closeout](closeout.md) 按其规则安排独立 reviewer；Cadra 的角色派发按[编排派发](workflow.md#编排派发)核对 reviewer 与作者分离，并将身份和候选来源留在本轮交付；其他单独阶段调用不自动委派。\n+- 作者自审仍有价值，但切换阶段不构成独立审查。单独 [review](review.md) 默认委派独立 reviewer，身份、上下文、受阻与用户明确例外按该入口执行。明确调用 [closeout](closeout.md) 按其规则安排独立 reviewer；Cadra 的角色派发按[编排派发](workflow.md#编排派发)核对 reviewer 与作者分离，并将身份和候选来源留在本轮交付；其余单独阶段调用不自动委派；已派发的 reviewer 不再次委派。\n \n ## 缺口和复审\n \ndiff --git a/cohestra/references/review.md b/cohestra/references/review.md\nindex 71465f5..d098de9 100644\n--- a/cohestra/references/review.md\n+++ b/cohestra/references/review.md\n@@ -9,6 +9,19 @@ $cohestra review\n .yuzio/cohestra/handoffs/<task-slug>/code-01.md\n ```\n \n+## 独立审查与委派\n+\n+单独调用 `$cohestra review` 或按目标自动选择本阶段时，默认授权主会话委派一个独立 reviewer 子智能体，不需另行请求启动许可；仅讨论规则不触发执行。这只授权本轮 review，不授权 fix、validate 或 closeout。\n+\n+- 主会话核对目标项目、任务、有效输入和固定候选，完成必要的最小初始化后派发；它负责交接与核对交付，不替 reviewer 出具审查结论。reviewer 必须与所有被审实现／整改作者分离，以实际 agent 身份及来源核实，不以角色名称或作者切换阶段代替。复审优先复用仍满足身份与上下文条件的原 reviewer；不可用时创建新的独立 reviewer，并传递原 findings 与候选差异。\n+- reviewer 使用干净上下文，不继承完整作者聊天；只传实际技能目录与版本、目标项目和任务目录、有效需求／决定／授权、项目规范、固定候选及必要未修改依赖、上游交付、findings 和证据。作者摘要只作为线索，reviewer 独立读取原始证据。\n+- 派发时明确主会话身份、实际 reviewer、调用来源为单独 review、本轮候选和阶段边界。reviewer 读取本阶段规则并独占写入本轮 handoff 与任务索引；主会话等待其结束，回读核对候选、实际身份、结论及索引同步，再汇报并停止。主会话不并行修改索引、不代写 reviewer 结论；索引同步失败沿用[发布与恢复](publication.md)，不重跑审查或覆盖未知更新。\n+- 已收到单独 review、closeout 或 Cadra 明确派发的 reviewer 直接执行，不再创建子 agent、不启动下一阶段。收到派发不能只凭声称的角色放行，仍须核实实际身份与作者分离；Cadra 和 closeout 分别沿用下方已有派发规则。\n+- 缺少子智能体能力、身份无法核实或无法固定候选时，按公共流程既有 blocked 出口停止，不静默退回主会话自审。尚未成功派发时，主会话可如实记录受阻交付及索引，执行者写自身，注明独立审查未执行；已派发但执行／停止状态不明时，先核实，不争写索引或另起 reviewer。候选、身份、工具缺口分别按实际原因使用 `candidate_unavailable`、`missing_input`、`dependency_unavailable` 等既有 reason，不新增控制字段。\n+- 用户明确要求本次不委派或只做作者自审时，记录该指令与实际审查方式，不宣称独立审查。若项目或既定验收仍要求独立证据，保留缺口；不能以本次例外免除既定门禁。工具不可用、超时或预算不足不属于用户明确例外。\n+\n+以上仅改变本入口的默认执行方式；协议仍为 0.8，不改历史审查记录，也不从历史阶段名推断独立身份。\n+\n ## 输入与职责\n \n 输入为任务目录或 code/fix 交付，读取有效需求/设计、固定候选、前次 findings 及复审要求。业务文件只读，允许在授权范围内做审查检查、写审查交付与任务索引，不自行修复。\ndiff --git a/cohestra/references/workflow.md b/cohestra/references/workflow.md\nindex 37c753c..7cbb5c8 100644\n--- a/cohestra/references/workflow.md\n+++ b/cohestra/references/workflow.md\n@@ -24,7 +24,7 @@\n - 首次任务以本次原始材料为输入，先查看指定任务目录及其 `README.md` 任务索引；确认没有对应任务后才建目录，允许从任一正式阶段起步。使用稳定英文短横线名称，不按工具、会话或执行者重复建任务。接续已有任务缺输入时不能另建替代任务。\n - 项目入口及 AGENTS 等业务规则继续有效；流程规则和阶段提示词来自本次加载的技能。既有任务中的确认决定与验收要求继续生效。\n - 只读阶段仍允许写本阶段交付物与任务索引。既有授权不重复索取，运行环境或发布等额外授权遵守项目规则；handoff 记录授权，不产生授权。\n-- 阶段执行者交付后停止，不因相邻或仍在链条内而自动继续，不自行启动其他智能体、提交或发布。明确调用 closeout 时，仅其主会话按[编排说明](closeout.md)启动独立 reviewer、核对交接后继续本任务；普通阶段调用的停止边界不变。为进入阶段而执行的初始化是前置动作，不算跨阶段继续。只读调查保持只读。没有整改就不生成 fix，已有任务仅缺验证就用 validate。\n+- 阶段执行者交付后停止，不因相邻或仍在链条内而自动继续，不自行提交或发布。单独 review 的主会话按[审查说明](review.md)默认委派独立 reviewer，审查交付后停止；其余普通阶段不自行启动其他智能体。明确调用 closeout 时，仅其主会话按[编排说明](closeout.md)启动独立 reviewer、核对交接后继续本任务；普通阶段调用的停止边界不变。为进入阶段而执行的初始化是前置动作，不算跨阶段继续。只读调查保持只读。没有整改就不生成 fix，已有任务仅缺验证就用 validate。\n - 输入与索引冲突时核对，不能凭文件编号、修改时间或“最新”推断用户接受了方案。关键决定或候选无法确认时停止依赖它的工作，继续独立且已授权部分。\n - 不补造前置文件。仅读取当前索引、直接输入及必要链接，复盘不是每阶段必读。\n \n@@ -41,7 +41,7 @@\n \n - 事实、假设、建议和已确认决定分开。明确的局部用户修订记录确认来源、覆盖的旧条款、影响范围和验收变化，并让索引指向该记录；不追加设计追认。重要取舍、需求歧义或显著范围变化才返回 need/design，共享语义仍走项目治理。\n - 改动范围、实现复杂度、风险与未知项决定设计/验证深度；文件数、行数和耗时不作机械门槛。事实不清先调查，一行高风险变化也可能需要升级。\n-- 执行者数量单独决定。普通独立阶段调用默认单智能体，只有输入稳定、写入可分离、能独立验收且有并行收益时才建议分工；不自动授权启动其他智能体。明确调用 closeout 已安排独立 reviewer，角色与串行交接按其说明执行。Cadra 的固定角色派发按下文执行，不由阶段 agent 再次委派。\n+- 执行者数量单独决定。单独 review 默认由主会话委派独立 reviewer 子智能体，显式入口与按目标自动选择 review 均适用；具体身份、上下文、失败出口与用户明确例外见[审查说明](review.md)。其余普通独立阶段默认单智能体，只有输入稳定、写入可分离、能独立验收且有并行收益时才建议分工；不自动授权启动其他智能体。明确调用 closeout 已安排独立 reviewer，角色与串行交接按其说明执行。Cadra 的固定角色派发按下文执行，不由阶段 agent 再次委派。\n - design 确定审查方式、依据、复查责任与触发条件，以及 AC 对应的证据类型和执行前提。后续提高门槛需说明新事实与适用范围；同一作者切换阶段不构成独立审查。\n - 视觉设计先说明方案数量、图片角色与用户待决定事项。默认一套方向的代表图，补充状态图只解决具体问题，生成图不能证明动态布局。修改同类组件要列影响实例、状态和明确保留项，覆盖截图外实例。\n - review 区分确定缺陷、待核实问题、可选建议及是否阻塞。fix 区分认可判断与本次实施；可选项默认延后，纳入本次需说明必要性、范围及授权。\ndiff --git a/cohestra/release.json b/cohestra/release.json\nindex aaf4bb7..c154f11 100644\n--- a/cohestra/release.json\n+++ b/cohestra/release.json\n@@ -1,5 +1,5 @@\n {\n-  \"version\": \"0.17.0\",\n+  \"version\": \"0.18.0\",\n   \"protocol_version\": \"0.8\",\n   \"repository\": \"https://github.com/yuzio-ai/skills\",\n   \"skill_path\": \"cohestra\"\n",
+  "audit": {
+    "caller": "/root/review_forward_test",
+    "skill": "/private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md",
+    "skill_version": "0.18.0",
+    "protocol": "0.8",
+    "scope": "Three independent projects; sequential requests",
+    "cases": {
+      "default": {
+        "request": "default-request.md",
+        "candidate": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+        "creation": {
+          "tool": "collaboration.spawn_agent",
+          "task_name": "default_reviewer",
+          "fork_turns": "none",
+          "returned_task_name": "/root/review_forward_test/default_reviewer"
+        },
+        "dispatch": [
+          {
+            "tool": "collaboration.send_message",
+            "target": "default_reviewer",
+            "purpose": "formal review-01 dispatch"
+          },
+          {
+            "tool": "collaboration.followup_task",
+            "target": "default_reviewer",
+            "purpose": "resume after identity-only final; execute formal dispatch"
+          }
+        ],
+        "identity_evidence": {
+          "runtime_task_path": "/root/review_forward_test/default_reviewer",
+          "list_agents_observed_status": "running",
+          "author_separation_basis": "requirements.md says fixture-authored; reviewer self-report not treated as independent tool proof"
+        },
+        "result": "Independent review completed: R1 P2 blocking; 6 cases, 4 pass, 2 fail",
+        "executor": "/root/review_forward_test/default_reviewer",
+        "handoff": "/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization/review-01.md",
+        "index": "/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization/README.md",
+        "front_matter_initial": "\ncontract: \"0.8\"\ntask: name-normalization\nstatus: in_progress\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: completed\n  round: 1\ncandidate:\n  commit: b6818f9d6b081efae96a50c9e567e94ff379fbf9\n  snapshot: null\nfindings:\n  blocking: 1\n  non_blocking: 0\n  unresolved: 0\nnext:\n  stage: fix\n  allowed: true\n  reason: blocking_findings\nblocked:\n  value: false\n  reason: null\n",
+        "index_sync": "success",
+        "no_fix_or_validate_artifacts": true,
+        "review_01_sha256": "3c48f23efe3957e133a9ad1f19c31a786f12dd974903484ad157b5dec374d7a7",
+        "completion_source": "collaboration FINAL_ANSWER from /root/review_forward_test/default_reviewer, followed by parent read-back of handoff and index",
+        "initial_post_review_git_status": "",
+        "initial_post_review_head": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+        "initial_observation_note": "Observed before host supplied subsequent controlled revision",
+        "publication_note": "Reviewer reported Ruby encoding validation failure, then validation success and later publication; parent verified final index"
+      },
+      "unavailable": {
+        "request": "unavailable-request.md",
+        "result": "Blocked dependency_unavailable; no review performed; no findings conclusion",
+        "executor": "/root/review_forward_test",
+        "handoff": "/private/tmp/cohestra-standalone-review-20261106/unavailable/.yuzio/cohestra/handoffs/name-normalization/review-01.md",
+        "index": "/private/tmp/cohestra-standalone-review-20261106/unavailable/.yuzio/cohestra/handoffs/name-normalization/README.md",
+        "front_matter_initial": "\ncontract: \"0.8\"\ntask: name-normalization\nstatus: blocked\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: blocked\n  round: 1\ncandidate:\n  commit: b6818f9d6b081efae96a50c9e567e94ff379fbf9\n  snapshot: null\nnext:\n  stage: null\n  allowed: false\n  reason: blocked\nblocked:\n  value: true\n  reason: dependency_unavailable\n",
+        "index_sync": "success",
+        "no_fix_or_validate_artifacts": true,
+        "review_01_sha256": "5455e0bc13296d42503767f6ed97bde45ef900fab8c740faf717a4a8965a48af",
+        "creation": null,
+        "dispatch": null,
+        "completion_source": "current caller direct execution and publication read-back",
+        "git_status": "",
+        "head": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+        "limitation": "Independent review not performed"
+      },
+      "self-review": {
+        "request": "self-review-request.md",
+        "result": "Explicit current-session self-review; R1 P2 blocking; 6 cases, 4 pass, 2 fail",
+        "executor": "/root/review_forward_test",
+        "handoff": "/private/tmp/cohestra-standalone-review-20261106/self-review/.yuzio/cohestra/handoffs/name-normalization/review-01.md",
+        "index": "/private/tmp/cohestra-standalone-review-20261106/self-review/.yuzio/cohestra/handoffs/name-normalization/README.md",
+        "front_matter_initial": "\ncontract: \"0.8\"\ntask: name-normalization\nstatus: in_progress\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: completed\n  round: 1\ncandidate:\n  commit: b6818f9d6b081efae96a50c9e567e94ff379fbf9\n  snapshot: null\nfindings:\n  blocking: 1\n  non_blocking: 0\n  unresolved: 0\nnext:\n  stage: fix\n  allowed: true\n  reason: blocking_findings\nblocked:\n  value: false\n  reason: null\n",
+        "index_sync": "success",
+        "no_fix_or_validate_artifacts": true,
+        "review_01_sha256": "cd880e5ddee31d0fce44028dc893af1c598f30577fbd27c265ec7d56c3e2a1aa",
+        "creation": null,
+        "dispatch": null,
+        "completion_source": "current caller direct execution and publication read-back",
+        "git_status": "",
+        "head": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+        "limitation": "Independent review not performed"
+      }
+    },
+    "limitations": [
+      "The unavailable request imposed a simulated environment prohibition; no actual spawn rejection was attempted or claimed",
+      "Independence has runtime separate-agent/clean-context evidence plus fixture-author provenance; self-descriptions are not independent proof",
+      "No fix, validate, closeout, installation or source-repository integration executed by this caller or reviewer",
+      "Successful review endpoint is not acceptance passed",
+      "Original reviewer retained for further explicit calls"
+    ],
+    "rereview": {
+      "request": "rereview-request.md",
+      "author_source": "rereview-input.json",
+      "caller": "/root/review_forward_test",
+      "status": "completed",
+      "before": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+      "after": "96bde153d658d2098609db1ed2f30638e95b5c09",
+      "executor": "/root/review_forward_test/default_reviewer",
+      "creation": "Reused original reviewer; no new agent created",
+      "dispatch": {
+        "tool": "collaboration.followup_task",
+        "target": "default_reviewer",
+        "source": "explicit rereview-request.md supplied by host /root"
+      },
+      "completion_source": "collaboration FINAL_ANSWER from original reviewer, followed by parent read-back",
+      "handoff": "/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization/review-02.md",
+      "index": "/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization/README.md",
+      "front_matter": "\ncontract: \"0.8\"\ntask: name-normalization\nstatus: completed\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: completed\n  round: 2\ncandidate:\n  commit: 96bde153d658d2098609db1ed2f30638e95b5c09\n  snapshot: null\nfindings:\n  blocking: 0\n  non_blocking: 0\n  unresolved: 0\nnext:\n  stage: null\n  allowed: false\n  reason: task_completed\nblocked:\n  value: false\n  reason: null\n",
+      "result": "R1 closed, no new findings; 6/6 checks passed; declared review endpoint complete; acceptance omitted",
+      "index_sync": "success",
+      "git_status": "",
+      "head": "96bde153d658d2098609db1ed2f30638e95b5c09",
+      "no_fix_or_validate_artifacts": true,
+      "original_review_sha256": "3c48f23efe3957e133a9ad1f19c31a786f12dd974903484ad157b5dec374d7a7",
+      "original_review_unchanged": true
+    }
+  },
+  "rereview_input": {
+    "author": "/root",
+    "source": "test harness preparation, not review or fix stage",
+    "before": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+    "after": "96bde153d658d2098609db1ed2f30638e95b5c09",
+    "review_01_sha256": "3c48f23efe3957e133a9ad1f19c31a786f12dd974903484ad157b5dec374d7a7"
+  },
+  "root_checks": {
+    "default": {
+      "contract": {
+        "contract": "0.8",
+        "task": "name-normalization",
+        "status": "completed",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": "96bde153d658d2098609db1ed2f30638e95b5c09",
+          "snapshot": null
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "git_status": "",
+      "review_only": true
+    },
+    "unavailable": {
+      "contract": {
+        "contract": "0.8",
+        "task": "name-normalization",
+        "status": "blocked",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "review",
+          "status": "blocked",
+          "round": 1
+        },
+        "candidate": {
+          "commit": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "blocked"
+        },
+        "blocked": {
+          "value": true,
+          "reason": "dependency_unavailable"
+        }
+      },
+      "git_status": "",
+      "review_only": true
+    },
+    "self-review": {
+      "contract": {
+        "contract": "0.8",
+        "task": "name-normalization",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 1
+        },
+        "candidate": {
+          "commit": "b6818f9d6b081efae96a50c9e567e94ff379fbf9",
+          "snapshot": null
+        },
+        "findings": {
+          "blocking": 1,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "next": {
+          "stage": "fix",
+          "allowed": true,
+          "reason": "blocking_findings"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "git_status": "",
+      "review_only": true
+    }
+  },
+  "artifacts": {
+    "default/.yuzio/cohestra/handoffs/name-normalization/review-02.md": {
+      "sha256": "5ddf963d9a18cadb83148c30fc37c0d58fc7895a32714e53882c15fa103c1184",
+      "text": "# 展示名称归一化 · review-02\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.18.0；实际技能目录：/private/tmp/cohestra-standalone-review-20261106/skill。\n- 执行者：/root/review_forward_test/default_reviewer，复用初审的实际独立 reviewer。\n- 时间：2026-11-06T20:21:09.991119+08:00（Asia/Shanghai）；执行模式：attended；阶段/轮次：review-02；阶段状态：已结束。\n- 单独 review 来源：主调用会话 /root/review_forward_test 明确派发 review-02；本 reviewer 未参与实现或修订。初始创建、身份确认和初审派发记录见 [review-01](review-01.md)。\n- 输入与上游依据：[复审原始请求](/private/tmp/cohestra-standalone-review-20261106/rereview-request.md)、[修订来源](/private/tmp/cohestra-standalone-review-20261106/rereview-input.json)、review-01.md、任务 README、固定候选中的 requirements.md 与 AGENTS.md。\n- 候选：before b6818f9d6b081efae96a50c9e567e94ff379fbf9 → after 96bde153d658d2098609db1ed2f30638e95b5c09；git merge-base --is-ancestor 返回 0，git diff 证实仅 names.py:2 改变，需求与规则未变。HEAD 为 after，Git clean。\n- 作者分离：修订来源明确作者为测试宿主 /root，性质为 test harness preparation, not review or fix stage；该身份与实际 reviewer 不同。本 reviewer 独立读取差异和源码，不以来源声明替代行为检查。\n\n## 有效上下文\n\n沿用 [review-01](review-01.md) 的目标、目录、需求、权限与项目规则。本次只复审原 R1 及受影响路径；不执行 fix、validate、closeout，不改业务、不提交、不创建子 agent。主会话明确本 reviewer 独占写入 review-02 与 README。\n修订发生在初审停止之后、显式复审请求之前，属于测试宿主另行提供的新候选；不把它记作此前 review 自行整改，也不补造 fix 交付。\n\n## 本阶段结果\n\n**R1 已关闭；没有新增 findings。本轮独立复审完成，明确的 review 终点已到达。**\n\n| 风险或需求 | 实际路径 | 固定候选证据 | 结论与缺口 |\n|---|---|---|---|\n| R1：纯空白回退 | normalize_name → strip → 空串 → Untitled | after names.py:2；空格、制表/换行检查 | 原两个失败均通过，关闭 R1 |\n| 空字符串回退 | normalize_name → strip → 空串 → Untitled | after names.py:2；空字符串检查 | 通过 |\n| 普通名称与内部空格 | normalize_name → strip → 返回非空结果 | Alice、边界空白、中文及内部空格检查 | 通过，未发现回归 |\n| 需求、调用范围及文档 | before/after 精确差异仅 names.py:2 | 未修改依赖及范围沿用初审固定提交；需求未变 | 不扩大审查范围，无文档同步或替代内容清理需求 |\n\nR1 保留稳定 ID；本轮核实改为先 strip 再用 `or \"Untitled\"` 回退，满足原 finding 验证条件。当前未关闭计数：blocking=0，non_blocking=0，unresolved=0。初审原记录不回写。\n\n## 证据与限制\n\n- git diff before after --：仅将 `return value.strip() if value else \"Untitled\"` 改为 `return value.strip() or \"Untitled\"`。\n- 宿主 `python3 -B` 通过 `git show 96bde153d658d2098609db1ed2f30638e95b5c09:names.py` 读取固定源码，编译执行后直接调用函数。检查时间为 2026-11-06T20:20:33+08:00（Asia/Shanghai）。\n\n| 输入（Python 表示） | 预期和实际 | 结果 |\n|---|---|---|\n| `''` | `'Untitled'` | 通过 |\n| `'   '` | `'Untitled'` | 通过 |\n| `'\\t\\n'` | `'Untitled'` | 通过 |\n| `' Alice '` | `'Alice'` | 通过 |\n| `'Alice'` | `'Alice'` | 通过 |\n| `'  张 三  '` | `'张 三'` | 通过 |\n\n6 例全部通过；断言进程退出 0。检查限定明确的字符串需求；非字符串（例如 None）不在约定输入范围。本轮证据是 review 检查，不是 validate 验收。\n- review-01.md SHA-256：3c48f23efe3957e133a9ad1f19c31a786f12dd974903484ad157b5dec374d7a7，与派发及 rereview-input.json 一致。\n- 发布前 README 基线 SHA-256：6ceeb78d3f74e74424fce27edeb52c4de499e7f97db9cadde9f3e89a36db9331。\n- 历史摘要：初审候选 b6818f9 的 R1 为必做缺陷，6 例中 2 失败；本次新候选对应检查全部通过，历史失败保持原样。\n\n## 下一步交接\n\n用户明确只完成本轮 review，且必做问题全部关闭，按协议 7.3 使用 task_completed：任务 completed，next.stage=null、allowed=false；不转 validate，不宣称验收通过，acceptance 缺省。\n本 reviewer 交付后停止，保留会话。没有本轮剩余必做审查项；若用户另行要求验收，需要新的明确调用，不由本交付自动启动。\n"
+    },
+    "default/.yuzio/cohestra/handoffs/name-normalization/README.md": {
+      "sha256": "2a14db18d30f9c316004d527a30dabc5e7c366ff5aad64a80336f248c77d33be",
+      "text": "---\ncontract: \"0.8\"\ntask: name-normalization\nstatus: completed\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: completed\n  round: 2\ncandidate:\n  commit: 96bde153d658d2098609db1ed2f30638e95b5c09\n  snapshot: null\nfindings:\n  blocking: 0\n  non_blocking: 0\n  unresolved: 0\nnext:\n  stage: null\n  allowed: false\n  reason: task_completed\nblocked:\n  value: false\n  reason: null\n---\n\n# 展示名称归一化\n\n- 任务目标：首次从 review 起步，依据原始需求审查 normalize_name；按显式请求完成初审及后续独立复审。\n- 有效决定与来源：[初审请求](/private/tmp/cohestra-standalone-review-20261106/default-request.md)、[复审请求](/private/tmp/cohestra-standalone-review-20261106/rereview-request.md)、requirements.md 与 AGENTS.md；范围详见 [review-01](review-01.md) 与 [review-02](review-02.md)。\n- 修订来源：[rereview-input.json](/private/tmp/cohestra-standalone-review-20261106/rereview-input.json) 记录测试宿主 /root 提供新候选，未冒充 review 或 fix 阶段；需求不变。\n- 工作项记录：初审 R1 为必做缺陷（6 例中 2 失败）；复审关闭 R1（6 例全通过），无新增问题。两轮均由 /root/review_forward_test/default_reviewer 独立完成。未执行 fix 或 validate，未作验收结论；reviewer 未修改业务、提交或推送。\n- 终点依据：用户仅要求本轮 review；必做问题已关闭，审查终点已到达。acceptance 缺省不代表验收通过；没有自动后续执行。\n- 索引维护者：/root/review_forward_test/default_reviewer（本轮独占写入者）。\n- 最近更新：/root/review_forward_test/default_reviewer，2026-11-06T20:21:30.500779+08:00，Asia/Shanghai。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| review-01 | [review-01.md](review-01.md)，独立审查需求与函数行为 | 已结束；R1 为必做缺陷 | b6818f9d6b081efae96a50c9e567e94ff379fbf9 |\n| review-02 | [review-02.md](review-02.md)，候选差异、R1 与受影响路径复审 | 已结束；R1 关闭，无新增问题 | 96bde153d658d2098609db1ed2f30638e95b5c09 |\n"
+    },
+    "default/.yuzio/cohestra/handoffs/name-normalization/review-01.md": {
+      "sha256": "3c48f23efe3957e133a9ad1f19c31a786f12dd974903484ad157b5dec374d7a7",
+      "text": "# 展示名称归一化 · review-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.18.0。\n- 实际技能：/private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md。\n- 执行者：/root/review_forward_test/default_reviewer，实际独立 reviewer 子智能体。\n- 时间：2026-11-06T20:15:16.275324+08:00（Asia/Shanghai）。\n- 执行模式：attended；阶段/轮次：review-01；阶段状态：已结束，发现 1 项必做问题。\n- 输入与上游依据：[原始用户请求](/private/tmp/cohestra-standalone-review-20261106/default-request.md)、固定候选中的 requirements.md 与 AGENTS.md。本任务首次从 review 起步，无上游阶段交付。\n- 单独 review 来源：主会话 /root/review_forward_test 创建本 reviewer；首次 NEW_TASK 仅要求身份确认，我已以实际 agent 路径确认未参与实现并等待。随后收到主会话明确的 review-01 派发及继续执行指令，本轮才开始审查。\n- 独立性依据：本工具上下文确认实际身份为 /root/review_forward_test/default_reviewer；未参与被审实现或整改；requirements.md:4 明示候选由测试夹具生成，并非执行会话或 reviewer 编写。主会话也声明不是实现作者。独立读取提交与需求并运行检查，没有以主会话结论代替证据。\n- 固定候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9。HEAD 相同、Git clean；提交含 .gitignore、AGENTS.md、names.py、requirements.md，工作区对应文件与提交无差异。\n- 初始化：主会话在派发前按技能资产最小初始化；本 reviewer 核实容器和入口存在、目标任务不存在、根 /.yuzio/ 忽略生效，.yuzio 无跟踪文件或 Git 历史；未重复初始化。\n\n## 有效上下文\n\n- 目标项目：/private/tmp/cohestra-standalone-review-20261106/default。\n- 任务目录：.yuzio/cohestra/handoffs/name-normalization。\n- 流程范围：首次 review 起步，只完成本轮独立审查；不执行 fix、validate、closeout，不提交或推送，不创建子 agent。\n- 目标：审查 names.py 是否满足 requirements.md：先去除两端空白；空或纯空白返回 Untitled，其余返回裁剪结果。\n- 授权：原始请求及目标 AGENTS.md 允许必要只读 Python 检查、Cohestra 交付及必要正式报告。业务与需求只读，不访问其他项目。\n- 文件所有权：主会话明确将本轮 handoff 与任务 README 独占写入权授予本 reviewer。\n\n## 本阶段结果\n\n**结论：存在 1 项阻塞整改问题；独立审查已完成，候选不满足全部需求。**\n\n| 风险或需求 | 实际路径 | 固定候选证据 | 结论与缺口 |\n|---|---|---|---|\n| 空字符串回退 | 直接调用 normalize_name → falsy 分支 → Untitled | names.py:1–2，检查输入空字符串 | 符合 |\n| 纯空白回退 | 直接调用 normalize_name → truthy 分支 → strip → 空串 | names.py:2，空格及制表/换行输入 | 不符合，R1 |\n| 普通名称裁剪 | 直接调用 normalize_name → strip → 返回名称 | Alice、带边界空白 Alice、中文及内部空格 | 符合 |\n| 调用方与文档范围 | 提交树及 normalize_name 全项目搜索 | 固定提交仅四文件，无其他业务调用方或依赖 | 直接函数接口即审查路径；需求为有效文档 |\n\n### R1 · [P2] 在裁剪后判断是否需要默认名称\n\n- 类型：确定缺陷；严重度：P2；阻塞性：必做；状态：未关闭。\n- 位置：names.py:2。\n- 触发条件：输入非空但仅含空白，例如 `\"   \"` 或 `\"\\t\\n\"`。\n- 后果：当前条件在 strip 前判断原始字符串，进入真分支后返回空字符串，展示名称缺失。\n- 依据：requirements.md:3 明确要求纯空白字符串也返回 Untitled；固定候选执行结果与之冲突。\n- 归属：本次固定候选已有问题；无更早实现基线，不能断言是本轮引入的回归。\n- 验证方法：整改后检查空字符串、纯空格、制表/换行均返回 Untitled；普通名称仍仅裁剪两端，保留内部空格。修复方向是先 strip，再判断结果；本轮未修改实现。\n\n计数：blocking=1，non_blocking=0，unresolved=0。\n文档与清理：已有 requirements.md 准确表述需求，缺陷在实现；提交为单一函数的首次候选，无被替代代码、入口或文档需要清理。本次为局部审查过程，项目未要求独立共享报告，不新增 docs 副本。\n\n## 证据与限制\n\n- 在目标目录执行 git rev-parse HEAD、git status --short、git diff 候选 -- names.py requirements.md AGENTS.md，核对固定候选与工作区一致。\n- 执行 git ls-tree -r --name-only 候选、rg -n normalize_name，核查范围与调用方；git ls-files .yuzio、git log --all --oneline -- .yuzio 均为空；git check-ignore -v .yuzio/cohestra/probe 命中根规则。\n- 宿主 Python 检查采用 `python3 -B`，通过 `git show <候选>:names.py` 读取源码，`exec(compile(source, '<候选>:names.py', 'exec'), ns)` 后直接调用函数；未写测试或业务文件，未产生字节码。\n\n| 输入（Python 表示） | 预期 | 实际 | 结果 |\n|---|---|---|---|\n| `''` | `'Untitled'` | `'Untitled'` | 通过 |\n| `'   '` | `'Untitled'` | `''` | 失败 |\n| `'\\t\\n'` | `'Untitled'` | `''` | 失败 |\n| `' Alice '` | `'Alice'` | `'Alice'` | 通过 |\n| `'Alice'` | `'Alice'` | `'Alice'` | 通过 |\n| `'  张 三  '` | `'张 三'` | `'张 三'` | 通过 |\n\n检查时间：2026-11-06T20:14:21+08:00，Asia/Shanghai。共 6 例，4 通过、2 失败，两个失败为同一缺陷。非字符串输入不在明确需求范围内。以上为本轮 review 的针对性运行证据，不代表执行了 validate；未作整体验收。\n\n## 下一步交接\n\n推荐 `$cohestra fix /private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization/review-01.md`。\n依据协议 7.3，尚有必做 finding 时使用 blocking_findings 出口，不将任务写为 completed。用户限定本轮只审查，因此推荐不产生执行授权，本 reviewer 交付后停止。\n后续需用户另行授权整改，由实现执行者处理 R1 并交付新固定候选；复审优先复用本 reviewer，核查候选差异、R1 和上述输入类别。本轮未运行整改、复审或验收。\n"
+    },
+    "default/names.py": {
+      "sha256": "18430fd7ec16f72dab13b222adaff21e6835b09b5c5fc9cf5945810720e41043",
+      "text": "def normalize_name(value):\n    return value.strip() or \"Untitled\"\n"
+    },
+    "default/requirements.md": {
+      "sha256": "bc6af27a58f52939bf6bcc910c9e91893d51e2945113f4648ace689d5fe9a5dd",
+      "text": "# 展示名称\n\nnormalize_name 必须先去除两端空白；空字符串及纯空白字符串均返回 Untitled，其余返回去空白后的名称。\n当前候选由测试夹具生成，不是执行会话或 reviewer 编写。\n"
+    },
+    "default/AGENTS.md": {
+      "sha256": "4f9c569c2633e3a08762f78063573e45536c7487932f2ccd47e028f72044e1e5",
+      "text": "这是隔离审查项目。业务源文件及需求只读，允许 Python 检查。\n只写本次审查所需的 Cohestra 交付及必要正式报告。\n不执行整改、验收、提交或推送；不访问其他项目。\n"
+    },
+    "unavailable/.yuzio/cohestra/handoffs/name-normalization/README.md": {
+      "sha256": "983a8ac91dfefb95113311e77c28b91d50e805473b11a52be70d6908bac36d98",
+      "text": "---\ncontract: \"0.8\"\ntask: name-normalization\nstatus: blocked\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: blocked\n  round: 1\ncandidate:\n  commit: b6818f9d6b081efae96a50c9e567e94ff379fbf9\n  snapshot: null\nnext:\n  stage: null\n  allowed: false\n  reason: blocked\nblocked:\n  value: true\n  reason: dependency_unavailable\n---\n\n# 展示名称归一化\n\n- 任务目标：首次 review 起步，审查 names.py；原始输入为 unavailable-request.md、requirements.md 与 AGENTS.md。\n- 有效决定：本请求环境禁止子智能体且不要求自审；该限制不传播至其他项目。\n- 工作项记录：独立审查未执行，无产品结论；未整改、验收、提交或推送。\n- 下一步补充：调用方恢复允许独立 reviewer 的工具条件后，以本任务目录重试 review；当前停止。\n- 索引维护者：/root/review_forward_test，唯一写入者。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| review-01 | [review-01.md](review-01.md)，受阻事实 | 受阻；独立 reviewer 不可用 | b6818f9d6b081efae96a50c9e567e94ff379fbf9 |\n"
+    },
+    "unavailable/.yuzio/cohestra/handoffs/name-normalization/review-01.md": {
+      "sha256": "5455e0bc13296d42503767f6ed97bde45ef900fab8c740faf717a4a8965a48af",
+      "text": "# 展示名称归一化 · review-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.18.0。\n- 实际技能：/private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md。\n- 执行者及主调用会话：/root/review_forward_test；未创建或调用 reviewer。\n- 时间：2026-11-06T20:17:05.767455+08:00（Asia/Shanghai）；执行模式：attended；阶段状态：受阻。\n- 输入与上游依据：/private/tmp/cohestra-standalone-review-20261106/unavailable-request.md、requirements.md、AGENTS.md；首次从 review 起步。\n- 固定候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9；HEAD 一致，工作区 clean。\n- 初始化：本会话按实际技能模板完成最小初始化，根 /.yuzio/ 忽略生效，无已跟踪或历史资料。\n\n## 有效上下文\n\n目标项目 /private/tmp/cohestra-standalone-review-20261106/unavailable；任务目录 /private/tmp/cohestra-standalone-review-20261106/unavailable/.yuzio/cohestra/handoffs/name-normalization。本次仅审查 names.py 是否满足 requirements.md，不整改、验收、提交或推送。\n用户原始请求明确说明环境禁止创建或调用子智能体，且不是要求自审；该限制仅适用于本项目请求。\n\n## 本阶段结果\n\n独立审查未执行。必要 reviewer 能力受限，未派发任何 reviewer，不能静默退回主会话自审。\n本轮没有形成代码审查结论，不以零 findings 代表覆盖完整。主会话仅记录受阻交付与索引。\n\n## 证据与限制\n\n- 实际只执行候选与存储前置核查：git status --short 为空、git rev-parse HEAD 等于固定候选、git ls-files .yuzio 与 git log --all --oneline -- .yuzio 为空、git check-ignore 命中。\n- 未执行 names.py 行为检查；没有可用的独立审查证据，没有 findings 判断。\n- 工具受限依据是本次用户请求的环境条件，不声称真实工具调用失败或自行推断权限。\n\n## 下一步交接\n\n受阻原因 dependency_unavailable；next.allowed=false，next.stage=null。由调用方恢复允许独立 reviewer 的执行环境后重新调用 $cohestra review /private/tmp/cohestra-standalone-review-20261106/unavailable/.yuzio/cohestra/handoffs/name-normalization。\n本轮停止；未进入 fix、validate 或 closeout。\n"
+    },
+    "unavailable/names.py": {
+      "sha256": "8099b70d5bc947093d00519d2ab40c4187ec0c1a380f9b28d8dea72cf30e6408",
+      "text": "def normalize_name(value):\n    return value.strip() if value else \"Untitled\"\n"
+    },
+    "unavailable/requirements.md": {
+      "sha256": "bc6af27a58f52939bf6bcc910c9e91893d51e2945113f4648ace689d5fe9a5dd",
+      "text": "# 展示名称\n\nnormalize_name 必须先去除两端空白；空字符串及纯空白字符串均返回 Untitled，其余返回去空白后的名称。\n当前候选由测试夹具生成，不是执行会话或 reviewer 编写。\n"
+    },
+    "unavailable/AGENTS.md": {
+      "sha256": "4f9c569c2633e3a08762f78063573e45536c7487932f2ccd47e028f72044e1e5",
+      "text": "这是隔离审查项目。业务源文件及需求只读，允许 Python 检查。\n只写本次审查所需的 Cohestra 交付及必要正式报告。\n不执行整改、验收、提交或推送；不访问其他项目。\n"
+    },
+    "self-review/.yuzio/cohestra/handoffs/name-normalization/README.md": {
+      "sha256": "4fbe744d210beccd862f811bc94f0af2cf58b2e75f36db05d9fcd7bb82ae9113",
+      "text": "---\ncontract: \"0.8\"\ntask: name-normalization\nstatus: in_progress\nexecution_mode: attended\nstage_result:\n  stage: review\n  status: completed\n  round: 1\ncandidate:\n  commit: b6818f9d6b081efae96a50c9e567e94ff379fbf9\n  snapshot: null\nfindings:\n  blocking: 1\n  non_blocking: 0\n  unresolved: 0\nnext:\n  stage: fix\n  allowed: true\n  reason: blocking_findings\nblocked:\n  value: false\n  reason: null\n---\n\n# 展示名称归一化\n\n- 任务目标：首次从 review 起步，按 requirements.md 审查 names.py，只完成本轮 review。\n- 有效决定与来源：self-review-request.md 明确要求当前会话自审、不委派；AGENTS.md 允许必要只读 Python 检查。\n- 工作项记录：主会话自审发现 R1，6 例 4 通过 2 失败；独立审查未执行，不宣称验收通过。\n- 下一步补充：以 [review-01.md](review-01.md) 为整改输入，由后续明确授权处理 R1；本轮停止。\n- 索引维护者：/root/review_forward_test，唯一写入者。\n\n| 阶段/轮次 | 交付物及覆盖职责 | 阶段状态与结论 | 输入/目标候选 |\n|---|---|---|---|\n| review-01 | [review-01.md](review-01.md)，当前会话自审 | 已结束；R1 必做 | b6818f9d6b081efae96a50c9e567e94ff379fbf9 |\n"
+    },
+    "self-review/.yuzio/cohestra/handoffs/name-normalization/review-01.md": {
+      "sha256": "cd880e5ddee31d0fce44028dc893af1c598f30577fbd27c265ec7d56c3e2a1aa",
+      "text": "# 展示名称归一化 · review-01\n\n## 身份与输入\n\n- 协议：cohestra v0.8；Skill 发行版本：0.18.0；实际技能 /private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md。\n- 执行者及主调用会话：/root/review_forward_test；实际方式：当前会话自审，未委派，不宣称独立审查。\n- 时间：2026-11-06T20:19:08.016453+08:00（Asia/Shanghai）；执行模式 attended；阶段状态：已结束。\n- 输入与上游依据：/private/tmp/cohestra-standalone-review-20261106/self-review-request.md、固定候选 requirements.md、AGENTS.md；无上游阶段。\n- 候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9；HEAD 一致，Git clean，业务与需求无差异。\n- 初始化：本会话按技能资产执行最小初始化；根忽略生效，无已跟踪或历史资料。\n\n## 有效上下文\n\n目标项目 /private/tmp/cohestra-standalone-review-20261106/self-review；任务目录 /private/tmp/cohestra-standalone-review-20261106/self-review/.yuzio/cohestra/handoffs/name-normalization。首次从 review 起步，仅本轮 review，不修复、验收、提交或推送。\n本次原始请求明确要求不委派，由当前会话自审；该决定只适用本项目。需求来源明确代码由测试夹具生成，但本轮仍按自审例外记录，不把作者不同等同于独立 reviewer 派发。\n\n## 本阶段结果\n\n发现一项确定缺陷 R1，P2，必做，未关闭：names.py:2 在 strip 前判断原字符串，纯空白字符串 truthy，裁剪后返回空串，违反 requirements.md:3 的 Untitled 回退要求。\n触发：两个空格或制表/换行；后果：名称为空。归属为固定候选已有缺陷，缺少更早基线，不推断新回归。\n验证方式：先去两端空白后判断空结果，并复测空串、纯空白、普通名称和内部空格；本轮不实施整改。\n\n| 风险或 AC | 实际路径 | 固定候选证据 | 结论与缺口 |\n|---|---|---|---|\n| 空串回退 | normalize_name → falsy → Untitled | 固定提交 names.py:2，空串检查 | 符合 |\n| 纯空白回退 | normalize_name → truthy → strip → 空串 | 两个空格、制表/换行检查 | 失败，R1 |\n| 名称裁剪与内部空格 | normalize_name → strip → 名称 | Alice、中文内部空格、全角边界空格 | 符合 |\n| 调用方与文档 | 提交树与 normalize_name 搜索 | 固定提交仅四文件，无业务调用方 | 直接函数为完整路径；需求无需修改 |\n\n计数：blocking=1，non_blocking=0，unresolved=0。无替代入口或旧代码清理需要。项目未要求额外正式报告，本次交付留在任务目录。\n\n## 证据与限制\n\nPython3 -B 直接读取 git show 候选:names.py，通过 exec(compile(...)) 加载并调用；未写业务文件或字节码。\n\n| 输入（Python 表示） | 预期 | 实际 |\n|---|---|---|\n| `''` | `Untitled` | `Untitled` |\n| `'  '` | `Untitled` | 空串 |\n| `'\\t\\n'` | `Untitled` | 空串 |\n| `' Alice '` | `Alice` | `Alice` |\n| `'张 三'` | `张 三` | `张 三` |\n| `'\\u3000张 三\\u3000'` | `张 三` | `张 三` |\n\n6 例，4 通过、2 失败。git diff 固定候选 -- names.py requirements.md AGENTS.md 无输出；git ls-tree 与 rg 核查范围和调用方。非字符串不在需求范围。当前证据仅为主会话自审和宿主函数检查；独立审查未执行，未执行 validate。项目无额外独立验收门禁，仍不宣称整体验收通过。\n\n## 下一步交接\n\n建议 $cohestra fix /private/tmp/cohestra-standalone-review-20261106/self-review/.yuzio/cohestra/handoffs/name-normalization/review-01.md，处理 R1 并提供新固定候选。next 为 fix / blocking_findings，用户只授权本轮 review，本会话现在停止，不执行整改。\n"
+    },
+    "self-review/names.py": {
+      "sha256": "8099b70d5bc947093d00519d2ab40c4187ec0c1a380f9b28d8dea72cf30e6408",
+      "text": "def normalize_name(value):\n    return value.strip() if value else \"Untitled\"\n"
+    },
+    "self-review/requirements.md": {
+      "sha256": "bc6af27a58f52939bf6bcc910c9e91893d51e2945113f4648ace689d5fe9a5dd",
+      "text": "# 展示名称\n\nnormalize_name 必须先去除两端空白；空字符串及纯空白字符串均返回 Untitled，其余返回去空白后的名称。\n当前候选由测试夹具生成，不是执行会话或 reviewer 编写。\n"
+    },
+    "self-review/AGENTS.md": {
+      "sha256": "4f9c569c2633e3a08762f78063573e45536c7487932f2ccd47e028f72044e1e5",
+      "text": "这是隔离审查项目。业务源文件及需求只读，允许 Python 检查。\n只写本次审查所需的 Cohestra 交付及必要正式报告。\n不执行整改、验收、提交或推送；不访问其他项目。\n"
+    },
+    "default-request.md": {
+      "sha256": "6e879bc8ba1fd3aecf3fd76446da619bcd53846837343ed60f32e193f523b54e",
+      "text": "使用 /private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md 的 $cohestra review。\n目标项目：/private/tmp/cohestra-standalone-review-20261106/default\n任务目录：/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization\n首次从 review 起步。固定候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9。需求见 requirements.md。\n审查 names.py 是否满足需求，只完成本轮 review。允许必要的只读检查。\n"
+    },
+    "rereview-request.md": {
+      "sha256": "440a4d8afa2f2a7659e4d766b2fd909e5a9f39101d602dc7796fa7a14a01f2e7",
+      "text": "使用 /private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md 的 $cohestra review。\n目标项目：/private/tmp/cohestra-standalone-review-20261106/default\n任务目录：/private/tmp/cohestra-standalone-review-20261106/default/.yuzio/cohestra/handoffs/name-normalization\n测试宿主 /root 已在本次显式复审请求前修订候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9 → 96bde153d658d2098609db1ed2f30638e95b5c09，仅 names.py 变化，需求不变。修改来源见 /private/tmp/cohestra-standalone-review-20261106/rereview-input.json；这不是此前 review 自行执行整改，也不补造 fix 阶段。请对新的固定候选复审 review-01.md 的 findings，只完成本轮 review。允许必要的只读 Python 检查。\n"
+    },
+    "self-review-request.md": {
+      "sha256": "c978071d4b51f89d60bf9bd3a47ae47ffc620a205eca99c3fc444809bfd2dc32",
+      "text": "使用 /private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md 的 $cohestra review。\n目标项目：/private/tmp/cohestra-standalone-review-20261106/self-review\n任务目录：/private/tmp/cohestra-standalone-review-20261106/self-review/.yuzio/cohestra/handoffs/name-normalization\n首次从 review 起步。固定候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9。需求见 requirements.md。\n审查 names.py 是否满足需求，只完成本轮 review。允许必要的只读检查。\n本次明确要求不委派，由当前会话自审，并如实记录审查方式。\n"
+    },
+    "unavailable-request.md": {
+      "sha256": "bba7d4833315102daf8792b567d5fa74fdbc6f327ff11da823159bba4395e277",
+      "text": "使用 /private/tmp/cohestra-standalone-review-20261106/skill/SKILL.md 的 $cohestra review。\n目标项目：/private/tmp/cohestra-standalone-review-20261106/unavailable\n任务目录：/private/tmp/cohestra-standalone-review-20261106/unavailable/.yuzio/cohestra/handoffs/name-normalization\n首次从 review 起步。固定候选：b6818f9d6b081efae96a50c9e567e94ff379fbf9。需求见 requirements.md。\n审查 names.py 是否满足需求，只完成本轮 review。允许必要的只读检查。\n本次运行环境禁止创建或调用任何子智能体；这是工具条件限制，不是请求改做自审。\n"
+    }
+  },
+  "unittest_log": ".........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 505 tests in 31.385s\n\nOK\n"
+}
