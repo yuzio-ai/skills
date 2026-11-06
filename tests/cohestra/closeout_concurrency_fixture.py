@@ -195,7 +195,9 @@ def seed_cadra(project, now):
 def create(destination, mode):
     destination = destination.resolve()
     destination.mkdir(parents=True, exist_ok=False)
-    shutil.copytree(REPO / "cohestra", destination / "skill")
+    skill = destination / "skill"
+    shutil.copytree(REPO / "cohestra", skill)
+    release = json.loads((skill / "release.json").read_text())
     project = destination / "project"
     project.mkdir()
     write(project, ".gitignore", "/.yuzio/\n/.test/\n__pycache__/\n/reply-*.md\n")
@@ -239,15 +241,17 @@ class NormalizationTests(unittest.TestCase):
         subprocess.run(cmd + args, cwd=project, check=True)
     baseline = subprocess.check_output(cmd + ["rev-parse", "HEAD"], cwd=project, text=True).strip()
     container = project / ".yuzio/cohestra"
-    shutil.copytree(REPO / "cohestra/assets/project", container)
-    text = (container / "README.md").read_text().replace("<实际项目名称>", "Closeout concurrency fixture").replace("<实际发行版本；仅记录初始化来源，不锁定后续调用>", "0.16.0")
+    shutil.copytree(skill / "assets/project", container)
+    text = ((container / "README.md").read_text()
+            .replace("<实际项目名称>", "Closeout concurrency fixture")
+            .replace("<实际发行版本；仅记录初始化来源，不锁定后续调用>", release["version"]))
     (container / "README.md").write_text(text)
     now = datetime.now(ZoneInfo("Asia/Shanghai")).isoformat()
     run = seed_cadra(project, now)
-    metadata = dict(mode=mode, baseline=baseline, project=str(project), skill=str(destination / "skill"),
+    metadata = dict(mode=mode, baseline=baseline, project=str(project), skill=str(skill),
                     cadra_run=str(run), cadra_sha256=digest(run),
                     preserved={name:digest(project/name) for name in ["other-session.txt", "cadra-owned.txt", "tools/probe.py", "AGENTS.md"]},
-                    skill_hashes={str(p.relative_to(destination/"skill")):digest(p) for p in (destination/"skill").rglob("*") if p.is_file()})
+                    skill_hashes={str(p.relative_to(skill)):digest(p) for p in skill.rglob("*") if p.is_file()})
     write(destination, "metadata.json", json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(metadata, ensure_ascii=False))
 

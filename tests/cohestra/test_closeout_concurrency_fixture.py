@@ -9,11 +9,38 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
+from . import closeout_concurrency_fixture as fixture
 from .closeout_concurrency_fixture import create, observations, shared_resource_result
 
 
 class ConcurrencyProbeTests(unittest.TestCase):
+    def test_container_initialization_uses_frozen_skill(self):
+        with tempfile.TemporaryDirectory(prefix="closeout-source-") as folder:
+            suite = (Path(folder) / "suite").resolve()
+            frozen = suite / "skill"
+            copytree = fixture.shutil.copytree
+
+            def copy_with_distinct_frozen_source(source, destination, *args, **kwargs):
+                result = copytree(source, destination, *args, **kwargs)
+                if Path(destination) == frozen:
+                    manifest = frozen / "release.json"
+                    release = json.loads(manifest.read_text())
+                    release["version"] = "9.8.7"
+                    manifest.write_text(json.dumps(release))
+                    (frozen / "assets/project/source-marker.txt").write_text("frozen template\n")
+                return result
+
+            with patch.object(fixture.shutil, "copytree", side_effect=copy_with_distinct_frozen_source), contextlib.redirect_stdout(io.StringIO()):
+                create(suite, "disjoint")
+
+            container = suite / "project/.yuzio/cohestra"
+            version = json.loads((frozen / "release.json").read_text())["version"]
+            self.assertIn(f"初始化时 Skill 发行版本：{version}", (container / "README.md").read_text())
+            self.assertEqual((container / "source-marker.txt").read_bytes(),
+                             (frozen / "assets/project/source-marker.txt").read_bytes())
+
     def test_two_real_validation_processes_wait_then_use_one_resource(self):
         with tempfile.TemporaryDirectory(prefix="closeout-resource-") as folder:
             suite = Path(folder) / "suite"
