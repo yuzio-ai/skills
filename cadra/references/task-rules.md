@@ -27,4 +27,6 @@ ready 只适用于展示状态 draft/ready：通过时 preparation=ready；未�
 
 已有交付或 Run 执行依据时，起点项按 [完整契约与前置检查](contract.md#前置检查与首个动作) 核对候选适用性、控制字段及合法首动作；定义变更时按 [重启准入](revision-rules.md) 核对。add 的身份绑定不替代上述检查，缺口未解除不得放行。
 
+ready 可按 [准备交接补齐](preparation-handoff.md) 将已确认的 need/design 交给 Cohestra 正式收敛后重核；这不新增 Gate、不豁免起点，也不授权 run/append 自动修复准备状态。
+
 生成收尾任务仅在来源 Run 的内部准备中执行本 Gate；不得因来自执行器就跳过八项准入。普通全部 ready／显式选择排除 origin 非 null 的生成任务，见 [收尾审查](closeout.md)。

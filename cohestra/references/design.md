@@ -38,3 +38,5 @@ $cohestra design
 新增 `design-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
 本阶段完成后推荐 code，说明有效方案、剩余验证项及实施前提；必要关键决定或所需整体确认未齐备时按共用澄清规则受阻，设计交付不自动授权实现。
+
+确认答复和 Cadra ready 的准备请求按 [确认交接](confirmation-handoff.md) 收敛；既有仅设计终点不因 ready 请求而自动开放 code。

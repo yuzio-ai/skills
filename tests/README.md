@@ -45,6 +45,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_list_summary.py](cadra/test_list_summary.py) | 保留原 0.11 语义的列表摘要状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
 | [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
 | [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
+| [test_process_view.py](cadra/test_process_view.py) | 包内只读过程视图：多轮整改、未闭合交付、同步缺口、验证先失败后通过、恢复来源、输入不变、独立包运行与旧协议拒绝；不模拟真实 agent 决策 |
 | [test_review_full_fixture.py](cohestra/test_review_full_fixture.py)、[review_full_fixture.py](cohestra/review_full_fixture.py) | 扩展单独 review 实测输入与实际发布故障：原子替换拒绝、竞争写入保留和解除故障后的发布；不模拟 agent 决策 |
 | [test_review_fixture.py](cohestra/test_review_fixture.py)、[review_fixture.py](cohestra/review_fixture.py) | 单独 review 实测输入：固定候选、真实缺陷、工具不可用及明确自审；unittest 只校验夹具与隔离，不模拟 agent 决策 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
@@ -93,5 +94,6 @@ Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见�
 | 2026-11-06 | [最终整体确认独立真实会话](cohestra/reports/2026-11-06-overall-confirmation.md) | Cohestra 0.17.0 草稿 / 协议 0.8 | 六个执行会话覆盖整体确认、拒答/认可、修订、免除、复用及无人值守；另有独立终态裁决，保留核对器误报与修正证据 |
 | 2026-11-06 | [单独 review 独立审查实测](cohestra/reports/2026-11-06-standalone-review.md) | Cohestra 0.18.0 草稿 / 协议 0.8 | 默认独立派发、受控子 agent 禁用、明确自审例外、复用原 reviewer 复审；核对候选、发布与阶段停止边界 |
 | 2026-11-06 | [单独 review 完整验证](cohestra/reports/2026-11-06-standalone-review-full.md) | Cohestra 0.18.0 草稿 / 协议 0.8 | 独立规则审查、真实 CLI 安装/迁移、10 个新增行为场景、发布失败与同轮恢复、竞争写入保留、closeout 实际验收 |
+| 2026-11-07 | [确认交接与运行过程](cadra/reports/2026-11-07-preparation-process.md) | Cohestra 0.19.0／Cadra 0.18.0 草稿，协议不变 | 三个独立会话实测确认收敛、直接／重复 ready、拒绝路径、同步恢复、真实 Task 并发更新及旧 Run 逐任务报告；主会话回读核对，未升级实际安装副本 |
 
 当前验收要求以各[场景清单](#行为场景与辅助工具)为准；报告中的通过数量只对应所列版本。

@@ -2,7 +2,7 @@
 
 ## 契约字段
 
-控制状态只读 `cohestra_task/README.md` 的 YAML Front Matter，字段与值采用 Cohestra 契约 0.8。Cadra 不修改契约、不解析自然语言正文来选择阶段。报告可以引用正文短摘要。
+控制状态只读 `cohestra_task/README.md` 的 YAML Front Matter，字段与值采用 Cohestra 契约 0.8。Cadra 不修改契约、不解析自然语言正文来选择工程阶段。ready 的[受限准备请求](preparation-handoff.md)可核实正文中的既有确认并交由 Cohestra 发布；只有回读后的合法契约才能放行。报告可以引用正文短摘要。
 
 ```yaml
 contract: "0.8"  # 必填；当前支持的 Cohestra 契约版本

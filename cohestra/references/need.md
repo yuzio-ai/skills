@@ -38,3 +38,5 @@ $cohestra need
 新增 `need-<轮次>.md`；骨架字段、落盘顺序、索引同步与停止规则见 [公共流程](workflow.md)。
 
 本阶段完成后推荐 design，传递本轮 need、剩余验证项和负责人；必要关键决定或所需整体确认未齐备时按共用澄清规则受阻。
+
+确认答复和 Cadra ready 的准备请求按 [确认交接](confirmation-handoff.md) 收敛；本阶段只交付 need，不代做 design。

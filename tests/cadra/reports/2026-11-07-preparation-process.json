@@ -1,0 +1,1002 @@
+{
+  "packages": {
+    "cadra": {
+      "release": {
+        "version": "0.18.0",
+        "protocol_version": "0.12",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cadra"
+      },
+      "manifest": {
+        "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "release.json": "e40e27546151b366cfcad35815b4aac268a2bdf27886482752a8098be5371cb5",
+        "SKILL.md": "075b044803a4ee271833f239ec5299c7d882a588dcf3815b346dbe5289ebe9a4",
+        "references/storage.md": "6146ce9c6ce5753bf1d892c6631221b7c5f46c11dfabebf90bf616f7ef00fec8",
+        "references/retention.md": "612abf43d44d03bfe8909e23e23110ec8f0e9ce2bab27dd5879db57458237fd0",
+        "references/scheduling.md": "2dc4223df531098afbb1538aa19d85904a3d36c6aa509dcda490d65018ad54b9",
+        "references/task-definition.md": "5c68961148ecc187495e943e40a95a8bc3a316cad7702cc6aff9fe83553f284f",
+        "references/list-details.md": "01e14e833828097d73c0da362e286645674a087510932482e48f5a8ad31fd7bd",
+        "references/closeout.md": "d59cdfe52a4c6cdd9b4a7eecc64f1790148be62df71cf0173db5d8b5b847fbd0",
+        "references/design-inputs.md": "a7a48c1c5c83b6e91d03d1a176ef50cb2e9beb29abdfe6073cd1bcba93a7955e",
+        "references/ready.md": "ee8e0e8a728f88663745551cf932bd396fbc6a43eda4fe41d73ffd38489eb970",
+        "references/report.md": "13a6dafb25b739a64d53b50c276f2e7e7c0d686fd96ec6c81ce49b8f5c49d667",
+        "references/preflight.md": "c1d807ecb9f8d6d975ea22ca93fb8b529965cc195b4f060239c07c4e8c939051",
+        "references/executor.md": "b1a39d7f7d1fadbaa6cab7c5351e509f77a501b6da82eb88f23c836b30cd8eb1",
+        "references/revision-rules.md": "28c2df472602f0ea4f198f6bbe4c311f36e2e3da127a704336d3c7be336db75b",
+        "references/workflow.md": "c79e17ee1d3b493daadaa0cb3d19ddb995741948deab93e1d90beb9d3dcc44df",
+        "references/binding.md": "ed1001ff4acfc99fe415f78e04d54c2417952a4b254f84cb5ae2d9085563d136",
+        "references/contract.md": "d68311cce997208b14a15c95a1e45abdaa4a534c339614c4396178327727cce8",
+        "references/task-rules.md": "5b317e8fbba48ee07990aa7a685ee6c4ec8007244239c6ffef50acdd1df54193",
+        "references/append.md": "bb0bf43f49dd4a47faebe6b84ee0fdbd858273d4ad741ce77b2f5a58565846d7",
+        "references/add.md": "1e8e39db59efee111f6e5334bfa643a45d28a48ac62c0855ec33b8383e91bc0b",
+        "references/list.md": "92c6a7851fc54c1d16128a7e9ef3e7fdae06af22cc2137c46dc841dcbb5fc5db",
+        "references/resume.md": "7ce98ca920a4ddb4dfb797f738dcbfa8fb96eaa0537dcd82b11ce2e4c84aa400",
+        "references/recovery.md": "abb4f7b8913495236f20154e033a2ea5b86898cc3eaf9e7e215064544e7f764d",
+        "references/run-rules.md": "71698a38b0c66e769845dd77e4f8af5d76aed76e1a1a8ee235ed6102e5b5f516",
+        "references/run.md": "e74b755e948dc0a731b581930321a88d83cab76dc2b20ab2536ad6e7b33c63bf",
+        "references/compatibility.md": "c5169bcdfa5aeb66d7eac5e2633a9f0340b9143e849a8fabc7bad6e63f694d2a",
+        "references/preparation-handoff.md": "99e2615d8cef8ceb566d5d8cacd5b44fbea8f647e6c93340451cefceb2130cee",
+        "references/flow.md": "298d59663187b6213a9c710c9995f0cb5b1c21d3f9f3134e7e1f8c4d5c0696b4",
+        "references/flow-config.md": "66148683a5f91db8950372d1ba99e970fec0b0987d7df4a66001e99784a0d86c",
+        "references/dispatch.md": "e9994e3203b9d197ac001f0f73f6f7c0b45b6ea234b28be0436b0d4ab5d21529",
+        "scripts/run_guard.py": "35ce06345540f47d2fc000e7cee01f13f846f8e0821d7ceee848c68a10d71cd3",
+        "scripts/closeout.py": "190f298dd14c713479711bc1e57ab3176919234e40f86c5a2380d386ee0c5074",
+        "scripts/list_summary.py": "553b9aea7fc419ca0664a11ea5995a2c84f3794eba599b843c2441e570f855f9",
+        "scripts/scheduler.py": "0acc2bf105b3adf2137f8cc24b03a0b81b1ed2057de2f9631fdd8a4068702f94",
+        "scripts/list_legacy_011.py": "d770ab0fd28896f3c7ada66880c67cb1a5f9a4dfabb22a389242ac7717790dca",
+        "scripts/process_view.py": "56736f2f9408254e8ed582fcfd01444597e6e10ddf4b0a714fcf69ac36c8ee3b",
+        "scripts/list_legacy_010.py": "53458f2ac348e40d8ad2fce3ffe69e99e097a75605fffd11caef74b40d859c2d",
+        "assets/run.md": "9e801c24bc19cc03226060e51d7e0c5e40c4e6d1b8f8a16f0f2c088a64ef3392",
+        "assets/task.md": "b76ca52b67a5a2d2636779ad0ca64783d73c5262aa19c7164dcbc368977d84ac",
+        "assets/project/README.md": "86230a87be63b33fcd1c5ec0ebaf1ac8e55dcf952b0f3de0ec495f27e0d75dcb",
+        "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "assets/project/tasks/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "assets/project/runs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "frozen_equals_source": true
+    },
+    "cohestra": {
+      "release": {
+        "version": "0.19.0",
+        "protocol_version": "0.8",
+        "repository": "https://github.com/yuzio-ai/skills",
+        "skill_path": "cohestra"
+      },
+      "manifest": {
+        "LICENSE": "3b700ba324cdba598f01d0a6bd3566ec907c2165b3cb20ab8458381848ac0e61",
+        "release.json": "498190f799c80485c94b0975fc92e918501dc8e600d91224a8a0157fdb5eb92a",
+        "SKILL.md": "772e96cc432a0734cc7a4a8953c976ce1d6cc838e51d07424ff9875388957706",
+        "references/publication.md": "bb732f7b2e25799450253d8587be8b103de5fc9905f42f2b9ad3b03dba835d29",
+        "references/storage.md": "b8a70562b1682f3f0f14fa52248d475ebac1778afecaab7c3f82245752ab796a",
+        "references/retention.md": "ef0befd3e6b25cee0710a327ac10a8f32a27a98c1ca6a743279b848df0f4deef",
+        "references/fix.md": "20bd08bb1983078143f6ddf388567ff8b070be850b9d93073e66ec2ef51fa7cb",
+        "references/need.md": "281cab0421ebae1b712287ef46c3ffbda2e4d3f690f8b5e8d665da6029584692",
+        "references/closeout.md": "e7038086ac64747bbb5a1477a3c5e6cf002f6e40bbc7efea842257531a5fc6e7",
+        "references/validate.md": "3375861bb8c0b90956b3f1b94bf65bd0c2b6848d4f50f948c5ad6fde5f93cf7b",
+        "references/confirmation-handoff.md": "28c5028e4988b0b5eefd5bcea4ec6870db1befb912500adb97662630f1ff44e2",
+        "references/report.md": "36065ea5ef86d1bdbd13925cbb0ef01c90e200c3456ad49d18139d1603617a39",
+        "references/verify.md": "7590b5cf5b435bac3215f3e35da001391e2087c125d69efc9a7d2df3bb7e233c",
+        "references/workflow.md": "9e8964a7365081ad272f17ae88cbabc7b64da5a786cf837025d718f8b0b93b98",
+        "references/init.md": "6554da52d5c42db19c668584c12698906fea1bb10d74b220c8b611ef574c7ea3",
+        "references/review-coverage.md": "7ec7a5dace8a47bdcae98186c052a0fd64a71274c75085552df0acf892fab27d",
+        "references/design.md": "7661f0f982e6ed2a12964fad72b498e399ca98c2c0f29fd2f90cce3332d29f88",
+        "references/code.md": "548906e27cf06c49de62e4aad8eb62ad8b611728933a3082eca0bd0044773abf",
+        "references/clarification.md": "0d0be92640fe4aefe4c4626e79ab916cd7adbdbab46fd4fbd916f94b8222829f",
+        "references/review.md": "40a9b505d5628977d36dd3073c1c63c9bcd2e34db4089e8adde1cbb3ad9b399e",
+        "references/installation.md": "56dfbd8ccb4a8eceadda31dcd13435827420c84fbe1e7bfdd87b75c6ee1c92bc",
+        "assets/task-index.md": "68b5098a4e2f47fd2c05eac07bc0033f0ea793f88eb07aad19b00d1e779469be",
+        "assets/handoff.md": "33705d23b719f774ae6bb8993bb92105d5fd495f77a3dcc99b7be79284b12539",
+        "assets/project/README.md": "7d7a920cd7b29b8fceb86a8ec7d984748252dd42dfaa325956166e489e25e156",
+        "assets/project/.gitignore": "55fc6f847a63ef635086eccb91bd60a60f5ad3c647274aa58312cd96faa0b111",
+        "assets/project/retrospectives/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "assets/project/handoffs/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "frozen_equals_source": true
+    }
+  },
+  "independent_agents": [
+    "/root/forward_normal",
+    "/root/forward_ready",
+    "/root/forward_report"
+  ],
+  "cases": [
+    {
+      "case": "normal",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "notes-cleanup",
+        "title": "文档 · 整理 Notes 内容",
+        "revision": 1,
+        "preparation": "ready",
+        "ready_scope": {
+          "revision": 1,
+          "scope": {
+            "mode": "parallel",
+            "files": [
+              "notes.md"
+            ],
+            "dirs": []
+          },
+          "inputs": {
+            "notes.md": "31f369775abc9cd823c52e454b536c3475665aebe8d6842790b8086276098817",
+            "AGENTS.md": "3d6987df8787bfd7447e25fd21c3123895b53a0b9744cf045d8cff264329dd9b"
+          }
+        },
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/notes-cleanup/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "notes-cleanup",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": "code",
+          "allowed": true,
+          "reason": "stage_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "13db0eb0b569861e454f21902dcb53887bf5f747c2067870306ac75eeee57af2",
+      "handoffs": {
+        "design-01.md": "b6825bba6e005544f90cc558b9adcd2fd3419d0d3fc4bfce333bf2fec500089f",
+        "need-02.md": "4f95751225236414bb910ab67a37f0664d1a9f6a954490f51ee19a81b861524f",
+        "README.md": "e4aab85d6a5d5a4e46e170b55fa0614536e5b033ca1f358b7c4599eba904657b",
+        "need-01.md": "9ee35c67fc50b19c368bdfa7354682f01b326f1e7d5dccc7d635ec2b2dd966f3",
+        "design-02.md": "705f865225955f3cd70382ed2d4c3960b520bfb3868e760034456f7eb511df85"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "direct",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "paper-notes",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "ready",
+        "ready_scope": {
+          "revision": 1,
+          "scope": {
+            "mode": "parallel",
+            "files": [
+              "notes.md"
+            ],
+            "dirs": []
+          },
+          "inputs": {
+            "notes.md": "31f369775abc9cd823c52e454b536c3475665aebe8d6842790b8086276098817",
+            "AGENTS.md": "3d6987df8787bfd7447e25fd21c3123895b53a0b9744cf045d8cff264329dd9b"
+          }
+        },
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/paper-notes/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "paper-notes",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": "code",
+          "allowed": true,
+          "reason": "stage_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "d834b82a0c585d133d46d4a9e95784edf9c8dde2a8a26b6e51392852b81f42b8",
+      "handoffs": {
+        "design-01.md": "46204e8527502bed0ea30065689e8dd4131ae3625344ff0d8b35558d4b6adf5b",
+        "README.md": "9f932d8fb1aca72928a1c0f66fa8436f885768ad91054e6c5ef654f51e120186",
+        "design-02.md": "843574d39809a0960418d5f03171f7ba440139187dd9423a20630e702dc3789d"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "no-approval",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "no-approval",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/no-approval/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "no-approval",
+        "status": "blocked",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "blocked",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "human_decision_required"
+        },
+        "blocked": {
+          "value": true,
+          "reason": "human_decision_required"
+        }
+      },
+      "task_sha256": "3d9f6330cc87779a21659299df845e0d4cfa5edf0d92f1e714610718fb63b250",
+      "handoffs": {
+        "design-01.md": "46204e8527502bed0ea30065689e8dd4131ae3625344ff0d8b35558d4b6adf5b",
+        "README.md": "6c9f50903bd1b470f540650c8a696b8e3a4edfa49b7ab5a45f0aecf9e1b661ca"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "changed-plan",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "changed-plan",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/changed-plan/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "changed-plan",
+        "status": "blocked",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "blocked",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "human_decision_required"
+        },
+        "blocked": {
+          "value": true,
+          "reason": "human_decision_required"
+        }
+      },
+      "task_sha256": "236ac6feca5a78e98574e3adda94534f4a622d5b502e2b0c6e2764cb9277baeb",
+      "handoffs": {
+        "design-01.md": "2b147442e3cbee6816a52a23428ee0280f274b08e79c8aa115d9c4e0afd799c8",
+        "README.md": "00ee668a927b171ee344daad0dc8141524643e1f7af25c911f23e9fcf1f974b4"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "unresolved",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "unresolved",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/unresolved/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "unresolved",
+        "status": "blocked",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "blocked",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "human_decision_required"
+        },
+        "blocked": {
+          "value": true,
+          "reason": "human_decision_required"
+        }
+      },
+      "task_sha256": "23978995410334dfe25d0976d2479d426fc32fbcb1730ff6ed68fdd3e28cc470",
+      "handoffs": {
+        "design-01.md": "4dd121ce65c78eb80bb6d830bc79fb9de61fb3640cf26f50321c1d268376af94",
+        "README.md": "873675fde2eaf3d78b6e30fc80cd3147f9c4b24bbdf637749dc84b013ae879a3"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "design-only",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "design-only",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/design-only/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "design-only",
+        "status": "completed",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "completed",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "task_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "c1b81928c0a185a18b7381eeb4011f2b2c85a024d36597ff54b1e164439df83f",
+      "handoffs": {
+        "design-01.md": "fe23de8c0ec70bd0db863d1c0b3a784879c90a19d11350ba5e58dace6b9f40c8",
+        "README.md": "defbc9f90ea5a4200bf5c662ca97450af54c6edc8081b30b0cc4ae43a5f65d4b"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "need-approved",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "need-approved",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/need-approved/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "need-approved",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "need",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": "design",
+          "allowed": true,
+          "reason": "stage_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "bc3e4f4935ae301c9f714bd7e787f5e29f502e82b7579f8ab8acb8e9a958d0a9",
+      "handoffs": {
+        "need-02.md": "b0fa416b0fbf5c5de4ee9bcdf7a87e01418628fbbeb4846eadcf32ee6d1dc47f",
+        "README.md": "049e3bef5588eb461276227fb8a54e71e992035f5cb1548686288e36892e3919",
+        "need-01.md": "a9a4fc37b3bdd4649b686d20893340d1f8cb683692163c7d83a777a9d6e6b690"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "sync-recovery",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "paper-notes",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "ready",
+        "ready_scope": {
+          "revision": 1,
+          "scope": {
+            "mode": "parallel",
+            "files": [
+              "notes.md"
+            ],
+            "dirs": []
+          },
+          "inputs": {
+            "notes.md": "31f369775abc9cd823c52e454b536c3475665aebe8d6842790b8086276098817",
+            "AGENTS.md": "3d6987df8787bfd7447e25fd21c3123895b53a0b9744cf045d8cff264329dd9b"
+          }
+        },
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/paper-notes/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "paper-notes",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": "code",
+          "allowed": true,
+          "reason": "stage_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "f1bb049318e0349ad14e92b0c2e760b12962e670e8fb0777f013b6db7f98bb00",
+      "handoffs": {
+        "design-01.md": "46204e8527502bed0ea30065689e8dd4131ae3625344ff0d8b35558d4b6adf5b",
+        "README.md": "088e6ca1a056fe070b15a02cae50172e7e8ac2b8dd348c72ba8b42513d1eca96",
+        "design-02.md": "843574d39809a0960418d5f03171f7ba440139187dd9423a20630e702dc3789d"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "old-capability",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "no-approval",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/no-approval/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "no-approval",
+        "status": "blocked",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "blocked",
+          "round": 1
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": null,
+          "allowed": false,
+          "reason": "human_decision_required"
+        },
+        "blocked": {
+          "value": true,
+          "reason": "human_decision_required"
+        }
+      },
+      "task_sha256": "f5d66a079405a1db3d53201fd36679eaf2eb2cefde181db4e55d5f000e734b1f",
+      "handoffs": {
+        "design-01.md": "46204e8527502bed0ea30065689e8dd4131ae3625344ff0d8b35558d4b6adf5b",
+        "README.md": "6c9f50903bd1b470f540650c8a696b8e3a4edfa49b7ab5a45f0aecf9e1b661ca"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    },
+    {
+      "case": "concurrent",
+      "task_header": {
+        "protocol": "0.12",
+        "slug": "no-approval",
+        "title": "使用说明整理",
+        "revision": 1,
+        "preparation": "draft",
+        "ready_scope": null,
+        "origin": null,
+        "priority": "medium",
+        "dependencies": [],
+        "flow": "code",
+        "execution_policy": {
+          "stop_queue_on_failure": false
+        },
+        "cohestra_task": ".yuzio/cohestra/handoffs/no-approval/",
+        "revision_base": null,
+        "changed_fields": []
+      },
+      "cohestra_header": {
+        "contract": "0.8",
+        "task": "no-approval",
+        "status": "in_progress",
+        "execution_mode": "attended",
+        "stage_result": {
+          "stage": "design",
+          "status": "completed",
+          "round": 2
+        },
+        "candidate": {
+          "commit": null,
+          "snapshot": null
+        },
+        "next": {
+          "stage": "code",
+          "allowed": true,
+          "reason": "stage_completed"
+        },
+        "blocked": {
+          "value": false,
+          "reason": null
+        }
+      },
+      "task_sha256": "351fc6179c58018f615fd4bc7ebcfc12754adbcc9ebcbb1fcb6ab4a7d99e69c8",
+      "handoffs": {
+        "design-01.md": "46204e8527502bed0ea30065689e8dd4131ae3625344ff0d8b35558d4b6adf5b",
+        "README.md": "cdb66d05b9a1cd35e40b7abec53b7bbaedc122a532b4345f3829265105890354",
+        "design-02.md": "9fc2ae24e34dfde1527980c7cfccb3feb36cef228b300894fb9915713cba64d5"
+      },
+      "notes_unchanged": true,
+      "no_run": true
+    }
+  ],
+  "direct_repeat": {
+    "round_unchanged": 2,
+    "no_new_handoff": true
+  },
+  "concurrent_observation": {
+    "trigger": "design-02 created",
+    "before": "37f7202a32cbb013c31e39ff1b78de4c7a32610a76ae735b3e99926619f9bff5",
+    "after": "351fc6179c58018f615fd4bc7ebcfc12754adbcc9ebcbb1fcb6ab4a7d99e69c8"
+  },
+  "history": {
+    "original_run_sha256": "1a47be06eb63c45973f8408541c46b233289e3b97999e95738d72fe47458d180",
+    "report_sha256": "7ae31273c8e5e93d42731d758015a25cf3043562f69a66424790348230636390",
+    "old_report_sha256": "5f62ca680335d0b9332267a51fb9175c9e4f9bdc87ca2e101133b6c65f640dc4",
+    "run_changed_only_reports": true,
+    "report01_unchanged": true,
+    "process_reader_unchanged_bytes": true,
+    "tasks": 9,
+    "calls": 34,
+    "events": 255,
+    "verification_outcomes": {
+      "passed": 32,
+      "failed": 6
+    },
+    "monthly_calls": [
+      {
+        "stage": "code",
+        "stage_result": {
+          "stage": "code",
+          "status": "completed",
+          "round": 1
+        },
+        "findings": null,
+        "acceptance": null
+      },
+      {
+        "stage": "review",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 1
+        },
+        "findings": {
+          "blocking": 1,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": null
+      },
+      {
+        "stage": "fix",
+        "stage_result": {
+          "stage": "fix",
+          "status": "completed",
+          "round": 1
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": null
+      },
+      {
+        "stage": "review",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 2
+        },
+        "findings": {
+          "blocking": 1,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": null
+      },
+      {
+        "stage": "fix",
+        "stage_result": {
+          "stage": "fix",
+          "status": "completed",
+          "round": 2
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": null
+      },
+      {
+        "stage": "review",
+        "stage_result": {
+          "stage": "review",
+          "status": "completed",
+          "round": 3
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": null
+      },
+      {
+        "stage": "validate",
+        "stage_result": {
+          "stage": "validate",
+          "status": "blocked",
+          "round": 1
+        },
+        "findings": {
+          "blocking": 0,
+          "non_blocking": 0,
+          "unresolved": 0
+        },
+        "acceptance": {
+          "status": "blocked"
+        }
+      }
+    ],
+    "compact_bytes": 168832
+  },
+  "validation": {
+    "unittest_count": 517,
+    "unittest_skipped": 0,
+    "full_history": true,
+    "quick_validate": [
+      "cadra",
+      "cohestra"
+    ]
+  },
+  "boundaries": [
+    "initial blocked and negative inputs were synthetic fixtures",
+    "index sync failure input was injected by restoring the previous README, not an observed filesystem failure",
+    "Task concurrency was a real atomic external edit after handoff creation",
+    "original engineering/device evidence not rerun or verified",
+    "live installed skills unchanged"
+  ],
+  "post_review_fix": {
+    "finding": "P2: malformed recorded delivery contracts were projected as recorded without gaps",
+    "scope": "recorded Cohestra contract validation only; initial package manifests remain pre-fix historical evidence",
+    "candidate_files": {
+      "cadra/scripts/process_view.py": "f2f4d9b11251bc9bf06e3e931c6efa65931ab42050e40bf2a3754f8d48e6c776",
+      "cadra/references/report.md": "cec702a583eb9a5aac35f5d5a4bb7674190c5dd40401aa18769cea3514624be5"
+    },
+    "targeted_tests": 13,
+    "independent_reviewer": "/root/review_process",
+    "independent_verdict": "original P2 fixed; no new actionable issue or valid-contract rejection found",
+    "cli_counterexamples": {
+      "count": 4,
+      "exit_code": 1,
+      "stdout": "",
+      "input_bytes_unchanged": true
+    },
+    "compatibility": [
+      "direct and wrapped snapshots",
+      "missing/null findings and acceptance",
+      "missing/null unresolved",
+      "whole contract absent remains unknown"
+    ],
+    "history_copies": [
+      {
+        "run": "run-20261101-01.md",
+        "tasks": 3,
+        "calls": 4,
+        "sha256": "78a4faee34f0c46490c546218a7dcaa8f038ac2719f0756704961f00c965572a",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261101-02.md",
+        "tasks": 2,
+        "calls": 7,
+        "sha256": "67c2e9f28efca01a4a3f7c6f459618bd3a203893dcdbbe89ef7676158fe1a68c",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261102-01.md",
+        "tasks": 2,
+        "calls": 3,
+        "sha256": "b22cf1a333f5304fdc8ae3e2ee25d78f4fae6758ce29d259ecbd8abf6dc3332a",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261102-02.md",
+        "tasks": 1,
+        "calls": 1,
+        "sha256": "cf1130ece8d777023fedf71fbe6a8aff9b00c6b1010740da32862cb078028576",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261103-01.md",
+        "tasks": 2,
+        "calls": 2,
+        "sha256": "7c761d9aab162f7edb5c06933367c052671ace2c37788543eb253d1aae8b08dc",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261103-02.md",
+        "tasks": 2,
+        "calls": 10,
+        "sha256": "d205803b8f59e4d6c8a1ef0a256c1e4851d351d7f6e73c594fdff25645329056",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261107-01.md",
+        "tasks": 9,
+        "calls": 34,
+        "sha256": "1a47be06eb63c45973f8408541c46b233289e3b97999e95738d72fe47458d180",
+        "copy_unchanged": true,
+        "source_stable": true
+      },
+      {
+        "run": "run-20261107-02.md",
+        "tasks": 2,
+        "calls": 9,
+        "sha256": "c097ebdb7a90abef259bf59c2a87a67b60a2503ac479da9098c2aba2a73eb6bb",
+        "copy_unchanged": true,
+        "source_stable": true
+      }
+    ],
+    "version_policy": "same uncommitted Cadra 0.18.0 delivery; protocols unchanged",
+    "full_suite": {
+      "tests": 521,
+      "skipped": 0,
+      "seconds": 33.322,
+      "result": "passed",
+      "full_history_version_checks": "passed",
+      "quick_validate": "passed"
+    }
+  },
+  "final_review_fix": {
+    "finding": "P2: validate passed completion fields were not jointly checked",
+    "status": "closed after independent re-review",
+    "candidate_files": {
+      "cadra/scripts/process_view.py": "be751c0a937569a45fdc470b16a5db8d038be957a5482dfc1bfd356177d7fff5",
+      "cadra/references/report.md": "9d47ff2147402bc79c7a2074cac6fd2e68bbfcd90f6612d218935ea7d7135536"
+    },
+    "scope": "existing contract 0.8 validate completion consistency; no protocol change or external acceptance reevaluation",
+    "independent_reviewer": "/root/final_review_code",
+    "targeted_tests": 15,
+    "original_cli_counterexample": {
+      "exit_code": 1,
+      "stdout": "",
+      "input_bytes_unchanged": true
+    },
+    "compatibility": [
+      "valid direct/wrapped validate completion",
+      "retained prior acceptance on non-validate stages"
+    ],
+    "history_copies": [
+      {
+        "run": "run-20261101-01.md",
+        "tasks": 3,
+        "calls": 4,
+        "sha256": "78a4faee34f0c46490c546218a7dcaa8f038ac2719f0756704961f00c965572a",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261101-02.md",
+        "tasks": 2,
+        "calls": 7,
+        "sha256": "67c2e9f28efca01a4a3f7c6f459618bd3a203893dcdbbe89ef7676158fe1a68c",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261102-01.md",
+        "tasks": 2,
+        "calls": 3,
+        "sha256": "b22cf1a333f5304fdc8ae3e2ee25d78f4fae6758ce29d259ecbd8abf6dc3332a",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261102-02.md",
+        "tasks": 1,
+        "calls": 1,
+        "sha256": "cf1130ece8d777023fedf71fbe6a8aff9b00c6b1010740da32862cb078028576",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261103-01.md",
+        "tasks": 2,
+        "calls": 2,
+        "sha256": "7c761d9aab162f7edb5c06933367c052671ace2c37788543eb253d1aae8b08dc",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261103-02.md",
+        "tasks": 2,
+        "calls": 10,
+        "sha256": "d205803b8f59e4d6c8a1ef0a256c1e4851d351d7f6e73c594fdff25645329056",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261107-01.md",
+        "tasks": 9,
+        "calls": 34,
+        "sha256": "1a47be06eb63c45973f8408541c46b233289e3b97999e95738d72fe47458d180",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261107-02.md",
+        "tasks": 2,
+        "calls": 9,
+        "sha256": "d9d31c9c27e19347e06615c7f8e843e7711e636aff5ea925cc782eed1ae37b0b",
+        "copy_unchanged": true
+      },
+      {
+        "run": "run-20261107-03.md",
+        "tasks": 4,
+        "calls": 2,
+        "sha256": "f0ee52b4a7553b4c7457158ec06dec50e92b6a0e10367df998855650eb8cdb92",
+        "copy_unchanged": true
+      }
+    ],
+    "version_policy": "same uncommitted Cadra 0.18.0 delivery",
+    "full_suite": {
+      "tests": 523,
+      "skipped": 0,
+      "seconds": 36.153,
+      "result": "passed",
+      "full_history_version_checks": "passed",
+      "quick_validate": "passed"
+    },
+    "review_status": "rules review clear; final code re-review closed P2 with no new actionable issue"
+  }
+}

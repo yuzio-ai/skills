@@ -14,6 +14,8 @@ $cadra ready
 
 起点项遇到已有交付、Run 执行依据或定义修订时，按 Task 规则加载完整契约/重启准入；add 已记录的身份确认可沿用，执行材料缺口不能据此豁免。
 
-通过写 preparation=ready 和当前 revision 的 ready_scope；失败写 draft、清空 ready_scope 并列缺口。Gate 记录绑定 revision，保留旧历史，不重复追加同一修订的等价通过记录。回读后，无未完成 Run 时推荐 `$cadra run` 加范围；已有 running Run 时推荐 `$cadra append` 加明确 slug；其他情况按恢复边界说明，或继续准备任务。不建立 Run、不调用阶段。
+当前 need/design 唯一缺口是已有确认尚未正式交接时，读取并按 [准备交接补齐](preparation-handoff.md) 处理，再重核 Gate。仅此路径可调用 Cohestra 收敛当前人工阶段；其他失败仍只列缺口，不开展新需求、设计或工程阶段。
+
+通过写 preparation=ready 和当前 revision 的 ready_scope；失败写 draft、清空 ready_scope 并列缺口。Gate 记录绑定 revision，保留旧历史，不重复追加同一修订的等价通过记录。回读后，无未完成 Run 时推荐 `$cadra run` 加范围；已有 running Run 时推荐 `$cadra append` 加明确 slug；其他情况按恢复边界说明，或继续准备任务。不建立 Run、不调用工程阶段。
 
 普通 ready 不为 origin 非 null 的生成任务单独授权执行；其 Gate 由来源 Run 的内部 [收尾准备](closeout.md) 复用本页检查，执行前仍须全部满足。

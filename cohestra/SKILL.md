@@ -33,7 +33,7 @@ license: MIT
 4. 写交付时读取对应骨架；正式阶段和 verify 准备更新索引时必须读取[索引发布与恢复](references/publication.md)。先确认发布前校验成功，再用后续工具调用发布；校验失败不得继续。init、report 不读发布细则。
 5. 既有项目规范、有效决定和用户授权继续有效；授权、候选、证据、复审、历史和停止规则统一见公共流程。每个阶段执行者交付后停止；单独进入 `review` 默认授权主会话按[审查说明](references/review.md)委派独立 reviewer，仅完成本轮审查。明确调用 `closeout` 授权其主会话按说明启动独立 reviewer 并接续本任务阶段；其余单独阶段不自动启动智能体或推进阶段。提交、推送、发布和多任务调度不属于 closeout。
 6. `verify` 按请求执行，仅在发现具体偏差时建议；不固定提议、不记录未执行核对，不替代 review、复审或 validate。调用方声明 `execution_mode: unattended` 时执行公共流程第 7.4 节，不新增授权或降低门禁，无法合法继续时受阻并停止。
-7. Cadra 派发的阶段按[编排派发](references/workflow.md#编排派发)核对实际角色、候选和来源；本阶段执行者发布 Cohestra 交付与索引，不写 Cadra Run，也不自行启动下一阶段或其他 agent。`closeout` 使用自己的单任务角色与交接规则，不套用 Cadra 调度协议；单独 `review` 按自己的委派规则执行，已派发的 reviewer 不重复委派。
+7. Cadra Run 派发的工程阶段按[编排派发](references/workflow.md#编排派发)核对实际角色、候选和来源；本阶段执行者发布 Cohestra 交付与索引，不写 Cadra Run，也不自行启动下一阶段或其他 agent。入队前 ready 的 need/design 受限准备请求按[确认交接](references/confirmation-handoff.md)执行，不套用 Run 派发。`closeout` 使用自己的单任务角色与交接规则；单独 `review` 按自己的委派规则执行，已派发的 reviewer 不重复委派。
 
 ## 来源与版本
 
