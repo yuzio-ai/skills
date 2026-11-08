@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cadra 0.12 Run publication guard. Stdlib only; never dispatches work.
+"""Cadra 0.12 Run publication guard. Never dispatches work.
 
 Runs use JSON inside YAML Front Matter. Only protocol 0.12 is accepted;
 full provenance and Cohestra contract checks remain the caller's job.
@@ -22,6 +22,10 @@ _spec.loader.exec_module(scheduler)
 _closeout_spec = importlib.util.spec_from_file_location('cadra_closeout', Path(__file__).with_name('closeout.py'))
 closeout = importlib.util.module_from_spec(_closeout_spec)
 _closeout_spec.loader.exec_module(closeout)
+
+_records_spec = importlib.util.spec_from_file_location('cadra_task_records', Path(__file__).with_name('task_records.py'))
+task_records = importlib.util.module_from_spec(_records_spec)
+_records_spec.loader.exec_module(task_records)
 
 STAGES = ('code', 'review', 'fix', 'validate')
 PROTOCOL = '0.12'
@@ -522,6 +526,21 @@ def validate_append(old, new, *, is_closeout=False):
             'append record does not match batch')
 
 
+def verify_admitted_definitions(project, items):
+    root = project / '.yuzio/cadra'
+    raws = {}
+    for item in items:
+        path = task_records.task_path(root, item['slug'])
+        raw = task_records.read_file(path, project)
+        require(raw is not None, f'Task missing at admission: {path}')
+        raws[path] = raw
+    docs = task_records.documents(raws, split_document, read_json)
+    for path, item in zip(raws, items, strict=True):
+        doc = docs[path]
+        require(isinstance(doc['data'], dict) and doc['data'].get('protocol') == PROTOCOL, f'{path}: {PROTOCOL_ERROR}')
+        require(task_records.same_definition(doc, item), f'Task definition changed before admission: {path}')
+
+
 def publish(path, proposed, expected, instance, generation, mode='update', observation=None):
     path = Path(path).absolute()
     require(path.parent.name == 'runs' and path.parent.parent.name == 'cadra' and
@@ -559,6 +578,7 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
                 require(not other.is_symlink(), 'linked historical Run')
                 data, _ = current(other.read_bytes())
                 require(not unfinished(data), 'unfinished Run; do not create another')
+            verify_admitted_definitions(project, new['tasks'])
         else:
             require(raw is not None, 'missing Run')
             old, old_body = current(raw)
@@ -567,6 +587,8 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
                 validate_append(old, new, is_closeout=mode == 'closeout')
                 if mode == 'closeout':
                     require((instance, generation) == (old['executor']['instance_id'], old['executor']['generation']), 'writer does not own Run')
+                else:
+                    verify_admitted_definitions(project, new['tasks'][len(old['tasks']):])
             else:
                 validate_update(old, new)
                 for event in new['scheduler']['events'][len(old['scheduler']['events']):]:

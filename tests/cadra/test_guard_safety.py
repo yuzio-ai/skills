@@ -258,6 +258,7 @@ class GuardSafetyTests(unittest.TestCase):
         task = self.data['tasks'][0]
         task['definition'].update(flow='fix', changed_fields=['requirement'])
         task['start_action'] = {'stage': 'fix', 'source': 'admitted definition restart'}
+        fixtures.write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, fixtures.document(self.data), None, 'first', 1, 'create')
         task['agents'].append(fixtures.binding(agent_id='agent-worker'))
         self.save()
@@ -274,6 +275,7 @@ class GuardSafetyTests(unittest.TestCase):
                 task['definition']['changed_fields'] = ['requirement']
             if missing == 'start':
                 task['start_action']['stage'] = 'review'
+            fixtures.write_admission_tasks(self.path, self.data)
             self.sha = guard.publish(self.path, fixtures.document(self.data), None, 'first', 1, 'create')
             task['agents'].append(fixtures.binding(agent_id='agent-worker'))
             self.save()
@@ -288,6 +290,7 @@ class GuardSafetyTests(unittest.TestCase):
         task = self.data['tasks'][0]
         task['definition'].update(flow='fix', changed_fields=['flow'])
         task['start_action'] = {'kind': 'revision_restart', 'stage': 'fix'}
+        fixtures.write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, fixtures.document(self.data), None, 'first', 1, 'create')
         task['agents'].append(fixtures.binding(agent_id='agent-worker'))
         self.save()

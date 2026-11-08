@@ -11,8 +11,6 @@ import importlib.util
 import json
 from pathlib import Path
 import re
-import shutil
-import subprocess
 from zoneinfo import ZoneInfo
 
 _spec = importlib.util.spec_from_file_location('cadra_list_guard', Path(__file__).with_name('run_guard.py'))
@@ -28,31 +26,6 @@ READ_PROTOCOLS = (legacy.PROTOCOL, legacy011.PROTOCOL, guard.PROTOCOL)
 STATES = ('running', 'waiting', 'queued', 'blocked', 'failed', 'unknown', 'ready', 'draft', 'completed')
 END = {'completed', 'blocked', 'failed', 'skipped'}
 LABELS = dict(code='实现', review='评审', fix='整改', validate='验证')
-RUBY = r'''
-require 'yaml'; require 'json'; require 'date'
-def check(node)
-  raise 'YAML aliases are not accepted' if node.is_a?(Psych::Nodes::Alias)
-  if node.respond_to?(:tag) && node.tag
-    raise 'unsupported YAML tag' unless node.tag.match(/\Atag:yaml.org,2002:(str|int|float|bool|null|map|seq|timestamp)\z/)
-  end
-  if node.is_a?(Psych::Nodes::Mapping)
-    keys = node.children.each_slice(2).map { |k,v| k.value }
-    raise 'duplicate YAML key' unless keys.uniq.length == keys.length
-  end
-  (node.children || []).each { |c| check(c) } if node.respond_to?(:children)
-end
-out = JSON.parse(STDIN.read).map do |raw|
-  begin
-    tree = Psych.parse_stream(raw)
-    raise 'one YAML document required' unless tree.children.length == 1
-    check(tree)
-    {data: YAML.safe_load(raw, permitted_classes: [Date, Time], aliases: false)}
-  rescue => e
-    {error: 'invalid YAML header (' + e.class.name + ')'}
-  end
-end
-print JSON.generate(out)
-'''
 
 
 def require(value, reason):
@@ -68,23 +41,6 @@ def record_reader(protocol):
     if protocol == legacy011.PROTOCOL:
         return legacy011
     raise ValueError('unsupported Cadra protocol for list; only 0.10, 0.11 and 0.12 are readable')
-
-
-def yaml_batch(blocks):
-    if not blocks:
-        return []
-    ruby = shutil.which('ruby')
-    if not ruby:
-        return [{'error': 'YAML parser unavailable: Ruby/Psych required'} for _ in blocks]
-    try:
-        proc = subprocess.run([ruby, '-e', RUBY], input=json.dumps(blocks), text=True,
-                              capture_output=True, timeout=60, check=False)
-        require(proc.returncode == 0, 'YAML parser failed')
-        result = guard.read_json(proc.stdout)
-        require(isinstance(result, list) and len(result) == len(blocks), 'invalid YAML parser response')
-        return result
-    except (OSError, ValueError, subprocess.TimeoutExpired):
-        return [{'error': 'YAML parser unavailable or failed'} for _ in blocks]
 
 
 def creation(data, body, zone):
@@ -107,59 +63,9 @@ def creation(data, body, zone):
 
 def task_valid(data, slug):
     rules = record_reader(data.get('protocol'))
-    require(data.get('slug') == slug and re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug), 'Task identity mismatch')
-    require(isinstance(data.get('title'), str) and data['title'].strip(), 'missing Task title')
-    require(type(data.get('revision')) is int and data['revision'] > 0, 'invalid Task revision')
-    require(data.get('preparation') in ('draft', 'ready'), 'invalid preparation')
-    require(data.get('priority', 'medium') in ('high', 'medium', 'low'), 'invalid priority')
-    require(data.get('cohestra_task') == f'.yuzio/cohestra/handoffs/{slug}/', 'Task binding mismatch')
-    deps = data.get('dependencies', [])
-    require(isinstance(deps, list) and all(isinstance(d, str) and d for d in deps), 'invalid dependencies')
-    rules.normalize_flow(data.get('flow', 'code'), data['protocol'])
+    guard.task_records.validate_task(data, slug, rules)
     if rules is guard:
         guard.closeout.origin(data)
-
-
-def same_definition(task, item):
-    definition = item['definition']
-    current = task['data']
-    # Snapshots may add requirement/source_document; all Task header fields
-    # must still match while owned by an unfinished Run.
-    if any(definition.get(k) != v for k, v in current.items()):
-        return False
-    documents = [definition[k] for k in ('source_document', 'definition_record') if k in definition]
-    if documents and any(not isinstance(value, str) or value != task['raw'].decode('utf-8') for value in documents):
-        return False
-    section = re.search(r'^## Requirement\s*\n(.*?)(?=^## |\Z)', task['body'], re.M | re.S)
-    if section and 'requirement' in definition:
-        return isinstance(definition.get('requirement'), str) and definition['requirement'].strip() == section[1].strip()
-    return bool(documents)
-
-
-def tail(entries, revision, protocol, unfinished_runs=()):
-    if not entries:
-        return None
-    children = {}
-    for run_id, item in entries.items():
-        require(item['definition']['protocol'] == protocol, 'cross-protocol source chain is not supported')
-        require('previous_run' in item, 'missing previous_run')
-        previous = item['previous_run']
-        require(previous is None or isinstance(previous, str) and previous in entries, 'missing source Run')
-        require(previous not in unfinished_runs,
-                f'Run lifecycle contradiction: unfinished predecessor {previous} has successor {run_id}')
-        require(previous not in children, 'branched source chain')
-        require(item['revision'] <= revision, 'Run revision exceeds Task')
-        children[previous] = run_id
-    seen, key, prior = set(), children.get(None), 0
-    last = None
-    while key is not None and key not in seen:
-        seen.add(key)
-        last = (key, entries[key])
-        require(last[1]['revision'] >= prior, 'revision regressed along source chain')
-        prior = last[1]['revision']
-        key = children.get(key)
-    require(key is None and len(seen) == len(entries), 'cyclic or disconnected source chain')
-    return last
 
 
 def action(item, gaps=()):
@@ -339,7 +245,7 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
                 blocks.append(block)
         except (OSError, ValueError, UnicodeError) as exc:
             docs[p] = dict(error=str(exc))
-    for p, parsed in zip(yaml_paths, yaml_batch(blocks)):
+    for p, parsed in zip(yaml_paths, guard.task_records.yaml_batch(blocks, guard.read_json)):
         docs[p].update(parsed)
 
     tasks, runs, entries = {}, {}, defaultdict(dict)
@@ -415,10 +321,10 @@ def summarize(project, slugs=(), states=(), expand_completed=False, history=Fals
             continue
         try:
             require(not global_unknown, 'Run ownership/closure cannot be established; see global issues')
-            last = tail(entries[slug], task['data']['revision'], task['data']['protocol'], unfinished)
+            last = guard.task_records.tail(entries[slug], task['data']['revision'], task['data']['protocol'], unfinished)
             if slug in owners:
                 _, item = owners[slug]
-                require(item['revision'] == task['data']['revision'] and same_definition(task, item),
+                require(item['revision'] == task['data']['revision'] and guard.task_records.same_definition(task, item),
                         'unfinished Run definition/revision differs from Task')
             if last:
                 rid, item = last

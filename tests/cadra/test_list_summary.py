@@ -203,10 +203,10 @@ class ListSummaryTests(unittest.TestCase):
             task = self.task(slug)
             raw = '\n'.join(f'{k}: {json.dumps(v, ensure_ascii=False)}' for k, v in task.items())
             (self.tasks / (slug + '.md')).write_text('---\n' + raw + '\n---\n')
-        with patch.object(reader.subprocess, 'run', wraps=subprocess.run) as proc:
+        with patch.object(reader.guard.task_records.subprocess, 'run', wraps=subprocess.run) as proc:
             self.assertEqual(self.summary()['counts'], {'ready': 2})
             self.assertEqual(proc.call_count, 1)
-        with patch.object(reader.shutil, 'which', return_value=None):
+        with patch.object(reader.guard.task_records.shutil, 'which', return_value=None):
             self.assert_unknown(self.summary(), 'YAML parser unavailable')
         for raw in ('protocol: "0.11"\nprotocol: "0.11"', 'slug: &x camera\ntitle: *x',
                     'slug: !!python/object:bad {}', 'slug: [unterminated'):

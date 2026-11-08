@@ -1,6 +1,6 @@
 # ready
 
-读 [公共流程](workflow.md)、[Task 与 Ready Gate](task-rules.md)、[Flow](flow.md)。
+读[公共流程的身份、状态、写入规则](workflow.md#身份与归属)、[Ready Gate](task-rules.md#ready-gate)、[Flow 配置](flow-config.md)和[准备入口](prepare.md)。普通路径必须按准备入口三批完成。先读取目标及归属，再核验依据和预检，最后写前复核、原子保存并回读。仅加载本任务命中的条件规则。
 
 ```text
 $cadra ready
@@ -12,7 +12,9 @@ $cadra ready
 
 解析当前展示状态及 Run 归属，仅接受 draft/ready 且不属于未完成 Run 的任务。读取本 Task、依赖当前状态和必要输入，按唯一 Ready Gate 逐项核对；不修改需求定义；在既有范围／输入项计算 ready_scope，见 [小组调度](scheduling.md)。补充改变定义时先指向 add。
 
-起点项遇到已有交付、Run 执行依据或定义修订时，按 Task 规则加载完整契约/重启准入；add 已记录的身份确认可沿用，执行材料缺口不能据此豁免。
+附件摘要匹配且确认对象和来源可核对时，使用 Task 已记录的决定核对 Gate。只有缺件、摘要不符或确认结论冲突才进一步查对应资料。不重做产品方案调查。按[预检](preflight.md)运行本任务需要的已知检查。每项对相同输入只执行一次。写前检查输入变化，变化时只重检受影响的项。分别列预计写范围和有明确依据的输入路径，独占任务也不递归给写入目录做指纹。
+
+起点项遇到已有交付、Run 执行依据或定义修订时，按 [Flow](flow.md) 与 Task 规则加载适用的完整契约／重启准入。add 已记录的身份确认可沿用，执行材料缺口不能据此豁免。工程交付终点按 [Flow 对应章节](flow.md#工程交付终点)核对。
 
 当前 need/design 唯一缺口是已有确认尚未正式交接时，读取并按 [准备交接补齐](preparation-handoff.md) 处理，再重核 Gate。仅此路径可调用 Cohestra 收敛当前人工阶段；其他失败仍只列缺口，不开展新需求、设计或工程阶段。
 

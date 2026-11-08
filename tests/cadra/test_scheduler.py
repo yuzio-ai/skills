@@ -13,7 +13,7 @@ import sys
 import tempfile
 import unittest
 
-from .test_run_guard import guard, example, raw_document, binding, pending, AT
+from .test_run_guard import guard, example, raw_document, binding, pending, AT, write_admission_tasks
 from .test_cadra import contract
 
 schedule = guard.scheduler
@@ -46,6 +46,7 @@ class SchedulerTests(unittest.TestCase):
                                                inputs={}, evidence='synthetic ready input audit'))
             (self.root / (slug + '.swift')).write_text('// original ' + slug + '\n')
         self.clock = datetime.fromisoformat(AT)
+        write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, raw_document(self.data), None, 'first', 1, 'create')
 
     def now(self):
@@ -325,6 +326,7 @@ class SchedulerTests(unittest.TestCase):
     def test_finished_stage_finalizes_after_peer_policy_stop_without_file_grant(self):
         self.data['tasks'][0]['definition']['execution_policy'] = {'stop_queue_on_failure': True}
         self.path.unlink()
+        write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, raw_document(self.data), None, 'first', 1, 'create')
         self.group(); self.stage('a')
         self.stage('b'); self.close_stage('b', 'review')
@@ -452,6 +454,7 @@ class SchedulerTests(unittest.TestCase):
         # Frozen policy must be configured in the initial admitted definition.
         base=deepcopy(self.data);base['tasks'][0]['definition']['execution_policy']={'stop_queue_on_failure':True}
         self.path.unlink();self.data=base
+        write_admission_tasks(self.path, base)
         self.sha=guard.publish(self.path,raw_document(base),None,'first',1,'create')
         self.group();self.stage('a');self.stage('b');self.close_stage('b')
         self.event('abort',slug='a',call_id=1,stop=self.proof('a'),state='failed',reason='failed',source='stop audit')
@@ -463,6 +466,7 @@ class SchedulerTests(unittest.TestCase):
     def finish_policy_group(self, stop_queue=True):
         self.data['tasks'][0]['definition']['execution_policy'] = {'stop_queue_on_failure': stop_queue}
         self.path.unlink()
+        write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, raw_document(self.data), None, 'first', 1, 'create')
         self.group(); self.stage('a'); self.stage('b'); self.close_stage('b', 'review')
         self.stage('b', 'review'); self.close_stage('b', 'validate')
@@ -594,6 +598,7 @@ class SchedulerTests(unittest.TestCase):
         self.data['tasks'][0]['definition']['flow']=['review']
         self.data['tasks'][0]['start_action']['stage']='review'
         self.path.unlink()
+        write_admission_tasks(self.path, self.data)
         self.sha=guard.publish(self.path,raw_document(self.data),None,'first',1,'create')
         self.group();self.stage('a','review');self.close_stage('a',None)
         self.wait('a','finalization',cand=fixed({'a.swift':'a'*64}))
@@ -691,7 +696,9 @@ class SchedulerTests(unittest.TestCase):
 
     def test_prepared_dispatch_rechecks_failure_policy_and_accepts_historical_registration(self):
         self.data['tasks'][0]['definition']['execution_policy']={'stop_queue_on_failure':True}
-        self.path.unlink();self.sha=guard.publish(self.path,raw_document(self.data),None,'first',1,'create')
+        self.path.unlink()
+        write_admission_tasks(self.path, self.data)
+        self.sha=guard.publish(self.path,raw_document(self.data),None,'first',1,'create')
         self.group();self.stage('a');self.stage('b',dispatch=False)
         self.event('abort',slug='a',call_id=1,stop=self.proof('a'),state='failed',reason='known failure',source='actual synthetic stop')
         proposal=deepcopy(self.data);call=proposal['tasks'][1]['calls'][-1]
@@ -757,7 +764,9 @@ class SchedulerTests(unittest.TestCase):
 
     def test_historical_marker_cannot_authorize_dispatch_after_stop(self):
         self.data['tasks'][0]['definition']['execution_policy']={'stop_queue_on_failure':True}
-        self.path.unlink();self.sha=guard.publish(self.path,raw_document(self.data),None,'first',1,'create')
+        self.path.unlink()
+        write_admission_tasks(self.path, self.data)
+        self.sha=guard.publish(self.path,raw_document(self.data),None,'first',1,'create')
         self.group();self.stage('a');self.stage('b',dispatch=False)
         self.event('abort',slug='a',call_id=1,stop=self.proof('a'),state='failed',reason='failure',source='host stop')
         proposal=deepcopy(self.data);call=proposal['tasks'][1]['calls'][-1]

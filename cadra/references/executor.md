@@ -20,7 +20,9 @@ list 不落盘、不加锁、不发送消息。明确 resume 授权后也必须�
 
 ## 写入与交接
 
-使用包内 [run_guard.py](../scripts/run_guard.py)，只依赖 Python 标准库及 POSIX 文件锁。它不调用 Agent、不执行项目命令、不证明观察证据真实性；调用者负责上述核实和完整契约/Gate/来源链核验。工具不具备安全锁支持时停止写入，不退化成直接覆盖。
+使用包内 [run_guard.py](../scripts/run_guard.py)，依赖 Python 标准库及 POSIX 文件锁。create／append 读取 YAML Task 时使用既有 Ruby/Psych 读取器。它不调用 Agent、不执行项目命令、不证明观察证据真实性。调用者负责上述核实和完整契约/Gate/来源链核验。工具不具备安全锁支持时停止写入，不退化成直接覆盖。
+
+create／append 在与 [Task 准备入口](prepare.md)共用的锁内，将本次新增条目的冻结定义与当前 Task 比对，变化则停止写入。使用原有提案和参数，已入队条目、历史记录和其他写入模式沿用原规则。
 
 新 Run 使用 JSON 映射作为 YAML Front Matter，便于无外部 YAML 依赖的完整读写；正文仍为 Markdown。[Run 骨架](../assets/run.md) 展示字段，落盘时将头部转换为合法 JSON，不写占位符。Task 仍可使用 YAML。
 

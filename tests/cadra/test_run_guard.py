@@ -73,6 +73,16 @@ def raw_document(data):
     return ('---\n' + json.dumps(data, ensure_ascii=False, indent=2) + '\n---\n\n# Run\n').encode()
 
 
+def write_admission_tasks(run_path, data, start=0):
+    tasks = run_path.parent.parent / 'tasks'
+    tasks.mkdir(exist_ok=True)
+    for item in data['tasks'][start:]:
+        header = deepcopy(item['definition'])
+        requirement = header.pop('requirement', '')
+        (tasks / (item['slug'] + '.md')).write_bytes(
+            raw_document(header) + f'\n## Requirement\n\n{requirement}\n'.encode())
+
+
 def binding(role='worker', agent_id='agent-worker', id_='worker-1'):
     return dict(id=id_, role=role, agent_id=agent_id, host_id='local', created_at=AT,
                 source='host spawn response', supersedes=None, stop_observation=None)
@@ -97,6 +107,7 @@ class RunGuardTests(unittest.TestCase):
         self.runs.mkdir(parents=True)
         self.path = self.runs / 'run-20261025-01.md'
         self.data = example(getattr(self, 'protocol', '0.12'), getattr(self, 'configured_flow', 'code'))
+        write_admission_tasks(self.path, self.data)
         self.sha = guard.publish(self.path, document(self.data), None, 'first', 1, 'create')
 
     def bind_worker(self):

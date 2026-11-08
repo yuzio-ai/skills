@@ -30,6 +30,8 @@ class AppendAgentTests(unittest.TestCase):
     takeover = fixtures.RunGuardTests.takeover
 
     def publish(self, data, mode='update', sha=None):
+        if mode == 'append':
+            fixtures.write_admission_tasks(self.path, data, len(self.data['tasks']))
         return guard.publish(self.path, document(data), sha or self.sha,
                              'first' if mode == 'update' else None, 1 if mode == 'update' else None, mode)
 
@@ -139,7 +141,9 @@ class AppendAgentTests(unittest.TestCase):
         processes = []
         for slug in ('a', 'b'):
             proposal = self.root / (slug + '.md')
-            proposal.write_bytes(document(appended(self.data, (slug,))))
+            data = appended(self.data, (slug,))
+            fixtures.write_admission_tasks(self.path, data, len(self.data['tasks']))
+            proposal.write_bytes(document(data))
             processes.append(subprocess.Popen([sys.executable, '-B', str(SCRIPT), 'append',
                 '--run', str(self.path), '--proposal', str(proposal), '--expected-sha256', self.sha],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE))
@@ -153,6 +157,8 @@ class AppendAgentTests(unittest.TestCase):
         processes = []
         for mode, data in (('append', appended(self.data)), ('update', self.completed())):
             proposal = self.root / (mode + '.md')
+            if mode == 'append':
+                fixtures.write_admission_tasks(self.path, data, len(self.data['tasks']))
             proposal.write_bytes(document(data))
             args = [sys.executable, '-B', str(SCRIPT), mode, '--run', str(self.path),
                     '--proposal', str(proposal), '--expected-sha256', self.sha]

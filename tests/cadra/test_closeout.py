@@ -37,8 +37,8 @@ class Harness:
         task['definition']['ready_scope']['scope'] = dict(mode='parallel', files=['app.py','README.md','old.py'], dirs=[])
         task['definition']['ready_scope']['inputs'] = self.inputs()
         self.data['scheduler'] = guard.scheduler.initial()
-        self.sha = guard.publish(self.path, raw_document(self.data), None, 'first', 1, 'create')
         self.write_task(task['definition'])
+        self.sha = guard.publish(self.path, raw_document(self.data), None, 'first', 1, 'create')
         self.group()
 
     def inputs(self):
@@ -60,6 +60,9 @@ class Harness:
 
     def save(self, data, mode='update', *, who=None):
         owner = data['executor']
+        if mode == 'append':
+            for item in data['tasks'][len(self.data['tasks']):]:
+                self.write_task(item['definition'])
         self.sha = guard.publish(self.path, raw_document(data), self.sha,
                                 who or owner['instance_id'], owner['generation'], mode)
         self.data = deepcopy(data)
@@ -432,6 +435,7 @@ class CloseoutTests(unittest.TestCase):
         h=self.h;h.business_done();h.finish()
         closing=deepcopy(h.data);closing['status']='completed'
         extension=appended(h.data,('concurrent',))
+        h.write_task(extension['tasks'][-1]['definition'])
         processes=[]
         for name,mode,proposal in [('closing','update',closing),('extension','append',extension)]:
             path=h.root/(name+'.md');path.write_bytes(raw_document(proposal))

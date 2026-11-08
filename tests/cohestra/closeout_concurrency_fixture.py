@@ -163,7 +163,7 @@ def shared_resource_result(project):
 
 def seed_cadra(project, now):
     sys.path.insert(0, str(REPO / "tests"))
-    from cadra.test_run_guard import guard, example, raw_document, AT
+    from cadra.test_run_guard import guard, example, raw_document, write_admission_tasks, AT
     data = example()
 
     def dates(value):
@@ -188,6 +188,7 @@ def seed_cadra(project, now):
              before={"camera": inputs}, before_refs={"camera": "controlled fixture baseline"})
     path = project / ".yuzio/cadra/runs/run-20261104-91.md"
     path.parent.mkdir(parents=True)
+    write_admission_tasks(path, data)
     guard.publish(path, raw_document(data), None, "controlled-cadra-fixture", 1, "create")
     return path
 
