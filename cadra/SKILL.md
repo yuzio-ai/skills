@@ -29,7 +29,7 @@ license: MIT
 - 写入口缺容器时先报告路径，再按 [容器模板](assets/project/) 最小建立 README、tasks、runs 与忽略规则；已有缺项仅补齐。接续指定任务或 Run 却找不到记录时报告缺口，不能用空初始化代替恢复。目标不明确、指向技能源仓库或不可安全写入时停止。
 - Task 只保存定义与准入；Run 是执行状态的唯一来源。实际工程阶段通过 Cohestra 调用，Cadra 不写 `.yuzio/cohestra`，不复制 handoff 正文。正式执行总结按存储约定处理。
 - 同一项目至多一个未完成 Run、一个队列。每组固定一至两个 Task，每项最多一个阶段执行，全组最多两个阶段并行；各项使用独立 worker/reviewer，按需创建并在任务内复用。等待仍占组内名额，不补位；不做 DAG 调度、定时器或 daemon。Run 默认 code；need/design 仍由人工参与准备，ready 仅可补齐已有确认的当前阶段交接，不开展新的需求／设计。
-- 写入、准入与执行入口仅接受协议 0.12；仅 list 可按原协议只读查询 0.10/0.11。缺版本、其他旧版与未知版停止相关操作；查询不迁移、不授权旧记录执行。本地切换先闭合原 Run、备份并归档，再重新准备待办，见 [版本边界](references/compatibility.md)。
+- 写入、准入与执行入口仅接受协议 0.12；仅 list 可按原协议只读查询 0.10/0.11。缺版本、其他旧版与未知版停止相关操作；查询不迁移、不授权旧记录执行。跨协议切换先闭合原 Run、备份并归档，再重新准备待办，见 [版本边界](references/compatibility.md)。
 - run/resume 的角色隔离与派发遵循 [任务执行者](references/dispatch.md)；run/resume 写入和 list 后续建议遵循 [执行归属](references/executor.md)；建 Run 前完成 [执行预检](references/preflight.md)。执行中与活性未知均不得自动接管。
 
 run/resume/append/ready 的并行准入、文件占用、阶段内等待和串行验证统一读取 [小组调度](references/scheduling.md)；确定性规则由包内 [scheduler.py](scripts/scheduler.py) 提供，仍由主 agent 派发与核验证据。

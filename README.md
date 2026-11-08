@@ -144,7 +144,7 @@ Prepare tasks, execute them in fixed groups of up to two tasks and recover inter
 | `resume` | Continue or finalize an unfinished run; automatically report after finalization |
 | `report` | Generate a summary file for a run and register its report link |
 
-For protocol `0.12`, `report` writes a file and registers its link. Only `list` can also query original `0.10` and `0.11` records read-only. Writing, admission and execution still require `0.12`; old records must be archived before switching execution environments.
+Cadra uses protocol `0.12` for writing, admission and execution. Only `list` can query original `0.10` and `0.11` records read-only. Compatible skill package updates reuse the existing data container. A cross-protocol cutover requires closing unfinished Runs in their original environment and archiving old records. See [Version boundaries](cadra/references/compatibility.md).
 
 After `run` or `resume` successfully finalizes and rereads a `completed` Run or a `stopped` Run whose entries have all ended and groups have all closed, it automatically generates a report for that exact Run. The reply gives Run and report paths, result counts and necessary human actions, using saved results without repeating engineering stages or acceptance. Unfinished Runs do not automatically produce reports. A repeated `resume` on an already closed Run stays read-only; use manual `report` for a missing report, a progress report or a different focus. Report failures preserve execution results; if only link registration fails, retain the file and retry registration using its exact path instead of generating another report. Necessary formal project summaries still follow project conventions.
 
@@ -167,8 +167,6 @@ A nonempty list containing only these four stages is also supported. Its first i
 The `review` preset is stored as `flow: review`, equivalent to `[review, fix, validate]`. Mandatory findings follow review → fix → independent re-review → validate; complete coverage without mandatory findings proceeds directly to validate. Create a reviewer first and a worker only when fix/validate is needed. Review alone does not establish acceptance.
 
 For an explicitly agreed engineering delivery endpoint, use `flow: [code, review, fix]` and record the required engineering evidence and any deferred checks with their owners in the Task Requirement. Cadra reports engineering delivery and acceptance separately and still runs the batch consistency closeout. See [Engineering delivery endpoint](cadra/references/flow.md#工程交付终点).
-
-Cadra writing, admission and execution accept only protocol `0.12`. `list` can also read `0.10` with its original serial rules and `0.11` with its original fixed-group rules, without migrating or rewriting records. Cross-protocol source chains, unsupported versions and missing versions remain errors; a successful query does not authorize execution. Finish unfinished Runs in their original environment, back up and archive closed records unchanged, then prepare pending tasks and repeat `ready`. Archives do not participate in scanning or admission, and completed tasks are not rerun. [Version boundaries](cadra/references/compatibility.md).
 
 Prepare need/design outside Cadra with human participation. Existing decisions remain valid; small tasks need no fabricated earlier handoffs. Resolve goals, acceptance, product decisions and necessary design through interactive `$cohestra need` / `$cohestra design` before admission. A return to need/design during execution blocks for human input instead of completing the task.
 
@@ -362,7 +360,7 @@ $cadra run
 
 Recovery does not simply skip the blocked stage. Cadra checks handoffs and recovery conditions, then takes a legal next action or retries the blocked stage within the permitted flow. Subsequent execution remains unattended. See [Recovery admission](cadra/references/recovery.md) and [Definition revisions](cadra/references/revision-rules.md).
 
-Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before new execution. Writing, admission and execution require `0.12`. Only `list` can query original `0.10` and `0.11` records read-only.
+Before freezing a Run, Cadra checks the current project and task prerequisites. Later stages produce their own outputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery. Takeover requires confirmed stop evidence.
 
 **`resume` handles confirmed execution interruptions**: it checks, continues or finalizes an unfinished Run. It does not rerun entries that already have blocked/failed results or reopen a finished Run:
 

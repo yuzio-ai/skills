@@ -4,7 +4,7 @@ No parallel test-only scheduler. Synthetic agent/tool observations are explicit;
 these tests do not claim real engineering-stage execution or throughput.
 """
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -90,7 +90,7 @@ class SchedulerTests(unittest.TestCase):
             call.update(dispatch='dispatched', dispatch_evidence=dict(agent_id=slug + '-' + role,
                         source='synthetic host tool handle', at=self.now())); self.save()
 
-    def close_stage(self, slug, next_stage='review', accepted=False):
+    def close_stage(self, slug, next_stage='review', accepted=False, **result_evidence):
         task = self.task(slug); call = task['calls'][-1]
         sr = contract(call['stage'], next_stage, 'stage_completed',
                       sum(c['stage'] == call['stage'] for c in task['calls']))
@@ -100,7 +100,7 @@ class SchedulerTests(unittest.TestCase):
             sr.update(status='completed', acceptance={'status': 'passed'},
                       candidate={'commit': None, 'snapshot': 'synthetic-fixed-candidate'})
             sr['next'] = dict(stage=None, allowed=False, reason='task_completed')
-        call.update(closed=True, result=dict(contract=sr, handoff='synthetic-stage.md'))
+        call.update(closed=True, result=dict(contract=sr, handoff='synthetic-stage.md', **result_evidence))
         task['checkpoint'].update(pending_call=None, last_delivery=call['result']); self.save()
 
     def proof(self, slug):
@@ -577,14 +577,22 @@ class SchedulerTests(unittest.TestCase):
     def test_takeover_of_granted_command_records_original_outcome_without_regrant(self):
         self.group();self.stage('a');self.stage('b');self.wait('a','verification');self.wait('b','verification')
         self.event('barrier',candidate=fixed());self.grant()
+        started = self.now()
         historical_stop=self.proof('a')
+        timing = dict(command_started=dict(at=started, source='original host process log'),
+                      command_exited=dict(at=historical_stop['observed_at'], source='original host process log'))
         self.takeover()
         self.assertIsNone(schedule.next_request(schedule.replay(self.data)))
-        stop=historical_stop
-        new=schedule.append_event(self.data,'finish',self.now(),seq=1,stop=stop,outcome='passed',source='original command log checked')
-        guard.publish(self.path,raw_document(new),self.sha,'second',2)
-        self.assertEqual(new['tasks'][0]['budget']['calls'],1)
-        self.assertEqual(len([e for e in new['scheduler']['events'] if e['kind']=='grant']),1)
+        view = self.event('finish', seq=1, stop=historical_stop, outcome='passed',
+                          source='original command log checked', timing=timing)
+        self.assertEqual(self.task('a')['budget']['calls'], 1)
+        self.assertEqual(view['requests'][0]['status'], 'done')
+        self.assertEqual(schedule.next_request(view), 2)
+        self.assertEqual([e['seq'] for e in self.data['scheduler']['events'] if e['kind'] == 'grant'], [1])
+        self.assertEqual(self.data['scheduler']['events'][-1]['timing'], timing)
+        with self.assertRaisesRegex(ValueError, 'no matching active verification'):
+            self.event('finish', seq=1, stop=historical_stop, outcome='passed',
+                       source='already recorded', timing=timing)
 
     def test_independent_reviewers_can_run_together_and_mix_with_worker(self):
         self.group();self.stage('a');self.stage('b');self.close_stage('a')
@@ -847,6 +855,30 @@ class SchedulerTests(unittest.TestCase):
         result=json.loads(proc.stdout)
         self.assertEqual(result['scheduling']['waiting'][0]['kind'],'verification')
         self.assertEqual(self.path.read_bytes(),before)
+
+    def test_cli_receipt_identifies_successful_readback_only(self):
+        self.group(); self.stage('a'); self.stage('b')
+        self.wait('a', 'verification'); self.wait('b', 'verification')
+        self.event('barrier', candidate=fixed())
+        proposed = schedule.append_event(self.data, 'grant', self.now(), seq=1, candidate=fixed())
+        proposal = self.root / 'grant.md'
+        raw = raw_document(proposed)
+        proposal.write_bytes(raw)
+        command = [sys.executable, '-B', guard.__file__, 'update', '--run', str(self.path),
+                   '--proposal', str(proposal), '--expected-sha256', self.sha,
+                   '--instance', 'first', '--generation', '1', '--receipt']
+        before = datetime.now(timezone.utc)
+        published = subprocess.run(command, capture_output=True, text=True, check=True)
+        readback = json.loads(published.stdout)
+        self.assertEqual(readback['sha256'], guard.digest(raw))
+        self.assertEqual(self.path.read_bytes(), raw)
+        self.assertLessEqual(before, guard.timestamp(readback['readback_at']))
+        self.assertLessEqual(guard.timestamp(readback['readback_at']), datetime.now(timezone.utc))
+
+        stale = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(stale.returncode, 1)
+        self.assertEqual(stale.stdout, '')
+        self.assertIn('Run changed', stale.stderr)
 
     def test_two_wait_publications_cannot_erase_each_other(self):
         self.group();self.stage('a');self.stage('b')

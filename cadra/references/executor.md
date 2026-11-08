@@ -29,6 +29,7 @@ create／append 在与 [Task 准备入口](prepare.md)共用的锁内，将本�
 脚本接口：`python3 -B <安装目录>/scripts/run_guard.py <inspect|create|update|append|closeout|takeover|report> --run <绝对路径>`。
 - inspect 可加 `--observation <JSON 文件>`；只读返回摘要、协议、executor 与 active/stopped/unknown，不写入观察。
 - 写操作提供 `--proposal <完整 Markdown 文件>`；除首次 create 外，提供上次 inspect 的 `--expected-sha256`。create/update/closeout/takeover 同时提供 `--instance` 和 `--generation`。临时提案放 Run 的 scratch 目录，不参与状态解析；调用者在发布成功并回读核实后按 [日常留存](retention.md#日常留存) 移除已消费提案，写入器不自动删除调用者的输入文件。
+- 写操作默认返回已发布内容的 SHA-256。附 `--receipt` 时返回 `{sha256, readback_at}` JSON，时间采自成功回读之后。验证计时按[调度规则](scheduling.md#验证计时证据)引用该回执。
 - create 在项目 runs 目录的短时 `.writer.lock` 下检查既有 Run、目标不存在和完整初态；先准备 queued 数组，再创建。锁不保存执行状态，进程退出由内核释放，锁文件不能删除重建。
 - update 只接受当前身份/代次与预期摘要；冻结定义、闭合调用、终态条目及既有预检不得改写；普通 update 不得增删、重排队列或改 append_history。角色绑定仅按任务执行者规则追加，原 pending 未闭合时不得替换。调度日志按 [小组调度](scheduling.md) 由同一 owner 追加，禁止删除或改写历史事件。一次只追加一个 prepared、未闭合且无结果的调用；原 pending 必须先单独核实闭合落盘，再追加下一意图。调用前保存意图后回读归属，再派发；写入保护不是外部调用的 exactly-once 保证。
 - skipped 只允许由未执行的 queued 转入，必须没有调用、预算消费、授权消费和交付 checkpoint；running 即使尚无调用也不能改记 skipped。guard 拒绝这些非法新提案及历史记录，failed 保留未闭合调用的恢复路径不变。计费分类和已保存的同阶段轮次按 [契约核对](contract.md#本次结果核对) 与 [调用预算](contract.md#调用预算) 检查。

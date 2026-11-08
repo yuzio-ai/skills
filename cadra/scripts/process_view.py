@@ -151,8 +151,156 @@ def call_view(call, slug):
     )
 
 
+def observed_time(evidence, earliest, latest=None):
+    if not isinstance(evidence, dict):
+        return None
+    stamp = recorded_time(evidence.get('at'))
+    source = evidence.get('source')
+    if stamp is None or not isinstance(source, str) or not source.strip():
+        return None
+    time = guard.timestamp(stamp)
+    if time < guard.timestamp(earliest) or (latest is not None and time > guard.timestamp(latest)):
+        return None
+    return {'at': stamp, 'source': source}
+
+
+def merge_observation(records, key, observed):
+    previous = records.setdefault(key, observed)
+    if previous is not None and guard.timestamp(previous['at']) != guard.timestamp(observed['at']):
+        # Once the time is disputed, another copy of either value cannot resolve it.
+        records[key] = None
+
+
+def record_readbacks(readbacks, events, evidence, latest=None):
+    if not isinstance(evidence, list):
+        return
+    for entry in evidence:
+        event_id = entry.get('event_id') if isinstance(entry, dict) else None
+        if type(event_id) is not int or event_id not in events:
+            continue
+        observed = observed_time(entry, events[event_id]['at'], latest)
+        if observed is not None:
+            merge_observation(readbacks, event_id, observed)
+
+
+def verification_readbacks(data):
+    events = {}
+    readbacks = {}
+    for event in data['scheduler']['events']:
+        record_readbacks(readbacks, events, event.get('verification_readbacks'), event['at'])
+        if event['kind'] in ('grant', 'finish'):
+            events[event['id']] = event
+    for task in data['tasks']:
+        for call in task['calls']:
+            result = call.get('result')
+            if call['closed'] and isinstance(result, dict):
+                # The handoff verification can predate receipts carried by its result.
+                record_readbacks(readbacks, events, result.get('verification_readbacks'))
+    return readbacks
+
+
+def event_time(event, readbacks):
+    return (readbacks.get(event['id']) or event)['at']
+
+
+def record_resume(resumes, finish, evidence, file_grant, readbacks, latest=None):
+    if not isinstance(evidence, dict):
+        return
+    seq = evidence.get('seq')
+    if type(seq) is int and seq == finish['seq']:
+        observed = observed_time(evidence, event_time(finish, readbacks), latest)
+        if observed is not None and file_grant is not None:
+            file_readback = readbacks.get(file_grant['id'])
+            observed = observed_time(observed, file_readback['at']) if file_readback else None
+        if observed is not None:
+            merge_observation(resumes, seq, observed)
+
+
+def verification_resumes(data, requests, file_grants, readbacks):
+    latest_finishes = {}
+    resumes = {}
+    for event in data['scheduler']['events']:
+        if event['kind'] == 'finish':
+            request = requests[event['seq']]
+            latest_finishes[request['slug'], request['call_id']] = event
+        elif event['kind'] == 'wait':
+            finish = latest_finishes.get((event['slug'], event.get('call_id')))
+            if finish is not None:
+                file_grant = file_grants.get(finish['seq'])
+                if file_grant is not None and file_grant['id'] >= event['id']:
+                    file_grant = None
+                # An engineering wait can only follow the resumed file lease.
+                if file_grant is not None or event['resource'] == 'finalization':
+                    record_resume(resumes, finish, event.get('verification_resume'),
+                                  file_grant, readbacks, event['stop']['observed_at'])
+    for task in data['tasks']:
+        for call in task['calls']:
+            result = call.get('result')
+            if call['closed'] and isinstance(result, dict):
+                finish = latest_finishes.get((task['slug'], call['id']))
+                if finish is not None:
+                    latest = recorded_time(result.get('verified_at')) or recorded_time(result.get('at'))
+                    evidence = result.get('verification_resume')
+                    file_grant = file_grants.get(finish['seq'])
+                    process_only = isinstance(evidence, dict) and evidence.get('process_only') is True
+                    # Process-only handoffs do not require files. Older records can
+                    # establish this if the handoff predates the grant proposal.
+                    if process_only or (file_grant is not None and latest is not None
+                                        and guard.timestamp(latest) < guard.timestamp(file_grant['at'])):
+                        file_grant = None
+                    record_resume(resumes, finish, evidence, file_grant, readbacks, latest)
+    return resumes
+
+
+def seconds_between(start, end):
+    if start is None or end is None:
+        return None
+    seconds = (guard.timestamp(end) - guard.timestamp(start)).total_seconds()
+    return seconds if seconds >= 0 else None
+
+
+def verification_timing(event, grant, file_grant, resume, readbacks):
+    granted = readbacks.get(grant['id'])
+    finished = readbacks.get(event['id'])
+    files_granted = readbacks.get(file_grant['id']) if file_grant else None
+    timing = event.get('timing')
+    if not isinstance(timing, dict):
+        timing = {}
+    earliest, latest = event_time(grant, readbacks), event['at']
+    started = observed_time(timing.get('command_started'), earliest, latest)
+    ended = observed_time(timing.get('command_exited'), earliest, latest)
+    if started and ended and guard.timestamp(started['at']) > guard.timestamp(ended['at']):
+        started = ended = None
+    start_at = started['at'] if started else None
+    end_at = ended['at'] if ended else None
+    resume_at = resume['at'] if resume else None
+    grant_at = granted['at'] if granted else None
+    finish_at = finished['at'] if finished else None
+    files_granted_at = files_granted['at'] if files_granted else None
+    reasons = pick(timing.get('delay_reasons'), ('grant_to_start', 'end_to_finish')) or {}
+    return dict(
+        granted=granted, finished=finished, files_granted=files_granted,
+        started=started, ended=ended, resumed=resume, files_granted_at=files_granted_at,
+        seconds=dict(grant_to_start=seconds_between(grant_at, start_at),
+                     command=seconds_between(start_at, end_at),
+                     end_to_finish=seconds_between(end_at, finish_at),
+                     finish_to_resume=seconds_between(finish_at, resume_at),
+                     finish_to_files_grant=seconds_between(finish_at, files_granted_at),
+                     grant_to_finish=seconds_between(grant_at, finish_at)),
+        event_seconds=dict(grant_to_finish=seconds_between(grant['at'], event['at']),
+                           finish_to_files_grant=seconds_between(event['at'], file_grant['at'] if file_grant else None)),
+        delay_reasons={key: value for key, value in reasons.items()
+                       if isinstance(value, str) and value.strip()},
+    )
+
+
 def event_views(data, scheduler_view):
     requests = {r['seq']: r for r in scheduler_view['requests']}
+    grants = {e['seq']: e for e in data['scheduler']['events'] if e['kind'] == 'grant'}
+    file_grants = {r['resume_of']: grants[r['seq']] for r in requests.values()
+                   if 'resume_of' in r and r['seq'] in grants}
+    readbacks = verification_readbacks(data)
+    resumes = verification_resumes(data, requests, file_grants, readbacks)
     members = []
     group = 0
     result = []
@@ -170,6 +318,9 @@ def event_views(data, scheduler_view):
             item['resource'] = request.get('kind')
         if 'candidate' in event:
             item['candidate'] = pick(event['candidate'], ('snapshot', 'sha256'))
+        if event['kind'] == 'finish':
+            seq = event['seq']
+            item['timing'] = verification_timing(event, grants[seq], file_grants.get(seq), resumes.get(seq), readbacks)
         result.append(item)
     return result
 

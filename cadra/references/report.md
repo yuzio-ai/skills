@@ -61,6 +61,8 @@ python3 -B <本次实际 Cadra 目录>/scripts/process_view.py --run <Run绝对�
 - 顺利任务用阶段路径和结果即可。有 findings、整改、验证失败／不确定、受阻或恢复的任务展开“阶段／轮次｜结果与问题｜处理及证据”表。依据工具给出的引用，按需读取对应不可变 handoff 整理问题 ID、现象、原因、修改和验证；只有计数时写“问题详情未知”，不能从计数下降推断某个 ID 已关闭。
 - fix 的零 findings 是作者整改声明，review 的关闭结论才按其实际独立身份和候选来源标为独立复审确认。复审仍有问题时保留该轮结果；第二次整改和后续通过不能覆盖第一次失败。验证先失败后通过逐次保留，不把编译失败且零测试写成测试通过。
 - 按 event_ids 对应的调度事件补充重要资源等待、验证 outcome（含 failed/inconclusive/interrupted）、候选失效与恢复。跨任务事件保持原 event id，不能凭缺失时间拼接总时间线；ownership_history 单列中断／接管事实，不因代次变化断言工具已停止。
+- 按每次 finish 的 `timing.seconds` 展示授予回读到进程启动（grant_to_start）、外层命令进程耗时（command）、进程退出到登记回读（end_to_finish）、登记回读到原角色续接（finish_to_resume）。文件续接获授（finish_to_files_grant）与资源占用（grant_to_finish）单列。同一事件或续接的重复时间可合并，缺失、相互冲突或顺序矛盾的观察标未知。`timing.event_seconds` 仅表示日志事件间隔，可单列作历史对照。未 finish 的请求保留实际调度状态和中止事实。两段超过 10 秒时附 `delay_reasons` 的有据原因，未记录则写原因未知。只有已知分段参与汇总，注明已知次数。
+- 对照优化效果时分别汇总业务整改与收尾整改轮数，并按原始证据核对同候选、同完整 argv、同必要输入及工具链的实际重复验证。证据不足时标未知。引用已有证据不计执行，条件变化后的重测单列原因。
 - 原生证据缺口与已完成工程过程分开：例如“code → review（问题 A）→ fix → review（仍未关闭）→ fix → review（确认关闭）→ validate（缺设备证据 blocked）”，不得压缩为只有 blocked／零 findings。该示例不是所有任务的必经路线。
 - 历史过程只使用该 Run 的冻结结果和当时引用交付。当前 README、后续 Run 或新修复不能填补旧结果；缺失信息标 unknown。报告仍按原轮次规则新增并登记，保留旧报告与原结果。
 

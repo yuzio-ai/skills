@@ -6,7 +6,7 @@ full provenance and Cohestra contract checks remain the caller's job.
 """
 import argparse
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import json
@@ -541,7 +541,7 @@ def verify_admitted_definitions(project, items):
         require(task_records.same_definition(doc, item), f'Task definition changed before admission: {path}')
 
 
-def publish(path, proposed, expected, instance, generation, mode='update', observation=None):
+def publish(path, proposed, expected, instance, generation, mode='update', observation=None, *, receipt=False):
     path = Path(path).absolute()
     require(path.parent.name == 'runs' and path.parent.parent.name == 'cadra' and
             path.parent.parent.parent.name == '.yuzio', 'expected project .yuzio/cadra/runs path')
@@ -643,10 +643,13 @@ def publish(path, proposed, expected, instance, generation, mode='update', obser
             require((path.read_bytes() if path.exists() else None) == raw, 'Run changed during publication')
             os.replace(temporary, path)
             require(path.read_bytes() == proposed, 'Run readback failed; stop and inspect')
+            if receipt:
+                readback_at = datetime.now(timezone.utc).isoformat()
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
-    return digest(proposed)
+    sha256 = digest(proposed)
+    return {'sha256': sha256, 'readback_at': readback_at} if receipt else sha256
 
 
 def main():
@@ -658,10 +661,12 @@ def main():
     parser.add_argument('--instance')
     parser.add_argument('--generation', type=int)
     parser.add_argument('--observation', type=Path)
+    parser.add_argument('--receipt', action='store_true', help='return JSON with the digest and successful readback time')
     args = parser.parse_args()
     try:
         observation = read_json(args.observation.read_text()) if args.observation else None
         if args.mode == 'inspect':
+            require(not args.receipt, 'publication receipt requires a write operation')
             raw = args.run.read_bytes()
             data, _ = current(raw)
             result = {'sha256': digest(raw), 'protocol': data['protocol'], 'status': data['status'],
@@ -672,8 +677,9 @@ def main():
             print(json.dumps(result, ensure_ascii=False))
         else:
             require(args.proposal is not None, 'proposal required')
-            print(publish(args.run, args.proposal.read_bytes(), args.expected_sha256,
-                          args.instance, args.generation, args.mode, observation))
+            result = publish(args.run, args.proposal.read_bytes(), args.expected_sha256,
+                             args.instance, args.generation, args.mode, observation, receipt=args.receipt)
+            print(json.dumps(result) if args.receipt else result)
     except (ValueError, KeyError, TypeError, AttributeError, OSError) as error:
         parser.exit(1, str(error) + '\n')
 

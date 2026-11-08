@@ -144,7 +144,7 @@ review 按适用风险核查真实调用方、装配与生命周期路径，证�
 | `resume` | 恢复或收尾尚未完成的执行批次，收尾后自动生成报告 |
 | `report` | 为指定执行批次生成摘要文件，并登记报告链接 |
 
-协议 `0.12` 的 `report` 生成文件并登记链接；仅 `list` 还能只读查询 `0.10`、`0.11` 原记录。写入、准入与执行仍要求 `0.12`，切换执行环境前须完成旧记录归档。
+Cadra 写入、准入与执行使用协议 `0.12`。仅 `list` 可只读查询 `0.10`、`0.11` 原记录。兼容的技能包升级沿用现有资料容器。跨协议切换须先由原环境闭合未完成 Run，再归档旧记录。详见 [版本边界](cadra/references/compatibility.md)。
 
 `run` / `resume` 本次将 Run 收尾为 `completed`，或所有条目均已结束且小组均已 close 的 `stopped`，并成功回读后，自动为当前 Run 生成报告。最终回复直接给出 Run 与报告路径、结果数量及必要人工事项，使用已保存结果，不重跑工程阶段或验收。未完成 Run 不自动生成报告；对已结束 Run 重复 `resume` 保持只读，缺报告、需要阶段报告或不同关注点时手动调用 `report`。报告失败不改变执行结果；仅链接登记失败时保留文件，按准确路径补登记，不重新生成。必要的正式项目总结仍按项目规范处理。
 
@@ -167,8 +167,6 @@ Run 正常结束前自动执行 [收尾一致性审查](cadra/references/closeou
 `review` 原样保存为 `flow: review`，等价于 `[review, fix, validate]`。有必做问题时走 review → fix → 独立复审 → validate；无必做问题且覆盖齐备时直接 review → validate。先创建 reviewer，需要 fix/validate 时再创建 worker；审查通过本身不代表验收完成。
 
 用户明确选择工程交付终点时，使用 `flow: [code, review, fix]`，在 Task 的 Requirement 记录必做检查、延后事项及负责人。Cadra 分列工程交付与验收结果，整批一致性收尾照常执行。详见[工程交付终点](cadra/references/flow.md#工程交付终点)。
-
-Cadra 写入、准入与执行仅接受协议 `0.12`。`list` 可按 `0.10` 原串行规则和 `0.11` 原固定小组规则只读查询，不迁移或改写记录；跨协议来源链、未知版本与缺版本仍为异常，查询成功不授权执行。先由原环境闭合未完成 Run，备份并原样归档已结束记录，再准备待办、重新 ready。归档不参与扫描或准入，已完成任务不重跑。见 [版本边界](cadra/references/compatibility.md)。
 
 need/design 在 Cadra 外由人工参与准备；已有确认继续有效，小任务不必补造阶段文档。目标、验收、产品取舍或设计未明确时，先交互调用 `$cohestra need` / `$cohestra design`，再准备 Cadra 任务。执行中返回 need/design 会受阻交回人工，不判完成。
 
@@ -362,7 +360,7 @@ $cadra run
 
 恢复不是直接跳过受阻阶段。Cadra 核对交付与恢复条件后，选择合法下一步，或在允许范围内重试原受阻阶段；后续继续使用无人值守模式。详情见 [恢复准入](cadra/references/recovery.md) 和 [定义修订](cadra/references/revision-rules.md)。
 
-冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 要求先完成归档切换再执行新版。写入、准入与执行要求 `0.12`。仅 `list` 可只读查询 `0.10` 和 `0.11` 原记录。
+冻结 Run 前检查当前的项目和任务前提。后续阶段负责生成各自的产物。详见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)，接管须有已确认的停止证据。
 
 **`resume` 处理已确认的执行中断**，用于未完成 Run 的核对、续跑或收尾；不会重新执行其中已有 blocked/failed 结果的条目，也不会重开已结束的 Run：
 

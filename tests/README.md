@@ -40,12 +40,13 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_cutover.py](cadra/test_cutover.py)、[一次性切换工具](../tools/cutover_cadra_010.py) | 历史 0.10 环境的本地归档、摘要、Gate 失效、安装切换、链接修复与回滚；工具要求匹配的 0.10 来源包，不用于当前 0.12 迁移；离线旧 YAML 读取需 macOS 系统 Ruby |
 | [test_run_guard.py](cadra/test_run_guard.py) | 直接执行包内写入器；进程竞争、归属交接、预检约束、调用及历史保护；不执行真实工程阶段 |
 | [test_guard_safety.py](cadra/test_guard_safety.py) | 停止与 skipped、计费依据及上限、合法恢复、复审旧轮次的真实文件回归；跨 Run 轮次另用当前模型核对 |
-| [test_scheduler.py](cadra/test_scheduler.py) | 直接调用包内 reducer 与真实 CAS 发布：小组范围、FIFO、阶段内等待、验证窗口、失败取消、候选刷新及跨代恢复；工具观察为合成输入 |
+| [test_prepare.py](cadra/test_prepare.py) | add／ready 的 Task 发布、附件和明确输入的指纹、协议拒绝、Run 写锁竞争与准入复核 |
+| [test_scheduler.py](cadra/test_scheduler.py) | 直接调用包内 reducer 与真实 CAS 发布，覆盖小组范围、FIFO、阶段内等待、验证窗口、写入回执、失败取消、候选刷新及跨代恢复。工具观察为合成输入 |
 | [test_closeout.py](cadra/test_closeout.py) | 0.12 收尾门槛、整改闭环、继承权限、候选与实际字节、追加、恢复、历史与隔离查询；工具观察和交付为合成输入 |
 | [test_list_summary.py](cadra/test_list_summary.py) | 保留原 0.11 语义的列表摘要状态、来源链、折叠、详情与只读快照；含未闭合小组的 completed 条目显示 unknown |
 | [test_list_legacy.py](cadra/test_list_legacy.py) | 0.10 原协议只读查询：原语义、混合版本、跨协议链拒绝、独立安装副本与文件/时间不变；执行写入器仍拒绝旧记录 |
 | [test_list_optimization.py](cadra/test_list_optimization.py) | 列表成本与生命周期：前驱闭合、异常保留、身份去重、摘要/原文等价、预检索引与调度视图复用 |
-| [test_process_view.py](cadra/test_process_view.py) | 包内只读过程视图：多轮整改、未闭合交付、同步缺口、验证先失败后通过、恢复来源、输入不变、独立包运行与旧协议拒绝；不模拟真实 agent 决策 |
+| [test_process_view.py](cadra/test_process_view.py) | 包内只读过程视图，覆盖多轮整改、交付与同步缺口、验证结果和恢复来源、跨 call 回执与冲突、分段计时及续接边界、输入不变、隔离运行和旧协议拒绝 |
 | [test_review_full_fixture.py](cohestra/test_review_full_fixture.py)、[review_full_fixture.py](cohestra/review_full_fixture.py) | 扩展单独 review 实测输入与实际发布故障：原子替换拒绝、竞争写入保留和解除故障后的发布；不模拟 agent 决策 |
 | [test_review_fixture.py](cohestra/test_review_fixture.py)、[review_fixture.py](cohestra/review_fixture.py) | 单独 review 实测输入：固定候选、真实缺陷、工具不可用及明确自审；unittest 只校验夹具与隔离，不模拟 agent 决策 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
