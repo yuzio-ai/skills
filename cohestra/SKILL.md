@@ -1,6 +1,6 @@
 ---
 name: cohestra
-description: 通过 init 初始化项目协作上下文，按目标选择或显式调用 need、design、code、review、fix、validate 阶段，review 默认独立子智能体审查；closeout 单次编排一个任务的独立审查、必要整改、复审、验收和收尾，无需 Cadra 队列；verify 核对阶段偏差，report 只读汇总项目状态。普通阶段单次交付后停止，closeout 须明确调用；仅讨论流程不触发执行。
+description: 通过 init 初始化项目协作上下文，按目标选择或显式调用 need、design、code、review、fix、validate 阶段，review 默认独立子智能体审查；closeout 单次编排一个任务的审查、必要整改、复审和收尾，默认整体验收，可显式选择工程交付终点；verify 核对阶段偏差，report 只读汇总项目状态。普通阶段单次交付后停止，closeout 须明确调用；仅讨论流程不触发执行。
 license: MIT
 ---
 
@@ -21,14 +21,14 @@ license: MIT
 | review | [review](references/review.md) | 默认由独立 reviewer 子智能体审查固定候选，输出 findings |
 | fix | [fix](references/fix.md) | 裁决并修复审查问题 |
 | validate | [validate](references/validate.md) | 补足证据，判断验收状态 |
-| closeout | [closeout](references/closeout.md) | 单次编排一个任务的 review、必要 fix、独立复审、validate 与收尾，不加入 Cadra 队列 |
+| closeout | [closeout](references/closeout.md) | 单任务独立审查、必要整改与复审，默认整体验收，可显式选择工程交付 |
 | verify | [verify](references/verify.md) | 核对某阶段产出与其上游依据的偏差 |
 | report | [report](references/report.md) | 只读展示项目任务总览、遗留问题与状态异常，不落盘 |
 
 ## 执行边界与读取顺序
 
 1. 固定目标项目绝对路径，读取适用项目规则及[存储约定](references/storage.md)。默认当前任务项目，目标无法唯一确定时澄清；不因技能安装位置改变目标。
-2. 显式入口优先；未指定时按[公共流程第 2 节](references/workflow.md#2-起步位置)选择最直接的阶段并简短说明。六阶段可从任意阶段起步，普通阶段调用一次只执行选定阶段，终点由用户决定。明确调用 `closeout` 时按其说明串行编排已有阶段，以最终候选验收及收尾为终点；不因普通任务完成自动进入。只讨论流程不触发执行。实质歧义、入口冲突或未知名称才澄清。validate 补验收证据，verify 核对偏差，不可混用。
+2. 显式入口优先；未指定时按[公共流程第 2 节](references/workflow.md#2-起步位置)选择最直接的阶段并简短说明。六阶段可从任意阶段起步，普通阶段调用一次只执行选定阶段，终点由用户决定。明确调用 `closeout` 时按其说明串行编排已有阶段，默认验收最终候选，也可显式选择工程交付终点；普通任务完成后仍由用户决定是否调用。只讨论流程不触发执行。实质歧义、入口冲突或未知名称才澄清。validate 补验收证据，verify 核对偏差，不可混用。
 3. `init` 只读取初始化说明、发行版本和必要模板。`report` 只读报告说明、发行版本、任务索引及必要问题来源，字段有疑问再查公共流程第 7 节；不初始化、不写文件、不推进阶段。`closeout` 先读公共流程、发行版本与编排说明，按实际进入的阶段加载说明，不预读无须执行的阶段。其余入口读取一次公共流程、本阶段说明与发行版本，再读必要任务输入；仅 need/design 额外读取[共用需求澄清规则](references/clarification.md)，不新增 clarify 入口或阶段。缺容器时按公共流程第 2 节最小初始化，接续任务缺资料不能用空初始化代替恢复。
 4. 写交付时读取对应骨架；正式阶段和 verify 准备更新索引时必须读取[索引发布与恢复](references/publication.md)。先确认发布前校验成功，再用后续工具调用发布；校验失败不得继续。init、report 不读发布细则。
 5. 既有项目规范、有效决定和用户授权继续有效；授权、候选、证据、复审、历史和停止规则统一见公共流程。每个阶段执行者交付后停止；单独进入 `review` 默认授权主会话按[审查说明](references/review.md)委派独立 reviewer，仅完成本轮审查。明确调用 `closeout` 授权其主会话按说明启动独立 reviewer 并接续本任务阶段；其余单独阶段不自动启动智能体或推进阶段。提交、推送、发布和多任务调度不属于 closeout。

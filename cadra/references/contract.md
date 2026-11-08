@@ -51,7 +51,7 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 
 没有后续独立 review 时，报告需要用户明确调用 `$cohestra review` 并传递当前固定候选、有效决定及独立评审安排；已有 review 交付但索引未同步时，由 Cohestra 按发布恢复规则修复。Cadra 不代写索引、不制造 `next`、不把旧交付当首次启动重跑。取得新的合法契约后重新准入；已发布的 review/validate 仍须核对独立身份、候选适用性和既有验收要求，证据缺失时不沿用完成结论。
 
-上述核对只约束本次接续/收尾，不回写历史 Run 结果。入队前缺合法动作时只报告准入受阻；已在执行中的条目按现有 blocked 规则记录。核对本身不派发阶段、不消费调用预算。
+沿用工程交付终点时，还须按下节核对冻结约定与最终 review 交付。上述核对只约束本次接续/收尾，不回写历史 Run 结果。入队前缺合法动作时只报告准入受阻；已在执行中的条目按现有 blocked 规则记录。核对本身不派发阶段、不消费调用预算。
 
 ## 本次结果核对
 
@@ -61,6 +61,8 @@ Cohestra 的 status 不含 Cadra 的 draft/ready/queued/running。stage_result �
 - execution_mode 必须等于本次声明 unattended；缺失、非法或 attended 均为 failed，不消费 next。
 - index sync failed、同步无法确认、阶段不符或旧结果均不构成可用交付，即使文件看似新版也不能忽略失败信号。恢复需核对完整 README 与该轮 handoff 的阶段、轮次、候选和模式。
 - 字段类型、枚举与 Cohestra 契约一致；next.allowed=true 时 next.stage 必须是六阶段名。协议不合法优先记 failed，不以表面 completed 放行。
+
+- 对显式[工程交付终点](flow.md#工程交付终点)的普通 Task，最终 review 还须与冻结约定及最终候选匹配，必做检查有适用结果，独立审查及必要复审已证实，必做问题已关闭。核对 `status: completed`、`stage_result: review/completed`、`next: {stage: null, allowed: false, reason: task_completed}` 及 `blocked: {value: false, reason: null}`。可沿用适用于该候选的正式验收结论，无结论则保留 unknown。若 review 声称可收尾却缺该终点交付，按结果核对失败处理，不能用 flow 截断替代。合法整改或受阻结果按原终态映射。
 
 已完整交付但 Cadra 未记结果时，resume 核实后补同一调用记录；无法确认派发/交付时保留证据并停止，不盲目重试。
 

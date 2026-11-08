@@ -69,7 +69,7 @@ Cohestra and Cadra default to the current task's project. Relatra needs a define
 
 ### Cohestra
 
-Advance one engineering task. Start at any stage; **each stage call executes one stage**. If no entry is specified, the skill selects one based on the goal. Explicit `closeout` orchestrates the remaining review, fixes, independent re-review, validation and final delivery in one call, without a Cadra queue.
+Advance one engineering task. Start at any stage; **each stage call executes one stage**. If no entry is specified, the skill selects one based on the goal. Explicit `closeout` orchestrates independent review, necessary fixes and final delivery without a Cadra queue. It defaults to full acceptance.
 
 | Entry | Purpose |
 |---|---|
@@ -104,7 +104,7 @@ $cohestra closeout
 任务目录：<已有任务目录绝对路径>
 ```
 
-Closeout creates an independent reviewer and reuses the existing stage contracts. It checks documentation and superseded content during review, fixes required issues within scope, requires independent re-review after fixes, then validates the final candidate. It skips empty fix stages and reuses applicable evidence. Missing permissions, unresolved decisions, publication failures or exhausted budgets stop dependent work with recovery details. No Cadra records, commits, pushes or releases are created. See [Single-task closeout](cohestra/references/closeout.md).
+Closeout creates an independent reviewer and reuses the existing stage contracts. It checks documentation and superseded content during review and requires independent re-review after fixes. Add `终点：工程交付` to stop after the final review when the candidate has the required engineering evidence and the user has agreed who will handle any deferred checks. Full acceptance uses `validate`. See [Single-task closeout](cohestra/references/closeout.md).
 
 <details>
 <summary>Acceptance, drift checks and evidence boundaries</summary>
@@ -165,6 +165,8 @@ Before normal Run closure, [closeout consistency review](cadra/references/closeo
 A nonempty list containing only these four stages is also supported. Its first item sets the start; the remaining items define allowed scope, not execution order, and the last item does not declare an endpoint. Initial execution and restarts after requirements/flow revisions use that start; continuation and recovery determine the first action from the legal contract and admission rules. Implementation receives independent review; mandatory fixes require fix and re-review, and complete coverage with no mandatory fixes remaining permits validation within the allowed flow. Optional suggestions are deferred by default. Mandatory findings block tasks limited to `[review]` rather than expand their scope.
 
 The `review` preset is stored as `flow: review`, equivalent to `[review, fix, validate]`. Mandatory findings follow review → fix → independent re-review → validate; complete coverage without mandatory findings proceeds directly to validate. Create a reviewer first and a worker only when fix/validate is needed. Review alone does not establish acceptance.
+
+For an explicitly agreed engineering delivery endpoint, use `flow: [code, review, fix]` and record the required engineering evidence and any deferred checks with their owners in the Task Requirement. Cadra reports engineering delivery and acceptance separately and still runs the batch consistency closeout. See [Engineering delivery endpoint](cadra/references/flow.md#工程交付终点).
 
 Cadra writing, admission and execution accept only protocol `0.12`. `list` can also read `0.10` with its original serial rules and `0.11` with its original fixed-group rules, without migrating or rewriting records. Cross-protocol source chains, unsupported versions and missing versions remain errors; a successful query does not authorize execution. Finish unfinished Runs in their original environment, back up and archive closed records unchanged, then prepare pending tasks and repeat `ready`. Archives do not participate in scanning or admission, and completed tasks are not rerun. [Version boundaries](cadra/references/compatibility.md).
 

@@ -152,6 +152,24 @@ class CloseoutTests(unittest.TestCase):
         self.assertEqual([c['stage'] for c in h.data['tasks'][-1]['calls']],['review','validate'])
         self.assertEqual(guard.closeout.summary(h.data)['status'],'passed')
 
+    def test_engineering_review_endpoint_keeps_batch_validation(self):
+        root = self.root / 'engineering-delivery'
+        root.mkdir()
+        h = Harness(root, ['code', 'review', 'fix'])
+        candidate = h.candidate()
+        h.save(deliver(h.data, 'code', candidate, h.save, next_stage='review'))
+        h.save(deliver(h.data, 'review', candidate, h.save))
+        h.save(finalize(h.data, candidate, h.save))
+        business = deepcopy(h.data['tasks'][0])
+
+        h.finish()
+        h.close()
+        self.assertEqual(h.data['tasks'][0], business)
+        self.assertEqual([call['stage'] for call in business['calls']], ['code', 'review'])
+        self.assertIsNone(business['result']['acceptance'])
+        self.assertEqual([call['stage'] for call in h.data['tasks'][-1]['calls']], ['review', 'validate'])
+        self.assertEqual(guard.closeout.summary(h.data)['status'], 'passed')
+
     def test_document_sync_finding_is_fixed_rereviewed_and_verified(self):
         h=self.h;(h.root/'README.md').write_text('Use removed_entry()\n');h.business_done()
         original=deepcopy(h.data['tasks'][0])

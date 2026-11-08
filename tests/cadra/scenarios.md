@@ -144,6 +144,9 @@
 
 ## 当前队列与角色隔离
 
+- 普通 Task 明确选择工程交付并冻结工程检查及后续责任，使用 `[code, review, fix]`。核对 ready、派发上下文、最终独立 review 的真实工程终点及小组关闭。报告分列工程完成、整体验收未知及原生待办。内部收尾继续走其原 flow。
+- 仅有 flow 列表不能推定工程终点。声明终点但缺用户依据、负责人、硬门槛前提或已加载 Cohestra 支持时，Gate 未通过。终点交付不合法时不以 flow 截断补成成功，原缺口和历史结果可追溯。
+
 - 旧 code/fix 终点 completed、next=null 接续：普通准入、恢复核对及仅策略/依赖修订收尾均不得绕过后续独立评审。不含 validate 的显式 flow、[review] 或历史 acceptance=passed 仍应受阻；旧交付和预算不变。Cohestra 经明确授权补审/恢复索引后，重新按新契约准入；已有合法 review/validate 交付仍可按原要求沿用。
 - 默认 code；fix/review 和仅 [review] 保持各自边界。写入、准入与执行仅接受协议 0.11，拒绝旧预设、旧协议及 need/design 列表；list 的 0.10 只读支持独立核对。测试用历史模型只复用通用状态不变量，不代表运行时兼容。
 - 返回 need/design 必须 blocked；显式缩小列表不能跳过 code/fix 的必要独立 review。

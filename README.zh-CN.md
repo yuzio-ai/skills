@@ -69,7 +69,7 @@ npx skills add yuzio-ai/skills --skill vistra
 
 ### Cohestra
 
-用于推进单个工程任务。可以从任意阶段起步，**普通阶段每次调用只执行一个阶段**；未指定入口时会根据目标选择。明确调用 `closeout`，可在一次调用内完成该任务的审查、必要整改、独立复审、验收和收尾，无需加入 Cadra 队列。
+用于推进单个工程任务。可以从任意阶段起步，**普通阶段每次调用只执行一个阶段**。未指定入口时根据目标选择。明确调用 `closeout` 可编排独立审查、必要整改和交付，无需加入 Cadra 队列，默认以整体验收为终点。
 
 | 入口 | 用法 |
 |---|---|
@@ -104,7 +104,7 @@ $cohestra closeout
 任务目录：<已有任务目录绝对路径>
 ```
 
-closeout 创建独立 reviewer，复用现有阶段契约。在 review 检查文档与被替代内容，在范围内整改必做问题，整改后必须独立复审，再验收最终候选；没有整改不生成空 fix，已有适用证据优先复用。权限缺失、决定未定、索引同步失败或预算耗尽时停止依赖它的工作并给出恢复条件。不创建 Cadra 记录，不自动提交、推送或发布。详见[单任务收尾编排](cohestra/references/closeout.md)。
+closeout 创建独立 reviewer 并复用现有阶段契约。review 检查文档与被替代内容，整改后必须独立复审。候选已有必要工程证据，且用户已确认延后检查及负责人时，可加 `终点：工程交付`，在最终 review 收尾。整体验收使用 `validate`。详见[单任务收尾编排](cohestra/references/closeout.md)。
 
 <details>
 <summary>展开：验收、偏差核对及证据边界</summary>
@@ -165,6 +165,8 @@ Run 正常结束前自动执行 [收尾一致性审查](cadra/references/closeou
 也可用仅含这四个阶段的非空列表。首项决定起点，其余项是允许范围，不是执行顺序，末项不声明终点。首次启动或需求/流程修订重启使用该起点；接续与恢复按合法契约及准入确定首个动作。实施后独立 review，必做整改经 fix 后复审，覆盖齐备、无必做整改且 flow 允许时才进入 validate；可选建议默认延后。明确只评审、不修改时使用 `[review]`；遇必做整改会受阻，不扩大范围。
 
 `review` 原样保存为 `flow: review`，等价于 `[review, fix, validate]`。有必做问题时走 review → fix → 独立复审 → validate；无必做问题且覆盖齐备时直接 review → validate。先创建 reviewer，需要 fix/validate 时再创建 worker；审查通过本身不代表验收完成。
+
+用户明确选择工程交付终点时，使用 `flow: [code, review, fix]`，在 Task 的 Requirement 记录必做检查、延后事项及负责人。Cadra 分列工程交付与验收结果，整批一致性收尾照常执行。详见[工程交付终点](cadra/references/flow.md#工程交付终点)。
 
 Cadra 写入、准入与执行仅接受协议 `0.12`。`list` 可按 `0.10` 原串行规则和 `0.11` 原固定小组规则只读查询，不迁移或改写记录；跨协议来源链、未知版本与缺版本仍为异常，查询成功不授权执行。先由原环境闭合未完成 Run，备份并原样归档已结束记录，再准备待办、重新 ready。归档不参与扫描或准入，已完成任务不重跑。见 [版本边界](cadra/references/compatibility.md)。
 

@@ -69,6 +69,23 @@ class CurrentFlowTests(unittest.TestCase):
         passed['acceptance'] = {'status': 'passed'}
         self.assertEqual(decision(passed), 'completed')
 
+    def test_engineering_delivery_uses_existing_review_terminal_contract(self):
+        engineering = ['code', 'review', 'fix']
+        self.assertEqual(decision(contract('review', 'fix', 'blocking_findings'), engineering), 'call')
+        self.assertEqual(decision(contract('fix', 'review', 'stage_completed'), engineering), 'call')
+        final_review = contract('review', None, 'task_completed', 2)
+        final_review['status'] = 'completed'
+        final_review['next']['allowed'] = False
+        self.assertEqual(decision(final_review, engineering), 'completed')
+        self.assertEqual(decision(final_review), 'blocked')
+
+        failed = {**final_review, 'acceptance': {'status': 'failed'}}
+        self.assertEqual(decision(failed, engineering), 'blocked')
+        for reason in ('missing_input', 'missing_permission', 'candidate_unavailable'):
+            with self.subTest(reason=reason):
+                blocked = {**final_review, 'status': 'blocked', 'blocked': {'value': True, 'reason': reason}}
+                self.assertEqual(decision(blocked, engineering), 'blocked')
+
     def test_human_stages_never_become_normal_boundary_completion(self):
         for stage in ('need', 'design'):
             for reason in ('stage_completed', 'acceptance_failed'):
