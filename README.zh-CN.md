@@ -229,11 +229,12 @@ flowchart TB
     S --> E["Cohestra<br/>组内最多两阶段并行<br/>阶段内等待与串行验证"]
     E --> F["finalization<br/>核对最终输入并关闭小组"]
     F -->|"证据失效：在授权内复审或复验"| E
-    F -->|"小组已 close"| M{"还有排队任务？"}
+    F -->|"小组已 close"| M{"还有排队的业务任务？"}
     M -->|"有：下一组"| S
-    M -->|"无：结束本批次"| O["自动生成报告<br/>结果与人工待办"]
+    M -->|"无"| C["整批收尾一致性审查"]
+    C -->|"当前收尾通过"| O["关闭并回读 Run<br/>自动生成报告"]
     class H human
-    class R,S,E,F automatic
+    class R,S,E,F,C automatic
     class O result
     classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
     classDef automatic fill:#e8f1ff,stroke:#547fb8,color:#193d6a
@@ -304,7 +305,7 @@ $cadra list
 
 | 状态 | 实际含义 | 接下来检查什么 |
 |---|---|---|
-| Run completed | 本批次所有项已结束，仍可能包含受阻或失败项 | 逐项看结果与人工待办 |
+| Run completed | 所有条目均已结束，当前收尾一致性审查已通过。业务任务仍可能受阻或失败 | 逐项看结果与人工待办 |
 | Task completed | 已完成配置的任务范围 | 核对 flow 和 acceptance；仅审查不等于工程验收 |
 | Task skipped | 本轮未执行 | 选入新批次前仍需核对原准入和恢复条件 |
 
@@ -361,7 +362,7 @@ $cadra run
 
 恢复不是直接跳过受阻阶段。Cadra 核对交付与恢复条件后，选择合法下一步，或在允许范围内重试原受阻阶段；后续继续使用无人值守模式。详情见 [恢复准入](cadra/references/recovery.md) 和 [定义修订](cadra/references/revision-rules.md)。
 
-冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 要求先完成归档切换再执行新版；执行入口仍拒绝旧协议，仅 `list` 可只读查询 `0.10`。
+冻结 Run 前检查项目和任务前提；未来阶段产物不作为准入输入，见 [执行预检](cadra/references/preflight.md)。Run 写入需要 Python 和 POSIX 文件锁。恢复前先核对 [执行归属](cadra/references/executor.md)：活跃或活性未知不授权接管。[版本边界](cadra/references/compatibility.md) 要求先完成归档切换再执行新版。写入、准入与执行要求 `0.12`。仅 `list` 可只读查询 `0.10` 和 `0.11` 原记录。
 
 **`resume` 处理已确认的执行中断**，用于未完成 Run 的核对、续跑或收尾；不会重新执行其中已有 blocked/failed 结果的条目，也不会重开已结束的 Run：
 

@@ -86,7 +86,6 @@ Cohestra 的报告输入生成器、validate 故障驱动和产物核对器见�
 | 2026-10-25 | [两个真实会话竞争接管](cadra/reports/2026-10-25-live-race.md) | 同上 | 同时 resume 的实际竞争、唯一所有者、失败方调用审计与预算保护 |
 | 2026-10-26 | [add 规则读取量核对](cadra/reports/2026-10-26-add-reading-scope.md) | Cadra 0.9.0 / 协议 0.8 基线 | 静态字符计数对比，不是实际 agent 运行证据 |
 | 2026-10-26 | [0.10 流程统一与本地切换](cadra/reports/2026-10-26-flow-unification.md) | Cadra 0.10.0 / 协议 0.10；Cohestra 0.13.1 / 契约 0.8 | 0.10 切换、网站检查和真实 live smoke；已被 0.11 取代 |
-| 2026-10-26 | [review 闭环预设验证](cadra/reports/2026-10-26-review-preset.md) | Cadra 0.10.0 / 协议 0.9 方案 | 已标注为历史检查点，被协议 0.10 取代 |
 | 2026-11-02 | [add 真实会话附件留存](cadra/reports/2026-11-02-add-real-attachment.md) | Cadra 0.17.0 / 协议 0.12 | 真实上传图片与采用确认留存、独立只读交接；宿主自动提供附件临时路径，未执行 ready/run 或工程验收 |
 | 2026-11-04 | [单任务 closeout 前向验证](cohestra/reports/2026-11-04-closeout.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 隔离项目实际独立初审、整改、复审、验收与收尾；最终草稿重复调用复用证据，未实测全部异常路径 |
 | 2026-11-04 | [closeout 跨会话并发实测](cohestra/reports/2026-11-04-closeout-concurrency.md) | Cohestra 0.16.0 草稿 / 协议 0.8 | 两个实际执行会话与未完成 Run 夹具共存、真实验证进程互斥、已知同文件冲突停止及安全接续；占用信息和项目锁为明确输入 |

@@ -229,11 +229,12 @@ flowchart TB
     S --> E["Cohestra<br/>Up to two concurrent stages<br/>Stage-local waits and serial verification"]
     E --> F["Finalization<br/>Check final inputs and close the group"]
     F -->|"Evidence invalidated: authorized re-review or revalidation"| E
-    F -->|"Group closed"| M{"More queued tasks?"}
+    F -->|"Group closed"| M{"More queued business tasks?"}
     M -->|"Yes: next group"| S
-    M -->|"No: end the Run"| O["Automatic report<br/>Results and human actions"]
+    M -->|"No"| C["Run closeout consistency review"]
+    C -->|"Current closeout passes"| O["Close and read back the Run<br/>Generate the report automatically"]
     class H human
-    class R,S,E,F automatic
+    class R,S,E,F,C automatic
     class O result
     classDef human fill:#fff1db,stroke:#bf8424,color:#603f0b
     classDef automatic fill:#e8f1ff,stroke:#547fb8,color:#193d6a
@@ -304,7 +305,7 @@ $cadra list
 
 | State | Meaning | What to check next |
 |---|---|---|
-| Run completed | Every entry has ended; some may be blocked or failed | Inspect per-task results and human actions |
+| Run completed | All entries have ended and the current closeout consistency review passed. Business tasks may still be blocked or failed | Inspect per-task results and human actions |
 | Task completed | The configured scope ended | Check flow and acceptance; `[review]` does not establish engineering acceptance |
 | Task skipped | Not executed in this Run | Apply original admission and recovery conditions before a new Run |
 
@@ -361,7 +362,7 @@ $cadra run
 
 Recovery does not simply skip the blocked stage. Cadra checks handoffs and recovery conditions, then takes a legal next action or retries the blocked stage within the permitted flow. Subsequent execution remains unattended. See [Recovery admission](cadra/references/recovery.md) and [Definition revisions](cadra/references/revision-rules.md).
 
-Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before new execution. Old protocols are rejected by execution entries; `list` alone may query `0.10` read-only.
+Before freezing a Run, Cadra checks project and task prerequisites; future stage outputs are not admission inputs. See [Preflight](cadra/references/preflight.md). Run writes require Python and POSIX file locks. Check [Executor ownership](cadra/references/executor.md) before recovery: active or unknown liveness does not authorize takeover. [Version boundaries](cadra/references/compatibility.md) require a completed archive cutover before new execution. Writing, admission and execution require `0.12`. Only `list` can query original `0.10` and `0.11` records read-only.
 
 **`resume` handles confirmed execution interruptions**: it checks, continues or finalizes an unfinished Run. It does not rerun entries that already have blocked/failed results or reopen a finished Run:
 

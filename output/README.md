@@ -7,6 +7,7 @@
 | `cadra-flow-unification-20261026` | 已跟踪，历史 | Cadra 0.10 切换、网站检查和 live smoke；被 [2026-10-26 流程统一记录](../tests/cadra/reports/2026-10-26-flow-unification.md)引用 |
 | `cadra-list-scaling-20261030` | 纳入版本管理，历史 | 列表成本验证脚本、性能结果和真实历史只读查询记录；`verify.py` 被 [测试说明](../tests/README.md)引用 |
 | `skills-release-preflight-20261030` | 纳入版本管理，历史 | 0.14.0 发布前检查、提交与推送核对，以及宿主验收摘要；完整演练工作区不在 Git 中 |
+| `cadra-closeout-20261101` | 纳入版本管理，历史 | Cadra 0.16.0（协议 0.12）与 Cohestra 0.15.0（契约 0.8）的整批收尾[验证记录](cadra-closeout-20261101/verification.json)和[独立审查记录](cadra-closeout-20261101/review.json) |
 
 约定：新增记录应在目录内保留可复核的原始输出，并注明日期、对应包版本、结果和是否被维护文档引用；已被后续发布取代的记录只在有独立证据价值时保留。历史产物只证明记录时的版本和环境，不代表当前环境已经复测。
 
