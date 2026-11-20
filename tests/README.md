@@ -51,6 +51,7 @@ python3 -B -m unittest discover -s tests/cadra -t tests -p 'test_*.py'
 | [test_review_fixture.py](cohestra/test_review_fixture.py)、[review_fixture.py](cohestra/review_fixture.py) | 单独 review 实测输入：固定候选、真实缺陷、工具不可用及明确自审；unittest 只校验夹具与隔离，不模拟 agent 决策 |
 | [test_validate_check.py](cohestra/test_validate_check.py) | 用隔离合成产物核对旧任务拒绝、损坏契约、正常发布与解析故障，以及汇总和 CLI 退出码；不执行真实 agent 阶段 |
 | [test_closeout_concurrency_fixture.py](cohestra/test_closeout_concurrency_fixture.py)、[closeout_concurrency_fixture.py](cohestra/closeout_concurrency_fixture.py) | closeout 并发实测的隔离输入、受控 Cadra 记录与真实进程探针；回归验证两个进程等待后互斥执行，并拒绝重叠占用日志，不模拟 agent 决策 |
+| [test_sandbox_cleanup.py](cohestra/test_sandbox_cleanup.py) | 隔离验证的子进程与文件探针：失败留证、包装脚本漏清理、进程观察不可用时留存现场 |
 | [Cadra](cadra/test_package.py)、[Cohestra](cohestra/test_package.py)、[Relatra](relatra/test_package.py) | 各包结构、元数据与资源完整性；Cadra/Cohestra 另检查路由、模板与契约 |
 | [test_relatra.py](relatra/test_relatra.py) | 合成历史的采集、统计、账本复用、更正和隔离包调用 |
 | [test_reports.py](relatra/test_reports.py)、[周期报告样例](relatra/examples/README.md) | 重点正文与完整明细、日周月归纳、锚点、资源覆盖及可复现样例 |
